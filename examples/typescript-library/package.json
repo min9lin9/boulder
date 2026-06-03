@@ -1,0 +1,8 @@
+{
+  "name": "boulder-typescript-example",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "bun test",
+    "build": "bun build src/index.ts --outdir dist"
+  }
+}

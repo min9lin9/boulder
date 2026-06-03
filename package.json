@@ -1,0 +1,38 @@
+{
+  "name": "boulder-oss-cli",
+  "version": "0.1.0",
+  "description": "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "boulder": "./bin/boulder.ts",
+    "boulder-oss-cli": "./bin/boulder.ts"
+  },
+  "scripts": {
+    "boulder": "bun bin/boulder.ts",
+    "smoke": "bun bin/boulder.ts --help && bun test",
+    "test": "bun test"
+  },
+  "keywords": [
+    "codex",
+    "oss",
+    "maintainer",
+    "agent",
+    "cli",
+    "workflow",
+    "verification"
+  ],
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "ROADMAP.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "bun": ">=1.3.0"
+  }
+}
