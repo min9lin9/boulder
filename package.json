@@ -1,6 +1,6 @@
 {
   "name": "boulder-oss-cli",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
   "type": "module",
   "license": "MIT",
@@ -28,7 +28,10 @@
   "files": [
     "bin",
     "src",
+    "docs",
+    "fixtures",
     "README.md",
+    "boulder.yaml",
     "LICENSE",
     "CHANGELOG.md",
     "ROADMAP.md",

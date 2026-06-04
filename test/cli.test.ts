@@ -5,7 +5,8 @@ import { describe, expect, test } from "bun:test";
 import { exists } from "../src/fs";
 import { exportHarness } from "../src/export";
 import { inspectRepo } from "../src/inspect";
-import { defaultManifest } from "../src/manifest";
+import { defaultManifest, loadManifest } from "../src/manifest";
+import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
 import { initHarness } from "../src/workflows";
 import { verifyHarness } from "../src/verify";
@@ -21,6 +22,7 @@ describe("boulder M1 surface", () => {
     expect(results.some((line) => line.includes("boulder.yaml"))).toBe(true);
     expect(await exists(join(root, "BOULDER.md"))).toBe(true);
     expect(await exists(join(root, "docs", "REPO_BRIEF.md"))).toBe(true);
+    expect(await exists(join(root, "docs", "HARNESS_QUALITY_SCORECARD.md"))).toBe(true);
     const boulder = await readFile(join(root, "BOULDER.md"), "utf8");
     expect(boulder).toContain("## Operator Contract");
     expect(boulder).toContain("Record command evidence before claims.");
@@ -107,6 +109,55 @@ describe("boulder M1 surface", () => {
     const results = await exportHarness(root, true);
     expect(results.some((line) => line.includes("CODEX_WORKFLOW_NOTES.md"))).toBe(true);
     expect(await exists(join(root, "docs", "BOULDER_EXPORT.md"))).toBe(true);
+  });
+});
+
+describe("provider policy fixtures", () => {
+  const cases: readonly [string, boolean][] = [
+    ["codex-only", false],
+    ["external-approved", false],
+    ["external-without-approval", true]
+  ];
+
+  for (const [name, shouldError] of cases) {
+    test(`${name} fixture validates as expected`, async () => {
+      const root = join(import.meta.dir, "..", "fixtures", "provider-policies", name);
+      const manifest = await loadManifest(root);
+      const issues = validateManifest(manifest);
+      const hasProviderError = issues.some((item) => item.path === "providers.approvalRequired" && item.severity === "error");
+      expect(hasProviderError).toBe(shouldError);
+    });
+  }
+});
+
+describe("harness quality scorecard", () => {
+  test("scores the root Boulder harness as ready", async () => {
+    const root = join(import.meta.dir, "..");
+    const manifest = await loadManifest(root);
+    const scorecard = scoreManifest(manifest);
+    expect(scorecard.score).toBe(100);
+    expect(scorecard.rating).toBe("ready");
+  });
+
+  test("scores an approval-gated harness as ready", () => {
+    const manifest = defaultManifest("fixture");
+    manifest.verification = [{ name: "smoke", command: "bun test", required: true }];
+    const scorecard = scoreManifest(manifest);
+    expect(scorecard.score).toBeGreaterThan(84);
+    expect(scorecard.rating).toBe("ready");
+    expect(scorecard.criteria.some((item) => item.id === "provider-policy" && item.status === "pass")).toBe(true);
+  });
+
+  test("penalizes unsafe external provider policy", () => {
+    const manifest = defaultManifest("fixture");
+    manifest.providers.externalAllowed = true;
+    manifest.providers.approvalRequired = false;
+    manifest.verification = [{ name: "smoke", command: "bun test", required: true }];
+    const scorecard = scoreManifest(manifest);
+    const markdown = scorecardToMarkdown(scorecard);
+    expect(scorecard.rating).toBe("needs-work");
+    expect(markdown).toContain("provider-policy");
+    expect(markdown).toContain("fail");
   });
 });
 

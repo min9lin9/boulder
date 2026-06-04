@@ -8,7 +8,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 - Package distribution name: `boulder-oss-cli`
 - License: MIT
 - Runtime: Bun + TypeScript
-- Current release: `v0.1.3`
+- Current release: `v0.1.4`
 
 ## M1 Surface
 
@@ -19,6 +19,7 @@ boulder init
 boulder inspect
 boulder validate
 boulder verify --dry-run
+boulder scorecard
 boulder export
 ```
 
@@ -30,6 +31,7 @@ These commands generate and maintain:
 - `docs/MAINTAINER_WORKFLOWS.md`
 - `docs/VERIFICATION_GATES.md`
 - `docs/PROVIDER_POLICY.md`
+- `docs/HARNESS_QUALITY_SCORECARD.md`
 - `docs/BOULDER_EXPORT.md`
 - `docs/CODEX_WORKFLOW_NOTES.md`
 
@@ -67,6 +69,7 @@ The current test suite covers:
 - `inspect` returns a repo brief shape
 - `validate` catches unsafe provider policies
 - `verify` supports dry run
+- `scorecard` rates harness quality across context, verification, provider policy, export, and review boundaries
 - `export` writes Codex workflow notes
 - checked-in TypeScript, Python, and MCP-shaped example harnesses
 
@@ -84,7 +87,6 @@ External projects and catalogs can be referenced with attribution, but their ado
 
 ## Next Evidence Targets
 
-- Expand provider-aware policy fixtures.
+- Add small benchmark fixture definitions without claiming leaderboard performance.
 - Improve Codex subagent workflow notes and attribution-safe catalog references.
-- Add repeatable harness quality scorecard fixtures.
 - Add release packaging automation once the manual release path has enough evidence.

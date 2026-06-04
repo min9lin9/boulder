@@ -3,6 +3,7 @@ import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
+import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
@@ -14,7 +15,7 @@ type CliOptions = {
   json: boolean;
 };
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.4";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -62,6 +63,18 @@ export async function main(args: string[]): Promise<void> {
     }
     return;
   }
+  if (command === "scorecard") {
+    const manifest = await loadManifest(options.cwd);
+    const scorecard = scoreManifest(manifest);
+    if (options.json) {
+      console.log(JSON.stringify(scorecard, null, 2));
+      return;
+    }
+    const markdown = scorecardToMarkdown(scorecard);
+    await writeText(resolve(options.cwd, "docs", "HARNESS_QUALITY_SCORECARD.md"), markdown, true);
+    console.log(markdown);
+    return;
+  }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
     printLines("Boulder export complete", results);
@@ -94,6 +107,7 @@ function printHelp(): void {
     "  boulder inspect [--cwd path] [--json]",
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
+    "  boulder scorecard [--cwd path] [--json]",
     "  boulder export [--cwd path] [--force]",
     "",
     "Package:",
