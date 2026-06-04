@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Added a GitHub Actions CI gate for smoke, build, and package dry-run checks.
+- Added package scripts for local CI parity and package distribution validation.
+
 ## 0.1.2
 
 - Added generated example harness outputs for TypeScript, Python, and MCP-shaped repositories.
