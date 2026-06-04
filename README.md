@@ -35,6 +35,7 @@ boulder inspect
 boulder validate
 boulder verify --dry-run
 boulder scorecard
+boulder benchmark
 boulder export
 ```
 
@@ -46,6 +47,7 @@ bun run boulder -- inspect
 bun run boulder -- validate
 bun run boulder -- verify --dry-run
 bun run boulder -- scorecard
+bun run boulder -- benchmark
 bun run boulder -- export
 ```
 
@@ -87,6 +89,14 @@ boulder scorecard
 
 `scorecard` rates a harness across context contract, verification gates, provider policy, export readiness, and review boundaries.
 
+## Benchmark Fixtures
+
+```bash
+boulder benchmark
+```
+
+`benchmark` checks deterministic fixture definitions for TypeScript library, Python package, and MCP-shaped maintainer workflows. It is not a runtime speed benchmark, model benchmark, or leaderboard claim.
+
 ## Why This Exists
 
 Codex can help with issue triage, PR review, release planning, and safer agent-assisted maintenance. But every repository needs explicit context, workflow boundaries, verification commands, and review discipline before agents can be useful.
@@ -97,18 +107,20 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 
 - Not a full swarm runtime.
 - Not a benchmark leaderboard.
+- Not a runtime speed benchmark.
 - Not a replacement for local verification.
 - Not an integration claim for external OSS projects.
 - Not a tool for scanning repositories you do not own or administer.
 
 ## Status
 
-`v0.1.4`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, `scorecard`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
+`v0.1.5`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, `scorecard`, `benchmark`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
 
 ## Public Evidence
 
-- Release: `v0.1.4`
+- Release: `v0.1.5`
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Evidence notes: [`docs/APPLICATION_EVIDENCE.md`](docs/APPLICATION_EVIDENCE.md)
+- Benchmark fixture report: [`docs/BENCHMARK_FIXTURE_REPORT.md`](docs/BENCHMARK_FIXTURE_REPORT.md)
 - Verification gate: [`docs/VERIFICATION_GATES.md`](docs/VERIFICATION_GATES.md)
 - Provider policy: [`docs/PROVIDER_POLICY.md`](docs/PROVIDER_POLICY.md)

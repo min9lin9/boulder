@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+- Added `boulder benchmark` for deterministic benchmark fixture reports without runtime or leaderboard claims.
+- Added benchmark fixtures for TypeScript library, Python package, and MCP-shaped maintainer workflows.
+- Added final submission evidence polish for the Codex for OSS application baseline.
+
 ## 0.1.4
 
 - Added `boulder scorecard` for deterministic harness quality scoring.

@@ -1,0 +1,27 @@
+{
+  "id": "python-package",
+  "name": "Python package harness fixture",
+  "repositoryShape": "python-package",
+  "description": "Checks whether Boulder fixture expectations cover a small Python package maintainer workflow.",
+  "expectedOutputs": [
+    "BOULDER.md",
+    "boulder.yaml",
+    "docs/REPO_BRIEF.md",
+    "docs/CODEX_WORKFLOW_NOTES.md",
+    "docs/VERIFICATION_GATES.md",
+    "docs/PROVIDER_POLICY.md"
+  ],
+  "expectedVerification": [
+    "python -m pip check"
+  ],
+  "requiredBoundaries": [
+    "provider-approval",
+    "local-verification",
+    "secret-exclusion"
+  ],
+  "disallowedClaims": [
+    "benchmark-leadership",
+    "runtime-speed",
+    "model-quality-comparison"
+  ]
+}

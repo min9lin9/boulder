@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { exists } from "../src/fs";
+import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "../src/benchmark";
 import { exportHarness } from "../src/export";
 import { inspectRepo } from "../src/inspect";
 import { defaultManifest, loadManifest } from "../src/manifest";
@@ -158,6 +159,26 @@ describe("harness quality scorecard", () => {
     expect(scorecard.rating).toBe("needs-work");
     expect(markdown).toContain("provider-policy");
     expect(markdown).toContain("fail");
+  });
+});
+
+describe("benchmark fixtures", () => {
+  test("loads root benchmark fixtures and rates them ready", async () => {
+    const root = join(import.meta.dir, "..");
+    const fixtures = await loadBenchmarkFixtures(root);
+    const report = evaluateBenchmarkFixtures(fixtures);
+    expect(fixtures.length).toBe(3);
+    expect(report.readyCount).toBe(3);
+    expect(report.results.every((item) => item.rating === "ready")).toBe(true);
+  });
+
+  test("benchmark report avoids runtime leaderboard claims", async () => {
+    const root = join(import.meta.dir, "..");
+    const fixtures = await loadBenchmarkFixtures(root);
+    const report = evaluateBenchmarkFixtures(fixtures);
+    const markdown = benchmarkReportToMarkdown(report);
+    expect(markdown).toContain("not a runtime speed benchmark");
+    expect(markdown).toContain("benchmark-leadership");
   });
 });
 
