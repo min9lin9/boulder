@@ -76,11 +76,11 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 
 ## Status
 
-`v0.1.0`. M1 includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `verify`, and `export`.
+`v0.1.1`. M1 includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, and `export`.
 
 ## Public Evidence
 
-- Release: `v0.1.0`
+- Release: `v0.1.1`
 - Evidence notes: [`docs/APPLICATION_EVIDENCE.md`](docs/APPLICATION_EVIDENCE.md)
 - Verification gate: [`docs/VERIFICATION_GATES.md`](docs/VERIFICATION_GATES.md)
 - Provider policy: [`docs/PROVIDER_POLICY.md`](docs/PROVIDER_POLICY.md)
