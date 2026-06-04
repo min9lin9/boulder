@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+- Added `boulder release-plan` for release-facing evidence checks.
+- Added `docs/RELEASE_PLAN.md` with manual publish boundaries.
+- Finalized submission evidence while keeping npm publication manual.
+
 ## 0.1.5
 
 - Added `boulder benchmark` for deterministic benchmark fixture reports without runtime or leaderboard claims.

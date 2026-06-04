@@ -7,6 +7,7 @@ import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixt
 import { exportHarness } from "../src/export";
 import { inspectRepo } from "../src/inspect";
 import { defaultManifest, loadManifest } from "../src/manifest";
+import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
 import { initHarness } from "../src/workflows";
@@ -179,6 +180,23 @@ describe("benchmark fixtures", () => {
     const markdown = benchmarkReportToMarkdown(report);
     expect(markdown).toContain("not a runtime speed benchmark");
     expect(markdown).toContain("benchmark-leadership");
+  });
+});
+
+describe("release plan", () => {
+  test("rates the root release plan as ready", async () => {
+    const root = join(import.meta.dir, "..");
+    const plan = await evaluateReleasePlan(root);
+    expect(plan.status).toBe("ready");
+    expect(plan.checks.every((item) => item.status === "pass")).toBe(true);
+  });
+
+  test("release plan report keeps publish manual", async () => {
+    const root = join(import.meta.dir, "..");
+    const plan = await evaluateReleasePlan(root);
+    const markdown = releasePlanToMarkdown(plan);
+    expect(markdown).toContain("Publishing remains manual");
+    expect(markdown).toContain("npm publish is not automated");
   });
 });
 
