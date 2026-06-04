@@ -7,6 +7,10 @@ declare const process: {
   exitCode?: number;
 };
 
+interface ImportMeta {
+  dir: string;
+}
+
 declare module "node:child_process" {
   export function exec(command: string, options: { cwd?: string; timeout?: number }, callback: (error: Error | null, stdout: string, stderr: string) => void): void;
 }

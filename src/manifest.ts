@@ -1,5 +1,5 @@
 import { at, readText, writeText } from "./fs";
-import type { BoulderManifest, VerificationCommand } from "./types";
+import type { BoulderManifest, RepoInspection, VerificationCommand } from "./types";
 
 export const MANIFEST_FILE = "boulder.yaml";
 
@@ -67,6 +67,21 @@ export function manifestToYaml(manifest: BoulderManifest): string {
 export async function writeDefaultManifest(root: string, force = false): Promise<"created" | "skipped"> {
   const name = root.split(/[\\/]/).filter(Boolean).at(-1) ?? "oss-repository";
   return await writeText(at(root, MANIFEST_FILE), manifestToYaml(defaultManifest(name)), force);
+}
+
+export async function writeManifest(root: string, manifest: BoulderManifest, force = false): Promise<"created" | "skipped"> {
+  return await writeText(at(root, MANIFEST_FILE), manifestToYaml(manifest), force);
+}
+
+export function manifestFromInspection(inspection: RepoInspection): BoulderManifest {
+  const manifest = defaultManifest(inspection.name);
+  return {
+    ...manifest,
+    description: `Codex-ready OSS maintainer harness for ${inspection.name}.`,
+    workflows: inspection.recommendedWorkflows,
+    protectedPaths: inspection.protectedPaths,
+    verification: inspection.likelyVerification
+  };
 }
 
 export async function loadManifest(root: string): Promise<BoulderManifest> {

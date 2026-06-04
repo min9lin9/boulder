@@ -52,6 +52,16 @@ bun run boulder -- export
 - `docs/BOULDER_EXPORT.md` - exported maintainer context
 - `docs/CODEX_WORKFLOW_NOTES.md` - Codex-ready notes
 
+## Examples
+
+Generated harness examples are checked into `examples/` so reviewers can inspect Boulder output without running the CLI first.
+
+- [`examples/typescript-library`](examples/typescript-library) - package scripts mapped to `bun run test` and `bun run build`
+- [`examples/python-package`](examples/python-package) - Python package metadata with local package verification
+- [`examples/mcp-server`](examples/mcp-server) - MCP-shaped TypeScript package with test and typecheck commands
+
+Each example includes `BOULDER.md`, `boulder.yaml`, a repo brief, verification report, provider policy, and Codex workflow notes.
+
 ## Manifest Validation
 
 ```bash
