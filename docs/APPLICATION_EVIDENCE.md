@@ -17,6 +17,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 ```bash
 boulder init
 boulder inspect
+boulder validate
 boulder verify --dry-run
 boulder export
 ```
@@ -63,6 +64,7 @@ The current test suite covers:
 
 - `init` creates harness files
 - `inspect` returns a repo brief shape
+- `validate` catches unsafe provider policies
 - `verify` supports dry run
 - `export` writes Codex workflow notes
 
