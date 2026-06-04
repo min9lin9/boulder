@@ -2,6 +2,8 @@ import { resolve } from "node:path";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
+import { loadManifest } from "./manifest";
+import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
 
@@ -51,6 +53,15 @@ export async function main(args: string[]): Promise<void> {
     }
     return;
   }
+  if (command === "validate") {
+    const manifest = await loadManifest(options.cwd);
+    const issues = validateManifest(manifest);
+    console.log(formatManifestIssues(issues));
+    if (hasManifestErrors(issues)) {
+      process.exitCode = 1;
+    }
+    return;
+  }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
     printLines("Boulder export complete", results);
@@ -81,6 +92,7 @@ function printHelp(): void {
     "Usage:",
     "  boulder init [--cwd path] [--force]",
     "  boulder inspect [--cwd path] [--json]",
+    "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder export [--cwd path] [--force]",
     "",

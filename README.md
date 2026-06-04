@@ -26,6 +26,7 @@ bun run boulder -- --help
 ```bash
 boulder init
 boulder inspect
+boulder validate
 boulder verify --dry-run
 boulder export
 ```
@@ -35,6 +36,7 @@ With Bun before package publication:
 ```bash
 bun run boulder -- init
 bun run boulder -- inspect
+bun run boulder -- validate
 bun run boulder -- verify --dry-run
 bun run boulder -- export
 ```
@@ -49,6 +51,14 @@ bun run boulder -- export
 - `docs/PROVIDER_POLICY.md` - provider-aware execution boundaries
 - `docs/BOULDER_EXPORT.md` - exported maintainer context
 - `docs/CODEX_WORKFLOW_NOTES.md` - Codex-ready notes
+
+## Manifest Validation
+
+```bash
+boulder validate
+```
+
+`validate` checks that `boulder.yaml` has maintainers, workflows, protected paths, verification commands, and approval gating when external providers are enabled.
 
 ## Why This Exists
 

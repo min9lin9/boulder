@@ -1,9 +1,14 @@
 import { exec } from "node:child_process";
 import { loadManifest } from "./manifest";
 import type { VerifyResult } from "./types";
+import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 
 export async function verifyHarness(root: string, dryRun: boolean): Promise<VerifyResult[]> {
   const manifest = await loadManifest(root);
+  const issues = validateManifest(manifest);
+  if (hasManifestErrors(issues)) {
+    throw new Error(formatManifestIssues(issues));
+  }
   const results: VerifyResult[] = [];
   for (const item of manifest.verification) {
     if (dryRun) {
