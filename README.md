@@ -21,6 +21,12 @@ bun install
 bun run boulder -- --help
 ```
 
+CI parity:
+
+```bash
+bun run ci
+```
+
 ## Commands
 
 ```bash
@@ -86,11 +92,12 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 
 ## Status
 
-`v0.1.2`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, and `export`, plus generated example harnesses for representative repo shapes.
+`v0.1.3`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
 
 ## Public Evidence
 
-- Release: `v0.1.2`
+- Release: `v0.1.3`
+- CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Evidence notes: [`docs/APPLICATION_EVIDENCE.md`](docs/APPLICATION_EVIDENCE.md)
 - Verification gate: [`docs/VERIFICATION_GATES.md`](docs/VERIFICATION_GATES.md)
 - Provider policy: [`docs/PROVIDER_POLICY.md`](docs/PROVIDER_POLICY.md)
