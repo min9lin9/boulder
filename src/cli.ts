@@ -4,6 +4,7 @@ import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
+import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
@@ -16,7 +17,7 @@ type CliOptions = {
   json: boolean;
 };
 
-const VERSION = "0.1.5";
+const VERSION = "0.1.6";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -88,6 +89,17 @@ export async function main(args: string[]): Promise<void> {
     console.log(markdown);
     return;
   }
+  if (command === "release-plan") {
+    const plan = await evaluateReleasePlan(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(plan, null, 2));
+      return;
+    }
+    const markdown = releasePlanToMarkdown(plan);
+    await writeText(resolve(options.cwd, "docs", "RELEASE_PLAN.md"), markdown, true);
+    console.log(markdown);
+    return;
+  }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
     printLines("Boulder export complete", results);
@@ -122,6 +134,7 @@ function printHelp(): void {
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
+    "  boulder release-plan [--cwd path] [--json]",
     "  boulder export [--cwd path] [--force]",
     "",
     "Package:",
