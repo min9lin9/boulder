@@ -1,0 +1,28 @@
+{
+  "id": "typescript-library",
+  "name": "TypeScript library harness fixture",
+  "repositoryShape": "typescript-library",
+  "description": "Checks whether Boulder fixture expectations cover a small TypeScript library maintainer workflow.",
+  "expectedOutputs": [
+    "BOULDER.md",
+    "boulder.yaml",
+    "docs/REPO_BRIEF.md",
+    "docs/CODEX_WORKFLOW_NOTES.md",
+    "docs/VERIFICATION_GATES.md",
+    "docs/PROVIDER_POLICY.md"
+  ],
+  "expectedVerification": [
+    "bun run test",
+    "bun run build"
+  ],
+  "requiredBoundaries": [
+    "provider-approval",
+    "local-verification",
+    "secret-exclusion"
+  ],
+  "disallowedClaims": [
+    "benchmark-leadership",
+    "runtime-speed",
+    "model-quality-comparison"
+  ]
+}

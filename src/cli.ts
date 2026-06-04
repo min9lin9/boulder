@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
@@ -15,7 +16,7 @@ type CliOptions = {
   json: boolean;
 };
 
-const VERSION = "0.1.4";
+const VERSION = "0.1.5";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -75,6 +76,18 @@ export async function main(args: string[]): Promise<void> {
     console.log(markdown);
     return;
   }
+  if (command === "benchmark") {
+    const fixtures = await loadBenchmarkFixtures(options.cwd);
+    const report = evaluateBenchmarkFixtures(fixtures);
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    const markdown = benchmarkReportToMarkdown(report);
+    await writeText(resolve(options.cwd, "docs", "BENCHMARK_FIXTURE_REPORT.md"), markdown, true);
+    console.log(markdown);
+    return;
+  }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
     printLines("Boulder export complete", results);
@@ -108,6 +121,7 @@ function printHelp(): void {
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder scorecard [--cwd path] [--json]",
+    "  boulder benchmark [--cwd path] [--json]",
     "  boulder export [--cwd path] [--force]",
     "",
     "Package:",
