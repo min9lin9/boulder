@@ -34,6 +34,7 @@ boulder init
 boulder inspect
 boulder validate
 boulder verify --dry-run
+boulder scorecard
 boulder export
 ```
 
@@ -44,6 +45,7 @@ bun run boulder -- init
 bun run boulder -- inspect
 bun run boulder -- validate
 bun run boulder -- verify --dry-run
+bun run boulder -- scorecard
 bun run boulder -- export
 ```
 
@@ -55,6 +57,7 @@ bun run boulder -- export
 - `docs/MAINTAINER_WORKFLOWS.md` - issue/PR/release workflows
 - `docs/VERIFICATION_GATES.md` - evidence and verification rules
 - `docs/PROVIDER_POLICY.md` - provider-aware execution boundaries
+- `docs/HARNESS_QUALITY_SCORECARD.md` - deterministic harness readiness scorecard
 - `docs/BOULDER_EXPORT.md` - exported maintainer context
 - `docs/CODEX_WORKFLOW_NOTES.md` - Codex-ready notes
 
@@ -76,6 +79,14 @@ boulder validate
 
 `validate` checks that `boulder.yaml` has maintainers, workflows, protected paths, verification commands, and approval gating when external providers are enabled.
 
+## Harness Scorecard
+
+```bash
+boulder scorecard
+```
+
+`scorecard` rates a harness across context contract, verification gates, provider policy, export readiness, and review boundaries.
+
 ## Why This Exists
 
 Codex can help with issue triage, PR review, release planning, and safer agent-assisted maintenance. But every repository needs explicit context, workflow boundaries, verification commands, and review discipline before agents can be useful.
@@ -92,11 +103,11 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 
 ## Status
 
-`v0.1.3`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
+`v0.1.4`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, `scorecard`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
 
 ## Public Evidence
 
-- Release: `v0.1.3`
+- Release: `v0.1.4`
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Evidence notes: [`docs/APPLICATION_EVIDENCE.md`](docs/APPLICATION_EVIDENCE.md)
 - Verification gate: [`docs/VERIFICATION_GATES.md`](docs/VERIFICATION_GATES.md)

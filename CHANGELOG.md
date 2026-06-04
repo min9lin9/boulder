@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- Added `boulder scorecard` for deterministic harness quality scoring.
+- Added provider policy fixtures for Codex-only, approval-gated external, and unsafe external provider configurations.
+- Added generated scorecard output during `boulder init`.
+
 ## 0.1.3
 
 - Added a GitHub Actions CI gate for smoke, build, and package dry-run checks.

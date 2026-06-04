@@ -1,0 +1,27 @@
+name: boulder
+description: Codex-ready OSS maintainer harness for Boulder.
+maintainers:
+  - min9lin9
+workflows:
+  - issue-triage
+  - pr-review-prep
+  - release-planning
+  - dependency-review
+  - verification-gate
+protectedPaths:
+  - .env*
+  - secrets/**
+  - vendor/**
+  - node_modules/**
+  - dist/**
+verification:
+  - name: ci
+    command: bun run ci
+    required: true
+providers:
+  default: codex
+  externalAllowed: false
+  approvalRequired: true
+export:
+  markdown: true
+  codexNotes: true

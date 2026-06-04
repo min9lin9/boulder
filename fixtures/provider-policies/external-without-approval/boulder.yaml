@@ -1,0 +1,22 @@
+name: external-without-approval
+description: Unsafe external provider policy fixture.
+maintainers:
+  - min9lin9
+workflows:
+  - issue-triage
+  - pr-review-prep
+protectedPaths:
+  - .env*
+  - secrets/**
+  - vendor/**
+verification:
+  - name: smoke
+    command: bun test
+    required: true
+providers:
+  default: codex
+  externalAllowed: true
+  approvalRequired: false
+export:
+  markdown: true
+  codexNotes: true
