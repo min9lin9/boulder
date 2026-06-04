@@ -82,7 +82,7 @@ External projects and catalogs can be referenced with attribution, but their ado
 
 ## Next Evidence Targets
 
-- Generate complete harness outputs for TypeScript, Python, and MCP example repos.
+- Expand complete harness outputs for TypeScript, Python, and MCP example repos.
 - Expand provider-aware policy fixtures.
 - Improve Codex subagent workflow notes and attribution-safe catalog references.
 - Add repeatable harness quality scorecard fixtures.

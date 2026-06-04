@@ -1,0 +1,38 @@
+# Boulder Repo Brief: boulder-typescript-example
+
+## Detected Surface
+
+- README: yes
+- package.json: yes
+- pyproject.toml: no
+- tests: none detected
+- docs: none detected
+- CI/config signals: none detected
+
+## Likely Verification Commands
+
+- test: `bun run test` (required)
+- build: `bun run build`
+
+## Recommended Maintainer Workflows
+
+- issue-triage
+- pr-review-prep
+- release-planning
+- verification-gate
+- dependency-review
+
+## Protected Paths
+
+- .env*
+- secrets/**
+- vendor/**
+- node_modules/**
+- dist/**
+- coverage/**
+
+## Unresolved Risks
+
+- No test directory detected; verification may rely on manual smoke.
+- No docs directory detected; maintainer workflow docs may need to be generated.
+- No CI/config signals detected; release verification may be local-only.

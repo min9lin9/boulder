@@ -34,6 +34,23 @@ describe("boulder M1 surface", () => {
     expect(inspection.recommendedWorkflows).toContain("pr-review-prep");
   });
 
+  test("init writes inferred package verification commands", async () => {
+    const root = await tempRepo();
+    await writeFile(join(root, "package.json"), JSON.stringify({
+      name: "fixture-package",
+      scripts: {
+        test: "bun test",
+        build: "bun build src/index.ts"
+      }
+    }, null, 2), "utf8");
+    await initHarness(root);
+    const manifest = await readFile(join(root, "boulder.yaml"), "utf8");
+    expect(manifest).toContain("name: test");
+    expect(manifest).toContain("command: bun run test");
+    expect(manifest).toContain("name: build");
+    expect(manifest).toContain("command: bun run build");
+  });
+
   test("verify supports dry run", async () => {
     const root = await tempRepo();
     await initHarness(root);
@@ -91,4 +108,25 @@ describe("boulder M1 surface", () => {
     expect(results.some((line) => line.includes("CODEX_WORKFLOW_NOTES.md"))).toBe(true);
     expect(await exists(join(root, "docs", "BOULDER_EXPORT.md"))).toBe(true);
   });
+});
+
+describe("checked-in example harnesses", () => {
+  const examples = [
+    ["typescript-library", "bun run test"],
+    ["python-package", "python -m pip check"],
+    ["mcp-server", "bun run typecheck"]
+  ];
+
+  for (const [name, command] of examples) {
+    test(`${name} has generated Boulder outputs`, async () => {
+      const root = join(import.meta.dir, "..", "examples", name);
+      expect(await exists(join(root, "BOULDER.md"))).toBe(true);
+      expect(await exists(join(root, "boulder.yaml"))).toBe(true);
+      expect(await exists(join(root, "docs", "REPO_BRIEF.md"))).toBe(true);
+      expect(await exists(join(root, "docs", "VERIFICATION_REPORT.md"))).toBe(true);
+      expect(await exists(join(root, "docs", "CODEX_WORKFLOW_NOTES.md"))).toBe(true);
+      const manifest = await readFile(join(root, "boulder.yaml"), "utf8");
+      expect(manifest).toContain(command);
+    });
+  }
 });
