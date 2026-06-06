@@ -24,10 +24,15 @@ describe("boulder M1 surface", () => {
     expect(results.some((line) => line.includes("boulder.yaml"))).toBe(true);
     expect(await exists(join(root, "BOULDER.md"))).toBe(true);
     expect(await exists(join(root, "docs", "REPO_BRIEF.md"))).toBe(true);
+    expect(await exists(join(root, "docs", "OPERATOR_WORKFLOW_STACK.md"))).toBe(true);
     expect(await exists(join(root, "docs", "HARNESS_QUALITY_SCORECARD.md"))).toBe(true);
     const boulder = await readFile(join(root, "BOULDER.md"), "utf8");
     expect(boulder).toContain("## Operator Contract");
     expect(boulder).toContain("Record command evidence before claims.");
+    const stack = await readFile(join(root, "docs", "OPERATOR_WORKFLOW_STACK.md"), "utf8");
+    expect(stack).toContain("Superpowers");
+    expect(stack).toContain("GStack");
+    expect(stack).toContain("Compound");
   });
 
   test("inspect returns a repo brief shape", async () => {
@@ -71,6 +76,13 @@ describe("boulder M1 surface", () => {
     expect(issues.map((item) => item.path)).toContain("providers.approvalRequired");
   });
 
+  test("manifest validation requires the har-maker operator stack", () => {
+    const manifest = defaultManifest("fixture");
+    manifest.workflowStack = manifest.workflowStack.filter((item) => item.name !== "gstack");
+    const issues = validateManifest(manifest);
+    expect(issues.some((item) => item.path === "workflowStack" && item.severity === "error")).toBe(true);
+  });
+
   test("verify rejects invalid manifests", async () => {
     const root = await tempRepo();
     await initHarness(root);
@@ -111,6 +123,10 @@ describe("boulder M1 surface", () => {
     const results = await exportHarness(root, true);
     expect(results.some((line) => line.includes("CODEX_WORKFLOW_NOTES.md"))).toBe(true);
     expect(await exists(join(root, "docs", "BOULDER_EXPORT.md"))).toBe(true);
+    const notes = await readFile(join(root, "docs", "CODEX_WORKFLOW_NOTES.md"), "utf8");
+    expect(notes).toContain("Superpowers spine");
+    expect(notes).toContain("GStack gates");
+    expect(notes).toContain("Compound learning layer");
   });
 });
 
@@ -139,6 +155,7 @@ describe("harness quality scorecard", () => {
     const scorecard = scoreManifest(manifest);
     expect(scorecard.score).toBe(100);
     expect(scorecard.rating).toBe("ready");
+    expect(scorecard.criteria.some((item) => item.id === "operator-workflow-stack" && item.status === "pass")).toBe(true);
   });
 
   test("scores an approval-gated harness as ready", () => {
@@ -213,10 +230,15 @@ describe("checked-in example harnesses", () => {
       expect(await exists(join(root, "BOULDER.md"))).toBe(true);
       expect(await exists(join(root, "boulder.yaml"))).toBe(true);
       expect(await exists(join(root, "docs", "REPO_BRIEF.md"))).toBe(true);
+      expect(await exists(join(root, "docs", "OPERATOR_WORKFLOW_STACK.md"))).toBe(true);
       expect(await exists(join(root, "docs", "VERIFICATION_REPORT.md"))).toBe(true);
       expect(await exists(join(root, "docs", "CODEX_WORKFLOW_NOTES.md"))).toBe(true);
       const manifest = await readFile(join(root, "boulder.yaml"), "utf8");
       expect(manifest).toContain(command);
+      expect(manifest).toContain("workflowStack:");
+      expect(manifest).toContain("name: superpowers");
+      expect(manifest).toContain("name: gstack");
+      expect(manifest).toContain("name: compound");
     });
   }
 });

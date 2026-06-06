@@ -2,6 +2,19 @@ name: external-approved
 description: External provider policy fixture with approval gating.
 maintainers:
   - min9lin9
+workflowStack:
+  - name: superpowers
+    role: workflow-spine
+    required: true
+    description: Drives brainstorming, planning, implementation, debugging, review, and verification discipline.
+  - name: gstack
+    role: review-gate
+    required: true
+    description: Adds CSO, QA, executive, and office-hours review gates before risky implementation or release decisions.
+  - name: compound
+    role: learning-layer
+    required: true
+    description: Captures reusable decisions, repeated failure modes, and durable workflow improvements after each cycle.
 workflows:
   - issue-triage
   - pr-review-prep

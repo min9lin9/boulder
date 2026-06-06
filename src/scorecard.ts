@@ -1,4 +1,5 @@
 import type { BoulderManifest } from "./types";
+import { missingWorkflowStackComponents, workflowStackRolesMatch } from "./workflow-stack";
 
 export type ScorecardStatus = "pass" | "partial" | "fail";
 
@@ -21,6 +22,7 @@ export type HarnessScorecard = {
 export function scoreManifest(manifest: BoulderManifest): HarnessScorecard {
   const criteria = [
     contextContract(manifest),
+    operatorWorkflowStack(manifest),
     verificationGates(manifest),
     providerPolicy(manifest),
     exportReadiness(manifest),
@@ -67,9 +69,39 @@ function contextContract(manifest: BoulderManifest): ScorecardCriterion {
   return criterion({
     id: "context-contract",
     label: "Maintainer context contract",
-    weight: 20,
+    weight: 15,
     status: hasContract ? "pass" : "fail",
     evidence: hasContract ? "name, description, maintainers, workflows, and protected paths are present" : "required context fields are missing"
+  });
+}
+
+function operatorWorkflowStack(manifest: BoulderManifest): ScorecardCriterion {
+  const missing = missingWorkflowStackComponents(manifest.workflowStack);
+  const rolesMatch = workflowStackRolesMatch(manifest.workflowStack);
+  if (!missing.length && rolesMatch) {
+    return criterion({
+      id: "operator-workflow-stack",
+      label: "Operator workflow stack",
+      weight: 20,
+      status: "pass",
+      evidence: "Superpowers workflow spine, GStack review gates, and Compound learning layer are required"
+    });
+  }
+  if (!missing.length) {
+    return criterion({
+      id: "operator-workflow-stack",
+      label: "Operator workflow stack",
+      weight: 20,
+      status: "partial",
+      evidence: "required components exist, but har-maker roles do not fully match"
+    });
+  }
+  return criterion({
+    id: "operator-workflow-stack",
+    label: "Operator workflow stack",
+    weight: 20,
+    status: "fail",
+    evidence: `missing required component(s): ${missing.join(", ")}`
   });
 }
 
@@ -79,7 +111,7 @@ function verificationGates(manifest: BoulderManifest): ScorecardCriterion {
     return criterion({
       id: "verification-gates",
       label: "Required verification gates",
-      weight: 25,
+      weight: 20,
       status: "pass",
       evidence: `${required.length} required verification command(s) configured`
     });
@@ -88,7 +120,7 @@ function verificationGates(manifest: BoulderManifest): ScorecardCriterion {
     return criterion({
       id: "verification-gates",
       label: "Required verification gates",
-      weight: 25,
+      weight: 20,
       status: "partial",
       evidence: "verification commands exist, but none are marked required"
     });
@@ -96,7 +128,7 @@ function verificationGates(manifest: BoulderManifest): ScorecardCriterion {
   return criterion({
     id: "verification-gates",
     label: "Required verification gates",
-    weight: 25,
+    weight: 20,
     status: "fail",
     evidence: "no verification commands are configured"
   });
@@ -107,7 +139,7 @@ function providerPolicy(manifest: BoulderManifest): ScorecardCriterion {
   return criterion({
     id: "provider-policy",
     label: "Provider approval policy",
-    weight: 25,
+    weight: 20,
     status: safePolicy ? "pass" : "fail",
     evidence: safePolicy ? "external providers are disabled or approval-gated" : "external providers are enabled without approval gating"
   });
@@ -118,7 +150,7 @@ function exportReadiness(manifest: BoulderManifest): ScorecardCriterion {
     return criterion({
       id: "export-readiness",
       label: "Export readiness",
-      weight: 15,
+      weight: 10,
       status: "pass",
       evidence: "Markdown export and Codex notes are enabled"
     });
@@ -127,7 +159,7 @@ function exportReadiness(manifest: BoulderManifest): ScorecardCriterion {
     return criterion({
       id: "export-readiness",
       label: "Export readiness",
-      weight: 15,
+      weight: 10,
       status: "partial",
       evidence: "one export channel is enabled"
     });
@@ -135,7 +167,7 @@ function exportReadiness(manifest: BoulderManifest): ScorecardCriterion {
   return criterion({
     id: "export-readiness",
     label: "Export readiness",
-    weight: 15,
+    weight: 10,
     status: "fail",
     evidence: "no export channel is enabled"
   });

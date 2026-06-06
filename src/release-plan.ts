@@ -23,6 +23,8 @@ export async function evaluateReleasePlan(root: string): Promise<ReleasePlan> {
     await fileCheck(root, "changelog", "CHANGELOG.md"),
     await fileCheck(root, "ci-workflow", ".github/workflows/ci.yml"),
     await fileCheck(root, "root-harness", "boulder.yaml"),
+    await fileCheck(root, "operator-workflow-stack-doc", "docs/OPERATOR_WORKFLOW_STACK.md"),
+    await workflowStackEvidenceCheck(root),
     await fileCheck(root, "application-evidence", "docs/APPLICATION_EVIDENCE.md"),
     await fileCheck(root, "scorecard-evidence", "docs/HARNESS_QUALITY_SCORECARD.md"),
     await fileCheck(root, "benchmark-evidence", "docs/BENCHMARK_FIXTURE_REPORT.md"),
@@ -91,6 +93,18 @@ async function packageScriptCheck(root: string): Promise<ReleaseCheck> {
   };
 }
 
+async function workflowStackEvidenceCheck(root: string): Promise<ReleaseCheck> {
+  const manifest = await safeRead(join(root, "boulder.yaml"));
+  const docs = await safeRead(join(root, "docs", "OPERATOR_WORKFLOW_STACK.md"));
+  const required = ["superpowers", "gstack", "compound"];
+  const missing = required.filter((item) => !manifest.toLowerCase().includes(item) || !docs.toLowerCase().includes(item));
+  return {
+    id: "operator-workflow-stack-evidence",
+    status: missing.length ? "fail" : "pass",
+    evidence: missing.length ? `missing ${missing.join(", ")} in boulder.yaml or docs/OPERATOR_WORKFLOW_STACK.md` : "Superpowers, GStack, and Compound appear in manifest and operator workflow stack docs"
+  };
+}
+
 async function versionCheck(root: string, version: string): Promise<ReleaseCheck> {
   const changelog = await readFile(join(root, "CHANGELOG.md"), "utf8");
   const readme = await readFile(join(root, "README.md"), "utf8");
@@ -103,6 +117,14 @@ async function versionCheck(root: string, version: string): Promise<ReleaseCheck
     status: missing.length ? "fail" : "pass",
     evidence: missing.length ? `version marker missing from ${missing.join(", ")}` : `v${version} appears in release-facing docs`
   };
+}
+
+async function safeRead(path: string): Promise<string> {
+  try {
+    return await readFile(path, "utf8");
+  } catch {
+    return "";
+  }
 }
 
 async function fileCheck(root: string, id: string, relativePath: string): Promise<ReleaseCheck> {

@@ -1,4 +1,5 @@
 import type { BoulderManifest } from "./types";
+import { missingWorkflowStackComponents, REQUIRED_WORKFLOW_STACK, workflowStackRolesMatch } from "./workflow-stack";
 
 export type ManifestIssue = {
   path: string;
@@ -11,6 +12,7 @@ export function validateManifest(manifest: BoulderManifest): ManifestIssue[] {
   requireText(issues, "name", manifest.name, "Manifest name is required.");
   requireText(issues, "description", manifest.description, "Manifest description is required.");
   requireList(issues, "maintainers", manifest.maintainers, "At least one maintainer is required.");
+  validateWorkflowStack(issues, manifest);
   requireList(issues, "workflows", manifest.workflows, "At least one workflow is required.");
   requireList(issues, "protectedPaths", manifest.protectedPaths, "At least one protected path is recommended.");
   if (!manifest.verification.length) {
@@ -35,6 +37,40 @@ export function validateManifest(manifest: BoulderManifest): ManifestIssue[] {
     });
   }
   return issues;
+}
+
+function validateWorkflowStack(issues: ManifestIssue[], manifest: BoulderManifest): void {
+  if (!manifest.workflowStack.length) {
+    issues.push({
+      path: "workflowStack",
+      severity: "error",
+      message: "Superpowers, GStack, and Compound must be configured as the default operator workflow stack."
+    });
+    return;
+  }
+
+  manifest.workflowStack.forEach((item, index) => {
+    requireText(issues, `workflowStack[${index}].name`, item.name, "Workflow stack component name is required.");
+    requireText(issues, `workflowStack[${index}].role`, item.role, "Workflow stack component role is required.");
+    requireText(issues, `workflowStack[${index}].description`, item.description, "Workflow stack component description is required.");
+  });
+
+  const missing = missingWorkflowStackComponents(manifest.workflowStack);
+  if (missing.length) {
+    issues.push({
+      path: "workflowStack",
+      severity: "error",
+      message: `Missing required operator workflow component(s): ${missing.join(", ")}.`
+    });
+  }
+
+  if (!workflowStackRolesMatch(manifest.workflowStack)) {
+    issues.push({
+      path: "workflowStack",
+      severity: "warning",
+      message: `Expected har-maker roles: ${REQUIRED_WORKFLOW_STACK.map((item) => `${item.name}=${item.role}`).join(", ")}.`
+    });
+  }
 }
 
 export function formatManifestIssues(issues: ManifestIssue[]): string {

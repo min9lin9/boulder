@@ -1,3 +1,5 @@
+import type { WorkflowStackComponent } from "../types";
+
 export function boulderMarkdown(name: string): string {
   return [
     "# BOULDER.md",
@@ -7,6 +9,9 @@ export function boulderMarkdown(name: string): string {
     "## Operator Contract",
     "",
     "- Define context before action.",
+    "- Use Superpowers as the workflow spine.",
+    "- Use GStack as the review gate layer before risky implementation or release decisions.",
+    "- Use Compound to capture durable workflow learnings after meaningful cycles.",
     "- Require approval before risky or write-capable execution.",
     "- Record command evidence before claims.",
     "- Run verification before completion.",
@@ -27,9 +32,46 @@ export function boulderMarkdown(name: string): string {
   ].join("\n");
 }
 
+export function operatorWorkflowStack(stack: readonly WorkflowStackComponent[]): string {
+  return [
+    "# Operator Workflow Stack",
+    "",
+    "Boulder defaults to the har-maker operator stack. These are not runtime dependencies; they are the workflow contract Codex should preserve while working on the repository.",
+    "",
+    "## Components",
+    "",
+    ...stack.flatMap((item) => [
+      `### ${item.name}`,
+      "",
+      `Role: ${item.role}`,
+      `Required: ${item.required ? "yes" : "no"}`,
+      "",
+      item.description,
+      ""
+    ]),
+    "## Operating Loop",
+    "",
+    "1. Superpowers drives brainstorming, planning, implementation, debugging, review, and verification.",
+    "2. GStack inserts CSO, QA, executive, or office-hours review gates when risk or ambiguity rises.",
+    "3. Compound records reusable decisions, repeated failure modes, and workflow improvements after the cycle.",
+    "4. Boulder keeps the public OSS surface bounded to repo context, approval gates, local verification, and evidence.",
+    "",
+    "## Boundary",
+    "",
+    "This stack should not imply autonomous durable writes. Human approval and local verification remain required before high-risk changes, releases, or external-provider usage.",
+    ""
+  ].join("\n");
+}
+
 export function maintainerWorkflows(): string {
   return [
     "# Maintainer Workflows",
+    "",
+    "## Default Operator Stack",
+    "",
+    "- Superpowers is the workflow spine for brainstorming, planning, implementation, review, and verification.",
+    "- GStack is the review gate layer for CSO, QA, executive, or office-hours checks before risky decisions.",
+    "- Compound is the learning layer for reusable decisions, repeated failure modes, and durable workflow improvements.",
     "",
     "## Issue Triage",
     "",

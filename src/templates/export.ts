@@ -1,4 +1,6 @@
-export function exportMarkdown(repoBrief: string, workflows: string[]): string {
+import type { WorkflowStackComponent } from "../types";
+
+export function exportMarkdown(repoBrief: string, workflows: string[], stack: readonly WorkflowStackComponent[]): string {
   return [
     "# Boulder Export",
     "",
@@ -10,6 +12,10 @@ export function exportMarkdown(repoBrief: string, workflows: string[]): string {
     "",
     ...workflows.map((item) => `- ${item}`),
     "",
+    "## Operator Workflow Stack",
+    "",
+    ...stack.map((item) => `- ${item.name}: ${item.role}${item.required ? " (required)" : ""}`),
+    "",
     "## Evidence Rule",
     "",
     "Before claiming completion, attach command evidence, verification status, and unresolved risks.",
@@ -17,7 +23,7 @@ export function exportMarkdown(repoBrief: string, workflows: string[]): string {
   ].join("\n");
 }
 
-export function codexNotes(workflows: string[]): string {
+export function codexNotes(workflows: string[], stack: readonly WorkflowStackComponent[]): string {
   return [
     "# Codex Workflow Notes",
     "",
@@ -26,6 +32,7 @@ export function codexNotes(workflows: string[]): string {
     "## Default Contract",
     "",
     "- Read `BOULDER.md` before write-capable work.",
+    "- Preserve the operator workflow stack: Superpowers spine, GStack gates, Compound learning layer.",
     "- Ask for approval before external provider, network-heavy, or high-risk execution.",
     "- Prefer configured verification commands.",
     "- Report unresolved risks explicitly.",
@@ -40,6 +47,10 @@ export function codexNotes(workflows: string[]): string {
     "## Enabled Workflows",
     "",
     ...workflows.map((item) => `- ${item}`),
+    "",
+    "## Operator Workflow Stack",
+    "",
+    ...stack.map((item) => `- ${item.name}: ${item.role}${item.required ? " (required)" : ""}`),
     ""
   ].join("\n");
 }

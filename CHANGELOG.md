@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7
+
+- Added the har-maker-level operator workflow stack as a default Boulder manifest contract.
+- Added Superpowers, GStack, and Compound evidence across generated docs, exports, validation, scorecard, and release-plan checks.
+- Added `docs/OPERATOR_WORKFLOW_STACK.md` and test coverage for stack validation and export notes.
+
 ## 0.1.6
 
 - Added `boulder release-plan` for release-facing evidence checks.
