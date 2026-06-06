@@ -32,7 +32,7 @@ export async function main(args: string[]): Promise<void> {
   }
   if (command === "init") {
     const results = await initHarness(options.cwd, options.force);
-    printLines("Boulder initialized", results);
+    console.log(formatLines("Boulder initialized", results));
     return;
   }
   if (command === "inspect") {
@@ -102,7 +102,7 @@ export async function main(args: string[]): Promise<void> {
   }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
-    printLines("Boulder export complete", results);
+    console.log(formatLines("Boulder export complete", results));
     return;
   }
   console.error(`Unknown command: ${command}`);
@@ -143,9 +143,6 @@ function printHelp(): void {
   ].join("\n"));
 }
 
-function printLines(title: string, lines: string[]): void {
-  console.log(title);
-  for (const line of lines) {
-    console.log(`- ${line}`);
-  }
+function formatLines(title: string, lines: readonly string[]): string {
+  return [title, ...lines.map((line) => `- ${line}`)].join("\n");
 }
