@@ -220,10 +220,6 @@ function ratingForCriteria(score: number, maxScore: number, criteria: readonly S
   if (criteria.some((item) => item.id === "provider-policy" && item.status === "fail")) {
     return "needs-work";
   }
-  return ratingForScore(score, maxScore);
-}
-
-function ratingForScore(score: number, maxScore: number): HarnessScorecard["rating"] {
   const percentage = Math.round((score / maxScore) * 100);
   if (percentage >= 85) return "ready";
   if (percentage >= 70) return "usable";
