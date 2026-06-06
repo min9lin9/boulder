@@ -49,6 +49,12 @@ This export packages repository context for Codex-ready OSS maintenance.
 - verification-gate
 - dependency-review
 
+## Operator Workflow Stack
+
+- superpowers: workflow-spine (required)
+- gstack: review-gate (required)
+- compound: learning-layer (required)
+
 ## Evidence Rule
 
 Before claiming completion, attach command evidence, verification status, and unresolved risks.

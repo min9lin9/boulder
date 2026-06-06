@@ -8,7 +8,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 - Package distribution name: `boulder-oss-cli`
 - License: MIT
 - Runtime: Bun + TypeScript
-- Current release: `v0.1.6`
+- Current release: `v0.1.7`
 
 ## M1 Surface
 
@@ -31,6 +31,7 @@ These commands generate and maintain:
 - `BOULDER.md`
 - `docs/REPO_BRIEF.md`
 - `docs/MAINTAINER_WORKFLOWS.md`
+- `docs/OPERATOR_WORKFLOW_STACK.md`
 - `docs/VERIFICATION_GATES.md`
 - `docs/PROVIDER_POLICY.md`
 - `docs/HARNESS_QUALITY_SCORECARD.md`
@@ -51,6 +52,16 @@ These commands generate and maintain:
 - provider-aware execution boundaries
 
 The core rule is simple: explicit context before action, approval before risk, evidence before claims, and verification before completion.
+
+## M7 Operator Workflow Stack
+
+`boulder` now defaults to the har-maker-level operator workflow stack:
+
+- Superpowers as the workflow spine
+- GStack as the review gate layer
+- Compound as the learning layer
+
+This is a workflow contract, not a runtime dependency claim. The stack is represented in `boulder.yaml`, `docs/OPERATOR_WORKFLOW_STACK.md`, generated export notes, manifest validation, harness scorecard criteria, and release-plan evidence checks.
 
 ## Verification Evidence
 
@@ -75,7 +86,7 @@ The current test suite covers:
 - `verify` supports dry run
 - `scorecard` rates harness quality across context, verification, provider policy, export, and review boundaries
 - `benchmark` checks fixture completeness without runtime or leaderboard claims
-- `release-plan` checks release-facing evidence while keeping publishing manual
+- `release-plan` checks release-facing evidence, including operator workflow stack evidence, while keeping publishing manual
 - `export` writes Codex workflow notes
 - checked-in TypeScript, Python, and MCP-shaped example harnesses
 
@@ -93,5 +104,5 @@ External projects and catalogs can be referenced with attribution, but their ado
 
 ## Next Evidence Targets
 
-- Submit the v0.1.6 Codex for OSS application packet.
+- Submit the v0.1.7 Codex for OSS application packet.
 - Keep npm publication separate unless package distribution becomes required.

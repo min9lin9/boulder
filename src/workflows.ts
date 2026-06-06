@@ -2,7 +2,7 @@ import { at, writeText } from "./fs";
 import { inspectionToMarkdown, inspectRepo } from "./inspect";
 import { manifestFromInspection, writeManifest } from "./manifest";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
-import { boulderMarkdown, maintainerWorkflows, providerPolicy, verificationGates } from "./templates/init";
+import { boulderMarkdown, maintainerWorkflows, operatorWorkflowStack, providerPolicy, verificationGates } from "./templates/init";
 
 export async function initHarness(root: string, force = false): Promise<string[]> {
   const inspection = await inspectRepo(root);
@@ -11,6 +11,7 @@ export async function initHarness(root: string, force = false): Promise<string[]
   const writes = [
     [`boulder.yaml`, await writeManifest(root, manifest, force)] as const,
     [`BOULDER.md`, await writeText(at(root, "BOULDER.md"), boulderMarkdown(inspection.name), force)] as const,
+    [`docs/OPERATOR_WORKFLOW_STACK.md`, await writeText(at(root, "docs", "OPERATOR_WORKFLOW_STACK.md"), operatorWorkflowStack(manifest.workflowStack), force)] as const,
     [`docs/MAINTAINER_WORKFLOWS.md`, await writeText(at(root, "docs", "MAINTAINER_WORKFLOWS.md"), maintainerWorkflows(), force)] as const,
     [`docs/VERIFICATION_GATES.md`, await writeText(at(root, "docs", "VERIFICATION_GATES.md"), verificationGates(), force)] as const,
     [`docs/PROVIDER_POLICY.md`, await writeText(at(root, "docs", "PROVIDER_POLICY.md"), providerPolicy(), force)] as const,

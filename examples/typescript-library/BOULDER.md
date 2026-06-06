@@ -5,6 +5,9 @@ Repository: boulder-typescript-example
 ## Operator Contract
 
 - Define context before action.
+- Use Superpowers as the workflow spine.
+- Use GStack as the review gate layer before risky implementation or release decisions.
+- Use Compound to capture durable workflow learnings after meaningful cycles.
 - Require approval before risky or write-capable execution.
 - Record command evidence before claims.
 - Run verification before completion.

@@ -8,6 +8,8 @@ Make OSS repositories agent-ready without losing maintainer control.
 
 It is built for maintainers who use many models, but want one accountable workflow: explicit contracts, approval gates, evidence ledgers, verification gates, and clear risk reports.
 
+Boulder defaults to a har-maker-level operator workflow stack: Superpowers as the workflow spine, GStack as the review gate layer, and Compound as the learning layer. These are workflow contracts, not runtime dependencies.
+
 ## Install
 
 ```bash
@@ -59,6 +61,7 @@ bun run boulder -- export
 - `BOULDER.md` - operator contract for Codex-assisted work
 - `docs/REPO_BRIEF.md` - shallow repository brief
 - `docs/MAINTAINER_WORKFLOWS.md` - issue/PR/release workflows
+- `docs/OPERATOR_WORKFLOW_STACK.md` - Superpowers, GStack, and Compound operator contract
 - `docs/VERIFICATION_GATES.md` - evidence and verification rules
 - `docs/PROVIDER_POLICY.md` - provider-aware execution boundaries
 - `docs/HARNESS_QUALITY_SCORECARD.md` - deterministic harness readiness scorecard
@@ -82,7 +85,7 @@ Each example includes `BOULDER.md`, `boulder.yaml`, a repo brief, verification r
 boulder validate
 ```
 
-`validate` checks that `boulder.yaml` has maintainers, workflows, protected paths, verification commands, and approval gating when external providers are enabled.
+`validate` checks that `boulder.yaml` has maintainers, the default operator workflow stack, workflows, protected paths, verification commands, and approval gating when external providers are enabled.
 
 ## Harness Scorecard
 
@@ -90,7 +93,7 @@ boulder validate
 boulder scorecard
 ```
 
-`scorecard` rates a harness across context contract, verification gates, provider policy, export readiness, and review boundaries.
+`scorecard` rates a harness across context contract, operator workflow stack, verification gates, provider policy, export readiness, and review boundaries.
 
 ## Benchmark Fixtures
 
@@ -106,7 +109,7 @@ boulder benchmark
 boulder release-plan
 ```
 
-`release-plan` checks release-facing evidence and writes `docs/RELEASE_PLAN.md`. It keeps publishing manual and does not automate `npm publish`.
+`release-plan` checks release-facing evidence, including operator workflow stack evidence, and writes `docs/RELEASE_PLAN.md`. It keeps publishing manual and does not automate `npm publish`.
 
 ## Why This Exists
 
@@ -125,7 +128,7 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 
 ## Status
 
-`v0.1.6`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, `scorecard`, `benchmark`, `release-plan`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
+`v0.1.7`. Boulder includes a runnable Bun + TypeScript CLI with `init`, `inspect`, `validate`, `verify`, `scorecard`, `benchmark`, `release-plan`, and `export`, plus generated example harnesses for representative repo shapes. The CI gate runs the CLI smoke test, Bun test suite, Bun build, and package dry run.
 
 ## Public Evidence
 

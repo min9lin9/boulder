@@ -7,8 +7,8 @@ export async function exportHarness(root: string, force = false): Promise<string
   const inspection = await inspectRepo(root);
   const manifest = await loadManifest(root);
   const writes = [
-    [`docs/BOULDER_EXPORT.md`, await writeText(at(root, "docs", "BOULDER_EXPORT.md"), exportMarkdown(inspectionToMarkdown(inspection), manifest.workflows), force)] as const,
-    [`docs/CODEX_WORKFLOW_NOTES.md`, await writeText(at(root, "docs", "CODEX_WORKFLOW_NOTES.md"), codexNotes(manifest.workflows), force)] as const
+    [`docs/BOULDER_EXPORT.md`, await writeText(at(root, "docs", "BOULDER_EXPORT.md"), exportMarkdown(inspectionToMarkdown(inspection), manifest.workflows, manifest.workflowStack), force)] as const,
+    [`docs/CODEX_WORKFLOW_NOTES.md`, await writeText(at(root, "docs", "CODEX_WORKFLOW_NOTES.md"), codexNotes(manifest.workflows, manifest.workflowStack), force)] as const
   ];
   return writes.map(([file, status]) => `${status}: ${file}`);
 }

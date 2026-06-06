@@ -4,10 +4,18 @@ export type VerificationCommand = {
   required?: boolean;
 };
 
+export type WorkflowStackComponent = {
+  name: string;
+  role: string;
+  required: boolean;
+  description: string;
+};
+
 export type BoulderManifest = {
   name: string;
   description: string;
   maintainers: string[];
+  workflowStack: WorkflowStackComponent[];
   workflows: string[];
   protectedPaths: string[];
   verification: VerificationCommand[];

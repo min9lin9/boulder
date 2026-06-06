@@ -1,5 +1,11 @@
 # Maintainer Workflows
 
+## Default Operator Stack
+
+- Superpowers is the workflow spine for brainstorming, planning, implementation, review, and verification.
+- GStack is the review gate layer for CSO, QA, executive, or office-hours checks before risky decisions.
+- Compound is the learning layer for reusable decisions, repeated failure modes, and durable workflow improvements.
+
 ## Issue Triage
 
 1. Classify user impact and affected surface.

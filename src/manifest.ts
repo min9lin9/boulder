@@ -1,5 +1,6 @@
 import { at, readText, writeText } from "./fs";
-import type { BoulderManifest, RepoInspection, VerificationCommand } from "./types";
+import type { BoulderManifest, RepoInspection, VerificationCommand, WorkflowStackComponent } from "./types";
+import { defaultWorkflowStack } from "./workflow-stack";
 
 export const MANIFEST_FILE = "boulder.yaml";
 
@@ -8,6 +9,7 @@ export function defaultManifest(name = "oss-repository"): BoulderManifest {
     name,
     description: "Codex-ready OSS maintainer harness.",
     maintainers: ["min9lin9"],
+    workflowStack: defaultWorkflowStack(),
     workflows: [
       "issue-triage",
       "pr-review-prep",
@@ -43,6 +45,13 @@ export function manifestToYaml(manifest: BoulderManifest): string {
     `description: ${manifest.description}`,
     "maintainers:",
     ...manifest.maintainers.map((item) => `  - ${item}`),
+    "workflowStack:",
+    ...manifest.workflowStack.flatMap((item) => [
+      `  - name: ${item.name}`,
+      `    role: ${item.role}`,
+      `    required: ${item.required ? "true" : "false"}`,
+      `    description: ${item.description}`
+    ]),
     "workflows:",
     ...manifest.workflows.map((item) => `  - ${item}`),
     "protectedPaths:",
@@ -89,14 +98,16 @@ export async function loadManifest(root: string): Promise<BoulderManifest> {
   if (!text) {
     return defaultManifest(root.split(/[\\/]/).filter(Boolean).at(-1));
   }
+  const defaults = defaultManifest();
   return {
-    ...defaultManifest(),
-    name: scalar(text, "name") ?? defaultManifest().name,
-    description: scalar(text, "description") ?? defaultManifest().description,
-    maintainers: list(text, "maintainers") ?? defaultManifest().maintainers,
-    workflows: list(text, "workflows") ?? defaultManifest().workflows,
-    protectedPaths: list(text, "protectedPaths") ?? defaultManifest().protectedPaths,
-    verification: verificationList(text) ?? defaultManifest().verification,
+    ...defaults,
+    name: scalar(text, "name") ?? defaults.name,
+    description: scalar(text, "description") ?? defaults.description,
+    maintainers: list(text, "maintainers") ?? defaults.maintainers,
+    workflowStack: workflowStackList(text) ?? [],
+    workflows: list(text, "workflows") ?? defaults.workflows,
+    protectedPaths: list(text, "protectedPaths") ?? defaults.protectedPaths,
+    verification: verificationList(text) ?? defaults.verification,
     providers: {
       default: nestedScalar(text, "providers", "default") ?? "codex",
       externalAllowed: bool(nestedScalar(text, "providers", "externalAllowed")) ?? false,
@@ -126,6 +137,42 @@ function list(text: string, key: string): string[] | null {
     .map((line) => line.match(/^\s{2}-\s+(.+)$/)?.[1]?.trim())
     .filter((value): value is string => Boolean(value));
   return values.length ? values : null;
+}
+
+function workflowStackList(text: string): WorkflowStackComponent[] | null {
+  const lines = sectionLines(text, "workflowStack");
+  const items: WorkflowStackComponent[] = [];
+  let current: Partial<WorkflowStackComponent> | null = null;
+
+  for (const line of lines) {
+    const name = line.match(/^\s{2}-\s+name:\s*(.+)$/)?.[1]?.trim();
+    if (name) {
+      pushWorkflowStackItem(items, current);
+      current = { name, required: true };
+      continue;
+    }
+    if (!current) continue;
+    const role = line.match(/^\s{4}role:\s*(.+)$/)?.[1]?.trim();
+    const required = line.match(/^\s{4}required:\s*(.+)$/)?.[1]?.trim();
+    const description = line.match(/^\s{4}description:\s*(.+)$/)?.[1]?.trim();
+    if (role) current.role = role;
+    if (required) current.required = bool(required) ?? false;
+    if (description) current.description = description;
+  }
+
+  pushWorkflowStackItem(items, current);
+  return items.length ? items : null;
+}
+
+function pushWorkflowStackItem(items: WorkflowStackComponent[], current: Partial<WorkflowStackComponent> | null): void {
+  if (current?.name && current.role) {
+    items.push({
+      name: current.name,
+      role: current.role,
+      required: current.required ?? true,
+      description: current.description ?? ""
+    });
+  }
 }
 
 function verificationList(text: string): VerificationCommand[] | null {
