@@ -69,6 +69,10 @@ bun run boulder -- export
 - `docs/BOULDER_EXPORT.md` - exported maintainer context
 - `docs/CODEX_WORKFLOW_NOTES.md` - Codex-ready notes
 
+## Follow-up Direction
+
+- `docs/FOLLOW_UP_BRIEFING.md` - development-agent handoff, acceptance gate, and M8 pipeline-runtime direction
+
 ## Examples
 
 Generated harness examples are checked into `examples/` so reviewers can inspect Boulder output without running the CLI first.
