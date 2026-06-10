@@ -647,3 +647,189 @@ Tests likely to add:
 Decision needed from parent thread:
 
 Approve the M8-M12 roadmap as one arc, with M8 limited to `boulder pipeline` and no runtime-launcher behavior.
+
+## 98-point Planning Improvement Proposal
+
+Target planning score: 98/100.
+
+Scoring meaning:
+
+- 90+: implementation-ready for a single milestone.
+- 95+: implementation-ready across adjacent milestones with low handoff risk.
+- 98: implementation-ready with explicit ambiguity budget, scenario evidence, kill criteria, and post-milestone dependency closure.
+
+Current assessment after the M8 contract work:
+
+| Dimension | Current score | Target score | Remaining gap |
+| --- | ---: | ---: | --- |
+| M8 implementation specificity | 90 | 98 | Add parity-style scenario lane and exact ownership boundary. |
+| M9-M12 continuity | 78 | 96 | Add milestone dependency chain and evidence handoff rules. |
+| Benchmark measurability | 76 | 95 | Convert benchmark ideas into fixture/scenario pass-fail evidence. |
+| Runtime-boundary safety | 92 | 99 | Keep explicit "no runtime launcher" gate in every milestone. |
+| Developer handoff clarity | 86 | 98 | Add work package order and stop conditions. |
+
+### Round 1: Product definition
+
+Planner A:
+Boulder is still strongest when framed as an OSS operator workflow harness. M8 should not promise execution. The word "runtime" should be minimized because it invites category drift toward `harness-manager`.
+
+Planner B:
+The user-visible win must be concrete. A new operator should be able to run one command and see why a task is low, medium, or high friction and what review path follows.
+
+Planner C:
+The current plan has enough M8 implementation detail, but M9-M12 still read like roadmap themes. Each future milestone needs a concrete artifact.
+
+Synthesis:
+Rename the practical goal to "pipeline planning surface" in implementation guidance. The north star remains an operator workflow system, but every milestone must produce a concrete artifact and evidence file.
+
+### Round 2: Harness-manager benchmark boundary
+
+Planner A:
+`harness-manager` should remain a benchmark for validation and dry-run discipline, not a model for runtime launch.
+
+Planner B:
+The useful concepts are fail-closed registry validation, manifest-as-data, dry-run plans, and environment/credential boundary checks.
+
+Planner C:
+If M11 says "adapter registry," it may be misread as executable adapter runtime. It must be "adapter boundary registry" and data-only.
+
+Synthesis:
+Every milestone must carry an explicit runtime-boundary clause. If a feature requires launching an external agent, injecting credentials, installing packages, or managing isolated homes, it is outside Boulder unless a separate post-M12 approval happens.
+
+### Round 3: claw-code parity lessons
+
+Planner A:
+claw-code's useful pattern is not its Rust runtime; it is parity evidence. It tracks lanes, scenario maps, and permission-denied cases as first-class evidence.
+
+Planner B:
+Boulder should borrow "lane" thinking: each milestone should define a scenario lane with expected pass/fail behavior.
+
+Planner C:
+Permission enforcement in claw-code maps to Boulder as validation and approval gates, not runtime permission prompts.
+
+Synthesis:
+Add Boulder parity lanes. M8 has a pipeline-plan lane, M9 an export-evidence lane, M10 a benchmark-fixture lane, M11 an adapter-boundary lane, and M12 a case-study-submission lane.
+
+### Round 4: Implementation order
+
+Planner A:
+M8 must be a single PR. Adding export integration or benchmark scoring will make it too large.
+
+Planner B:
+M9 should consume M8 output unchanged. If M8 output changes during M9, the M8 contract was not stable enough.
+
+Planner C:
+M10 should not invent new semantics. It should test M8/M9 behavior across fixtures.
+
+Synthesis:
+Lock the order:
+
+1. M8 defines and tests pipeline plan generation.
+2. M9 exports that plan without changing the model.
+3. M10 benchmarks the existing model/export behavior.
+4. M11 documents adapter boundaries using existing evidence.
+5. M12 packages public case studies using M8-M11 artifacts.
+
+### Round 5: Ambiguity budget and approval policy
+
+Planner A:
+The plan is not 98-point unless remaining ambiguity is explicit and bounded.
+
+Planner B:
+Some ambiguity is acceptable if it is intentionally deferred and cannot block the next milestone.
+
+Planner C:
+The acceptance gate should include "what must not be decided yet" so implementers do not overbuild.
+
+Synthesis:
+Use an ambiguity budget. M8 may leave export placement, benchmark scoring, and adapter metadata unresolved. M8 may not leave CLI shape, JSON shape, friction variants, invalid friction behavior, or forbidden side-effect categories unresolved.
+
+## Final Synthesis: 98-point Plan
+
+The improved plan is approved for M8 implementation if and only if the following statements remain true:
+
+1. M8 adds `boulder pipeline` as a planning command only.
+2. M8 ships the built-in pipeline model with no repo-local pipeline config.
+3. M8 includes exact low/medium/high `PipelinePlan` behavior.
+4. M8 includes invalid friction exit behavior.
+5. M8 includes forbidden side-effect validation tests.
+6. M8 does not integrate pipeline output into export or release scoring.
+7. M9 consumes M8 output without changing the M8 schema.
+8. M10 benchmarks M8/M9 artifacts through fixtures.
+9. M11 remains metadata-only adapter boundary work.
+10. M12 packages public case studies and evidence for Codex for OSS.
+
+## Ambiguity Budget
+
+| Topic | Allowed ambiguity after this plan | Must be fixed before |
+| --- | --- | --- |
+| CLI shape | None: use `boulder pipeline` | M8 start |
+| Friction levels | None: `low`, `medium`, `high` only | M8 start |
+| Pipeline JSON shape | None for M8 fields listed above | M8 start |
+| Stage copy labels | Low: labels can improve if ids remain stable | M8 PR review |
+| User-editable pipeline config | Deferred intentionally | Post-M10 |
+| Export placement | Medium: M9 decides exact section | M9 start |
+| Benchmark scoring weights | Medium: M10 decides weights | M10 start |
+| Adapter boundary schema | High: only conceptually scoped | M11 start |
+| Case-study repo list | Medium: choose after M10 evidence | M12 start |
+| Runtime interop | High and intentionally out of scope | M13+ separate approval |
+
+## Boulder Parity Lanes
+
+These lanes adapt claw-code parity practice to Boulder without copying runtime behavior.
+
+| Lane | Milestone | Scenario | Required evidence |
+| --- | --- | --- | --- |
+| Pipeline plan lane | M8 | Generate low/medium/high plans and reject invalid friction | CLI output, JSON output, tests, manual QA |
+| Fail-closed lane | M8 | Reject forbidden side-effect categories in pipeline validation | unit test and error id |
+| Export evidence lane | M9 | Export includes pipeline summary without schema drift | export fixture or snapshot |
+| Benchmark fixture lane | M10 | Public fixture repos produce deterministic pipeline readiness | benchmark report and fixture expected output |
+| Adapter boundary lane | M11 | Adapter metadata remains data-only and non-executable | validation test and provider policy evidence |
+| Case-study lane | M12 | Public repos have reproducible before/after Boulder evidence | case-study packet and source links |
+
+## Milestone Dependency Closure
+
+| Milestone | May start when | Must not change |
+| --- | --- | --- |
+| M8 | PR #14 planning docs are merged or explicitly accepted | Existing CLI behavior outside new `pipeline` command |
+| M9 | M8 schema and command output are stable | `PipelinePlan` field names without migration note |
+| M10 | M9 export evidence exists | M8 friction semantics |
+| M11 | M10 benchmark evidence exists | Runtime-boundary prohibition |
+| M12 | M10/M11 evidence exists | Claims beyond measured evidence |
+
+## Work Package Order
+
+For LazyCodex or another development agent:
+
+1. Create `src/pipeline.ts` with types, built-in plans, and validation.
+2. Add unit tests for low/medium/high and invalid validation.
+3. Add `boulder pipeline` command and help text.
+4. Add CLI/e2e coverage for human and JSON output.
+5. Add manual QA evidence for valid and invalid commands.
+6. Run `bun run ci`, LSP diagnostics, and static gate.
+7. Open a PR limited to M8.
+
+Stop immediately and ask for parent approval if implementation requires:
+
+- repo-local pipeline config
+- export integration
+- release-plan scoring changes
+- adapter metadata
+- provider calls
+- package installation
+- native process launch
+- credential access
+
+## 98-point Readiness Verdict
+
+After this proposal, the M8 plan is implementation-ready at 98/100 if the parent thread accepts the scope lock:
+
+- `boulder pipeline` only
+- built-in plans only
+- no runtime launcher behavior
+- no export integration until M9
+- no benchmark scoring until M10
+- no adapter registry until M11
+- no submission packet until M12
+
+If any of those scope locks are rejected, the plan drops back to roughly 85/100 because the implementation boundary becomes ambiguous again.
