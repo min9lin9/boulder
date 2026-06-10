@@ -12,7 +12,7 @@ Boulder turns OSS repositories into evidence-backed Codex operator harnesses.
 - Public repository: `min9lin9/boulder`
 - Package name: `boulder-oss-cli`
 - Current release track: `v0.1.7`
-- Current CLI surface: `init`, `inspect`, `validate`, `verify`, `scorecard`, `benchmark`, `release-plan`, and `export`
+- Current CLI surface: `init`, `inspect`, `validate`, `verify`, `pipeline`, `scorecard`, `benchmark`, `release-plan`, and `export`
 - Latest merged engineering pass: PR #12 tightened CLI regression coverage, cleanup safety, manual QA evidence, LSP evidence, and static gate evidence.
 - Product direction: move from a harness-document generator toward an executable operator workflow system.
 
@@ -20,7 +20,7 @@ Boulder turns OSS repositories into evidence-backed Codex operator harnesses.
 
 LazyCodex owns the next development slice.
 
-The next slice should make the friction-scaled operating pipeline visible or executable from the CLI without destabilizing the existing CLI surface:
+The next slice makes the friction-scaled operating pipeline visible from the CLI without destabilizing the existing CLI surface:
 
 1. classification
 2. Deep Interview
@@ -28,7 +28,7 @@ The next slice should make the friction-scaled operating pipeline visible or exe
 4. Synthesizer
 5. CSO/QA
 
-The implementation should keep the first slice narrow. Prefer a typed model plus CLI rendering or export integration before adding long-running orchestration.
+The implementation keeps the first slice narrow: a typed built-in model plus CLI rendering. Export integration waits for M9.
 
 ## As-is / To-be
 
@@ -69,12 +69,12 @@ The parent thread should continue product and submission work while LazyCodex ha
 
 ## Immediate Next Milestone
 
-M8 should be "Pipeline Runtime Surface".
+M8 should be "Pipeline Planning Surface".
 
 Expected output:
 
 - A small typed pipeline model.
-- A CLI-visible way to inspect the pipeline for a repository or manifest.
+- A CLI-visible `boulder pipeline` command for low, medium, and high friction plans.
 - Test coverage for friction variants.
 - No expansion into full autonomous orchestration yet.
 

@@ -466,7 +466,7 @@ bun bin/boulder.ts pipeline --friction impossible
 Static gate:
 
 ```bash
-rg -n "credential|package install|spawn|exec|openai|anthropic|provider" src test docs/PIPELINE_RUNTIME_SURFACE.md docs/COMPETITIVE_BENCHMARK_HARNESS_MANAGER.md
+rg -n "credential|package install|spawn|exec|openai|anthropic|provider" src test docs/PIPELINE_PLANNING_SURFACE.md docs/COMPETITIVE_BENCHMARK_HARNESS_MANAGER.md
 ```
 
 Planner debate:
