@@ -36,6 +36,7 @@ boulder init
 boulder inspect
 boulder validate
 boulder verify --dry-run
+boulder pipeline --friction high
 boulder scorecard
 boulder benchmark
 boulder release-plan
@@ -49,6 +50,7 @@ bun run boulder -- init
 bun run boulder -- inspect
 bun run boulder -- validate
 bun run boulder -- verify --dry-run
+bun run boulder -- pipeline --friction high
 bun run boulder -- scorecard
 bun run boulder -- benchmark
 bun run boulder -- release-plan
@@ -71,7 +73,8 @@ bun run boulder -- export
 
 ## Follow-up Direction
 
-- `docs/FOLLOW_UP_BRIEFING.md` - development-agent handoff, acceptance gate, and M8 pipeline-runtime direction
+- `docs/FOLLOW_UP_BRIEFING.md` - development-agent handoff, acceptance gate, and M8 pipeline-planning direction
+- `docs/PIPELINE_PLANNING_SURFACE.md` - `boulder pipeline` command contract and M8 manual QA evidence
 
 ## Examples
 

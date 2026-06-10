@@ -4,6 +4,7 @@ import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
+import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -15,6 +16,7 @@ type CliOptions = {
   force: boolean;
   dryRun: boolean;
   json: boolean;
+  friction: string;
 };
 
 const VERSION = "0.1.6";
@@ -65,6 +67,20 @@ export async function main(args: string[]): Promise<void> {
     }
     return;
   }
+  if (command === "pipeline") {
+    if (!isFrictionLevel(options.friction)) {
+      console.error(invalidFrictionMessage(options.friction));
+      process.exitCode = 1;
+      return;
+    }
+    const plan = buildPipelinePlan(options.friction);
+    if (options.json) {
+      console.log(JSON.stringify(plan, null, 2));
+      return;
+    }
+    console.log(formatPipelinePlan(plan));
+    return;
+  }
   if (command === "scorecard") {
     const manifest = await loadManifest(options.cwd);
     const scorecard = scoreManifest(manifest);
@@ -112,12 +128,14 @@ export async function main(args: string[]): Promise<void> {
 
 function parseOptions(args: string[]): CliOptions {
   const cwdFlag = args.findIndex((arg) => arg === "--cwd");
+  const frictionFlag = args.findIndex((arg) => arg === "--friction");
   const cwd = cwdFlag >= 0 && args[cwdFlag + 1] ? resolve(args[cwdFlag + 1]) : process.cwd();
   return {
     cwd,
     force: args.includes("--force"),
     dryRun: args.includes("--dry-run"),
-    json: args.includes("--json")
+    json: args.includes("--json"),
+    friction: frictionFlag >= 0 && args[frictionFlag + 1] ? args[frictionFlag + 1] : "medium"
   };
 }
 
@@ -132,6 +150,7 @@ function printHelp(): void {
     "  boulder inspect [--cwd path] [--json]",
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
+    "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
     "  boulder release-plan [--cwd path] [--json]",

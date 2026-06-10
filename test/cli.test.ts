@@ -7,6 +7,7 @@ import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixt
 import { exportHarness } from "../src/export";
 import { inspectRepo } from "../src/inspect";
 import { defaultManifest, loadManifest } from "../src/manifest";
+import { buildPipelinePlan, validatePipelinePlan, type PipelinePlan } from "../src/pipeline";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
@@ -146,6 +147,47 @@ describe("provider policy fixtures", () => {
       expect(hasProviderError).toBe(shouldError);
     });
   }
+});
+
+describe("pipeline planning surface", () => {
+  test("builds a low friction pipeline plan", () => {
+    const plan = buildPipelinePlan("low");
+    expect(plan.friction).toBe("low");
+    expect(plan.failClosed).toBe(true);
+    expect(JSON.stringify(plan.stages.map((item) => item.id))).toBe(JSON.stringify(["classification", "synthesizer"]));
+    expect(JSON.stringify(plan.approvalGates)).toBe(JSON.stringify([]));
+    expect(plan.forbiddenSideEffects).toContain("credential-access");
+    expect(JSON.stringify(validatePipelinePlan(plan))).toBe(JSON.stringify([]));
+  });
+
+  test("builds a medium friction pipeline plan", () => {
+    const plan = buildPipelinePlan("medium");
+    expect(plan.friction).toBe("medium");
+    expect(JSON.stringify(plan.stages.map((item) => item.id))).toBe(JSON.stringify(["classification", "deep-interview", "pm-debate", "synthesizer"]));
+    expect(JSON.stringify(plan.approvalGates)).toBe(JSON.stringify(["pm-debate"]));
+    expect(plan.evidenceRequired).toContain("debate-notes");
+    expect(JSON.stringify(validatePipelinePlan(plan))).toBe(JSON.stringify([]));
+  });
+
+  test("builds a high friction pipeline plan", () => {
+    const plan = buildPipelinePlan("high");
+    expect(plan.friction).toBe("high");
+    expect(JSON.stringify(plan.stages.map((item) => item.id))).toBe(JSON.stringify(["classification", "deep-interview", "pm-debate", "synthesizer", "cso-qa"]));
+    expect(plan.stages.find((item) => item.id === "deep-interview")?.depth).toBe("deep");
+    expect(JSON.stringify(plan.approvalGates)).toBe(JSON.stringify(["pm-debate", "cso-qa"]));
+    expect(plan.evidenceRequired).toContain("security-review");
+    expect(JSON.stringify(validatePipelinePlan(plan))).toBe(JSON.stringify([]));
+  });
+
+  test("fails closed for forbidden side effects", () => {
+    const plan = buildPipelinePlan("high");
+    const unsafe: PipelinePlan = {
+      ...plan,
+      stages: plan.stages.map((item) => item.id === "cso-qa" ? { ...item, allowedSideEffects: ["none", "external-launch"] } : item)
+    };
+    const issues = validatePipelinePlan(unsafe);
+    expect(issues.some((item) => item.id === "pipeline.sideEffect.forbidden" && item.stageId === "cso-qa")).toBe(true);
+  });
 });
 
 describe("harness quality scorecard", () => {
