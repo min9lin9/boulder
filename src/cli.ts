@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
-import { formatDoctorReport, formatFieldEvidenceResult, formatLines } from "./cli-format";
+import { formatDoctorReport, formatFieldEvidenceResult, formatLines, printHelp } from "./cli-format";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { recordFieldEvidence } from "./field-evidence";
@@ -12,6 +12,7 @@ import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
+import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -28,7 +29,7 @@ type CliOptions = {
   evidence: string;
 };
 
-const VERSION = "0.1.7";
+const VERSION = "0.1.8";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -145,6 +146,17 @@ export async function main(args: string[]): Promise<void> {
     if (report.status === "blocked") process.exitCode = 1;
     return;
   }
+  if (command === "replay-check") {
+    const report = await evaluateReplayCheck(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      if (report.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    console.log(replayCheckToMarkdown(report));
+    if (report.status === "blocked") process.exitCode = 1;
+    return;
+  }
   if (command === "product-readiness") {
     const readiness = await evaluateProductReadiness(options.cwd);
     if (options.json) {
@@ -222,34 +234,4 @@ function parseOptions(args: string[]): CliOptions {
 function optionValue(args: readonly string[], flag: string): string | null {
   const index = args.findIndex((arg) => arg === flag);
   return index >= 0 && args[index + 1] ? args[index + 1] : null;
-}
-
-function printHelp(): void {
-  console.log([
-    "boulder",
-    "",
-    "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
-    "",
-    "Usage:",
-    "  boulder init [--cwd path] [--force]",
-    "  boulder quickstart [--cwd path] [--json]",
-    "  boulder onboard [--cwd path] [--json]",
-    "  boulder inspect [--cwd path] [--json]",
-    "  boulder validate [--cwd path]",
-    "  boulder verify [--cwd path] [--dry-run]",
-    "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",
-    "  boulder scorecard [--cwd path] [--json]",
-    "  boulder benchmark [--cwd path] [--json]",
-    "  boulder release-plan [--cwd path] [--json]",
-    "  boulder release-check [--cwd path] [--json]",
-    "  boulder product-readiness [--cwd path] [--json]",
-    "  boulder service-readiness [--cwd path] [--json]",
-    "  boulder doctor [--cwd path] [--json]",
-    "  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]",
-    "  boulder export [--cwd path] [--force]",
-    "",
-    "Package:",
-    "  bunx boulder-oss-cli <command>",
-    ""
-  ].join("\n"));
 }

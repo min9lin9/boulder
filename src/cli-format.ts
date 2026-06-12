@@ -5,6 +5,37 @@ export function formatLines(title: string, lines: readonly string[]): string {
   return [title, ...lines.map((line) => `- ${line}`)].join("\n");
 }
 
+export function printHelp(): void {
+  console.log([
+    "boulder",
+    "",
+    "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
+    "",
+    "Usage:",
+    "  boulder init [--cwd path] [--force]",
+    "  boulder quickstart [--cwd path] [--json]",
+    "  boulder onboard [--cwd path] [--json]",
+    "  boulder inspect [--cwd path] [--json]",
+    "  boulder validate [--cwd path]",
+    "  boulder verify [--cwd path] [--dry-run]",
+    "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",
+    "  boulder scorecard [--cwd path] [--json]",
+    "  boulder benchmark [--cwd path] [--json]",
+    "  boulder release-plan [--cwd path] [--json]",
+    "  boulder release-check [--cwd path] [--json]",
+    "  boulder replay-check [--cwd path] [--json]",
+    "  boulder product-readiness [--cwd path] [--json]",
+    "  boulder service-readiness [--cwd path] [--json]",
+    "  boulder doctor [--cwd path] [--json]",
+    "  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]",
+    "  boulder export [--cwd path] [--force]",
+    "",
+    "Package:",
+    "  bunx boulder-oss-cli <command>",
+    ""
+  ].join("\n"));
+}
+
 export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {
   return [
     "Boulder capability doctor",

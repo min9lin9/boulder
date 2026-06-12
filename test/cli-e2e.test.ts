@@ -130,6 +130,17 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
   });
 
+  test("renders replay-check fixture evidence", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const result = await runBoulder(["replay-check", "--cwd", root, "--json"]);
+    const payload = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(0);
+    expect(payload.status).toBe("ready");
+    expect(payload.projects.some((item: { project: string; status: string }) => item.project === "gajae-code" && item.status === "pass")).toBe(true);
+  });
+
   test("rejects unsafe provider policy through validate command", async () => {
     // Given
     const root = await tempRepo();

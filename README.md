@@ -18,6 +18,8 @@ Published package:
 bunx boulder-oss-cli --help
 ```
 
+Current package version: `v0.1.8`.
+
 Published install smoke is tracked in [`docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`](docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt).
 
 Local development:
@@ -80,6 +82,7 @@ boulder scorecard
 boulder benchmark
 boulder release-plan
 boulder release-check
+boulder replay-check
 boulder product-readiness
 boulder service-readiness
 boulder doctor
@@ -174,6 +177,14 @@ boulder release-check
 ```
 
 `release-plan` checks release-facing evidence, including operator workflow stack evidence, and writes `docs/RELEASE_PLAN.md`. `release-check` checks npm/GitHub release evidence before manual publishing. Neither command automates `npm publish`.
+
+## Replay Check
+
+```bash
+boulder replay-check
+```
+
+`replay-check` validates public replay fixtures under `fixtures/replay/*`, including official docs references, Boulder commands, expected artifacts, evidence paths, and explicit limitations.
 
 ## Product Readiness
 

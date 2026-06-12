@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.8
 
 - Added `boulder quickstart` and `boulder onboard` for a non-mutating first-run guided flow.
 - Added `boulder release-check` for release evidence checks before manual npm and GitHub Release steps.
+- Added `boulder replay-check` for official-docs-first public replay fixture validation.
 - Added public replay fixtures for `Yeachan-Heo/gajae-code` and `VoltAgent/awesome-codex-subagents`.
 - Added external replay case study documentation and updated onboarding/release docs around the new commands.
 

@@ -12,6 +12,7 @@ import { evaluateProductReadiness, productReadinessToMarkdown } from "../src/pro
 import { evaluateQuickstart, quickstartToMarkdown } from "../src/quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "../src/release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
+import { evaluateReplayCheck, replayCheckToMarkdown } from "../src/replay-check";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
 import { initHarness } from "../src/workflows";
@@ -295,6 +296,21 @@ describe("release check", () => {
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("does not publish");
+  });
+});
+
+describe("replay check", () => {
+  test("checks public replay fixtures and official docs references", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const report = await evaluateReplayCheck(root);
+    const markdown = replayCheckToMarkdown(report);
+
+    expect(report.status).toBe("ready");
+    expect(report.projects.length).toBeGreaterThanOrEqual(3);
+    expect(report.projects.some((item) => item.project === "gajae-code" && item.status === "pass")).toBe(true);
+    expect(report.projects.some((item) => item.project === "awesome-codex-subagents" && item.status === "pass")).toBe(true);
+    expect(markdown).toContain("official-docs-first");
   });
 });
 
