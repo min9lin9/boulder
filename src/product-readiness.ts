@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
 
@@ -60,7 +60,7 @@ export async function evaluateProductReadiness(root: string): Promise<ProductRea
     }),
     await contentCheck(root, "published-install-smoke", {
       path: "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
-      contains: ["bunx boulder-oss-cli --help", "boulder-oss-cli"]
+      contains: ["bunx boulder-oss-cli --help", "boulder-oss-cli", "Result: success", "exit: 0", "Usage:"]
     }),
     await contentCheck(root, "limitations-explicit", {
       path: "docs/CODEX_OSS_APPLICATION_PACKET.md",
@@ -71,9 +71,10 @@ export async function evaluateProductReadiness(root: string): Promise<ProductRea
       contains: ["Support channels", "Security policy", "Responsible disclosure", "No credential access", "Rollback"]
     }),
     await allFilesCheck(root, "public-support-templates", [
-      ".github/ISSUE_TEMPLATE/bug_report.md",
-      ".github/ISSUE_TEMPLATE/support_request.md",
-      ".github/ISSUE_TEMPLATE/case_study.md",
+      ".github/ISSUE_TEMPLATE/bug_report.yml",
+      ".github/ISSUE_TEMPLATE/feature_request.yml",
+      ".github/ISSUE_TEMPLATE/ai_contribution.yml",
+      ".github/ISSUE_TEMPLATE/documentation.yml",
       "SECURITY.md"
     ]),
     await allFilesCheck(root, "gjc-lazycodex-handoff-fixtures", [
@@ -156,16 +157,17 @@ async function findDuplicateCopyArtifacts(root: string): Promise<readonly string
 }
 
 async function collectDuplicateCopyArtifacts(root: string, relativeDir: string, artifacts: string[]): Promise<void> {
-  const entries = await readdir(join(root, relativeDir), { withFileTypes: true });
+  const entries = await readdir(join(root, relativeDir));
   for (const entry of entries) {
-    const relativePath = relativeDir ? `${relativeDir}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      if (!SKIPPED_SCAN_DIRECTORIES.has(entry.name)) {
+    const relativePath = relativeDir ? `${relativeDir}/${entry}` : entry;
+    const entryStat = await stat(join(root, relativePath)) as { isDirectory(): boolean; isFile(): boolean };
+    if (entryStat.isDirectory()) {
+      if (!SKIPPED_SCAN_DIRECTORIES.has(entry)) {
         await collectDuplicateCopyArtifacts(root, relativePath, artifacts);
       }
       continue;
     }
-    if (entry.isFile() && / 2\.[^/]+$/.test(entry.name)) {
+    if (entryStat.isFile() && / 2\.[^/]+$/.test(entry)) {
       artifacts.push(relativePath);
     }
   }

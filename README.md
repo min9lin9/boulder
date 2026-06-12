@@ -12,9 +12,13 @@ Boulder defaults to a har-maker-level operator workflow stack: Superpowers as th
 
 ## Install
 
+After the package is published:
+
 ```bash
 bunx boulder-oss-cli --help
 ```
+
+Current public product gate: npm publish is still pending, so `bunx boulder-oss-cli --help` is tracked as a blocker in [`docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`](docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt).
 
 Local development:
 
@@ -42,6 +46,8 @@ boulder benchmark
 boulder release-plan
 boulder product-readiness
 boulder service-readiness
+boulder doctor
+boulder record field-readiness --run-id oss-run-1 --evidence evidence/field-readiness/oss-run-1
 boulder export
 ```
 
@@ -58,6 +64,8 @@ bun run boulder -- benchmark
 bun run boulder -- release-plan
 bun run boulder -- product-readiness
 bun run boulder -- service-readiness
+bun run boulder -- doctor
+bun run boulder -- record field-readiness --run-id oss-run-1 --evidence evidence/field-readiness/oss-run-1
 bun run boulder -- export
 ```
 
@@ -131,6 +139,22 @@ boulder product-readiness
 
 `product-readiness` checks the Codex OSS application packet, public case studies, GJC planning evidence, LazyCodex implementation evidence, Boulder verification evidence, limitations, and trust/support/security posture.
 
+## Service Readiness
+
+```bash
+boulder service-readiness
+```
+
+`service-readiness` checks onboarding, official-docs coverage, external replay, handoff validation, field evidence, operating metrics, support routes, and product-readiness status. The service can be `pilot-ready` while product-readiness remains blocked by publish evidence.
+
+## Capability Doctor
+
+```bash
+boulder doctor
+```
+
+`doctor` inspects the local capability inventory fixture for skills, MCP servers, plugins, and runtimes, then maps them into Boulder workflow lanes.
+
 ## Why This Exists
 
 Codex can help with issue triage, PR review, release planning, and safer agent-assisted maintenance. But every repository needs explicit context, workflow boundaries, verification commands, and review discipline before agents can be useful.
@@ -158,6 +182,8 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 - Benchmark fixture report: [`docs/BENCHMARK_FIXTURE_REPORT.md`](docs/BENCHMARK_FIXTURE_REPORT.md)
 - Release plan: [`docs/RELEASE_PLAN.md`](docs/RELEASE_PLAN.md)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)
+- GitHub Actions evidence: [`docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt`](docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt)
+- Published install smoke evidence: [`docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`](docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt)
 - Verification gate: [`docs/VERIFICATION_GATES.md`](docs/VERIFICATION_GATES.md)
 - Provider policy: [`docs/PROVIDER_POLICY.md`](docs/PROVIDER_POLICY.md)
 - Trust/support/security posture: [`docs/TRUST_SUPPORT_SECURITY.md`](docs/TRUST_SUPPORT_SECURITY.md)

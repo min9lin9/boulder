@@ -1,0 +1,18 @@
+Published install smoke
+
+Command:
+
+```bash
+bunx boulder-oss-cli --help
+```
+
+Observed result on 2026-06-12:
+
+```text
+Resolving dependencies
+Resolved, downloaded and extracted [1]
+error: GET https://registry.npmjs.org/boulder-oss-cli - 404
+exit: 1
+```
+
+Conclusion: `boulder-oss-cli` is not published to npm yet. This evidence intentionally keeps `published-install-smoke` blocked until a maintainer publishes the package and records a successful help-command run from the npm registry.

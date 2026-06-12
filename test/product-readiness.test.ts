@@ -26,13 +26,14 @@ async function writeReadyPublicProductFixture(root: string): Promise<void> {
   await write(root, "docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md", "# Export\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/ci.txt", "bun run ci\n35 pass\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "https://github.com/min9lin9/boulder/actions/runs/27290627860\nCI\nsuccess\n");
-  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli --help\nboulder-oss-cli\n");
+  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli --help\nboulder-oss-cli\nResult: success\nUsage:\nexit: 0\n");
   await write(root, "docs/TRUST_SUPPORT_SECURITY.md", "Support channels\nSecurity policy\nResponsible disclosure\nNo credential access\nRollback\n");
   await write(root, "docs/CODEX_OSS_FINAL_AUDIT.md", "Local readiness\nPublic product readiness\nDoes Not Claim\nBlocked Below 9.0\nOpenAI acceptance\n");
   await write(root, ".github/workflows/ci.yml", "name: CI\non: [push, pull_request]\njobs:\n  smoke:\n    steps:\n      - run: bun run ci\n");
-  await write(root, ".github/ISSUE_TEMPLATE/bug_report.md", "# Bug\n");
-  await write(root, ".github/ISSUE_TEMPLATE/support_request.md", "# Support\n");
-  await write(root, ".github/ISSUE_TEMPLATE/case_study.md", "# Case Study\n");
+  await write(root, ".github/ISSUE_TEMPLATE/bug_report.yml", "name: Bug report\n");
+  await write(root, ".github/ISSUE_TEMPLATE/feature_request.yml", "name: Feature request\n");
+  await write(root, ".github/ISSUE_TEMPLATE/ai_contribution.yml", "name: AI-assisted contribution\n");
+  await write(root, ".github/ISSUE_TEMPLATE/documentation.yml", "name: Documentation\n");
   await write(root, "SECURITY.md", "Responsible disclosure\n");
   await write(root, "fixtures/handoffs/low.json", "{\"gjcPlan\":true,\"lazycodexResult\":true,\"acceptanceCriteria\":[]}\n");
   await write(root, "fixtures/handoffs/medium.json", "{\"gjcPlan\":true,\"lazycodexResult\":true,\"acceptanceCriteria\":[]}\n");

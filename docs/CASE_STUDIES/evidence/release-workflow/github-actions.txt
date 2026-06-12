@@ -1,0 +1,16 @@
+GitHub Actions evidence
+
+Repository: https://github.com/min9lin9/boulder
+Workflow: CI
+Run: https://github.com/min9lin9/boulder/actions/runs/27290627860
+Branch: main
+Event: push
+Status: success
+
+Command covered by the workflow:
+
+```bash
+bun run ci
+```
+
+Recorded as public CI evidence for Boulder release workflow review. Newer commits must keep `.github/workflows/ci.yml` green before claiming product-ready status.
