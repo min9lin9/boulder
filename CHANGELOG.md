@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.9
+
+- Added `boulder replay-run --dry-run` for share-safe replay runbook generation.
+- Added external replay transcripts for `kimi-agent-swarm-skill`, `gajae-code`, and `awesome-codex-subagents`.
+- Compressed the README around install, first run, core commands, evidence, and contributor entry points.
+- Added issue-to-PR-to-CI evidence for the replay-run development cycle.
+
 ## 0.1.8
 
 - Added `boulder quickstart` and `boulder onboard` for a non-mutating first-run guided flow.

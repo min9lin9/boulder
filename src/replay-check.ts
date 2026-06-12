@@ -96,7 +96,7 @@ async function evaluateReplayProject(root: string, project: string): Promise<Rep
   const issues = [
     ...replay ? [] : [`invalid ${replayPath}`],
     ...isOfficialDocs(parsedDocs) ? [] : [`invalid ${officialDocsPath}`],
-    ...replay ? replayManifestIssues(replay) : []
+    ...replay ? await replayManifestIssues(root, replay) : []
   ];
   return {
     project: replay?.project ?? project,
@@ -107,7 +107,7 @@ async function evaluateReplayProject(root: string, project: string): Promise<Rep
   };
 }
 
-function replayManifestIssues(replay: ReplayManifest): readonly string[] {
+async function replayManifestIssues(root: string, replay: ReplayManifest): Promise<readonly string[]> {
   const issues = [];
   if (!replay.officialDocsPath.includes(`fixtures/replay/${replay.project}/official-docs.json`)) {
     issues.push("officialDocsPath must point at the project official-docs fixture");
@@ -121,6 +121,11 @@ function replayManifestIssues(replay: ReplayManifest): readonly string[] {
     issues.push("evidencePaths must stay under docs/CASE_STUDIES/evidence/external-replay/");
   }
   if (replay.limitations.length === 0) issues.push("limitations must not be empty");
+  for (const path of replay.evidencePaths) {
+    if (!await exists(join(root, path))) {
+      issues.push(`missing evidence transcript: ${path}`);
+    }
+  }
   return issues;
 }
 

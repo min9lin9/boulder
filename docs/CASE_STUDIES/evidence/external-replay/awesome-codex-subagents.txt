@@ -1,0 +1,139 @@
+# Boulder external replay: awesome-codex-subagents
+
+Target: /private/tmp/boulder-external-replay/awesome-codex-subagents
+Friction: medium
+Recorded at: 2026-06-13
+
+## Official docs signal
+
+/private/tmp/boulder-external-replay/awesome-codex-subagents/CONTRIBUTING.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/README.md
+
+## init
+
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+
+## quickstart
+
+# Boulder Quickstart
+
+Status: ready
+
+This is the first-run guided flow for a maintainer opening Boulder in a repository.
+
+## Checks
+
+- manifest: pass - boulder.yaml
+- operator-contract: pass - BOULDER.md
+- repo-brief: pass - docs/REPO_BRIEF.md
+
+## Next Commands
+
+- `boulder inspect --cwd . --json` - Read the repository shape before planning.
+- `boulder pipeline --cwd . --friction medium` - Choose the default classification -> plan -> verify path.
+- `boulder service-readiness --cwd . --json` - See whether repeatable service evidence is already present.
+- `boulder export --cwd . --force` - Write shareable Codex workflow notes and handoff artifacts.
+
+## Next Docs
+
+- docs/CONTRIBUTOR_START_HERE.md
+- docs/ONBOARDING.md
+- docs/COMMUNITY.md
+
+
+## inspect json
+
+{
+  "root": "/private/tmp/boulder-external-replay/awesome-codex-subagents",
+  "name": "awesome-codex-subagents",
+  "detected": {
+    "readme": true,
+    "packageJson": false,
+    "pyproject": false,
+    "tests": [],
+    "docs": [
+      "docs"
+    ],
+    "ci": []
+  },
+  "likelyVerification": [
+    {
+      "name": "manual-smoke",
+      "command": "echo 'No automated verification configured yet.'",
+      "required": false
+    }
+  ],
+  "protectedPaths": [
+    ".env*",
+    "secrets/**",
+    "vendor/**",
+    "node_modules/**",
+    "dist/**",
+    "coverage/**"
+  ],
+  "recommendedWorkflows": [
+    "issue-triage",
+    "pr-review-prep",
+    "release-planning",
+    "verification-gate",
+    "dependency-review"
+  ],
+  "risks": [
+    "No package metadata detected; repo type is unclear.",
+    "No test directory detected; verification may rely on manual smoke.",
+    "No CI/config signals detected; release verification may be local-only.",
+    "No required verification command inferred."
+  ]
+}
+
+## doctor json
+
+{
+  "status": "fail",
+  "capabilities": [],
+  "issues": [
+    {
+      "id": "capability-inventory-missing",
+      "severity": "error",
+      "message": "missing or invalid fixtures/capabilities/codex-installed.json"
+    }
+  ],
+  "nextSteps": [
+    "Run capability discovery and commit fixtures/capabilities/codex-installed.json before routing work."
+  ]
+}
+
+## pipeline
+
+Boulder pipeline plan
+- friction: medium
+- stage: classification (required, standard)
+- stage: deep-interview (required, standard)
+- stage: pm-debate (required, standard, approval required)
+- stage: synthesizer (required, standard)
+- fail-closed: true
+
+## export
+
+Boulder export complete
+- created: docs/BOULDER_EXPORT.md
+- created: docs/CODEX_WORKFLOW_NOTES.md
+
+## generated artifacts
+
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/BOULDER_EXPORT.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/CODEX_WORKFLOW_NOTES.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/HARNESS_QUALITY_SCORECARD.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/MAINTAINER_WORKFLOWS.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/OPERATOR_WORKFLOW_STACK.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/PROVIDER_POLICY.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/REPO_BRIEF.md
+/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/VERIFICATION_GATES.md

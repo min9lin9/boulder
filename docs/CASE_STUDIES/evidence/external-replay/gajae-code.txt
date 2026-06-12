@@ -1,0 +1,203 @@
+# Boulder external replay: gajae-code
+
+Target: /private/tmp/boulder-external-replay/gajae-code
+Friction: high
+Recorded at: 2026-06-13
+
+## Official docs signal
+
+/private/tmp/boulder-external-replay/gajae-code/.github/SECURITY.md
+/private/tmp/boulder-external-replay/gajae-code/README.md
+
+## init
+
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+
+## quickstart
+
+# Boulder Quickstart
+
+Status: ready
+
+This is the first-run guided flow for a maintainer opening Boulder in a repository.
+
+## Checks
+
+- manifest: pass - boulder.yaml
+- operator-contract: pass - BOULDER.md
+- repo-brief: pass - docs/REPO_BRIEF.md
+
+## Next Commands
+
+- `boulder inspect --cwd . --json` - Read the repository shape before planning.
+- `boulder pipeline --cwd . --friction medium` - Choose the default classification -> plan -> verify path.
+- `boulder service-readiness --cwd . --json` - See whether repeatable service evidence is already present.
+- `boulder export --cwd . --force` - Write shareable Codex workflow notes and handoff artifacts.
+
+## Next Docs
+
+- docs/CONTRIBUTOR_START_HERE.md
+- docs/ONBOARDING.md
+- docs/COMMUNITY.md
+
+
+## inspect json
+
+{
+  "root": "/private/tmp/boulder-external-replay/gajae-code",
+  "name": "gajae-code",
+  "detected": {
+    "readme": true,
+    "packageJson": true,
+    "pyproject": false,
+    "tests": [],
+    "docs": [
+      "docs"
+    ],
+    "ci": [
+      ".github/workflows",
+      "bun.lock"
+    ]
+  },
+  "likelyVerification": [
+    {
+      "name": "test",
+      "command": "bun run test",
+      "required": true
+    },
+    {
+      "name": "lint",
+      "command": "bun run lint",
+      "required": false
+    },
+    {
+      "name": "build",
+      "command": "bun run build",
+      "required": false
+    }
+  ],
+  "protectedPaths": [
+    ".env*",
+    "secrets/**",
+    "vendor/**",
+    "node_modules/**",
+    "dist/**",
+    "coverage/**"
+  ],
+  "recommendedWorkflows": [
+    "issue-triage",
+    "pr-review-prep",
+    "release-planning",
+    "verification-gate",
+    "dependency-review"
+  ],
+  "risks": [
+    "No test directory detected; verification may rely on manual smoke."
+  ]
+}
+
+## doctor json
+
+{
+  "status": "fail",
+  "capabilities": [],
+  "issues": [
+    {
+      "id": "capability-inventory-missing",
+      "severity": "error",
+      "message": "missing or invalid fixtures/capabilities/codex-installed.json"
+    }
+  ],
+  "nextSteps": [
+    "Run capability discovery and commit fixtures/capabilities/codex-installed.json before routing work."
+  ]
+}
+
+## pipeline
+
+Boulder pipeline plan
+- friction: high
+- stage: classification (required, deep)
+- stage: deep-interview (required, deep)
+- stage: pm-debate (required, standard, approval required)
+- stage: synthesizer (required, deep)
+- stage: cso-qa (required, standard, approval required)
+- fail-closed: true
+
+## export
+
+Boulder export complete
+- created: docs/BOULDER_EXPORT.md
+- created: docs/CODEX_WORKFLOW_NOTES.md
+
+## generated artifacts
+
+/private/tmp/boulder-external-replay/gajae-code/docs/BOULDER_EXPORT.md
+/private/tmp/boulder-external-replay/gajae-code/docs/CODEX_WORKFLOW_NOTES.md
+/private/tmp/boulder-external-replay/gajae-code/docs/ERRATA-GPT5-HARMONY.md
+/private/tmp/boulder-external-replay/gajae-code/docs/HARNESS_QUALITY_SCORECARD.md
+/private/tmp/boulder-external-replay/gajae-code/docs/MAINTAINER_WORKFLOWS.md
+/private/tmp/boulder-external-replay/gajae-code/docs/OPERATOR_WORKFLOW_STACK.md
+/private/tmp/boulder-external-replay/gajae-code/docs/PROVIDER_POLICY.md
+/private/tmp/boulder-external-replay/gajae-code/docs/REBRANDING_PLAN_260525.md
+/private/tmp/boulder-external-replay/gajae-code/docs/REPO_BRIEF.md
+/private/tmp/boulder-external-replay/gajae-code/docs/VERIFICATION_GATES.md
+/private/tmp/boulder-external-replay/gajae-code/docs/ai-schema-normalize.md
+/private/tmp/boulder-external-replay/gajae-code/docs/auth-broker-gateway.md
+/private/tmp/boulder-external-replay/gajae-code/docs/bash-tool-runtime.md
+/private/tmp/boulder-external-replay/gajae-code/docs/blob-artifact-architecture.md
+/private/tmp/boulder-external-replay/gajae-code/docs/brand-assets.md
+/private/tmp/boulder-external-replay/gajae-code/docs/bridge.md
+/private/tmp/boulder-external-replay/gajae-code/docs/codebase-overview.md
+/private/tmp/boulder-external-replay/gajae-code/docs/compaction.md
+/private/tmp/boulder-external-replay/gajae-code/docs/cpu-hotspot-map.json
+/private/tmp/boulder-external-replay/gajae-code/docs/cpu-hotspot-map.review.json
+/private/tmp/boulder-external-replay/gajae-code/docs/cpu-hotspot-map.verify.txt
+/private/tmp/boulder-external-replay/gajae-code/docs/environment-variables.md
+/private/tmp/boulder-external-replay/gajae-code/docs/fs-scan-cache-architecture.md
+/private/tmp/boulder-external-replay/gajae-code/docs/gjc-dogfood-skill-template.md
+/private/tmp/boulder-external-replay/gajae-code/docs/grok-build-provider-design.md
+/private/tmp/boulder-external-replay/gajae-code/docs/handoff-generation-pipeline.md
+/private/tmp/boulder-external-replay/gajae-code/docs/hermes-mcp-bridge.md
+/private/tmp/boulder-external-replay/gajae-code/docs/keybindings.md
+/private/tmp/boulder-external-replay/gajae-code/docs/lsp-config.md
+/private/tmp/boulder-external-replay/gajae-code/docs/memory.md
+/private/tmp/boulder-external-replay/gajae-code/docs/models.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-addon-loader-runtime.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-architecture.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-binding-contract.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-build-release-debugging.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-media-system-utils.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-rust-task-cancellation.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-shell-pty-process.md
+/private/tmp/boulder-external-replay/gajae-code/docs/natives-text-search-pipeline.md
+/private/tmp/boulder-external-replay/gajae-code/docs/non-compaction-retry-policy.md
+/private/tmp/boulder-external-replay/gajae-code/docs/notebook-tool-runtime.md
+/private/tmp/boulder-external-replay/gajae-code/docs/onboarding-packet.md
+/private/tmp/boulder-external-replay/gajae-code/docs/onboarding-receipt.md
+/private/tmp/boulder-external-replay/gajae-code/docs/porting-from-pi-mono.md
+/private/tmp/boulder-external-replay/gajae-code/docs/porting-to-natives.md
+/private/tmp/boulder-external-replay/gajae-code/docs/provider-streaming-internals.md
+/private/tmp/boulder-external-replay/gajae-code/docs/python-repl.md
+/private/tmp/boulder-external-replay/gajae-code/docs/render-mermaid.md
+/private/tmp/boulder-external-replay/gajae-code/docs/resolve-tool-runtime.md
+/private/tmp/boulder-external-replay/gajae-code/docs/rpc.md
+/private/tmp/boulder-external-replay/gajae-code/docs/rulebook-matching-pipeline.md
+/private/tmp/boulder-external-replay/gajae-code/docs/sdk.md
+/private/tmp/boulder-external-replay/gajae-code/docs/secrets.md
+/private/tmp/boulder-external-replay/gajae-code/docs/session-operations-export-share-fork-resume.md
+/private/tmp/boulder-external-replay/gajae-code/docs/session-switching-and-recent-listing.md
+/private/tmp/boulder-external-replay/gajae-code/docs/session-tree-plan.md
+/private/tmp/boulder-external-replay/gajae-code/docs/session.md
+/private/tmp/boulder-external-replay/gajae-code/docs/theme.md
+/private/tmp/boulder-external-replay/gajae-code/docs/tree.md
+/private/tmp/boulder-external-replay/gajae-code/docs/ttsr-injection-lifecycle.md
+/private/tmp/boulder-external-replay/gajae-code/docs/tui-runtime-internals.md

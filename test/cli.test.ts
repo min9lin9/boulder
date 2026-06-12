@@ -13,6 +13,7 @@ import { evaluateQuickstart, quickstartToMarkdown } from "../src/quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "../src/release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "../src/replay-check";
+import { buildReplayRunPlan, replayRunPlanToMarkdown } from "../src/replay-run";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
 import { initHarness } from "../src/workflows";
@@ -311,6 +312,21 @@ describe("replay check", () => {
     expect(report.projects.some((item) => item.project === "gajae-code" && item.status === "pass")).toBe(true);
     expect(report.projects.some((item) => item.project === "awesome-codex-subagents" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("official-docs-first");
+  });
+});
+
+describe("replay run", () => {
+  test("builds a dry-run command plan from replay fixtures", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const plan = await buildReplayRunPlan(root);
+    const markdown = replayRunPlanToMarkdown(plan);
+
+    expect(plan.status).toBe("ready");
+    expect(plan.projects.length).toBeGreaterThanOrEqual(3);
+    expect(plan.projects.every((item) => item.dryRunOnly)).toBe(true);
+    expect(markdown).toContain("does not execute");
+    expect(markdown).toContain("gajae-code");
   });
 });
 

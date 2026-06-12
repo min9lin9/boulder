@@ -13,6 +13,7 @@ import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
+import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -29,7 +30,7 @@ type CliOptions = {
   evidence: string;
 };
 
-const VERSION = "0.1.8";
+const VERSION = "0.1.9";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -155,6 +156,17 @@ export async function main(args: string[]): Promise<void> {
     }
     console.log(replayCheckToMarkdown(report));
     if (report.status === "blocked") process.exitCode = 1;
+    return;
+  }
+  if (command === "replay-run") {
+    const plan = await buildReplayRunPlan(options.cwd, options.dryRun);
+    if (options.json) {
+      console.log(JSON.stringify(plan, null, 2));
+      if (plan.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    console.log(replayRunPlanToMarkdown(plan));
+    if (plan.status === "blocked") process.exitCode = 1;
     return;
   }
   if (command === "product-readiness") {

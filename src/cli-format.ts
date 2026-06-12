@@ -24,6 +24,7 @@ export function printHelp(): void {
     "  boulder release-plan [--cwd path] [--json]",
     "  boulder release-check [--cwd path] [--json]",
     "  boulder replay-check [--cwd path] [--json]",
+    "  boulder replay-run [--cwd path] --dry-run [--json]",
     "  boulder product-readiness [--cwd path] [--json]",
     "  boulder service-readiness [--cwd path] [--json]",
     "  boulder doctor [--cwd path] [--json]",

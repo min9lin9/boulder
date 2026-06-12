@@ -141,6 +141,17 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(payload.projects.some((item: { project: string; status: string }) => item.project === "gajae-code" && item.status === "pass")).toBe(true);
   });
 
+  test("renders replay-run dry-run plan", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const result = await runBoulder(["replay-run", "--cwd", root, "--dry-run", "--json"]);
+    const payload = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(0);
+    expect(payload.status).toBe("ready");
+    expect(payload.projects.every((item: { dryRunOnly: boolean }) => item.dryRunOnly)).toBe(true);
+  });
+
   test("rejects unsafe provider policy through validate command", async () => {
     // Given
     const root = await tempRepo();
