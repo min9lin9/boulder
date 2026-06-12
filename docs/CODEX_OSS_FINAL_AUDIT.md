@@ -8,13 +8,13 @@ This audit decides whether Boulder has enough public evidence to submit as a Cod
 
 ## Go Decision
 
-Decision: GO for submission preparation after the maintainer performs the manual release/tag/publish step they want to use as the public reference.
+Decision: GO for submission preparation with public npm install smoke and GitHub Actions evidence available.
 
 Local readiness: 9.56 / 10.
 
 Weighted score: 95.65 / 100.
 
-Public product readiness: blocked until the published `bunx boulder-oss-cli --help` install smoke records `exit: 0` against the npm registry.
+Public product readiness: ready, with published `bunx boulder-oss-cli --help` install smoke recorded against the npm registry.
 
 ## Final Local Readiness
 
@@ -35,15 +35,15 @@ No hard blocker remains for local application-readiness:
 - CLI version and `package.json` version are `0.1.7`.
 - Package dry run excludes duplicate `* 2.*` artifacts by package manifest policy.
 - Public GitHub Actions evidence is fixed in `docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt`.
-- Published install smoke evidence is fixed in `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt` and currently records the npm 404 blocker.
+- Published install smoke evidence is fixed in `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt` and records a successful `bunx boulder-oss-cli --help` run.
 - M9 export/release evidence is present through generated export docs and release-plan evidence.
-- Product-readiness is intentionally still a public-readiness blocker until public install smoke succeeds after npm publish.
+- Product-readiness passes in a clean release tree with public install smoke evidence present.
 - Three case studies exist and include commands, artifacts, operator conclusions, and limitations.
 - Public trust/support/security posture is documented.
 - Core Boulder commands remain local and do not require credential access.
 - Boulder makes no provider launch, hosted service, benchmark leadership, acceptance, runtime scale, or external adoption claim.
 
-Public service-ready remains blocked until `product-readiness --json` returns ready and external maintainer field evidence exists.
+Public service-ready can be claimed for the packaged CLI workflow when `product-readiness --json` returns ready in a clean release tree. External maintainer adoption remains future evidence, not a current claim.
 
 ## Public Product Readiness
 
@@ -51,11 +51,12 @@ Public service-ready remains blocked until `product-readiness --json` returns re
 
 Current public blockers:
 
-- `published-install-smoke`: npm registry currently returns 404 for `boulder-oss-cli`, so the successful `bunx boulder-oss-cli --help` evidence cannot be claimed yet.
+- None for the packaged CLI readiness gate in a clean release tree.
 
 Already evidenced:
 
 - GitHub Actions CI success run is recorded.
+- Published npm install smoke succeeds for `boulder-oss-cli@0.1.7`.
 - GitHub Issue Forms provide public bug, feature, AI contribution, and documentation support routes.
 - Public case studies, GJC planning evidence, LazyCodex handoff evidence, and trust/security posture are present.
 

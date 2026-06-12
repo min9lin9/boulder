@@ -12,13 +12,13 @@ Boulder defaults to a har-maker-level operator workflow stack: Superpowers as th
 
 ## Install
 
-After the package is published:
+Published package:
 
 ```bash
 bunx boulder-oss-cli --help
 ```
 
-Current public product gate: npm publish is still pending, so `bunx boulder-oss-cli --help` is tracked as a blocker in [`docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`](docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt).
+Published install smoke is tracked in [`docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`](docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt).
 
 Local development:
 
@@ -145,7 +145,7 @@ boulder product-readiness
 boulder service-readiness
 ```
 
-`service-readiness` checks onboarding, official-docs coverage, external replay, handoff validation, field evidence, operating metrics, support routes, and product-readiness status. The service can be `pilot-ready` while product-readiness remains blocked by publish evidence.
+`service-readiness` checks onboarding, official-docs coverage, external replay, handoff validation, field evidence, operating metrics, support routes, and product-readiness status. The service becomes public-ready only when product-readiness also passes.
 
 ## Capability Doctor
 
