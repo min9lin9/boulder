@@ -5,8 +5,8 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "boulder": "./bin/boulder.ts",
-    "boulder-oss-cli": "./bin/boulder.ts"
+    "boulder": "bin/boulder.js",
+    "boulder-oss-cli": "bin/boulder.js"
   },
   "scripts": {
     "build": "bun build bin/boulder.ts --outdir /tmp/boulder-build --target bun",
