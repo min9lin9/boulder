@@ -2,6 +2,9 @@
 
 ## 0.1.7
 
+- Published `boulder-oss-cli@0.1.7` to npm with a verified `bunx boulder-oss-cli --help` install smoke.
+- Added public product-readiness and service-readiness evidence showing clean release tree readiness.
+- Added first-run onboarding, contributor start, community policy, and release workflow documentation.
 - Added the har-maker-level operator workflow stack as a default Boulder manifest contract.
 - Added Superpowers, GStack, and Compound evidence across generated docs, exports, validation, scorecard, and release-plan checks.
 - Added `docs/OPERATOR_WORKFLOW_STACK.md` and test coverage for stack validation and export notes.

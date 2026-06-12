@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contributor start guide
+    url: https://github.com/min9lin9/boulder/blob/main/docs/CONTRIBUTOR_START_HERE.md
+    about: Start here if you want a bounded first contribution.
+  - name: Community policy
+    url: https://github.com/min9lin9/boulder/blob/main/docs/COMMUNITY.md
+    about: Read how Boulder uses GitHub issues as the official support and decision surface.
+  - name: Release workflow
+    url: https://github.com/min9lin9/boulder/blob/main/docs/RELEASE_WORKFLOW.md
+    about: Read the tag, changelog, npm publish, and release evidence flow.

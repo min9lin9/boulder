@@ -6,11 +6,10 @@ Status: proposed operating catalog
 
 Type:
 
-- `type: bug`
-- `type: feature`
-- `type: docs`
-- `type: ai-assisted`
-- `type: release`
+- `bug`
+- `enhancement`
+- `documentation`
+- `question`
 
 Priority:
 
@@ -37,6 +36,12 @@ Workflow:
 - `help wanted`
 - `blocked`
 
+Starter issues:
+
+- Use `good first issue` for docs, fixtures, examples, and small CLI evidence improvements that can be completed without private context.
+- Use `help wanted` when the task benefits from external repo experience or a second maintainer perspective.
+- Every starter issue must include acceptance criteria and a verification command.
+
 ## Milestones
 
 - `M0 Repo setup`: contributor-safe repository surface, templates, governance, branch protection docs.
@@ -50,3 +55,4 @@ Workflow:
 - Use `good first issue` only when the task is bounded and has clear acceptance criteria.
 - Use `help wanted` only when external contribution is welcome without private context.
 - Use milestones for reviewable batches, not vague themes.
+- Prefer GitHub's default labels unless a new label changes triage behavior.

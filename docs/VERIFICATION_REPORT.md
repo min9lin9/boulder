@@ -1,16 +1,9 @@
 # Boulder Verification Report
 
-## test
+## ci
 
-- command: `bun test`
-- required: no
-- status: planned
-- output: not captured
-
-## typecheck
-
-- command: `bunx tsc --noEmit`
-- required: no
+- command: `bun run ci`
+- required: yes
 - status: planned
 - output: not captured
 

@@ -62,6 +62,8 @@ bunx boulder-oss-cli pipeline --friction high
 
 ## Commands
 
+Most users only need `init`, `inspect`, `doctor`, `verify --dry-run`, and `service-readiness` on the first pass.
+
 ```bash
 boulder init
 boulder inspect
@@ -78,23 +80,7 @@ boulder record field-readiness --run-id oss-run-1 --evidence evidence/field-read
 boulder export
 ```
 
-With Bun before package publication:
-
-```bash
-bun run boulder -- init
-bun run boulder -- inspect
-bun run boulder -- validate
-bun run boulder -- verify --dry-run
-bun run boulder -- pipeline --friction high
-bun run boulder -- scorecard
-bun run boulder -- benchmark
-bun run boulder -- release-plan
-bun run boulder -- product-readiness
-bun run boulder -- service-readiness
-bun run boulder -- doctor
-bun run boulder -- record field-readiness --run-id oss-run-1 --evidence evidence/field-readiness/oss-run-1
-bun run boulder -- export
-```
+For local development, prefix commands with `bun run boulder --`.
 
 ## Repository Setup Status
 
@@ -127,6 +113,16 @@ The repo is structured for external contribution intake: anyone can propose work
 
 - `docs/FOLLOW_UP_BRIEFING.md` - development-agent handoff, acceptance gate, and M8 pipeline-planning direction
 - `docs/PIPELINE_PLANNING_SURFACE.md` - `boulder pipeline` command contract and M8 manual QA evidence
+
+## New Contributors
+
+Start with GitHub issues labeled `good first issue` or `help wanted`.
+
+- Contributor start guide: [`docs/CONTRIBUTOR_START_HERE.md`](docs/CONTRIBUTOR_START_HERE.md)
+- Community policy: [`docs/COMMUNITY.md`](docs/COMMUNITY.md)
+- Release workflow: [`docs/RELEASE_WORKFLOW.md`](docs/RELEASE_WORKFLOW.md)
+- Development setup: [`docs/contributing/development-setup.md`](docs/contributing/development-setup.md)
+- AI contribution policy: [`docs/contributing/ai-contribution-policy.md`](docs/contributing/ai-contribution-policy.md)
 
 ## Examples
 
@@ -231,6 +227,8 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 ## Open Source Operations
 
 - Contributor guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- New contributor start guide: [`docs/CONTRIBUTOR_START_HERE.md`](docs/CONTRIBUTOR_START_HERE.md)
+- Community policy: [`docs/COMMUNITY.md`](docs/COMMUNITY.md)
 - Governance: [`GOVERNANCE.md`](GOVERNANCE.md)
 - Code of conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
 - Repository setup review: [`docs/OSS_REPO_SETUP_REVIEW.md`](docs/OSS_REPO_SETUP_REVIEW.md)
@@ -239,6 +237,7 @@ Boulder turns that implicit maintainer knowledge into a repeatable harness.
 - Review policy: [`docs/contributing/review-policy.md`](docs/contributing/review-policy.md)
 - Branch protection checklist: [`docs/branch-protection.md`](docs/branch-protection.md)
 - Labels and milestones: [`docs/labels-and-milestones.md`](docs/labels-and-milestones.md)
+- Release workflow: [`docs/RELEASE_WORKFLOW.md`](docs/RELEASE_WORKFLOW.md)
 
 ## Service Loop
 

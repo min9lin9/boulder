@@ -7,11 +7,12 @@
 - pyproject.toml: no
 - tests: test
 - docs: docs
-- CI/config signals: none detected
+- CI/config signals: .github/workflows
 
 ## Likely Verification Commands
 
 - test: `bun run test` (required)
+- build: `bun run build`
 
 ## Recommended Maintainer Workflows
 
@@ -32,4 +33,4 @@
 
 ## Unresolved Risks
 
-- No CI/config signals detected; release verification may be local-only.
+- none detected by shallow inspection
