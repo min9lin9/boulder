@@ -33,6 +33,33 @@ CI parity:
 bun run ci
 ```
 
+## First Run
+
+Use this path when trying Boulder on a new OSS repository for the first time:
+
+```bash
+cd path/to/your/repo
+bunx boulder-oss-cli init
+bunx boulder-oss-cli inspect
+bunx boulder-oss-cli doctor
+bunx boulder-oss-cli verify --dry-run
+bunx boulder-oss-cli service-readiness
+```
+
+What each step means:
+
+- `init` creates the maintainer harness files.
+- `inspect` summarizes the repository shape and likely maintainer workflows.
+- `doctor` checks the local capability inventory for skills, MCP servers, plugins, and runtimes.
+- `verify --dry-run` shows the verification commands without changing the repository.
+- `service-readiness` tells you whether the repository has enough onboarding, support, replay, handoff, field-evidence, and product-readiness evidence for repeatable use.
+
+For a higher-friction task, generate the operator pipeline before implementation:
+
+```bash
+bunx boulder-oss-cli pipeline --friction high
+```
+
 ## Commands
 
 ```bash
@@ -68,6 +95,18 @@ bun run boulder -- doctor
 bun run boulder -- record field-readiness --run-id oss-run-1 --evidence evidence/field-readiness/oss-run-1
 bun run boulder -- export
 ```
+
+## Repository Setup Status
+
+Boulder matches the NAIYA-style open source repository setup structure:
+
+- Root docs: `README.md`, `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `GOVERNANCE.md`, `ROADMAP.md`
+- GitHub operations: `.github/CODEOWNERS`, pull request template, issue forms, CI workflow, Security/CodeQL workflow
+- Contribution policy: development setup, review policy, AI contribution policy
+- Protection docs: branch protection checklist, labels and milestones
+- Product evidence: install smoke, GitHub Actions evidence, product readiness, service readiness, trust/support/security posture
+
+The repo is structured for external contribution intake: anyone can propose work, but merge decisions stay gated by contracts, review, CI, security checks, and recorded evidence.
 
 ## What Boulder Creates
 
