@@ -6,8 +6,8 @@ Status: ready
 
 - service-loop: pass - docs/SERVICE_LOOP.md
 - onboarding: pass - docs/ONBOARDING.md
-- official-docs-coverage: pass - fixtures/replay/kimi-agent-swarm-skill/official-docs.json
-- external-replay: pass - fixtures/replay/kimi-agent-swarm-skill/replay.json
+- official-docs-coverage: pass - fixtures/replay/awesome-codex-subagents/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json, fixtures/replay/gajae-code/official-docs.json
+- external-replay: pass - fixtures/replay/awesome-codex-subagents/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json, fixtures/replay/gajae-code/replay.json
 - handoff-validation: pass - fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json
 - service-acceptance-gates: pass - fixtures/service-readiness/gates.json
 - field-evidence: pass - evidence/field-readiness/oss-run-1

@@ -99,6 +99,37 @@ describe("boulder CLI e2e cleanup safety", () => {
     }
   });
 
+  test("renders first-run quickstart and onboard surfaces", async () => {
+    const root = await tempRepo();
+    try {
+      await runBoulder(["init", "--cwd", root]);
+
+      const quickstart = await runBoulder(["quickstart", "--cwd", root]);
+      const onboard = await runBoulder(["onboard", "--cwd", root, "--json"]);
+      const payload = JSON.parse(onboard.stdout);
+
+      expect(quickstart.exitCode).toBe(0);
+      expect(quickstart.stdout).toContain("# Boulder Quickstart");
+      expect(quickstart.stdout).toContain("boulder service-readiness --cwd . --json");
+      expect(onboard.exitCode).toBe(0);
+      expect(payload.status).toBe("ready");
+      expect(payload.steps.some((item: { command: string }) => item.command === "boulder inspect --cwd . --json")).toBe(true);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("renders release-check evidence without publishing", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const result = await runBoulder(["release-check", "--cwd", root, "--json"]);
+    const payload = JSON.parse(result.stdout);
+
+    expect(result.exitCode).toBe(0);
+    expect(payload.status).toBe("ready");
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
+  });
+
   test("rejects unsafe provider policy through validate command", async () => {
     // Given
     const root = await tempRepo();

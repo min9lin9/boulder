@@ -39,7 +39,9 @@ Use this path when trying Boulder on a new OSS repository for the first time:
 
 ```bash
 cd path/to/your/repo
+bunx boulder-oss-cli quickstart
 bunx boulder-oss-cli init
+bunx boulder-oss-cli onboard
 bunx boulder-oss-cli inspect
 bunx boulder-oss-cli doctor
 bunx boulder-oss-cli verify --dry-run
@@ -48,7 +50,9 @@ bunx boulder-oss-cli service-readiness
 
 What each step means:
 
+- `quickstart` shows the first-run guided flow without mutating files.
 - `init` creates the maintainer harness files.
+- `onboard` is an alias for `quickstart`; run it again after `init` to see the next commands.
 - `inspect` summarizes the repository shape and likely maintainer workflows.
 - `doctor` checks the local capability inventory for skills, MCP servers, plugins, and runtimes.
 - `verify --dry-run` shows the verification commands without changing the repository.
@@ -66,6 +70,8 @@ Most users only need `init`, `inspect`, `doctor`, `verify --dry-run`, and `servi
 
 ```bash
 boulder init
+boulder quickstart
+boulder onboard
 boulder inspect
 boulder validate
 boulder verify --dry-run
@@ -73,6 +79,7 @@ boulder pipeline --friction high
 boulder scorecard
 boulder benchmark
 boulder release-plan
+boulder release-check
 boulder product-readiness
 boulder service-readiness
 boulder doctor
@@ -121,6 +128,7 @@ Start with GitHub issues labeled `good first issue` or `help wanted`.
 - Contributor start guide: [`docs/CONTRIBUTOR_START_HERE.md`](docs/CONTRIBUTOR_START_HERE.md)
 - Community policy: [`docs/COMMUNITY.md`](docs/COMMUNITY.md)
 - Release workflow: [`docs/RELEASE_WORKFLOW.md`](docs/RELEASE_WORKFLOW.md)
+- External replay cases: [`docs/CASE_STUDIES/external-replay.md`](docs/CASE_STUDIES/external-replay.md)
 - Development setup: [`docs/contributing/development-setup.md`](docs/contributing/development-setup.md)
 - AI contribution policy: [`docs/contributing/ai-contribution-policy.md`](docs/contributing/ai-contribution-policy.md)
 
@@ -162,9 +170,10 @@ boulder benchmark
 
 ```bash
 boulder release-plan
+boulder release-check
 ```
 
-`release-plan` checks release-facing evidence, including operator workflow stack evidence, and writes `docs/RELEASE_PLAN.md`. It keeps publishing manual and does not automate `npm publish`.
+`release-plan` checks release-facing evidence, including operator workflow stack evidence, and writes `docs/RELEASE_PLAN.md`. `release-check` checks npm/GitHub release evidence before manual publishing. Neither command automates `npm publish`.
 
 ## Product Readiness
 

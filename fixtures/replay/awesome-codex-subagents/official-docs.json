@@ -1,0 +1,27 @@
+{
+  "project": "awesome-codex-subagents",
+  "repoUrl": "https://github.com/VoltAgent/awesome-codex-subagents",
+  "docsUrls": [
+    "https://github.com/VoltAgent/awesome-codex-subagents#readme",
+    "https://developers.openai.com/codex"
+  ],
+  "versionOrRef": "main",
+  "setupCommands": [
+    "clone the repository",
+    "mkdir -p ~/.codex/agents",
+    "copy selected .toml agent files into ~/.codex/agents or .codex/agents"
+  ],
+  "testCommands": [
+    "inspect selected .toml files before installation",
+    "restart or refresh the Codex session after copying agents",
+    "delegate explicitly in prompts"
+  ],
+  "contributionPolicy": "Use the repository README and CONTRIBUTING.md as the source of truth before proposing agent additions or category changes.",
+  "securityPolicy": "Treat agent files as executable instructions; review sandbox mode and never install agents that request credentials or unsafe provider access without explicit approval.",
+  "constraints": [
+    "Codex does not auto-spawn custom subagents.",
+    "Project-specific .codex/agents entries override global ~/.codex/agents entries.",
+    "Agent installation is an explicit copy step, not an automatic Boulder side effect."
+  ],
+  "retrievedAt": "2026-06-13"
+}

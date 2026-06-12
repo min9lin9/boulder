@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
+import { formatDoctorReport, formatFieldEvidenceResult, formatLines } from "./cli-format";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { recordFieldEvidence } from "./field-evidence";
@@ -8,6 +9,8 @@ import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
 import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
 import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
+import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
+import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
@@ -41,6 +44,15 @@ export async function main(args: string[]): Promise<void> {
   if (command === "init") {
     const results = await initHarness(options.cwd, options.force);
     console.log(formatLines("Boulder initialized", results));
+    return;
+  }
+  if (command === "quickstart" || command === "onboard") {
+    const report = await evaluateQuickstart(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      return;
+    }
+    console.log(quickstartToMarkdown(report));
     return;
   }
   if (command === "inspect") {
@@ -120,6 +132,17 @@ export async function main(args: string[]): Promise<void> {
     const markdown = releasePlanToMarkdown(plan);
     await writeText(resolve(options.cwd, "docs", "RELEASE_PLAN.md"), markdown, true);
     console.log(markdown);
+    return;
+  }
+  if (command === "release-check") {
+    const report = await evaluateReleaseCheck(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      if (report.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    console.log(releaseCheckToMarkdown(report));
+    if (report.status === "blocked") process.exitCode = 1;
     return;
   }
   if (command === "product-readiness") {
@@ -209,6 +232,8 @@ function printHelp(): void {
     "",
     "Usage:",
     "  boulder init [--cwd path] [--force]",
+    "  boulder quickstart [--cwd path] [--json]",
+    "  boulder onboard [--cwd path] [--json]",
     "  boulder inspect [--cwd path] [--json]",
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
@@ -216,6 +241,7 @@ function printHelp(): void {
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
     "  boulder release-plan [--cwd path] [--json]",
+    "  boulder release-check [--cwd path] [--json]",
     "  boulder product-readiness [--cwd path] [--json]",
     "  boulder service-readiness [--cwd path] [--json]",
     "  boulder doctor [--cwd path] [--json]",
@@ -226,27 +252,4 @@ function printHelp(): void {
     "  bunx boulder-oss-cli <command>",
     ""
   ].join("\n"));
-}
-
-function formatLines(title: string, lines: readonly string[]): string {
-  return [title, ...lines.map((line) => `- ${line}`)].join("\n");
-}
-
-function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {
-  return [
-    "Boulder capability doctor",
-    `- status: ${report.status}`,
-    ...report.capabilities.map((item) => `- capability: ${item.id} (${item.kind}, ${item.lane})`),
-    ...report.issues.map((item) => `- ${item.severity}: ${item.id} - ${item.message}`)
-  ].join("\n");
-}
-
-function formatFieldEvidenceResult(result: Awaited<ReturnType<typeof recordFieldEvidence>>): string {
-  return [
-    "Boulder field-readiness record",
-    `- status: ${result.status}`,
-    `- run-id: ${result.runId}`,
-    `- manifest: ${result.manifestPath}`,
-    ...result.checks.map((item) => `- ${item.id}: ${item.status} - ${item.evidence}`)
-  ].join("\n");
 }

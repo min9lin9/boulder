@@ -9,10 +9,11 @@ Boulder releases must keep npm, GitHub tags, GitHub Releases, changelog entries,
 1. Update `package.json` version.
 2. Update `CHANGELOG.md`.
 3. Run `bun run ci`.
-4. Run `npm pack --dry-run` or `npm_config_cache=/private/tmp/npm-cache-boulder npm pack --dry-run`.
-5. Publish with npm 2FA.
-6. Verify `npm view boulder-oss-cli name version`.
-7. Verify install smoke from a fresh directory:
+4. Run `bun bin/boulder.ts release-check --cwd . --json`.
+5. Run `npm pack --dry-run` or `npm_config_cache=/private/tmp/npm-cache-boulder npm pack --dry-run`.
+6. Publish with npm 2FA: `npm publish --access public`.
+7. Verify `npm view boulder-oss-cli name version`.
+8. Verify install smoke from a fresh directory:
 
 ```bash
 tmpdir=$(mktemp -d)
@@ -20,10 +21,10 @@ cd "$tmpdir"
 bunx --no-cache boulder-oss-cli --help
 ```
 
-8. Update `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`.
-9. Tag the exact commit used for the release.
-10. Create or update the GitHub Release from the changelog entry.
-11. Record GitHub Actions evidence in `docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt`.
+9. Update `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`.
+10. Tag the exact commit used for the release.
+11. Create or update the GitHub Release from the changelog entry.
+12. Record GitHub Actions evidence in `docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt`.
 
 ## Required Alignment
 
@@ -36,3 +37,5 @@ bunx --no-cache boulder-oss-cli --help
 ## Current Release Note
 
 `boulder-oss-cli@0.1.7` is published and install-smoke verified. The next release should avoid rewriting the existing `v0.1.7` tag; use a new version and tag so npm, GitHub Release, and evidence point to the same commit.
+
+`release-check` is evidence automation only. It does not publish, tag, push, or create GitHub Releases.

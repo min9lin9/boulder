@@ -1,0 +1,24 @@
+{
+  "project": "awesome-codex-subagents",
+  "repoUrl": "https://github.com/VoltAgent/awesome-codex-subagents",
+  "ref": "main",
+  "officialDocsPath": "fixtures/replay/awesome-codex-subagents/official-docs.json",
+  "commands": [
+    "bunx boulder-oss-cli inspect --cwd . --json",
+    "bunx boulder-oss-cli pipeline --cwd . --friction medium",
+    "bunx boulder-oss-cli doctor --cwd . --json",
+    "bunx boulder-oss-cli export --cwd . --force"
+  ],
+  "expectedArtifacts": [
+    "docs/REPO_BRIEF.md",
+    "docs/BOULDER_EXPORT.md",
+    "docs/CODEX_WORKFLOW_NOTES.md"
+  ],
+  "evidencePaths": [
+    "docs/CASE_STUDIES/evidence/external-replay/awesome-codex-subagents.txt"
+  ],
+  "limitations": [
+    "Replay does not install agents automatically.",
+    "Official documentation must be checked before copying any subagent into Codex."
+  ]
+}

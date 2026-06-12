@@ -47,7 +47,7 @@ async function readManifestStatus(root: string, evidencePath: string): Promise<"
   const content = await readText(join(root, evidencePath, "manifest.json"));
   if (!content) return "missing";
   try {
-    const parsed = JSON.parse(content) as unknown;
+    const parsed: unknown = JSON.parse(content);
     return isPassManifest(parsed) ? "pass" : "fail";
   } catch {
     return "fail";

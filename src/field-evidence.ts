@@ -1,3 +1,4 @@
+import { lstat, realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { readText, writeText } from "./fs";
 
@@ -15,11 +16,6 @@ export type FieldEvidenceResult = {
   readonly evidencePath: string;
   readonly manifestPath: string;
   readonly checks: readonly FieldEvidenceCheck[];
-};
-
-type FsContainment = {
-  readonly lstat: (path: string) => Promise<{ isSymbolicLink: () => boolean }>;
-  readonly realpath: (path: string) => Promise<string>;
 };
 
 const DECISION_OUTCOMES = ["merge", "reject", "defer", "request-changes"];
@@ -78,19 +74,14 @@ function safeRunId(runId: string): boolean {
 async function isContainedDirectory(root: string, relative: string): Promise<boolean> {
   const target = join(root, relative);
   try {
-    const fs = await fsContainment();
-    if ((await fs.lstat(join(root, "evidence", "field-readiness"))).isSymbolicLink()) return false;
-    if ((await fs.lstat(target)).isSymbolicLink()) return false;
-    const realTarget = await fs.realpath(target);
-    const realRoot = await fs.realpath(join(root, "evidence", "field-readiness"));
+    if ((await lstat(join(root, "evidence", "field-readiness"))).isSymbolicLink()) return false;
+    if ((await lstat(target)).isSymbolicLink()) return false;
+    const realTarget = await realpath(target);
+    const realRoot = await realpath(join(root, "evidence", "field-readiness"));
     return realTarget === join(realRoot, relative.split("/").at(-1) ?? "") && realTarget.startsWith(`${realRoot}/`);
   } catch {
     return true;
   }
-}
-
-async function fsContainment(): Promise<FsContainment> {
-  return await import("node:fs/promises") as unknown as FsContainment;
 }
 
 export async function recordFieldEvidence(root: string, runId: string, evidencePath: string): Promise<FieldEvidenceResult> {
@@ -174,7 +165,8 @@ async function metricsCheck(root: string, base: string): Promise<FieldEvidenceCh
 function parseJson(content: string | null): unknown {
   if (!content) return null;
   try {
-    return JSON.parse(content) as unknown;
+    const parsed: unknown = JSON.parse(content);
+    return parsed;
   } catch {
     return null;
   }

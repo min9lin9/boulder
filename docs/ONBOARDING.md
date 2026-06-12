@@ -7,6 +7,7 @@ Status: pre-publish path
 ```bash
 bun install
 bun bin/boulder.ts --help
+bun bin/boulder.ts quickstart --cwd examples/typescript-library
 bun bin/boulder.ts init --cwd examples/typescript-library --force
 bun bin/boulder.ts inspect --cwd examples/typescript-library --json
 bun bin/boulder.ts pipeline --cwd examples/typescript-library --friction medium
@@ -22,11 +23,14 @@ Keyword: post-publish.
 
 ```bash
 bunx boulder-oss-cli --help
+bunx boulder-oss-cli onboard --cwd <repo>
 bunx boulder-oss-cli init --cwd <repo> --force
 bunx boulder-oss-cli inspect --cwd <repo> --json
 bunx boulder-oss-cli pipeline --cwd <repo> --friction medium
 bunx boulder-oss-cli export --cwd <repo> --force
 ```
+
+Use `quickstart` and `onboard` as aliases. They do not mutate the repository; they summarize current harness files, next commands, and the next docs to read.
 
 ## Success
 

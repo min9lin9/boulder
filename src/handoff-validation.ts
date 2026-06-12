@@ -14,7 +14,8 @@ type JsonObject = Record<string, unknown>;
 
 export async function validateHandoffFile(path: string): Promise<HandoffValidationResult> {
   const content = await readFile(path, "utf8");
-  return validateHandoffJson(JSON.parse(content) as unknown);
+  const parsed: unknown = JSON.parse(content);
+  return validateHandoffJson(parsed);
 }
 
 export function validateHandoffJson(value: unknown): HandoffValidationResult {

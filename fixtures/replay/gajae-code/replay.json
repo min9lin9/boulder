@@ -1,0 +1,24 @@
+{
+  "project": "gajae-code",
+  "repoUrl": "https://github.com/Yeachan-Heo/gajae-code",
+  "ref": "main",
+  "officialDocsPath": "fixtures/replay/gajae-code/official-docs.json",
+  "commands": [
+    "bunx boulder-oss-cli inspect --cwd . --json",
+    "bunx boulder-oss-cli pipeline --cwd . --friction high --json",
+    "bunx boulder-oss-cli doctor --cwd . --json",
+    "bunx boulder-oss-cli export --cwd . --force"
+  ],
+  "expectedArtifacts": [
+    "docs/REPO_BRIEF.md",
+    "docs/BOULDER_EXPORT.md",
+    "docs/CODEX_WORKFLOW_NOTES.md"
+  ],
+  "evidencePaths": [
+    "docs/CASE_STUDIES/evidence/external-replay/gajae-code.txt"
+  ],
+  "limitations": [
+    "Replay validates Boulder planning and handoff surfaces; it does not execute GJC sessions.",
+    "Refresh official docs before using GJC commands because the project is beta-stage."
+  ]
+}

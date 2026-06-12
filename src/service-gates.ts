@@ -104,7 +104,8 @@ export async function evaluateServiceGates(root: string): Promise<ServiceGateChe
 
 async function readJson(path: string): Promise<unknown> {
   try {
-    return JSON.parse(await readFile(path, "utf8")) as unknown;
+    const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
+    return parsed;
   } catch {
     return undefined;
   }

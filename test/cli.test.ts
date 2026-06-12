@@ -9,6 +9,8 @@ import { inspectRepo } from "../src/inspect";
 import { defaultManifest, loadManifest } from "../src/manifest";
 import { buildPipelinePlan, validatePipelinePlan, type PipelinePlan } from "../src/pipeline";
 import { evaluateProductReadiness, productReadinessToMarkdown } from "../src/product-readiness";
+import { evaluateQuickstart, quickstartToMarkdown } from "../src/quickstart";
+import { evaluateReleaseCheck, releaseCheckToMarkdown } from "../src/release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
@@ -263,6 +265,36 @@ describe("release plan", () => {
     const markdown = releasePlanToMarkdown(plan);
     expect(markdown).toContain("Publishing remains manual");
     expect(markdown).toContain("npm publish is not automated");
+  });
+});
+
+describe("quickstart guided flow", () => {
+  test("summarizes the next first-run commands for a repository", async () => {
+    const root = await tempRepo();
+    await initHarness(root);
+
+    const quickstart = await evaluateQuickstart(root);
+    const markdown = quickstartToMarkdown(quickstart);
+
+    expect(quickstart.status).toBe("ready");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
+    expect(markdown).toContain("# Boulder Quickstart");
+    expect(markdown).toContain("first-run guided flow");
+  });
+});
+
+describe("release check", () => {
+  test("checks release evidence without publishing", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const report = await evaluateReleaseCheck(root);
+    const markdown = releaseCheckToMarkdown(report);
+
+    expect(report.status).toBe("ready");
+    expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
+    expect(markdown).toContain("does not publish");
   });
 });
 

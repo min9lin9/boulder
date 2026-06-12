@@ -132,7 +132,7 @@ function runtimeIssues(runtimes: readonly InventoryItem[]): readonly DoctorIssue
 function parseInventory(content: string | null): CapabilityInventory | null {
   if (!content) return null;
   try {
-    const parsed = JSON.parse(content) as unknown;
+    const parsed: unknown = JSON.parse(content);
     if (!isInventory(parsed)) return null;
     return parsed;
   } catch {

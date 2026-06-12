@@ -1,0 +1,29 @@
+{
+  "project": "gajae-code",
+  "repoUrl": "https://github.com/Yeachan-Heo/gajae-code",
+  "docsUrls": [
+    "https://github.com/Yeachan-Heo/gajae-code#readme",
+    "https://github.com/Yeachan-Heo/gajae-code/blob/main/docs/bridge.md"
+  ],
+  "versionOrRef": "main",
+  "setupCommands": [
+    "bun install -g gajae-code",
+    "bun install",
+    "bun run install:defaults"
+  ],
+  "testCommands": [
+    "bun scripts/check-visible-definitions.ts",
+    "bun scripts/verify-g002-gates.ts",
+    "bun scripts/rebrand-inventory.ts --strict",
+    "bun test packages/coding-agent/test/default-gjc-definitions.test.ts"
+  ],
+  "contributionPolicy": "Use the public README, GitHub issues, pull requests, and Discord community only for share-safe coordination.",
+  "securityPolicy": "GJC is beta-stage; verify outputs before relying on them and never include provider tokens, credentials, or private worktree logs in replay evidence.",
+  "constraints": [
+    "External runner; do not patch Codex, Claude Code, OpenCode, or Claw Code runtimes.",
+    "Use deep-interview before planning ambiguous work.",
+    "Use ralplan before mutation.",
+    "Use ultragoal evidence before completion claims."
+  ],
+  "retrievedAt": "2026-06-13"
+}

@@ -229,7 +229,8 @@ function isCompleteOfficialDocs(value: unknown): value is OfficialDocs {
 
 function parseJsonObject(content: string): unknown {
   try {
-    return JSON.parse(content) as unknown;
+    const parsed: unknown = JSON.parse(content);
+    return parsed;
   } catch {
     return null;
   }
