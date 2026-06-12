@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+import { buildPipelinePlan, validatePipelinePlan } from "./pipeline";
 
 export type ReleaseCheck = {
   readonly id: string;
@@ -25,6 +26,7 @@ export async function evaluateReleasePlan(root: string): Promise<ReleasePlan> {
     await fileCheck(root, "root-harness", "boulder.yaml"),
     await fileCheck(root, "operator-workflow-stack-doc", "docs/OPERATOR_WORKFLOW_STACK.md"),
     await workflowStackEvidenceCheck(root),
+    await pipelinePlanningEvidenceCheck(root),
     await fileCheck(root, "application-evidence", "docs/APPLICATION_EVIDENCE.md"),
     await fileCheck(root, "scorecard-evidence", "docs/HARNESS_QUALITY_SCORECARD.md"),
     await fileCheck(root, "benchmark-evidence", "docs/BENCHMARK_FIXTURE_REPORT.md"),
@@ -41,6 +43,18 @@ export async function evaluateReleasePlan(root: string): Promise<ReleasePlan> {
       "Create the GitHub release with verification notes.",
       "Publishing remains manual; npm publish is not automated by Boulder."
     ]
+  };
+}
+
+async function pipelinePlanningEvidenceCheck(root: string): Promise<ReleaseCheck> {
+  const docExists = await exists(join(root, "docs", "PIPELINE_PLANNING_SURFACE.md"));
+  const issues = validatePipelinePlan(buildPipelinePlan("medium"));
+  return {
+    id: "pipeline-planning-evidence",
+    status: docExists && issues.length === 0 ? "pass" : "fail",
+    evidence: docExists && issues.length === 0
+      ? "docs/PIPELINE_PLANNING_SURFACE.md exists and medium pipeline plan validates"
+      : `pipeline planning evidence missing or invalid: ${[docExists ? "" : "docs/PIPELINE_PLANNING_SURFACE.md", ...issues.map((item) => item.id)].filter(Boolean).join(", ")}`
   };
 }
 

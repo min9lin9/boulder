@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a bounded Boulder improvement.
+title: "[Feature]: "
+labels: ["type: feature", "needs decision"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What maintainer workflow problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed scope
+      description: Keep the first version small and reviewable.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: What should this explicitly not do?
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification plan
+      description: Commands, tests, docs, and manual QA evidence expected.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This request does not require secrets, provider credentials, or private repository data.
+          required: true

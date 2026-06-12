@@ -12,7 +12,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 
 ## M1 Surface
 
-`boulder` currently exposes eight maintainer workflow commands:
+`boulder` currently exposes thirteen maintainer workflow commands:
 
 ```bash
 boulder init
@@ -22,6 +22,10 @@ boulder verify --dry-run
 boulder scorecard
 boulder benchmark
 boulder release-plan
+boulder product-readiness
+boulder service-readiness
+boulder doctor
+boulder record field-readiness --run-id oss-run-1 --evidence evidence/field-readiness/oss-run-1
 boulder export
 ```
 
@@ -37,6 +41,8 @@ These commands generate and maintain:
 - `docs/HARNESS_QUALITY_SCORECARD.md`
 - `docs/BENCHMARK_FIXTURE_REPORT.md`
 - `docs/RELEASE_PLAN.md`
+- `docs/PRODUCT_READINESS.md`
+- `docs/SERVICE_READINESS.md`
 - `docs/BOULDER_EXPORT.md`
 - `docs/CODEX_WORKFLOW_NOTES.md`
 
@@ -87,6 +93,7 @@ The current test suite covers:
 - `scorecard` rates harness quality across context, verification, provider policy, export, and review boundaries
 - `benchmark` checks fixture completeness without runtime or leaderboard claims
 - `release-plan` checks release-facing evidence, including operator workflow stack evidence, while keeping publishing manual
+- `product-readiness` checks the application packet, case studies, GJC/LazyCodex evidence, verification evidence, limitations, and trust/support/security posture
 - `export` writes Codex workflow notes
 - checked-in TypeScript, Python, and MCP-shaped example harnesses
 

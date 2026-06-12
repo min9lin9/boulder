@@ -1,0 +1,34 @@
+{
+  "friction": "high",
+  "officialDocsSources": [
+    "fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
+  ],
+  "gjcPlan": {
+    "objective": "Plan a high-friction public OSS replay and release-readiness workflow.",
+    "acceptanceCriteria": [
+      "official docs are captured",
+      "CSO/QA stage is required",
+      "release claims stay bounded"
+    ],
+    "manualQaPlan": [
+      "tmux captures onboarding, replay, handoff validation, and readiness output"
+    ],
+    "riskRegister": [
+      "public target commands may drift",
+      "npm publish may still be unavailable"
+    ]
+  },
+  "lazycodexResult": {
+    "changedFiles": [],
+    "verificationCommands": [
+      "bun test",
+      "bun run ci",
+      "bun bin/boulder.ts service-readiness --json"
+    ],
+    "readyForReview": true
+  },
+  "acceptanceCriteria": [
+    "handoff validator passes",
+    "product-readiness remains honest"
+  ]
+}

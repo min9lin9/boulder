@@ -1,0 +1,44 @@
+name: AI-assisted contribution
+description: Propose or disclose an AI-assisted change.
+title: "[AI contribution]: "
+labels: ["type: ai-assisted", "needs review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        AI use is allowed, but contributors must explain the change, scope, risks, and verification in their own words.
+  - type: input
+    id: ai_tool
+    attributes:
+      label: AI tool or model used
+      placeholder: Codex, ChatGPT, Claude, Gemini, local model, or none
+    validations:
+      required: true
+  - type: textarea
+    id: human_explanation
+    attributes:
+      label: Human explanation
+      description: Explain why the change is needed and how it works.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and files
+      description: List the affected files and the intended behavior change.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests and evidence
+      description: Include commands run and manual QA evidence.
+    validations:
+      required: true
+  - type: textarea
+    id: risk
+    attributes:
+      label: Risk and review notes
+      description: Include known limitations, security boundaries, and docs impact.
+    validations:
+      required: true

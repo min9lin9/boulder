@@ -1,0 +1,31 @@
+name: Documentation issue
+description: Report or propose a documentation correction.
+title: "[Docs]: "
+labels: ["type: docs", "needs triage"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or file
+      placeholder: docs/PRODUCT_READINESS.md
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is unclear, stale, missing, or incorrect?
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source of truth
+      description: Link to code, command output, issue, ADR, or public evidence that supports the change.
+    validations:
+      required: true
+  - type: textarea
+    id: affected_docs
+    attributes:
+      label: Affected docs
+      description: List related docs that may need the same update.

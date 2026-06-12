@@ -8,6 +8,7 @@ import { exportHarness } from "../src/export";
 import { inspectRepo } from "../src/inspect";
 import { defaultManifest, loadManifest } from "../src/manifest";
 import { buildPipelinePlan, validatePipelinePlan, type PipelinePlan } from "../src/pipeline";
+import { evaluateProductReadiness, productReadinessToMarkdown } from "../src/product-readiness";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "../src/release-plan";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { validateManifest } from "../src/validation";
@@ -124,6 +125,11 @@ describe("boulder M1 surface", () => {
     const results = await exportHarness(root, true);
     expect(results.some((line) => line.includes("CODEX_WORKFLOW_NOTES.md"))).toBe(true);
     expect(await exists(join(root, "docs", "BOULDER_EXPORT.md"))).toBe(true);
+    const exported = await readFile(join(root, "docs", "BOULDER_EXPORT.md"), "utf8");
+    expect(exported).toContain("## Operator Pipeline");
+    expect(exported).toContain("friction: medium");
+    expect(exported).toContain("fail-closed: true");
+    expect(exported).not.toContain("stage: cso-qa");
     const notes = await readFile(join(root, "docs", "CODEX_WORKFLOW_NOTES.md"), "utf8");
     expect(notes).toContain("Superpowers spine");
     expect(notes).toContain("GStack gates");
@@ -248,6 +254,7 @@ describe("release plan", () => {
     const plan = await evaluateReleasePlan(root);
     expect(plan.status).toBe("ready");
     expect(plan.checks.every((item) => item.status === "pass")).toBe(true);
+    expect(plan.checks.some((item) => item.id === "pipeline-planning-evidence" && item.status === "pass")).toBe(true);
   });
 
   test("release plan report keeps publish manual", async () => {
@@ -256,6 +263,44 @@ describe("release plan", () => {
     const markdown = releasePlanToMarkdown(plan);
     expect(markdown).toContain("Publishing remains manual");
     expect(markdown).toContain("npm publish is not automated");
+  });
+});
+
+describe("product readiness", () => {
+  test("blocks the local packet until public product gates are evidenced", async () => {
+    const root = join(import.meta.dir, "..");
+    const readiness = await evaluateProductReadiness(root);
+    const markdown = productReadinessToMarkdown(readiness);
+
+    expect(readiness.status).toBe("blocked");
+    expect(readiness.checks.some((item) => item.id === "codex-oss-application-packet")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "gjc-plan-evidence")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "lazycodex-implementation-evidence")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "boulder-verify-evidence")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "trust-support-security-posture")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "final-audit")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "clean-release-tree" && item.status === "fail")).toBe(true);
+    expect(readiness.checks.some((item) => item.id === "published-install-smoke" && item.status === "fail")).toBe(true);
+    expect(markdown).toContain("docs/CODEX_OSS_APPLICATION_PACKET.md");
+    expect(markdown).toContain("docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md");
+    expect(markdown).toContain("docs/TRUST_SUPPORT_SECURITY.md");
+    expect(markdown).toContain("docs/CODEX_OSS_FINAL_AUDIT.md");
+  });
+
+  test("blocks when GJC planning evidence is missing", async () => {
+    const root = await tempRepo();
+    await writeFile(join(root, "package.json"), JSON.stringify({ name: "fixture" }), "utf8");
+    await writeFile(join(root, "README.md"), "# fixture\n", "utf8");
+    await writeFile(join(root, "CHANGELOG.md"), "# Changelog\n", "utf8");
+    await initHarness(root);
+    await writeFile(join(root, "docs", "CODEX_OSS_APPLICATION_PACKET.md"), "# Codex OSS Application Packet\n", "utf8");
+    await writeFile(join(root, "docs", "CASE_STUDIES.md"), "# Case Studies\n", "utf8");
+    await writeFile(join(root, "docs", "lazycodex-implementation-summary.md"), "# LazyCodex\n", "utf8");
+
+    const readiness = await evaluateProductReadiness(root);
+
+    expect(readiness.status).toBe("blocked");
+    expect(readiness.checks.some((item) => item.id === "gjc-plan-evidence" && item.status === "fail")).toBe(true);
   });
 });
 

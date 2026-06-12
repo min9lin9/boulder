@@ -1,0 +1,7 @@
+{
+  "changedRecommendations": [
+    "add capability doctor inventory",
+    "record field-readiness manifest",
+    "gate service-readiness on field evidence"
+  ]
+}

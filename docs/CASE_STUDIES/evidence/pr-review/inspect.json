@@ -1,0 +1,46 @@
+{
+  "root": "/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder",
+  "name": "boulder-oss-cli",
+  "detected": {
+    "readme": true,
+    "packageJson": true,
+    "pyproject": false,
+    "tests": [
+      "test"
+    ],
+    "docs": [
+      "docs"
+    ],
+    "ci": [
+      ".github/workflows"
+    ]
+  },
+  "likelyVerification": [
+    {
+      "name": "test",
+      "command": "bun run test",
+      "required": true
+    },
+    {
+      "name": "build",
+      "command": "bun run build",
+      "required": false
+    }
+  ],
+  "protectedPaths": [
+    ".env*",
+    "secrets/**",
+    "vendor/**",
+    "node_modules/**",
+    "dist/**",
+    "coverage/**"
+  ],
+  "recommendedWorkflows": [
+    "issue-triage",
+    "pr-review-prep",
+    "release-planning",
+    "verification-gate",
+    "dependency-review"
+  ],
+  "risks": []
+}

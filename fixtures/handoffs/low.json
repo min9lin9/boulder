@@ -1,0 +1,27 @@
+{
+  "friction": "low",
+  "officialDocsSources": [
+    "fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
+  ],
+  "gjcPlan": {
+    "objective": "Plan a bounded low-friction documentation or inspection change.",
+    "acceptanceCriteria": [
+      "scope is explicit",
+      "verification command is named"
+    ],
+    "manualQaPlan": [
+      "tmux captures boulder inspect output"
+    ],
+    "riskRegister": []
+  },
+  "lazycodexResult": {
+    "changedFiles": [],
+    "verificationCommands": [
+      "bun test"
+    ],
+    "readyForReview": true
+  },
+  "acceptanceCriteria": [
+    "Boulder evidence paths are present"
+  ]
+}

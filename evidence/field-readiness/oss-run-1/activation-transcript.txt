@@ -1,0 +1,3 @@
+boulder inspect --cwd .
+boulder pipeline --friction high --json
+boulder service-readiness --json

@@ -1,0 +1,43 @@
+{
+  "status": "pass",
+  "runId": "oss-run-1",
+  "evidencePath": "evidence/field-readiness/oss-run-1",
+  "manifestPath": "evidence/field-readiness/oss-run-1/manifest.json",
+  "checks": [
+    {
+      "id": "activation-transcript",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/activation-transcript.txt"
+    },
+    {
+      "id": "first-readiness",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/first-readiness.json"
+    },
+    {
+      "id": "second-readiness-delta",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/second-readiness-delta.json"
+    },
+    {
+      "id": "share-safe-artifact-url",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/share-safe-artifact-url.txt"
+    },
+    {
+      "id": "decision-log",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/decision-log.json"
+    },
+    {
+      "id": "official-docs-refresh",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/official-docs-refresh.json"
+    },
+    {
+      "id": "generated-metrics",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1/generated-metrics.json"
+    }
+  ]
+}

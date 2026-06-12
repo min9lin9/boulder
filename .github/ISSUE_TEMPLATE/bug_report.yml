@@ -1,0 +1,48 @@
+name: Bug report
+description: Report a reproducible Boulder CLI, docs, or packaging issue.
+title: "[Bug]: "
+labels: ["type: bug", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste secrets, tokens, private repository content, credentials, or proprietary logs.
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Exact command or workflow that failed.
+      placeholder: bun bin/boulder.ts product-readiness --json
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Minimal steps to reproduce the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: macOS 15, Bun 1.3.5, boulder 0.1.7
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Paste non-sensitive stdout/stderr or link to a public artifact.

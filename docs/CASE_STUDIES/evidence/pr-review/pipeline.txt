@@ -1,0 +1,7 @@
+Boulder pipeline plan
+- friction: medium
+- stage: classification (required, standard)
+- stage: deep-interview (required, standard)
+- stage: pm-debate (required, standard, approval required)
+- stage: synthesizer (required, standard)
+- fail-closed: true

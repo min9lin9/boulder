@@ -1,0 +1,30 @@
+{
+  "friction": "medium",
+  "officialDocsSources": [
+    "fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
+  ],
+  "gjcPlan": {
+    "objective": "Plan a medium-friction replay or product-readiness change.",
+    "acceptanceCriteria": [
+      "official docs sources are cited",
+      "failure case is covered"
+    ],
+    "manualQaPlan": [
+      "tmux captures service-readiness JSON"
+    ],
+    "riskRegister": [
+      "target official docs may change"
+    ]
+  },
+  "lazycodexResult": {
+    "changedFiles": [],
+    "verificationCommands": [
+      "bun test",
+      "bun run ci"
+    ],
+    "readyForReview": true
+  },
+  "acceptanceCriteria": [
+    "service-readiness does not claim ready when product-readiness is blocked"
+  ]
+}

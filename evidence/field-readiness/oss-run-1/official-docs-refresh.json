@@ -1,0 +1,10 @@
+{
+  "officialDocsFirst": true,
+  "docsUrls": [
+    "https://modelcontextprotocol.io/docs/learn/architecture",
+    "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+    "https://modelcontextprotocol.io/docs/develop/build-with-agent-skills",
+    "https://openai.github.io/openai-agents-python/tools/",
+    "https://openai.github.io/openai-agents-python/handoffs/"
+  ]
+}

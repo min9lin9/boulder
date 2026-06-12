@@ -1,6 +1,6 @@
 import type { WorkflowStackComponent } from "../types";
 
-export function exportMarkdown(repoBrief: string, workflows: string[], stack: readonly WorkflowStackComponent[]): string {
+export function exportMarkdown(repoBrief: string, workflows: string[], stack: readonly WorkflowStackComponent[], pipeline: string): string {
   return [
     "# Boulder Export",
     "",
@@ -15,6 +15,10 @@ export function exportMarkdown(repoBrief: string, workflows: string[], stack: re
     "## Operator Workflow Stack",
     "",
     ...stack.map((item) => `- ${item.name}: ${item.role}${item.required ? " (required)" : ""}`),
+    "",
+    "## Operator Pipeline",
+    "",
+    pipeline,
     "",
     "## Evidence Rule",
     "",

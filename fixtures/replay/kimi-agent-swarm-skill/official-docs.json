@@ -1,0 +1,24 @@
+{
+  "project": "kimi-agent-swarm-skill",
+  "repoUrl": "https://github.com/min9lin9/kimi-agent-swarm-skill",
+  "docsUrls": [
+    "https://github.com/min9lin9/kimi-agent-swarm-skill#readme"
+  ],
+  "versionOrRef": "main",
+  "setupCommands": [
+    "inspect the repository README",
+    "install dependencies only if the official docs require them"
+  ],
+  "testCommands": [
+    "run the official test command from the target repository docs when present"
+  ],
+  "contributionPolicy": "Use the target repository's public README, issues, and pull request guidance as the contribution source of truth.",
+  "securityPolicy": "Do not include secrets, credentials, private logs, or provider tokens in replay evidence.",
+  "constraints": [
+    "No private repository access",
+    "No credentials",
+    "No provider launch",
+    "Commands must be refreshed when official docs change"
+  ],
+  "retrievedAt": "2026-06-12"
+}

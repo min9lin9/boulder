@@ -1,0 +1,51 @@
+{
+  "activationGate": {
+    "status": "pass",
+    "timeToFirstReadinessDeltaMinutes": 12,
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/activation.txt"
+  },
+  "repeatRunGate": {
+    "status": "pass",
+    "changedRecommendations": [
+      "tighten public artifact share-safety"
+    ],
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/repeat-run.txt"
+  },
+  "shareSafeGate": {
+    "status": "pass",
+    "checkedArtifactPaths": [
+      "docs/SERVICE_STRATEGY_REVIEW.md",
+      "docs/SERVICE_READINESS.md"
+    ],
+    "blockedPatterns": [
+      "local paths",
+      "secrets",
+      "private repo assumptions",
+      "unsupported claims"
+    ],
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/share-safe.txt"
+  },
+  "decisionImpactGate": {
+    "status": "pass",
+    "outcomes": [
+      "request-changes"
+    ],
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/decision-impact.txt"
+  },
+  "externalReplayGate": {
+    "status": "pass",
+    "officialDocsFirst": true,
+    "publicTarget": "min9lin9/kimi-agent-swarm-skill",
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/external-replay.txt"
+  },
+  "metricsGate": {
+    "status": "pass",
+    "generatedFromEvidence": true,
+    "metrics": [
+      "time-to-first-readiness-delta",
+      "readiness delta count",
+      "public evidence link count"
+    ],
+    "evidencePath": ".omo/ulw-loop/evidence/service-gap-remediation/metrics.txt"
+  }
+}

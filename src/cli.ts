@@ -1,12 +1,16 @@
 import { resolve } from "node:path";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
+import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
+import { recordFieldEvidence } from "./field-evidence";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
 import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
+import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
+import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
@@ -17,19 +21,21 @@ type CliOptions = {
   dryRun: boolean;
   json: boolean;
   friction: string;
+  runId: string;
+  evidence: string;
 };
 
-const VERSION = "0.1.6";
+const VERSION = "0.1.7";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
   const options = parseOptions(args);
-  if (command === "help" || args.includes("--help") || args.includes("-h")) {
-    printHelp();
-    return;
-  }
   if (command === "version" || args.includes("--version")) {
     console.log(VERSION);
+    return;
+  }
+  if (command === "help" || args.includes("--help") || args.includes("-h")) {
+    printHelp();
     return;
   }
   if (command === "init") {
@@ -116,6 +122,54 @@ export async function main(args: string[]): Promise<void> {
     console.log(markdown);
     return;
   }
+  if (command === "product-readiness") {
+    const readiness = await evaluateProductReadiness(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(readiness, null, 2));
+      if (readiness.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    const markdown = productReadinessToMarkdown(readiness);
+    await writeText(resolve(options.cwd, "docs", "PRODUCT_READINESS.md"), markdown, true);
+    console.log(markdown);
+    if (readiness.status === "blocked") process.exitCode = 1;
+    return;
+  }
+  if (command === "service-readiness") {
+    const readiness = await evaluateServiceReadiness(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(readiness, null, 2));
+      if (readiness.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    const markdown = serviceReadinessToMarkdown(readiness);
+    await writeText(resolve(options.cwd, "docs", "SERVICE_READINESS.md"), markdown, true);
+    console.log(markdown);
+    if (readiness.status === "blocked") process.exitCode = 1;
+    return;
+  }
+  if (command === "doctor") {
+    const report = await evaluateCapabilityDoctor(options.cwd);
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+      if (report.status === "fail") process.exitCode = 1;
+      return;
+    }
+    console.log(formatDoctorReport(report));
+    if (report.status === "fail") process.exitCode = 1;
+    return;
+  }
+  if (command === "record" && args.includes("field-readiness")) {
+    const result = await recordFieldEvidence(options.cwd, options.runId, options.evidence);
+    if (options.json) {
+      console.log(JSON.stringify(result, null, 2));
+      if (result.status === "fail") process.exitCode = 1;
+      return;
+    }
+    console.log(formatFieldEvidenceResult(result));
+    if (result.status === "fail") process.exitCode = 1;
+    return;
+  }
   if (command === "export") {
     const results = await exportHarness(options.cwd, options.force);
     console.log(formatLines("Boulder export complete", results));
@@ -127,16 +181,24 @@ export async function main(args: string[]): Promise<void> {
 }
 
 function parseOptions(args: string[]): CliOptions {
-  const cwdFlag = args.findIndex((arg) => arg === "--cwd");
-  const frictionFlag = args.findIndex((arg) => arg === "--friction");
-  const cwd = cwdFlag >= 0 && args[cwdFlag + 1] ? resolve(args[cwdFlag + 1]) : process.cwd();
+  const cwd = optionValue(args, "--cwd");
+  const friction = optionValue(args, "--friction");
+  const runId = optionValue(args, "--run-id");
+  const evidence = optionValue(args, "--evidence");
   return {
-    cwd,
+    cwd: cwd ? resolve(cwd) : process.cwd(),
     force: args.includes("--force"),
     dryRun: args.includes("--dry-run"),
     json: args.includes("--json"),
-    friction: frictionFlag >= 0 && args[frictionFlag + 1] ? args[frictionFlag + 1] : "medium"
+    friction: friction ?? "medium",
+    runId: runId ?? "field-run",
+    evidence: evidence ?? "evidence/field-readiness/field-run"
   };
+}
+
+function optionValue(args: readonly string[], flag: string): string | null {
+  const index = args.findIndex((arg) => arg === flag);
+  return index >= 0 && args[index + 1] ? args[index + 1] : null;
 }
 
 function printHelp(): void {
@@ -154,6 +216,10 @@ function printHelp(): void {
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
     "  boulder release-plan [--cwd path] [--json]",
+    "  boulder product-readiness [--cwd path] [--json]",
+    "  boulder service-readiness [--cwd path] [--json]",
+    "  boulder doctor [--cwd path] [--json]",
+    "  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]",
     "  boulder export [--cwd path] [--force]",
     "",
     "Package:",
@@ -164,4 +230,23 @@ function printHelp(): void {
 
 function formatLines(title: string, lines: readonly string[]): string {
   return [title, ...lines.map((line) => `- ${line}`)].join("\n");
+}
+
+function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {
+  return [
+    "Boulder capability doctor",
+    `- status: ${report.status}`,
+    ...report.capabilities.map((item) => `- capability: ${item.id} (${item.kind}, ${item.lane})`),
+    ...report.issues.map((item) => `- ${item.severity}: ${item.id} - ${item.message}`)
+  ].join("\n");
+}
+
+function formatFieldEvidenceResult(result: Awaited<ReturnType<typeof recordFieldEvidence>>): string {
+  return [
+    "Boulder field-readiness record",
+    `- status: ${result.status}`,
+    `- run-id: ${result.runId}`,
+    `- manifest: ${result.manifestPath}`,
+    ...result.checks.map((item) => `- ${item.id}: ${item.status} - ${item.evidence}`)
+  ].join("\n");
 }

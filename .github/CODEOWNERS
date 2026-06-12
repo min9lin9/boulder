@@ -1,0 +1,16 @@
+# Boulder ownership map.
+# Replace @min9lin9 with a team handle if repository ownership changes.
+
+* @min9lin9
+
+/.github/ @min9lin9
+/src/ @min9lin9
+/test/ @min9lin9
+/docs/ @min9lin9
+/examples/ @min9lin9
+/fixtures/ @min9lin9
+/bin/ @min9lin9
+/package.json @min9lin9
+/boulder.yaml @min9lin9
+/SECURITY.md @min9lin9
+/GOVERNANCE.md @min9lin9

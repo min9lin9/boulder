@@ -1,0 +1,13 @@
+{
+  "generatedFromEvidence": true,
+  "metrics": [
+    "time-to-first-readiness-delta",
+    "readiness delta count",
+    "public evidence link count"
+  ],
+  "values": {
+    "time-to-first-readiness-delta": "under 15 minutes in local CLI loop",
+    "readiness delta count": 3,
+    "public evidence link count": 1
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "project": "kimi-agent-swarm-skill",
+  "repoUrl": "https://github.com/min9lin9/kimi-agent-swarm-skill",
+  "ref": "main",
+  "officialDocsPath": "fixtures/replay/kimi-agent-swarm-skill/official-docs.json",
+  "commands": [
+    "bun bin/boulder.ts inspect --cwd . --json",
+    "bun bin/boulder.ts pipeline --friction medium",
+    "bun bin/boulder.ts export --cwd . --force"
+  ],
+  "expectedArtifacts": [
+    "docs/REPO_BRIEF.md",
+    "docs/BOULDER_EXPORT.md",
+    "docs/CODEX_WORKFLOW_NOTES.md"
+  ],
+  "evidencePaths": [
+    "docs/CASE_STUDIES/evidence/external-replay/kimi-agent-swarm-skill.txt"
+  ],
+  "limitations": [
+    "Replay commands must be rechecked against the target repository official docs before execution.",
+    "This fixture does not claim external adoption."
+  ]
+}

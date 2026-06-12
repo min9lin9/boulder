@@ -1,0 +1,132 @@
+{
+  "friction": "high",
+  "stages": [
+    {
+      "id": "classification",
+      "label": "Classification",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "task-class",
+        "friction-level",
+        "risk-flags",
+        "approval-scope"
+      ],
+      "evidence": [
+        "repo-context",
+        "manifest-context",
+        "risk-context"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none",
+        "repo-read"
+      ]
+    },
+    {
+      "id": "deep-interview",
+      "label": "Deep Interview",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "ambiguities",
+        "assumptions",
+        "required-decisions",
+        "blocked-unknowns"
+      ],
+      "evidence": [
+        "operator-intent",
+        "open-questions",
+        "decision-log"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "pm-debate",
+      "label": "PM Debate",
+      "required": true,
+      "depth": "standard",
+      "outputs": [
+        "tradeoffs",
+        "recommended-path",
+        "rejected-options",
+        "milestone-scope"
+      ],
+      "evidence": [
+        "debate-notes",
+        "scope-boundary"
+      ],
+      "approvalRequired": true,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "synthesizer",
+      "label": "Synthesizer",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "decision",
+        "acceptance-gates",
+        "next-action",
+        "handoff-contract"
+      ],
+      "evidence": [
+        "synthesis-summary",
+        "implementation-contract"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "cso-qa",
+      "label": "CSO/QA",
+      "required": true,
+      "depth": "standard",
+      "outputs": [
+        "risk-review",
+        "qa-gates",
+        "approval-result"
+      ],
+      "evidence": [
+        "security-review",
+        "qa-checklist"
+      ],
+      "approvalRequired": true,
+      "allowedSideEffects": [
+        "none"
+      ]
+    }
+  ],
+  "failClosed": true,
+  "forbiddenSideEffects": [
+    "credential-access",
+    "package-install",
+    "external-launch",
+    "provider-call"
+  ],
+  "approvalGates": [
+    "pm-debate",
+    "cso-qa"
+  ],
+  "evidenceRequired": [
+    "repo-context",
+    "manifest-context",
+    "risk-context",
+    "operator-intent",
+    "open-questions",
+    "decision-log",
+    "debate-notes",
+    "scope-boundary",
+    "synthesis-summary",
+    "implementation-contract",
+    "security-review",
+    "qa-checklist"
+  ]
+}

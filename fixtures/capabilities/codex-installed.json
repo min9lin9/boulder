@@ -1,0 +1,61 @@
+{
+  "skills": [
+    {
+      "id": "omo:ulw-plan",
+      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-plan/SKILL.md",
+      "status": "installed"
+    },
+    {
+      "id": "omo:ulw-loop",
+      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-loop/SKILL.md",
+      "status": "installed"
+    },
+    {
+      "id": "omo:programming",
+      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/programming/SKILL.md",
+      "status": "installed"
+    },
+    {
+      "id": "omo:remove-ai-slops",
+      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/remove-ai-slops/SKILL.md",
+      "status": "installed"
+    },
+    {
+      "id": "claw-harness-reference",
+      "path": "/Users/burt/.codex/skills/claw-harness-reference/SKILL.md",
+      "status": "installed"
+    }
+  ],
+  "mcpServers": [
+    {
+      "id": "lennys-podcast-mcp",
+      "status": "available",
+      "officialDocsUrl": "https://github.com/min9lin9/lennys-podcast-mcp#readme"
+    },
+    {
+      "id": "code-review-graph",
+      "status": "available",
+      "officialDocsUrl": "https://github.com/min9lin9/code-review-graph#readme"
+    }
+  ],
+  "plugins": [
+    {
+      "id": "superpowers",
+      "status": "installed"
+    },
+    {
+      "id": "context-mode",
+      "status": "installed"
+    },
+    {
+      "id": "ast-grep",
+      "status": "installed"
+    }
+  ],
+  "runtimes": [
+    {
+      "id": "bun",
+      "version": "1.3.5"
+    }
+  ]
+}

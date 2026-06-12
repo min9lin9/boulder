@@ -11,3 +11,7 @@
 ## Reporting Issues
 
 Open a GitHub issue with a minimal reproduction and avoid including secrets or private repository data.
+
+## Responsible Disclosure
+
+Start with a non-sensitive GitHub issue that summarizes the affected command, expected boundary, actual behavior, and reproduction steps. Do not include secrets, credentials, private repository content, or proprietary logs in public reports.

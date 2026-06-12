@@ -1,0 +1,20 @@
+# Service Readiness
+
+Status: pilot-ready
+
+## Checks
+
+- service-loop: pass - docs/SERVICE_LOOP.md
+- onboarding: pass - docs/ONBOARDING.md
+- official-docs-coverage: pass - fixtures/replay/kimi-agent-swarm-skill/official-docs.json
+- external-replay: pass - fixtures/replay/kimi-agent-swarm-skill/replay.json
+- handoff-validation: pass - fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json
+- service-acceptance-gates: pass - fixtures/service-readiness/gates.json
+- field-evidence: pass - evidence/field-readiness/oss-run-1
+- operating-metrics: pass - docs/OPERATING_METRICS.md
+- support-routes: pass - .github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, docs/TRUST_SUPPORT_SECURITY.md
+- product-readiness: fail - product-readiness blocked
+
+## Next Steps
+
+- Service pilot is ready; product-readiness must pass before claiming public service-ready.

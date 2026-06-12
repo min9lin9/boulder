@@ -36,7 +36,8 @@
     "CHANGELOG.md",
     "ROADMAP.md",
     "CONTRIBUTING.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "!**/* 2.*"
   ],
   "engines": {
     "bun": ">=1.3.0"

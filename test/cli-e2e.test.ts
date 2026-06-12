@@ -1,7 +1,7 @@
 import { exec } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, expect, test } from "bun:test";
 
 type CliResult = {
@@ -18,10 +18,20 @@ async function removeTempRepo(root: string): Promise<void> {
   await rm(root, { force: true, recursive: true });
 }
 
+async function write(root: string, path: string, content: string): Promise<void> {
+  const target = join(root, path);
+  await mkdir(dirname(target), { recursive: true });
+  await writeFile(target, content, "utf8");
+}
+
 async function runBoulder(args: readonly string[]): Promise<CliResult> {
   const root = join(import.meta.dir, "..");
+  return runCommand(`bun bin/boulder.ts ${args.map(shellQuote).join(" ")}`, root);
+}
+
+async function runCommand(command: string, cwd: string): Promise<CliResult> {
   return new Promise((resolve, reject) => {
-    exec(`bun bin/boulder.ts ${args.map(shellQuote).join(" ")}`, { cwd: root }, (error, stdout, stderr) => {
+    exec(command, { cwd }, (error, stdout, stderr) => {
       if (error && !stdout && !stderr) {
         reject(error);
         return;
@@ -42,6 +52,26 @@ function shellQuote(value: string): string {
 }
 
 describe("boulder CLI e2e cleanup safety", () => {
+  test("prints the package version", async () => {
+    const root = join(import.meta.dir, "..");
+    const pkg = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as { version: string };
+
+    const result = await runBoulder(["--version"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.trim()).toBe(pkg.version);
+  });
+
+  test("keeps duplicate copy artifacts out of package dry run", async () => {
+    const root = join(import.meta.dir, "..");
+
+    const result = await runCommand("bun pm pack --dry-run --ignore-scripts", root);
+    const output = `${result.stdout}\n${result.stderr}`;
+
+    expect(result.exitCode).toBe(0);
+    expect(output).not.toMatch(/(?:^|\n).* 2\.(?:ts|md|json|js|tsx|mts|cts)(?:\n|$)/);
+  });
+
   test("preserves full init-to-export happy path", async () => {
     // Given
     const root = await tempRepo();
@@ -166,5 +196,50 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toBe("");
     expect(result.stderr.trim()).toBe('ERROR pipeline.friction.invalid: Unsupported friction level "impossible". Expected one of: low, medium, high.');
+  });
+
+  test("renders capability doctor json for installed Codex tools", async () => {
+    const root = await tempRepo();
+    try {
+      await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+        skills: [{ id: "omo:ulw-plan", status: "installed" }],
+        mcpServers: [{ id: "lennys-podcast-mcp", status: "available", officialDocsUrl: "https://github.com/example/lennys-podcast-mcp#readme" }],
+        plugins: [{ id: "superpowers", status: "installed" }],
+        runtimes: [{ id: "bun", version: "1.3.5" }]
+      }));
+
+      const result = await runBoulder(["doctor", "--cwd", root, "--json"]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(payload.status).toBe("warn");
+      expect(payload.capabilities.some((item: { id: string; lane: string }) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
+      expect(payload.issues.some((item: { id: string }) => item.id === "gajae-code-bun-runtime")).toBe(true);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("records field-readiness evidence through the CLI", async () => {
+    const root = await tempRepo();
+    const evidencePath = "evidence/field-readiness/oss-run-1";
+    try {
+      await write(root, `${evidencePath}/activation-transcript.txt`, "boulder inspect\nboulder service-readiness\n");
+      await write(root, `${evidencePath}/first-readiness.json`, "{\"status\":\"pilot-ready\"}\n");
+      await write(root, `${evidencePath}/second-readiness-delta.json`, "{\"changedRecommendations\":[\"add public evidence link\"]}\n");
+      await write(root, `${evidencePath}/share-safe-artifact-url.txt`, "https://github.com/min9lin9/boulder/pull/1\n");
+      await write(root, `${evidencePath}/decision-log.json`, "{\"outcome\":\"request-changes\"}\n");
+      await write(root, `${evidencePath}/official-docs-refresh.json`, "{\"officialDocsFirst\":true,\"docsUrls\":[\"https://github.com/min9lin9/boulder#readme\"]}\n");
+      await write(root, `${evidencePath}/generated-metrics.json`, "{\"generatedFromEvidence\":true,\"metrics\":[\"time-to-first-readiness-delta\",\"readiness delta count\",\"public evidence link count\"]}\n");
+
+      const result = await runBoulder(["record", "field-readiness", "--run-id", "oss-run-1", "--evidence", evidencePath, "--cwd", root, "--json"]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(payload.status).toBe("pass");
+      expect(await readFile(join(root, evidencePath, "manifest.json"), "utf8")).toContain("\"runId\": \"oss-run-1\"");
+    } finally {
+      await removeTempRepo(root);
+    }
   });
 });
