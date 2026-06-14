@@ -13,6 +13,8 @@ Use `/Boulder` as the repo-local operating harness for Codex work:
 
 When the user writes `/Boulder`, treat it as an explicit request to run this skill.
 
+For user-facing Korean usage guidance, read `references/usage.ko.md`.
+
 ## Invocation
 
 In local Codex, do not rely on `bunx` or `npx` for `/Boulder`. The Codex sandbox may block tempdir writes or registry access.

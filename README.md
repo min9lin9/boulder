@@ -41,6 +41,32 @@ For higher-friction work:
 bunx boulder-oss-cli@latest pipeline --friction high
 ```
 
+## Local Codex Skill
+
+If you use Boulder from local Codex, start a new Codex session in the target repo and ask:
+
+```text
+/Boulder quickstart
+```
+
+For first-time setup:
+
+```text
+/Boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
+```
+
+If the target repo is not the current working directory, include `--cwd`:
+
+```text
+/Boulder quickstart --cwd /path/to/repo
+```
+
+The `/Boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
+
+GJC and LazyCodex are not executed automatically. Boulder can detect and route planning/execution workflows, but external executors should be enabled explicitly.
+
+See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
+
 ## Core Commands
 
 ```bash
