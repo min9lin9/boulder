@@ -16,6 +16,13 @@ export type SideEffectCategory =
   | "package-install"
   | "external-launch";
 
+export type ExecutorRoute = {
+  lane: "plan" | "execute";
+  preferred: string;
+  mode: "detect-and-suggest";
+  fallback: string;
+};
+
 export type PipelineStage = {
   id: PipelineStageId;
   label: string;
@@ -34,6 +41,7 @@ export type PipelinePlan = {
   forbiddenSideEffects: SideEffectCategory[];
   approvalGates: string[];
   evidenceRequired: string[];
+  executors: readonly ExecutorRoute[];
 };
 
 export type PipelineIssue = {
@@ -115,6 +123,7 @@ export function formatPipelinePlan(plan: PipelinePlan): string {
     "Boulder pipeline plan",
     `- friction: ${plan.friction}`,
     ...plan.stages.map((stageItem) => `- stage: ${stageItem.id} (${stageMarkers(stageItem).join(", ")})`),
+    ...plan.executors.map((route) => `- executor: ${route.lane}=${route.preferred} (${route.mode}, fallback: ${route.fallback})`),
     `- fail-closed: ${plan.failClosed}`
   ].join("\n");
 }
@@ -126,8 +135,26 @@ function plan(friction: FrictionLevel, stages: PipelineStage[]): PipelinePlan {
     failClosed: true,
     forbiddenSideEffects: [...FORBIDDEN_SIDE_EFFECTS],
     approvalGates: stages.filter((stageItem) => stageItem.approvalRequired).map((stageItem) => stageItem.id),
-    evidenceRequired: unique(stages.flatMap((stageItem) => stageItem.evidence))
+    evidenceRequired: unique(stages.flatMap((stageItem) => stageItem.evidence)),
+    executors: defaultExecutorRoutes()
   };
+}
+
+function defaultExecutorRoutes(): readonly ExecutorRoute[] {
+  return [
+    {
+      lane: "plan",
+      preferred: "gajae-code",
+      mode: "detect-and-suggest",
+      fallback: "codex"
+    },
+    {
+      lane: "execute",
+      preferred: "lazycodex",
+      mode: "detect-and-suggest",
+      fallback: "codex"
+    }
+  ];
 }
 
 function stage(

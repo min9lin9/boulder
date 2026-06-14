@@ -12,6 +12,23 @@ The product flow is:
 Boulder classify/export -> GJC plan/review -> LazyCodex implement -> Boulder verify/readiness gate
 ```
 
+The default executor profile is intentionally conservative:
+
+```yaml
+executors:
+  planning:
+    preferred: gajae-code
+    mode: detect-and-suggest
+  execution:
+    preferred: lazycodex
+    mode: detect-and-suggest
+  fallback:
+    planning: codex
+    execution: codex
+```
+
+This makes GJC and LazyCodex visible in planning without making Boulder launch either runtime automatically.
+
 ## Adoption Tiers
 
 | Project or source | Use now | Use later | Do not do |

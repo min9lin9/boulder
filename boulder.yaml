@@ -35,6 +35,16 @@ providers:
   default: codex
   externalAllowed: false
   approvalRequired: true
+executors:
+  planning:
+    preferred: gajae-code
+    mode: detect-and-suggest
+  execution:
+    preferred: lazycodex
+    mode: detect-and-suggest
+  fallback:
+    planning: codex
+    execution: codex
 export:
   markdown: true
   codexNotes: true

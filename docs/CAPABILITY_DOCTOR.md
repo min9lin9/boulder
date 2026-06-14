@@ -62,6 +62,15 @@ Gajae-Code requires Bun >=1.3.14; detected Bun <version>.
 
 This keeps Boulder modular. Boulder can still validate packets and record evidence, but live GJC execution remains blocked until the runtime is upgraded.
 
+When this warning appears, Boulder should keep routing in `detect-and-suggest` mode:
+
+- planning preference: `gajae-code`
+- execution preference: `lazycodex`
+- fallback planner: `codex`
+- fallback executor: `codex`
+
+The warning blocks only live GJC execution claims. It does not block `inspect`, `pipeline`, `verify --dry-run`, `replay-check`, `product-readiness`, or evidence export.
+
 ## CLI
 
 ```bash

@@ -36,7 +36,22 @@ export function validateManifest(manifest: BoulderManifest): ManifestIssue[] {
       message: "External providers require approval gating."
     });
   }
+  validateExecutors(issues, manifest);
   return issues;
+}
+
+function validateExecutors(issues: ManifestIssue[], manifest: BoulderManifest): void {
+  requireText(issues, "executors.planning.preferred", manifest.executors.planning.preferred, "Planning executor is required.");
+  requireText(issues, "executors.execution.preferred", manifest.executors.execution.preferred, "Execution executor is required.");
+  requireText(issues, "executors.fallback.planning", manifest.executors.fallback.planning, "Planning fallback executor is required.");
+  requireText(issues, "executors.fallback.execution", manifest.executors.fallback.execution, "Execution fallback executor is required.");
+  if (manifest.executors.planning.mode !== "detect-and-suggest" || manifest.executors.execution.mode !== "detect-and-suggest") {
+    issues.push({
+      path: "executors",
+      severity: "error",
+      message: "External executors must use detect-and-suggest mode until explicit execution adapters are configured."
+    });
+  }
 }
 
 function validateWorkflowStack(issues: ManifestIssue[], manifest: BoulderManifest): void {

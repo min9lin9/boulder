@@ -11,6 +11,24 @@ export type WorkflowStackComponent = {
   description: string;
 };
 
+export type ExecutorMode = "detect-and-suggest";
+
+export type ExecutorProfile = {
+  preferred: string;
+  mode: ExecutorMode;
+};
+
+export type ExecutorFallback = {
+  planning: string;
+  execution: string;
+};
+
+export type ExecutorProfiles = {
+  planning: ExecutorProfile;
+  execution: ExecutorProfile;
+  fallback: ExecutorFallback;
+};
+
 export type BoulderManifest = {
   name: string;
   description: string;
@@ -24,6 +42,7 @@ export type BoulderManifest = {
     externalAllowed: boolean;
     approvalRequired: boolean;
   };
+  executors: ExecutorProfiles;
   export: {
     markdown: boolean;
     codexNotes: boolean;

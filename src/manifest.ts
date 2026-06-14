@@ -1,4 +1,5 @@
 import { at, readText, writeText } from "./fs";
+import { defaultExecutors, executorsFromText } from "./executors";
 import type { BoulderManifest, RepoInspection, VerificationCommand, WorkflowStackComponent } from "./types";
 import { defaultWorkflowStack } from "./workflow-stack";
 
@@ -32,6 +33,7 @@ export function defaultManifest(name = "oss-repository"): BoulderManifest {
       externalAllowed: false,
       approvalRequired: true
     },
+    executors: defaultExecutors(),
     export: {
       markdown: true,
       codexNotes: true
@@ -66,6 +68,16 @@ export function manifestToYaml(manifest: BoulderManifest): string {
     `  default: ${manifest.providers.default}`,
     `  externalAllowed: ${manifest.providers.externalAllowed ? "true" : "false"}`,
     `  approvalRequired: ${manifest.providers.approvalRequired ? "true" : "false"}`,
+    "executors:",
+    "  planning:",
+    `    preferred: ${manifest.executors.planning.preferred}`,
+    `    mode: ${manifest.executors.planning.mode}`,
+    "  execution:",
+    `    preferred: ${manifest.executors.execution.preferred}`,
+    `    mode: ${manifest.executors.execution.mode}`,
+    "  fallback:",
+    `    planning: ${manifest.executors.fallback.planning}`,
+    `    execution: ${manifest.executors.fallback.execution}`,
     "export:",
     `  markdown: ${manifest.export.markdown ? "true" : "false"}`,
     `  codexNotes: ${manifest.export.codexNotes ? "true" : "false"}`,
@@ -113,6 +125,7 @@ export async function loadManifest(root: string): Promise<BoulderManifest> {
       externalAllowed: bool(nestedScalar(text, "providers", "externalAllowed")) ?? false,
       approvalRequired: bool(nestedScalar(text, "providers", "approvalRequired")) ?? true
     },
+    executors: executorsFromText(text, defaults.executors),
     export: {
       markdown: bool(nestedScalar(text, "export", "markdown")) ?? true,
       codexNotes: bool(nestedScalar(text, "export", "codexNotes")) ?? true

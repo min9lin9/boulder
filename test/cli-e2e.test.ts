@@ -242,6 +242,8 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(payload.forbiddenSideEffects).toContain("external-launch");
     expect(payload.forbiddenSideEffects).toContain("provider-call");
     expect(payload.approvalGates).toContain("cso-qa");
+    expect(payload.executors.some((item: { lane: string; preferred: string; mode: string }) => item.lane === "plan" && item.preferred === "gajae-code" && item.mode === "detect-and-suggest")).toBe(true);
+    expect(payload.executors.some((item: { lane: string; preferred: string; fallback: string }) => item.lane === "execute" && item.preferred === "lazycodex" && item.fallback === "codex")).toBe(true);
   });
 
   test("rejects invalid pipeline friction", async () => {

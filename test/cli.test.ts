@@ -89,6 +89,18 @@ describe("boulder M1 surface", () => {
     expect(issues.some((item) => item.path === "workflowStack" && item.severity === "error")).toBe(true);
   });
 
+  test("default manifest routes planning and execution executors by profile", () => {
+    const manifest = defaultManifest("fixture");
+
+    expect(manifest.executors.planning.preferred).toBe("gajae-code");
+    expect(manifest.executors.planning.mode).toBe("detect-and-suggest");
+    expect(manifest.executors.execution.preferred).toBe("lazycodex");
+    expect(manifest.executors.execution.mode).toBe("detect-and-suggest");
+    expect(manifest.executors.fallback.planning).toBe("codex");
+    expect(manifest.executors.fallback.execution).toBe("codex");
+    expect(validateManifest(manifest).some((item) => item.path === "executors")).toBe(false);
+  });
+
   test("verify rejects invalid manifests", async () => {
     const root = await tempRepo();
     await initHarness(root);
@@ -176,6 +188,8 @@ describe("pipeline planning surface", () => {
     expect(JSON.stringify(plan.stages.map((item) => item.id))).toBe(JSON.stringify(["classification", "deep-interview", "pm-debate", "synthesizer"]));
     expect(JSON.stringify(plan.approvalGates)).toBe(JSON.stringify(["pm-debate"]));
     expect(plan.evidenceRequired).toContain("debate-notes");
+    expect(plan.executors.some((item) => item.lane === "plan" && item.preferred === "gajae-code")).toBe(true);
+    expect(plan.executors.some((item) => item.lane === "execute" && item.preferred === "lazycodex")).toBe(true);
     expect(JSON.stringify(validatePipelinePlan(plan))).toBe(JSON.stringify([]));
   });
 
