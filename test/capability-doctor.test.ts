@@ -29,23 +29,59 @@ describe("capability doctor", () => {
         { id: "superpowers", status: "installed" }
       ],
       runtimes: [
-        { id: "bun", version: "1.3.5" }
+        { id: "bun", version: "1.3.14" }
       ]
     }));
 
     const report = await evaluateCapabilityDoctor(root);
 
-    expect(report.status).toBe("warn");
+    expect(report.status).toBe("pass");
     expect(report.capabilities.some((item) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "omo:ulw-loop" && item.lane === "execute")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "lennys-podcast-mcp" && item.officialDocsFirst)).toBe(true);
-    expect(report.issues.some((item) => item.id === "gajae-code-bun-runtime" && item.severity === "warn")).toBe(true);
+    expect(report.issues.some((item) => item.id === "gajae-code-bun-runtime")).toBe(false);
+  });
+
+  test("passes when Bun supports live GJC execution", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [{ id: "omo:ulw-plan", status: "installed" }],
+      mcpServers: [],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.14" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root, { codexHome: join(root, ".codex") });
+
+    expect(report.status).toBe("pass");
+    expect(report.issues.some((item) => item.id === "gajae-code-bun-runtime")).toBe(false);
+  });
+
+  test("discovers local Codex skills and MCP inventory when fixture is missing", async () => {
+    const root = await tempRepo();
+    await write(root, ".codex/skills/boulder/SKILL.md", "---\nname: boulder\n---\n");
+    await write(root, ".codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/programming/SKILL.md", "---\nname: programming\n---\n");
+    await write(root, ".codex/mcp.json", JSON.stringify({
+      mcpServers: {
+        "lennys-podcast-mcp": {
+          command: "lennys-podcast-mcp"
+        }
+      }
+    }));
+
+    const report = await evaluateCapabilityDoctor(root, { codexHome: join(root, ".codex") });
+
+    expect(report.status).toBe("pass");
+    expect(report.capabilities.some((item) => item.kind === "skill" && item.id === "boulder")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "skill" && item.id === "omo:programming")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "mcp" && item.id === "lennys-podcast-mcp" && item.officialDocsFirst)).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "runtime" && item.id === "bun" && item.status === "1.3.14")).toBe(true);
   });
 
   test("fails closed when capability inventory is missing", async () => {
     const root = await tempRepo();
 
-    const report = await evaluateCapabilityDoctor(root);
+    const report = await evaluateCapabilityDoctor(root, { codexHome: join(root, "missing-codex") });
 
     expect(report.status).toBe("fail");
     expect(report.issues.some((item) => item.id === "capability-inventory-missing")).toBe(true);

@@ -1,5 +1,6 @@
 import { at, readText, writeText } from "./fs";
 import { defaultExecutors, executorsFromText } from "./executors";
+import { yamlBool, yamlList, yamlNestedScalar, yamlScalar, yamlSectionLines } from "./manifest-yaml";
 import type { BoulderManifest, RepoInspection, VerificationCommand, WorkflowStackComponent } from "./types";
 import { defaultWorkflowStack } from "./workflow-stack";
 
@@ -113,47 +114,28 @@ export async function loadManifest(root: string): Promise<BoulderManifest> {
   const defaults = defaultManifest();
   return {
     ...defaults,
-    name: scalar(text, "name") ?? defaults.name,
-    description: scalar(text, "description") ?? defaults.description,
-    maintainers: list(text, "maintainers") ?? defaults.maintainers,
+    name: yamlScalar(text, "name") ?? defaults.name,
+    description: yamlScalar(text, "description") ?? defaults.description,
+    maintainers: [...yamlList(text, "maintainers") ?? defaults.maintainers],
     workflowStack: workflowStackList(text) ?? [],
-    workflows: list(text, "workflows") ?? defaults.workflows,
-    protectedPaths: list(text, "protectedPaths") ?? defaults.protectedPaths,
+    workflows: [...yamlList(text, "workflows") ?? defaults.workflows],
+    protectedPaths: [...yamlList(text, "protectedPaths") ?? defaults.protectedPaths],
     verification: verificationList(text) ?? defaults.verification,
     providers: {
-      default: nestedScalar(text, "providers", "default") ?? "codex",
-      externalAllowed: bool(nestedScalar(text, "providers", "externalAllowed")) ?? false,
-      approvalRequired: bool(nestedScalar(text, "providers", "approvalRequired")) ?? true
+      default: yamlNestedScalar(text, "providers", "default") ?? "codex",
+      externalAllowed: yamlBool(yamlNestedScalar(text, "providers", "externalAllowed")) ?? false,
+      approvalRequired: yamlBool(yamlNestedScalar(text, "providers", "approvalRequired")) ?? true
     },
     executors: executorsFromText(text, defaults.executors),
     export: {
-      markdown: bool(nestedScalar(text, "export", "markdown")) ?? true,
-      codexNotes: bool(nestedScalar(text, "export", "codexNotes")) ?? true
+      markdown: yamlBool(yamlNestedScalar(text, "export", "markdown")) ?? true,
+      codexNotes: yamlBool(yamlNestedScalar(text, "export", "codexNotes")) ?? true
     }
   };
 }
 
-function scalar(text: string, key: string): string | null {
-  const match = text.match(new RegExp(`^${escapeRegExp(key)}:\\s*(.+)$`, "m"));
-  return match?.[1]?.trim() ?? null;
-}
-
-function nestedScalar(text: string, section: string, key: string): string | null {
-  const lines = sectionLines(text, section);
-  const match = lines.join("\n").match(new RegExp(`^\\s{2}${escapeRegExp(key)}:\\s*(.+)$`, "m"));
-  return match?.[1]?.trim() ?? null;
-}
-
-function list(text: string, key: string): string[] | null {
-  const lines = sectionLines(text, key);
-  const values = lines
-    .map((line) => line.match(/^\s{2}-\s+(.+)$/)?.[1]?.trim())
-    .filter((value): value is string => Boolean(value));
-  return values.length ? values : null;
-}
-
 function workflowStackList(text: string): WorkflowStackComponent[] | null {
-  const lines = sectionLines(text, "workflowStack");
+  const lines = yamlSectionLines(text, "workflowStack");
   const items: WorkflowStackComponent[] = [];
   let current: Partial<WorkflowStackComponent> | null = null;
 
@@ -169,7 +151,7 @@ function workflowStackList(text: string): WorkflowStackComponent[] | null {
     const required = line.match(/^\s{4}required:\s*(.+)$/)?.[1]?.trim();
     const description = line.match(/^\s{4}description:\s*(.+)$/)?.[1]?.trim();
     if (role) current.role = role;
-    if (required) current.required = bool(required) ?? false;
+    if (required) current.required = yamlBool(required) ?? false;
     if (description) current.description = description;
   }
 
@@ -189,7 +171,7 @@ function pushWorkflowStackItem(items: WorkflowStackComponent[], current: Partial
 }
 
 function verificationList(text: string): VerificationCommand[] | null {
-  const lines = sectionLines(text, "verification");
+  const lines = yamlSectionLines(text, "verification");
   const items: VerificationCommand[] = [];
   let current: Partial<VerificationCommand> | null = null;
   for (const line of lines) {
@@ -204,32 +186,10 @@ function verificationList(text: string): VerificationCommand[] | null {
     const command = line.match(/^\s{4}command:\s*(.+)$/)?.[1]?.trim();
     if (command && current) current.command = command;
     const required = line.match(/^\s{4}required:\s*(.+)$/)?.[1]?.trim();
-    if (required && current) current.required = bool(required) ?? false;
+    if (required && current) current.required = yamlBool(required) ?? false;
   }
   if (current?.name && current.command) {
     items.push({ name: current.name, command: current.command, required: current.required });
   }
   return items.length ? items : null;
-}
-
-function sectionLines(text: string, section: string): string[] {
-  const lines = text.split("\n");
-  const start = lines.findIndex((line) => line.trim() === `${section}:`);
-  if (start === -1) return [];
-  const result: string[] = [];
-  for (const line of lines.slice(start + 1)) {
-    if (/^\S/.test(line) && line.includes(":")) break;
-    result.push(line);
-  }
-  return result;
-}
-
-function bool(value: string | null | undefined): boolean | null {
-  if (value === "true") return true;
-  if (value === "false") return false;
-  return null;
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

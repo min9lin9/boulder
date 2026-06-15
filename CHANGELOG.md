@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.10
+
+- Raised the supported Bun runtime floor to `>=1.3.14` and removed the default GJC runtime doctor warning.
+- Added local Codex skills, plugin-cache skills, MCP config, plugin family, and Bun runtime discovery for `boulder doctor` when a checked-in inventory fixture is absent.
+- Split the lightweight manifest YAML reader into a small parser module with boundary tests.
+- Added approval-gated GJC and LazyCodex command adapter candidates to pipeline executor routes.
+- Refreshed release workflow evidence for the upgraded runtime and package dry-run.
+
 ## 0.1.9
 
 - Added `boulder replay-run --dry-run` for share-safe replay runbook generation.

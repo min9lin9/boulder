@@ -4,19 +4,19 @@ Status: active
 
 ## Requirements
 
-- Bun `1.3.5` or compatible with the current CI workflow.
+- Bun `>=1.3.14`.
 - Git.
 - A local checkout of the Boulder repository.
 
 ## Optional Executor Runtime
 
-Boulder itself is tested against the current CI Bun runtime. Live downstream GJC execution has a stricter runtime floor:
+Boulder itself now uses the same Bun floor required for live downstream GJC adapter probes:
 
 - GJC live planning: Bun `>=1.3.14`
 - LazyCodex handoff: no automatic runtime launch from Boulder core
 - Fallback planning and execution: Codex/manual mode
 
-`boulder doctor` reports a warning when the local Bun runtime is below the GJC live execution floor. The warning does not block Boulder CLI checks, replay fixtures, packet validation, or Codex fallback routing.
+`boulder doctor` reports a warning when the local Bun runtime is below the GJC live execution floor. With Bun `>=1.3.14`, the GJC runtime warning is removed and Boulder can expose live adapter command candidates while keeping execution approval-gated.
 
 ## Install
 

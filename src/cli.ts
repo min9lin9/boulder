@@ -30,7 +30,7 @@ type CliOptions = {
   evidence: string;
 };
 
-const VERSION = "0.1.9";
+const VERSION = "0.1.10";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";

@@ -18,7 +18,7 @@ Default inventory path:
 fixtures/capabilities/codex-installed.json
 ```
 
-The inventory is intentionally explicit. It is evidence, not an auto-discovery claim.
+The committed fixture is explicit evidence. When the fixture is absent, Boulder can also scan the local Codex home for installed skills, plugin-cache skills, MCP server config, plugin families, and the active Bun runtime.
 
 Supported sections:
 
@@ -62,6 +62,8 @@ Gajae-Code requires Bun >=1.3.14; detected Bun <version>.
 
 This keeps Boulder modular. Boulder can still validate packets and record evidence, but live GJC execution remains blocked until the runtime is upgraded.
 
+With Bun `>=1.3.14`, the warning is removed. Boulder still treats live GJC/LazyCodex commands as adapter candidates, not automatic launches.
+
 When this warning appears, Boulder should keep routing in `detect-and-suggest` mode:
 
 - planning preference: `gajae-code`
@@ -83,4 +85,4 @@ Human output:
 boulder doctor
 ```
 
-`fail` means the capability inventory is missing or invalid. `warn` means Boulder can proceed with fixture-backed routing but the operator must resolve runtime or adapter issues before claiming live downstream execution.
+`fail` means neither a valid fixture nor a readable local Codex inventory was available, or the committed fixture is malformed. `warn` means Boulder can proceed with routing but the operator must resolve runtime or adapter issues before claiming live downstream execution.

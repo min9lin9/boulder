@@ -21,8 +21,8 @@ Boulder is a workflow manager and evaluator for modular AI-assisted work: GJC is
 
 Runtime constraint:
 
-- Live `gjc` execution was not completed in this review because `bunx gajae-code --help` requires Bun `>=1.3.14` and the local runtime is Bun `1.3.5`.
-- The architecture applies the public GJC contract and must later be validated with a real GJC session or compatible planning packet.
+- Boulder now requires Bun `>=1.3.14`, matching the GJC live adapter floor.
+- The architecture applies the public GJC contract and exposes approval-gated command adapter candidates. It must still be validated with a real GJC session or compatible planning packet before claiming production-grade executor telemetry.
 
 ## Thesis / Antithesis / Synthesis
 

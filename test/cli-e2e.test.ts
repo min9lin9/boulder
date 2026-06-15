@@ -175,16 +175,16 @@ describe("boulder CLI e2e cleanup safety", () => {
         skills: [{ id: "omo:ulw-plan", status: "installed" }],
         mcpServers: [{ id: "lennys-podcast-mcp", status: "available", officialDocsUrl: "https://github.com/example/lennys-podcast-mcp#readme" }],
         plugins: [{ id: "superpowers", status: "installed" }],
-        runtimes: [{ id: "bun", version: "1.3.5" }]
+        runtimes: [{ id: "bun", version: "1.3.14" }]
       }));
 
       const result = await runBoulder(["doctor", "--cwd", root, "--json"]);
       const payload = JSON.parse(result.stdout);
 
       expect(result.exitCode).toBe(0);
-      expect(payload.status).toBe("warn");
+      expect(payload.status).toBe("pass");
       expect(payload.capabilities.some((item: { id: string; lane: string }) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
-      expect(payload.issues.some((item: { id: string }) => item.id === "gajae-code-bun-runtime")).toBe(true);
+      expect(payload.issues.some((item: { id: string }) => item.id === "gajae-code-bun-runtime")).toBe(false);
     } finally {
       await removeTempRepo(root);
     }

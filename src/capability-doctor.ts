@@ -1,5 +1,4 @@
-import { join } from "node:path";
-import { readText } from "./fs";
+import { capabilityInventoryPath, hasValidInventoryItems, loadCapabilityInventory, type CapabilityDiscoveryOptions, type InventoryItem } from "./capability-inventory";
 
 export type CapabilityLane = "intake" | "plan" | "execute" | "verify" | "record" | "compound";
 export type DoctorStatus = "pass" | "warn" | "fail";
@@ -27,37 +26,21 @@ export type CapabilityDoctorReport = {
   readonly nextSteps: readonly string[];
 };
 
-type InventoryItem = {
-  readonly id: string;
-  readonly status?: string;
-  readonly version?: string;
-  readonly officialDocsUrl?: string;
-};
-
-type CapabilityInventory = {
-  readonly skills: readonly InventoryItem[];
-  readonly mcpServers: readonly InventoryItem[];
-  readonly plugins: readonly InventoryItem[];
-  readonly runtimes: readonly InventoryItem[];
-};
-
-const INVENTORY_PATH = "fixtures/capabilities/codex-installed.json";
-
-export async function evaluateCapabilityDoctor(root: string): Promise<CapabilityDoctorReport> {
-  const inventory = parseInventory(await readText(join(root, INVENTORY_PATH)));
+export async function evaluateCapabilityDoctor(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityDoctorReport> {
+  const inventory = await loadCapabilityInventory(root, options);
   if (!inventory) {
     return {
       status: "fail",
       capabilities: [],
-      issues: [{ id: "capability-inventory-missing", severity: "error", message: `missing or invalid ${INVENTORY_PATH}` }],
+      issues: [{ id: "capability-inventory-missing", severity: "error", message: `missing or invalid ${capabilityInventoryPath()}` }],
       nextSteps: ["Run capability discovery and commit fixtures/capabilities/codex-installed.json before routing work."]
     };
   }
-  if (!hasValidItems(inventory)) {
+  if (!hasValidInventoryItems(inventory)) {
     return {
       status: "fail",
       capabilities: [],
-      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${INVENTORY_PATH} contains malformed capability entries` }],
+      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} contains malformed capability entries` }],
       nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
     };
   }
@@ -83,7 +66,7 @@ function toCapability(item: InventoryItem, kind: Capability["kind"]): Capability
   return {
     id: item.id,
     kind,
-    status: item.status ?? "unknown",
+    status: kind === "runtime" ? item.version ?? item.status ?? "unknown" : item.status ?? "unknown",
     lane,
     officialDocsFirst: kind === "mcp" || Boolean(item.officialDocsUrl),
     routingHint: `${lane}: ${routingHintFor(lane)}`
@@ -127,35 +110,6 @@ function runtimeIssues(runtimes: readonly InventoryItem[]): readonly DoctorIssue
     }];
   }
   return [];
-}
-
-function parseInventory(content: string | null): CapabilityInventory | null {
-  if (!content) return null;
-  try {
-    const parsed: unknown = JSON.parse(content);
-    if (!isInventory(parsed)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function isInventory(value: unknown): value is CapabilityInventory {
-  if (!isRecord(value)) return false;
-  return ["skills", "mcpServers", "plugins", "runtimes"].every((key) => Array.isArray(value[key]));
-}
-
-function hasValidItems(inventory: CapabilityInventory): boolean {
-  return [
-    ...inventory.skills,
-    ...inventory.mcpServers,
-    ...inventory.plugins,
-    ...inventory.runtimes
-  ].every((item) => isRecord(item) && typeof item["id"] === "string");
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function compareVersions(left: string, right: string): number {

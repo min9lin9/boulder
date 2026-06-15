@@ -23,6 +23,12 @@ export type ExecutorFallback = {
   readonly execution: string;
 };
 
+export type ExecutorAdapterCommand = {
+  readonly command: string;
+  readonly purpose: string;
+  readonly requiresApproval: boolean;
+};
+
 export type ExecutorProfiles = {
   readonly planning: ExecutorProfile;
   readonly execution: ExecutorProfile;

@@ -25,6 +25,17 @@ describe("pipeline planning surface", () => {
     expect(JSON.stringify(validatePipelinePlan(plan))).toBe(JSON.stringify([]));
   });
 
+  test("adds command adapter candidates for GJC and LazyCodex handoff", () => {
+    const plan = buildPipelinePlan("medium");
+    const planning = plan.executors.find((item) => item.lane === "plan");
+    const execution = plan.executors.find((item) => item.lane === "execute");
+
+    expect(planning?.adapterCommands.some((item) => item.command === "bunx gajae-code --help")).toBe(true);
+    expect(planning?.adapterCommands.some((item) => item.command.includes("gjc-plan.md"))).toBe(true);
+    expect(execution?.adapterCommands.some((item) => item.command.includes("lazycodex"))).toBe(true);
+    expect(execution?.adapterCommands.some((item) => item.requiresApproval)).toBe(true);
+  });
+
   test("builds a high friction pipeline plan", () => {
     const plan = buildPipelinePlan("high");
     expect(plan.friction).toBe("high");

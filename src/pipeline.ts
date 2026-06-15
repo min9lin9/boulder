@@ -1,5 +1,6 @@
 import { defaultExecutors } from "./executors";
-import type { ExecutorProfiles } from "./types";
+import { adapterCommandsForExecutor } from "./executor-adapters";
+import type { ExecutorAdapterCommand, ExecutorProfiles } from "./types";
 
 export type FrictionLevel = "low" | "medium" | "high";
 
@@ -24,6 +25,7 @@ export type ExecutorRoute = {
   readonly preferred: string;
   readonly mode: "detect-and-suggest";
   readonly fallback: string;
+  readonly adapterCommands: readonly ExecutorAdapterCommand[];
 };
 
 export type PipelineStage = {
@@ -149,13 +151,15 @@ function executorRoutesFromProfiles(executors: ExecutorProfiles): readonly Execu
       lane: "plan",
       preferred: executors.planning.preferred,
       mode: executors.planning.mode,
-      fallback: executors.fallback.planning
+      fallback: executors.fallback.planning,
+      adapterCommands: adapterCommandsForExecutor(executors.planning.preferred)
     },
     {
       lane: "execute",
       preferred: executors.execution.preferred,
       mode: executors.execution.mode,
-      fallback: executors.fallback.execution
+      fallback: executors.fallback.execution,
+      adapterCommands: adapterCommandsForExecutor(executors.execution.preferred)
     }
   ];
 }

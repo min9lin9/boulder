@@ -18,8 +18,8 @@ Observed public contract from README:
 Runtime note:
 
 - `bunx gajae-code --help` was attempted during this review.
-- It resolved the package but failed because the local Bun runtime is `1.3.5` and GJC requires Bun `>=1.3.14`.
-- This review therefore applies the public GJC workflow contract without claiming a live GJC TUI session was completed.
+- The project now requires Bun `>=1.3.14`, matching the GJC live adapter floor.
+- This review applies the public GJC workflow contract and treats live GJC commands as approval-gated adapter candidates until a full GJC TUI session is recorded as field evidence.
 
 ## Interview Objective
 
