@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.11
+
+- Renamed the documented local Codex skill invocation from `/Boulder` to `boulder` to match the actual skill name.
+- Updated packaged skill metadata, Korean usage guidance, and README examples around the lowercase skill trigger.
+
 ## 0.1.10
 
 - Raised the supported Bun runtime floor to `>=1.3.14` and removed the default GJC runtime doctor warning.

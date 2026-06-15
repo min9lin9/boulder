@@ -1,19 +1,19 @@
-# /Boulder Codex Skill 사용설명서
+# boulder Codex Skill 사용설명서
 
-`/Boulder`는 Codex에서 Boulder를 호출하기 위한 로컬 skill 이름입니다. 새 repo에서 `/Boulder로 초기설정 해줘`라고 요청하면, Codex가 Boulder CLI를 통해 repo onboarding, 계획, 검증, evidence export를 순서대로 진행하는 흐름입니다.
+`boulder`는 Codex에서 Boulder를 호출하기 위한 로컬 skill 이름입니다. 새 repo에서 `boulder로 초기설정 해줘`라고 요청하면, Codex가 Boulder CLI를 통해 repo onboarding, 계획, 검증, evidence export를 순서대로 진행하는 흐름입니다.
 
 ## 결론
 
 네. 신규 repo에서는 이렇게 요청하면 됩니다.
 
 ```text
-/Boulder로 현재 repo 초기설정 해줘.
+boulder로 현재 repo 초기설정 해줘.
 ```
 
 대상 repo가 현재 Codex 작업 디렉터리가 아니면 경로를 명시합니다.
 
 ```text
-/Boulder로 /Users/burt/path/to/repo 초기설정 해줘.
+boulder로 /Users/burt/path/to/repo 초기설정 해줘.
 ```
 
 ## 추천 프롬프트
@@ -21,7 +21,7 @@
 가장 안정적인 첫 실행 요청은 아래 형식입니다.
 
 ```text
-/Boulder로 현재 repo 초기설정 해줘.
+boulder로 현재 repo 초기설정 해줘.
 init -> quickstart -> inspect -> doctor -> pipeline medium -> verify --dry-run -> export 순서로 진행하고,
 생성/수정된 파일, 실패한 gate, 다음 할 일을 요약해줘.
 ```
@@ -29,7 +29,7 @@ init -> quickstart -> inspect -> doctor -> pipeline medium -> verify --dry-run -
 외부 공개 OSS 수준까지 보고 싶으면 이렇게 요청합니다.
 
 ```text
-/Boulder로 이 repo가 외부 사용자가 반복해서 쓸 수 있는 OSS 제품 수준인지 점검해줘.
+boulder로 이 repo가 외부 사용자가 반복해서 쓸 수 있는 OSS 제품 수준인지 점검해줘.
 release-check, replay-check, product-readiness, service-readiness를 실행하고 부족점을 우선순위로 정리해줘.
 ```
 
@@ -37,7 +37,7 @@ release-check, replay-check, product-readiness, service-readiness를 실행하�
 
 로컬 Codex에서는 `bunx`나 `npx`를 기본 호출로 쓰지 않습니다. Codex sandbox에서 tempdir 쓰기나 npm registry 접근이 막힐 수 있기 때문입니다.
 
-대신 `/Boulder` skill은 설치된 wrapper를 통해 로컬 Boulder checkout을 직접 호출합니다.
+대신 `boulder` skill은 설치된 wrapper를 통해 로컬 Boulder checkout을 직접 호출합니다.
 
 ```bash
 bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
@@ -67,7 +67,7 @@ bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh --cwd /path/to/r
 
 ## Friction 기준
 
-`/Boulder`는 작업 마찰도에 따라 pipeline 깊이를 다르게 잡습니다.
+`boulder`는 작업 마찰도에 따라 pipeline 깊이를 다르게 잡습니다.
 
 - `low`: README, labels, 작은 문서 정리
 - `medium`: 신규 repo 초기설정, 일반 기능 구현, onboarding 보강
@@ -91,28 +91,28 @@ bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh --cwd /path/to/r
 ## 자주 쓰는 요청
 
 ```text
-/Boulder로 이 repo quickstart만 점검해줘.
+boulder로 이 repo quickstart만 점검해줘.
 ```
 
 ```text
-/Boulder로 pipeline high를 만들고 release 전에 막히는 gate를 찾아줘.
+boulder로 pipeline high를 만들고 release 전에 막히는 gate를 찾아줘.
 ```
 
 ```text
-/Boulder로 doctor 실행해서 Codex skill, MCP, CI, evidence 준비 상태를 평가해줘.
+boulder로 doctor 실행해서 Codex skill, MCP, CI, evidence 준비 상태를 평가해줘.
 ```
 
 ```text
-/Boulder로 release-check 후 npm publish 전에 부족한 점을 찾아줘.
+boulder로 release-check 후 npm publish 전에 부족한 점을 찾아줘.
 ```
 
 ```text
-/Boulder로 export evidence를 만들고 README에 다음 사용자가 볼 경로를 정리해줘.
+boulder로 export evidence를 만들고 README에 다음 사용자가 볼 경로를 정리해줘.
 ```
 
 ## 안 잡힐 때
 
-새로 설치한 skill은 현재 Codex 세션에 바로 로드되지 않을 수 있습니다. 새 Codex 세션을 열면 `/Boulder` 호출이 더 안정적으로 잡힙니다.
+새로 설치한 skill은 현재 Codex 세션에 바로 로드되지 않을 수 있습니다. 새 Codex 세션을 열면 `boulder` 호출이 더 안정적으로 잡힙니다.
 
 그래도 안 잡히면 wrapper를 직접 호출하면 됩니다.
 
@@ -121,4 +121,4 @@ bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh --version
 bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
 ```
 
-`bunx boulder-oss-cli` 실패는 Boulder 자체 실패가 아닐 수 있습니다. 로컬 Codex sandbox에서는 tempdir 권한 또는 registry 네트워크 제한 때문에 실패할 수 있으므로, `/Boulder` skill은 로컬 checkout 직접 호출을 기본값으로 둡니다.
+`bunx boulder-oss-cli` 실패는 Boulder 자체 실패가 아닐 수 있습니다. 로컬 Codex sandbox에서는 tempdir 권한 또는 registry 네트워크 제한 때문에 실패할 수 있으므로, `boulder` skill은 로컬 checkout 직접 호출을 기본값으로 둡니다.

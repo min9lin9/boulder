@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current package: `boulder-oss-cli@0.1.10`.
+Current package: `boulder-oss-cli@0.1.11`.
 
 ## Install
 
@@ -46,22 +46,22 @@ bunx boulder-oss-cli@latest pipeline --friction high
 If you use Boulder from local Codex, start a new Codex session in the target repo and ask:
 
 ```text
-/Boulder quickstart
+boulder quickstart
 ```
 
 For first-time setup:
 
 ```text
-/Boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
+boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
 ```
 
 If the target repo is not the current working directory, include `--cwd`:
 
 ```text
-/Boulder quickstart --cwd /path/to/repo
+boulder quickstart --cwd /path/to/repo
 ```
 
-The `/Boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
+The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
 GJC and LazyCodex are not executed automatically. Boulder can detect and route planning/execution workflows, but external executors should be enabled explicitly.
 
@@ -105,7 +105,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release: [`v0.1.10`](https://github.com/min9lin9/boulder/releases/tag/v0.1.10)
+- Release: [`v0.1.11`](https://github.com/min9lin9/boulder/releases/tag/v0.1.11)
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

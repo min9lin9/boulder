@@ -2,22 +2,22 @@
 name: boulder
 description: Use when working with Boulder, boulder-oss-cli, evidence-backed Codex workflows, OSS repo onboarding, replay checks, release checks, product readiness, service readiness, or Codex workflow exports. Prefer this skill whenever the user asks to run Boulder from local Codex.
 metadata:
-  short-description: /Boulder local Codex harness
+  short-description: boulder local Codex harness
 ---
 
-# /Boulder
+# boulder
 
-Use `/Boulder` as the repo-local operating harness for Codex work:
+Use `boulder` as the repo-local operating harness for Codex work:
 
 `intake -> plan -> execute -> verify -> record`
 
-When the user writes `/Boulder`, treat it as an explicit request to run this skill.
+When the user writes `boulder`, treat it as an explicit request to run this skill.
 
 For user-facing Korean usage guidance, read `references/usage.ko.md`.
 
 ## Invocation
 
-In local Codex, do not rely on `bunx` or `npx` for `/Boulder`. The Codex sandbox may block tempdir writes or registry access.
+In local Codex, do not rely on `bunx` or `npx` for `boulder`. The Codex sandbox may block tempdir writes or registry access.
 
 Use the bundled wrapper script from this skill:
 
@@ -39,7 +39,7 @@ BOULDER_HOME=/path/to/boulder ./scripts/boulder-local.sh inspect --cwd /path/to/
 
 ## Command Shape
 
-`/Boulder` options come after the Boulder command:
+`boulder` options come after the Boulder command:
 
 ```bash
 ./scripts/boulder-local.sh inspect --cwd /path/to/repo --json

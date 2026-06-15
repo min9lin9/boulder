@@ -2,7 +2,7 @@ $ bun pm pack --dry-run --ignore-scripts
 bun pack v1.3.14 (0d9b296a)
 
 packed 1.1KB package.json
-packed 3.75KB CHANGELOG.md
+packed 3.99KB CHANGELOG.md
 packed 1.28KB CONTRIBUTING.md
 packed 1.1KB LICENSE
 packed 4.50KB README.md
@@ -15,7 +15,7 @@ packed 1.25KB boulder.yaml
 packed 3.37KB docs/APPLICATION_EVIDENCE.md
 packed 1.75KB docs/BENCHMARK_FIXTURE_REPORT.md
 packed 0.94KB docs/BENCHMARK_PLAN.md
-packed 4.76KB docs/BOULDER_CODEX_SKILL_USAGE.ko.md
+packed 4.75KB docs/BOULDER_CODEX_SKILL_USAGE.ko.md
 packed 1.29KB docs/BOULDER_EXPORT.md
 packed 4.23KB docs/BOULDER_FINAL_PRODUCT_PLAN.md
 packed 3.18KB docs/CAPABILITY_DOCTOR.md
@@ -135,7 +135,7 @@ packed 2.71KB src/verify.ts
 packed 1.43KB src/workflow-stack.ts
 packed 1.72KB src/workflows.ts
 
-boulder-oss-cli-0.1.10.tgz
+boulder-oss-cli-0.1.11.tgz
 
 Total files: 133
 Unpacked size: 0.40MB

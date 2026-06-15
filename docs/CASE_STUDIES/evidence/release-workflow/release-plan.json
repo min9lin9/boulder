@@ -1,5 +1,5 @@
 {
-  "version": "0.1.10",
+  "version": "0.1.11",
   "status": "ready",
   "checks": [
     {
@@ -60,7 +60,7 @@
     {
       "id": "version-evidence",
       "status": "pass",
-      "evidence": "v0.1.10 appears in release-facing docs"
+      "evidence": "v0.1.11 appears in release-facing docs"
     },
     {
       "id": "package-scripts",
@@ -70,7 +70,7 @@
   ],
   "manualSteps": [
     "Run bun run ci.",
-    "Create and push tag v0.1.10.",
+    "Create and push tag v0.1.11.",
     "Create the GitHub release with verification notes.",
     "Publishing remains manual; npm publish is not automated by Boulder."
   ]

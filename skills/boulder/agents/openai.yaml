@@ -1,5 +1,5 @@
 interface:
-  display_name: "/Boulder"
+  display_name: "boulder"
   short_description: "Local Codex harness for OSS evidence"
   default_prompt: "Use $boulder to inspect this repo, plan the work, verify gates, and export evidence."
 
