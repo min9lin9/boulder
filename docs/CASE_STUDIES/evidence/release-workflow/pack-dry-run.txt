@@ -36,7 +36,7 @@ packed 0.84KB docs/CASE_STUDIES/evidence/pr-review/inspect.json
 packed 252B docs/CASE_STUDIES/evidence/pr-review/pipeline.txt
 packed 14.36KB docs/CASE_STUDIES/evidence/release-workflow/ci.txt
 packed 0.70KB docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
-packed 1.1KB docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
+packed 1.54KB docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
 packed 69B docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt
 packed 1.92KB docs/CASE_STUDIES/evidence/release-workflow/release-plan.json
 packed 1.66KB docs/CASE_STUDIES/external-replay.md
@@ -138,4 +138,4 @@ packed 1.72KB src/workflows.ts
 boulder-oss-cli-0.1.11.tgz
 
 Total files: 133
-Unpacked size: 0.40MB
+Unpacked size: 0.41MB
