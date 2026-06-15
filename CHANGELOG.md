@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.12
+
+- Made first-run executor setup visible in `quickstart`: planning is `gajae-code`, execution is `lazycodex`, both `detect-and-suggest`.
+- Added configured GJC/LazyCodex adapter capabilities to `boulder doctor` output.
+- Clarified local Codex skill guidance so initial setup reports adapter configuration without auto-running external executors.
+
 ## 0.1.11
 
 - Renamed the documented local Codex skill invocation from `/Boulder` to `boulder` to match the actual skill name.

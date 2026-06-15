@@ -1,4 +1,5 @@
 import { capabilityInventoryPath, hasValidInventoryItems, loadCapabilityInventory, type CapabilityDiscoveryOptions, type InventoryItem } from "./capability-inventory";
+import { loadManifest } from "./manifest";
 
 export type CapabilityLane = "intake" | "plan" | "execute" | "verify" | "record" | "compound";
 export type DoctorStatus = "pass" | "warn" | "fail";
@@ -6,7 +7,7 @@ export type DoctorSeverity = "warn" | "error";
 
 export type Capability = {
   readonly id: string;
-  readonly kind: "skill" | "mcp" | "plugin" | "runtime";
+  readonly kind: "skill" | "mcp" | "plugin" | "runtime" | "adapter";
   readonly status: string;
   readonly lane: CapabilityLane;
   readonly officialDocsFirst: boolean;
@@ -48,7 +49,8 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
     ...inventory.skills.map((item) => toCapability(item, "skill")),
     ...inventory.mcpServers.map((item) => toCapability(item, "mcp")),
     ...inventory.plugins.map((item) => toCapability(item, "plugin")),
-    ...inventory.runtimes.map((item) => toCapability(item, "runtime"))
+    ...inventory.runtimes.map((item) => toCapability(item, "runtime")),
+    ...await adapterCapabilities(root)
   ];
   const issues = runtimeIssues(inventory.runtimes);
   return {
@@ -59,6 +61,28 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
       ? issues.map((item) => item.message)
       : ["Capability routing is ready; use official docs before invoking public OSS adapters."]
   };
+}
+
+async function adapterCapabilities(root: string): Promise<readonly Capability[]> {
+  const manifest = await loadManifest(root);
+  return [
+    {
+      id: manifest.executors.planning.preferred,
+      kind: "adapter",
+      status: "configured",
+      lane: "plan",
+      officialDocsFirst: true,
+      routingHint: `plan: ${routingHintFor("plan")}`
+    },
+    {
+      id: manifest.executors.execution.preferred,
+      kind: "adapter",
+      status: "configured",
+      lane: "execute",
+      officialDocsFirst: true,
+      routingHint: `execute: ${routingHintFor("execute")}`
+    }
+  ];
 }
 
 function toCapability(item: InventoryItem, kind: Capability["kind"]): Capability {

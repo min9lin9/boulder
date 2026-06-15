@@ -80,9 +80,13 @@ describe("quickstart and replay reports", () => {
     const markdown = quickstartToMarkdown(quickstart);
 
     expect(quickstart.status).toBe("ready");
+    expect(quickstart.checks.some((item) => item.id === "executor-planning" && item.status === "pass")).toBe(true);
+    expect(quickstart.checks.some((item) => item.id === "executor-execution" && item.status === "pass")).toBe(true);
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
     expect(markdown).toContain("# Boulder Quickstart");
+    expect(markdown).toContain("plan=gajae-code");
+    expect(markdown).toContain("execute=lazycodex");
   });
 
   test("checks public replay fixtures and official docs references", async () => {

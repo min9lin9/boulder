@@ -56,6 +56,7 @@ Do not call it as:
 For a target OSS repository, start with:
 
 ```bash
+./scripts/boulder-local.sh init --cwd /path/to/repo
 ./scripts/boulder-local.sh quickstart --cwd /path/to/repo
 ./scripts/boulder-local.sh inspect --cwd /path/to/repo --json
 ./scripts/boulder-local.sh doctor --cwd /path/to/repo --json
@@ -63,6 +64,8 @@ For a target OSS repository, start with:
 ./scripts/boulder-local.sh verify --cwd /path/to/repo --dry-run
 ./scripts/boulder-local.sh export --cwd /path/to/repo
 ```
+
+`init` configures the default executor preferences in `boulder.yaml`: planning uses `gajae-code`, execution uses `lazycodex`, and both stay in `detect-and-suggest` mode. `quickstart` and `doctor` must report those adapters as configured. Do not auto-run GJC or LazyCodex unless the user explicitly approves the live executor command.
 
 Use `low` friction for small doc/config changes, `medium` for normal feature work, and `high` for release, CI, security, or cross-repo changes.
 

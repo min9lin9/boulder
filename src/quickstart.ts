@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { exists } from "./fs";
+import { loadManifest } from "./manifest";
 
 export type QuickstartStep = {
   readonly id: string;
@@ -44,10 +45,13 @@ const QUICKSTART_STEPS = [
 ] as const satisfies readonly QuickstartStep[];
 
 export async function evaluateQuickstart(root: string): Promise<QuickstartReport> {
+  const manifest = await loadManifest(root);
   const checks = [
     await fileCheck(root, "manifest", "boulder.yaml"),
     await fileCheck(root, "operator-contract", "BOULDER.md"),
-    await fileCheck(root, "repo-brief", "docs/REPO_BRIEF.md")
+    await fileCheck(root, "repo-brief", "docs/REPO_BRIEF.md"),
+    executorCheck("executor-planning", "plan", manifest.executors.planning.preferred, "gajae-code", manifest.executors.planning.mode),
+    executorCheck("executor-execution", "execute", manifest.executors.execution.preferred, "lazycodex", manifest.executors.execution.mode)
   ];
   return {
     status: checks.every((item) => item.status === "pass") ? "ready" : "needs-init",
@@ -82,6 +86,14 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     ...report.nextDocs.map((path) => `- ${path}`),
     ""
   ].join("\n");
+}
+
+function executorCheck(id: string, label: string, actual: string, expected: string, mode: string): QuickstartCheck {
+  return {
+    id,
+    status: actual === expected ? "pass" : "fail",
+    evidence: `${label}=${actual} (${mode})`
+  };
 }
 
 async function fileCheck(root: string, id: string, relativePath: string): Promise<QuickstartCheck> {

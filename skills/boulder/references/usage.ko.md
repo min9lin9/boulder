@@ -38,6 +38,10 @@ bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh verify --cwd /pa
 bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh export --cwd /path/to/repo
 ```
 
+`init`은 기본 executor preference를 `boulder.yaml`에 설정합니다. planning은 `gajae-code`, execution은 `lazycodex`, mode는 둘 다 `detect-and-suggest`입니다. `quickstart`에서는 `executor-planning`, `executor-execution` 체크로 보이고, `doctor --json`에서는 두 항목이 `kind: adapter`, `status: configured`로 보여야 합니다.
+
+단, 이것은 자동 실행이 아닙니다. GJC와 LazyCodex live command는 사용자가 명시적으로 승인할 때만 실행합니다.
+
 `--cwd`는 항상 Boulder command 뒤에 둡니다.
 
 ## Friction 선택
@@ -52,6 +56,8 @@ bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh export --cwd /pa
 
 - repo 구조와 검증 명령 감지
 - Boulder manifest/config
+- GJC planning adapter preference
+- LazyCodex execution adapter preference
 - quickstart와 onboarding surface
 - doctor 결과와 capability gap
 - pipeline plan

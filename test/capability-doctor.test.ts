@@ -38,6 +38,8 @@ describe("capability doctor", () => {
     expect(report.status).toBe("pass");
     expect(report.capabilities.some((item) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "omo:ulw-loop" && item.lane === "execute")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "configured")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "configured")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "lennys-podcast-mcp" && item.officialDocsFirst)).toBe(true);
     expect(report.issues.some((item) => item.id === "gajae-code-bun-runtime")).toBe(false);
   });
