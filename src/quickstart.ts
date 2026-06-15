@@ -92,7 +92,7 @@ function executorCheck(id: string, label: string, actual: string, expected: stri
   return {
     id,
     status: actual === expected ? "pass" : "fail",
-    evidence: `${label}=${actual} (${mode})`
+    evidence: `${label}=${actual} (${mode}; availability checked by doctor)`
   };
 }
 

@@ -65,7 +65,7 @@ For a target OSS repository, start with:
 ./scripts/boulder-local.sh export --cwd /path/to/repo
 ```
 
-`init` configures the default executor preferences in `boulder.yaml`: planning uses `gajae-code`, execution uses `lazycodex`, and both stay in `detect-and-suggest` mode. `quickstart` and `doctor` must report those adapters as configured. Do not auto-run GJC or LazyCodex unless the user explicitly approves the live executor command.
+`init` configures the default executor preferences in `boulder.yaml`: planning uses `gajae-code`, execution uses `lazycodex`, and both stay in `detect-and-suggest` mode. This does not prove GJC or LazyCodex are installed. `quickstart` reports the preferences; `doctor` reports adapters as `available` only when they are found in the local Codex inventory, otherwise `configured-unverified`. Do not auto-run GJC or LazyCodex unless the user explicitly approves the live executor command.
 
 Use `low` friction for small doc/config changes, `medium` for normal feature work, and `high` for release, CI, security, or cross-repo changes.
 

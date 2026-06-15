@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current package: `boulder-oss-cli@0.1.12`.
+Current package: `boulder-oss-cli@0.1.13`.
 
 ## Install
 
@@ -65,7 +65,7 @@ boulder quickstart --cwd /path/to/repo
 
 The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
-GJC and LazyCodex are configured automatically as adapter preferences, but they are not executed automatically. Boulder keeps live executor calls approval-gated.
+GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports them as `available` only when found in the Codex inventory; otherwise it reports `configured-unverified` and keeps live executor calls approval-gated.
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
 
@@ -107,7 +107,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release: [`v0.1.12`](https://github.com/min9lin9/boulder/releases/tag/v0.1.12)
+- Release: [`v0.1.13`](https://github.com/min9lin9/boulder/releases/tag/v0.1.13)
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

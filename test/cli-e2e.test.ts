@@ -182,11 +182,12 @@ describe("boulder CLI e2e cleanup safety", () => {
       const payload = JSON.parse(result.stdout);
 
       expect(result.exitCode).toBe(0);
-      expect(payload.status).toBe("pass");
+      expect(payload.status).toBe("warn");
       expect(payload.capabilities.some((item: { id: string; lane: string }) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
-      expect(payload.capabilities.some((item: { id: string; kind: string; status: string }) => item.id === "gajae-code" && item.kind === "adapter" && item.status === "configured")).toBe(true);
-      expect(payload.capabilities.some((item: { id: string; kind: string; status: string }) => item.id === "lazycodex" && item.kind === "adapter" && item.status === "configured")).toBe(true);
+      expect(payload.capabilities.some((item: { id: string; kind: string; status: string }) => item.id === "gajae-code" && item.kind === "adapter" && item.status === "configured-unverified")).toBe(true);
+      expect(payload.capabilities.some((item: { id: string; kind: string; status: string }) => item.id === "lazycodex" && item.kind === "adapter" && item.status === "configured-unverified")).toBe(true);
       expect(payload.issues.some((item: { id: string }) => item.id === "gajae-code-bun-runtime")).toBe(false);
+      expect(payload.issues.some((item: { id: string }) => item.id === "gajae-code-adapter-unverified")).toBe(true);
     } finally {
       await removeTempRepo(root);
     }

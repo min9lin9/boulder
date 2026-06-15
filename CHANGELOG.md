@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13
+
+- Split executor adapter preference from adapter availability in `boulder doctor`.
+- Report missing GJC/LazyCodex installations as `configured-unverified` warnings instead of implying installation.
+- Kept first-run setup automatic for adapter preferences while preserving explicit approval for live executor commands.
+
 ## 0.1.12
 
 - Made first-run executor setup visible in `quickstart`: planning is `gajae-code`, execution is `lazycodex`, both `detect-and-suggest`.

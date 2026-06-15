@@ -30,112 +30,113 @@ Package:
 bun test v1.3.14 (0d9b296a)
 
 test/pipeline.test.ts:
-(pass) pipeline planning surface > builds a low friction pipeline plan [1.11ms]
-(pass) pipeline planning surface > builds a medium friction pipeline plan [0.10ms]
+(pass) pipeline planning surface > builds a low friction pipeline plan [1.04ms]
+(pass) pipeline planning surface > builds a medium friction pipeline plan [0.09ms]
 (pass) pipeline planning surface > adds command adapter candidates for GJC and LazyCodex handoff [0.07ms]
 (pass) pipeline planning surface > builds a high friction pipeline plan [0.05ms]
 (pass) pipeline planning surface > fails closed for forbidden side effects [0.07ms]
-(pass) pipeline planning surface > default manifest routes planning and execution executors by profile [0.30ms]
+(pass) pipeline planning surface > default manifest routes planning and execution executors by profile [0.31ms]
 
 test/field-evidence.test.ts:
-(pass) field evidence > passes a complete field-readiness run and writes a manifest [3.91ms]
-(pass) field evidence > fails when the maintainer decision outcome is unsupported [1.83ms]
-(pass) field evidence > fails when JSON evidence is malformed [1.66ms]
-(pass) field evidence > fails closed for evidence paths outside field-readiness [0.16ms]
-(pass) field evidence > does not overwrite a valid manifest when evidence path is unsafe [0.45ms]
-(pass) field evidence > does not write a manifest when run id is unsafe [0.20ms]
-(pass) field evidence > does not write through a symlinked field evidence directory [0.46ms]
-(pass) field evidence > does not write through a symlinked field-readiness parent directory [1.47ms]
+(pass) field evidence > passes a complete field-readiness run and writes a manifest [4.75ms]
+(pass) field evidence > fails when the maintainer decision outcome is unsupported [2.36ms]
+(pass) field evidence > fails when JSON evidence is malformed [1.95ms]
+(pass) field evidence > fails closed for evidence paths outside field-readiness [0.27ms]
+(pass) field evidence > does not overwrite a valid manifest when evidence path is unsafe [0.60ms]
+(pass) field evidence > does not write a manifest when run id is unsafe [0.30ms]
+(pass) field evidence > does not write through a symlinked field evidence directory [0.95ms]
+(pass) field evidence > does not write through a symlinked field-readiness parent directory [2.40ms]
 
 test/cli-e2e.test.ts:
-(pass) boulder CLI e2e cleanup safety > prints the package version [28.44ms]
-(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [37.33ms]
-(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [121.37ms]
-(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [88.13ms]
-(pass) boulder CLI e2e cleanup safety > renders release-check evidence without publishing [28.40ms]
-(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [28.10ms]
-(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [27.45ms]
-(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [63.42ms]
-(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [90.75ms]
-(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [41.77ms]
-(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [32.08ms]
+(pass) boulder CLI e2e cleanup safety > prints the package version [30.26ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [26.70ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [144.00ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [153.11ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check evidence without publishing [47.57ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [30.84ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [29.17ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [92.83ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [111.60ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [29.96ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [38.94ms]
 
 test/readiness-reports.test.ts:
-(pass) harness quality scorecard > scores the root Boulder harness as ready [1.63ms]
-(pass) harness quality scorecard > penalizes unsafe external provider policy [0.08ms]
-(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [1.55ms]
-(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [1.31ms]
-(pass) benchmark and release reports > checks release evidence without publishing [0.67ms]
-(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [4.66ms]
-(pass) quickstart and replay reports > checks public replay fixtures and official docs references [1.40ms]
+(pass) harness quality scorecard > scores the root Boulder harness as ready [1.56ms]
+(pass) harness quality scorecard > penalizes unsafe external provider policy [0.09ms]
+(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [1.64ms]
+(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [1.55ms]
+(pass) benchmark and release reports > checks release evidence without publishing [1.07ms]
+(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [6.39ms]
+(pass) quickstart and replay reports > checks public replay fixtures and official docs references [1.72ms]
 (pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [0.65ms]
-(pass) product readiness and examples > reports root product readiness evidence gates [13.31ms]
-(pass) product readiness and examples > blocks when GJC planning evidence is missing [4.78ms]
-(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [0.85ms]
+(pass) product readiness and examples > reports root product readiness evidence gates [17.17ms]
+(pass) product readiness and examples > blocks when GJC planning evidence is missing [6.97ms]
+(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [0.90ms]
 
 test/service-readiness.test.ts:
-(pass) service readiness > rates a service evidence fixture as pilot-ready when product readiness is still blocked [12.73ms]
-(pass) service readiness > blocks when repeat-run gate evidence is missing [9.01ms]
-(pass) service readiness > blocks when official documentation evidence is missing for public OSS replay [9.59ms]
-(pass) service readiness > blocks when field evidence is not complete [11.63ms]
-(pass) service readiness > blocks when the recorded field evidence manifest is stale or failing [11.68ms]
-(pass) service readiness > blocks when field evidence exists but no manifest was recorded [9.35ms]
-(pass) service readiness > blocks when any recorded field evidence run becomes invalid [12.34ms]
+(pass) service readiness > rates a service evidence fixture as pilot-ready when product readiness is still blocked [18.32ms]
+(pass) service readiness > blocks when repeat-run gate evidence is missing [8.52ms]
+(pass) service readiness > blocks when official documentation evidence is missing for public OSS replay [7.49ms]
+(pass) service readiness > blocks when field evidence is not complete [7.65ms]
+(pass) service readiness > blocks when the recorded field evidence manifest is stale or failing [7.59ms]
+(pass) service readiness > blocks when field evidence exists but no manifest was recorded [7.06ms]
+(pass) service readiness > blocks when any recorded field evidence run becomes invalid [10.52ms]
 
 test/manifest-yaml.test.ts:
-(pass) manifest yaml parser > keeps scalar and list parsing inside the requested section [0.51ms]
-(pass) manifest yaml parser > keeps nested groups inside their parent boundary [0.37ms]
-(pass) manifest yaml parser > parses booleans without accepting arbitrary text [0.02ms]
+(pass) manifest yaml parser > keeps scalar and list parsing inside the requested section [0.10ms]
+(pass) manifest yaml parser > keeps nested groups inside their parent boundary [0.13ms]
+(pass) manifest yaml parser > parses booleans without accepting arbitrary text [0.03ms]
 
 test/cli-pipeline-e2e.test.ts:
-(pass) boulder pipeline CLI e2e > renders high friction pipeline human output [30.35ms]
-(pass) boulder pipeline CLI e2e > renders high friction pipeline json output [29.71ms]
-(pass) boulder pipeline CLI e2e > renders pipeline executor routes from the manifest [29.69ms]
-(pass) boulder pipeline CLI e2e > exports pipeline executor routes from the manifest [32.16ms]
-(pass) boulder pipeline CLI e2e > rejects invalid pipeline friction [26.30ms]
+(pass) boulder pipeline CLI e2e > renders high friction pipeline human output [34.54ms]
+(pass) boulder pipeline CLI e2e > renders high friction pipeline json output [40.72ms]
+(pass) boulder pipeline CLI e2e > renders pipeline executor routes from the manifest [44.32ms]
+(pass) boulder pipeline CLI e2e > exports pipeline executor routes from the manifest [39.33ms]
+(pass) boulder pipeline CLI e2e > rejects invalid pipeline friction [29.41ms]
 
 test/capability-doctor.test.ts:
-(pass) capability doctor > routes installed skills and MCP tools to workflow lanes [2.01ms]
-(pass) capability doctor > passes when Bun supports live GJC execution [0.70ms]
-(pass) capability doctor > discovers local Codex skills and MCP inventory when fixture is missing [2.91ms]
-(pass) capability doctor > fails closed when capability inventory is missing [0.44ms]
-(pass) capability doctor > fails closed when capability inventory entries are malformed [0.78ms]
+(pass) capability doctor > routes installed skills and MCP tools to workflow lanes [1.46ms]
+(pass) capability doctor > passes when configured adapters are present in inventory [0.64ms]
+(pass) capability doctor > passes when Bun supports live GJC execution [0.58ms]
+(pass) capability doctor > discovers local Codex skills and MCP inventory when fixture is missing [2.87ms]
+(pass) capability doctor > fails closed when capability inventory is missing [0.33ms]
+(pass) capability doctor > fails closed when capability inventory entries are malformed [0.59ms]
 
 test/product-readiness.test.ts:
-(pass) tight product readiness > rates a public evidence fixture as ready [7.90ms]
-(pass) tight product readiness > blocks when published install smoke evidence is missing [7.32ms]
-(pass) tight product readiness > blocks duplicate copy artifacts in the release tree [7.94ms]
+(pass) tight product readiness > rates a public evidence fixture as ready [6.94ms]
+(pass) tight product readiness > blocks when published install smoke evidence is missing [5.60ms]
+(pass) tight product readiness > blocks duplicate copy artifacts in the release tree [5.50ms]
 
 test/cli.test.ts:
-(pass) boulder M1 surface > init creates harness files [3.78ms]
-(pass) boulder M1 surface > inspect returns a repo brief shape [2.89ms]
-(pass) boulder M1 surface > init writes inferred package verification commands [2.82ms]
-(pass) boulder M1 surface > verify supports dry run [2.53ms]
+(pass) boulder M1 surface > init creates harness files [2.21ms]
+(pass) boulder M1 surface > inspect returns a repo brief shape [2.03ms]
+(pass) boulder M1 surface > init writes inferred package verification commands [3.18ms]
+(pass) boulder M1 surface > verify supports dry run [2.13ms]
 (pass) boulder M1 surface > manifest validation catches unsafe external provider policy [0.06ms]
-(pass) boulder M1 surface > manifest validation requires the har-maker operator stack [0.08ms]
-(pass) boulder M1 surface > verify rejects invalid manifests [2.59ms]
-(pass) boulder M1 surface > export writes Codex notes [3.53ms]
-(pass) provider policy fixtures > codex-only fixture validates as expected [0.48ms]
-(pass) provider policy fixtures > external-approved fixture validates as expected [0.33ms]
+(pass) boulder M1 surface > manifest validation requires the har-maker operator stack [0.09ms]
+(pass) boulder M1 surface > verify rejects invalid manifests [2.63ms]
+(pass) boulder M1 surface > export writes Codex notes [3.33ms]
+(pass) provider policy fixtures > codex-only fixture validates as expected [0.41ms]
+(pass) provider policy fixtures > external-approved fixture validates as expected [0.21ms]
 (pass) provider policy fixtures > external-without-approval fixture validates as expected [0.30ms]
 
- 70 pass
+ 71 pass
  0 fail
- 264 expect() calls
-Ran 70 tests across 10 files. [936.00ms]
+ 270 expect() calls
+Ran 71 tests across 10 files. [1121.00ms]
 $ bun build bin/boulder.ts --outdir /tmp/boulder-build --target bun
 Bundled 32 modules in 9ms
 
-  boulder.js  116.56 KB  (entry point)
+  boulder.js  117.65 KB  (entry point)
 
 $ bun pm pack --dry-run --ignore-scripts
 bun pack v1.3.14 (0d9b296a)
 
 packed 1.1KB package.json
-packed 4.35KB CHANGELOG.md
+packed 4.68KB CHANGELOG.md
 packed 1.28KB CONTRIBUTING.md
 packed 1.1KB LICENSE
-packed 4.72KB README.md
+packed 4.84KB README.md
 packed 0.59KB ROADMAP.md
 packed 0.80KB SECURITY.md
 packed 476B bin/boulder.js
@@ -145,7 +146,7 @@ packed 1.25KB boulder.yaml
 packed 3.37KB docs/APPLICATION_EVIDENCE.md
 packed 1.75KB docs/BENCHMARK_FIXTURE_REPORT.md
 packed 0.94KB docs/BENCHMARK_PLAN.md
-packed 5.34KB docs/BOULDER_CODEX_SKILL_USAGE.ko.md
+packed 5.47KB docs/BOULDER_CODEX_SKILL_USAGE.ko.md
 packed 1.29KB docs/BOULDER_EXPORT.md
 packed 4.23KB docs/BOULDER_FINAL_PRODUCT_PLAN.md
 packed 3.18KB docs/CAPABILITY_DOCTOR.md
@@ -164,7 +165,7 @@ packed 0.77KB docs/CASE_STUDIES/evidence/pr-review/CODEX_WORKFLOW_NOTES.md
 packed 98B docs/CASE_STUDIES/evidence/pr-review/export-command.txt
 packed 0.84KB docs/CASE_STUDIES/evidence/pr-review/inspect.json
 packed 252B docs/CASE_STUDIES/evidence/pr-review/pipeline.txt
-packed 8.14KB docs/CASE_STUDIES/evidence/release-workflow/ci.txt
+packed 8.23KB docs/CASE_STUDIES/evidence/release-workflow/ci.txt
 packed 0.70KB docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
 packed 1.54KB docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
 packed 6.29KB docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt
@@ -232,7 +233,7 @@ packed 0.91KB fixtures/replay/kimi-agent-swarm-skill/official-docs.json
 packed 0.78KB fixtures/replay/kimi-agent-swarm-skill/replay.json
 packed 1.48KB fixtures/service-readiness/gates.json
 packed 7.39KB src/benchmark.ts
-packed 5.77KB src/capability-doctor.ts
+packed 7.30KB src/capability-doctor.ts
 packed 6.31KB src/capability-inventory.ts
 packed 2.29KB src/cli-format.ts
 packed 9.26KB src/cli.ts
@@ -248,7 +249,7 @@ packed 2.0KB src/manifest-yaml.ts
 packed 7.47KB src/manifest.ts
 packed 7.87KB src/pipeline.ts
 packed 6.99KB src/product-readiness.ts
-packed 3.19KB src/quickstart.ts
+packed 3.22KB src/quickstart.ts
 packed 3.14KB src/release-check.ts
 packed 5.87KB src/release-plan.ts
 packed 6.53KB src/replay-check.ts
@@ -265,7 +266,7 @@ packed 2.71KB src/verify.ts
 packed 1.43KB src/workflow-stack.ts
 packed 1.72KB src/workflows.ts
 
-boulder-oss-cli-0.1.12.tgz
+boulder-oss-cli-0.1.13.tgz
 
 Total files: 133
 Unpacked size: 0.41MB

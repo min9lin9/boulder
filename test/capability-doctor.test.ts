@@ -35,19 +35,44 @@ describe("capability doctor", () => {
 
     const report = await evaluateCapabilityDoctor(root);
 
-    expect(report.status).toBe("pass");
+    expect(report.status).toBe("warn");
     expect(report.capabilities.some((item) => item.id === "omo:ulw-plan" && item.lane === "plan")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "omo:ulw-loop" && item.lane === "execute")).toBe(true);
-    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "configured")).toBe(true);
-    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "configured")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "configured-unverified")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "configured-unverified")).toBe(true);
     expect(report.capabilities.some((item) => item.id === "lennys-podcast-mcp" && item.officialDocsFirst)).toBe(true);
     expect(report.issues.some((item) => item.id === "gajae-code-bun-runtime")).toBe(false);
+    expect(report.issues.some((item) => item.id === "gajae-code-adapter-unverified")).toBe(true);
+    expect(report.issues.some((item) => item.id === "lazycodex-adapter-unverified")).toBe(true);
+  });
+
+  test("passes when configured adapters are present in inventory", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [
+        { id: "gajae-code", status: "installed" },
+        { id: "lazycodex", status: "installed" }
+      ],
+      mcpServers: [],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.14" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root);
+
+    expect(report.status).toBe("pass");
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "available")).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "available")).toBe(true);
   });
 
   test("passes when Bun supports live GJC execution", async () => {
     const root = await tempRepo();
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
-      skills: [{ id: "omo:ulw-plan", status: "installed" }],
+      skills: [
+        { id: "omo:ulw-plan", status: "installed" },
+        { id: "gajae-code", status: "installed" },
+        { id: "lazycodex", status: "installed" }
+      ],
       mcpServers: [],
       plugins: [],
       runtimes: [{ id: "bun", version: "1.3.14" }]
@@ -62,6 +87,8 @@ describe("capability doctor", () => {
   test("discovers local Codex skills and MCP inventory when fixture is missing", async () => {
     const root = await tempRepo();
     await write(root, ".codex/skills/boulder/SKILL.md", "---\nname: boulder\n---\n");
+    await write(root, ".codex/skills/gajae-code/SKILL.md", "---\nname: gajae-code\n---\n");
+    await write(root, ".codex/skills/lazycodex/SKILL.md", "---\nname: lazycodex\n---\n");
     await write(root, ".codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/programming/SKILL.md", "---\nname: programming\n---\n");
     await write(root, ".codex/mcp.json", JSON.stringify({
       mcpServers: {

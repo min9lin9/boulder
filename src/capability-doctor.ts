@@ -50,9 +50,12 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
     ...inventory.mcpServers.map((item) => toCapability(item, "mcp")),
     ...inventory.plugins.map((item) => toCapability(item, "plugin")),
     ...inventory.runtimes.map((item) => toCapability(item, "runtime")),
-    ...await adapterCapabilities(root)
+    ...await adapterCapabilities(root, inventory)
   ];
-  const issues = runtimeIssues(inventory.runtimes);
+  const issues = [
+    ...runtimeIssues(inventory.runtimes),
+    ...adapterIssues(capabilities)
+  ];
   return {
     status: issues.some((item) => item.severity === "error") ? "fail" : issues.length ? "warn" : "pass",
     capabilities,
@@ -63,13 +66,18 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   };
 }
 
-async function adapterCapabilities(root: string): Promise<readonly Capability[]> {
+async function adapterCapabilities(root: string, inventory: {
+  readonly skills: readonly InventoryItem[];
+  readonly mcpServers: readonly InventoryItem[];
+  readonly plugins: readonly InventoryItem[];
+  readonly runtimes: readonly InventoryItem[];
+}): Promise<readonly Capability[]> {
   const manifest = await loadManifest(root);
   return [
     {
       id: manifest.executors.planning.preferred,
       kind: "adapter",
-      status: "configured",
+      status: adapterStatus(manifest.executors.planning.preferred, inventory),
       lane: "plan",
       officialDocsFirst: true,
       routingHint: `plan: ${routingHintFor("plan")}`
@@ -77,12 +85,32 @@ async function adapterCapabilities(root: string): Promise<readonly Capability[]>
     {
       id: manifest.executors.execution.preferred,
       kind: "adapter",
-      status: "configured",
+      status: adapterStatus(manifest.executors.execution.preferred, inventory),
       lane: "execute",
       officialDocsFirst: true,
       routingHint: `execute: ${routingHintFor("execute")}`
     }
   ];
+}
+
+function adapterStatus(executorId: string, inventory: {
+  readonly skills: readonly InventoryItem[];
+  readonly mcpServers: readonly InventoryItem[];
+  readonly plugins: readonly InventoryItem[];
+  readonly runtimes: readonly InventoryItem[];
+}): string {
+  const normalized = executorId.toLowerCase();
+  const candidates = [
+    ...inventory.skills,
+    ...inventory.mcpServers,
+    ...inventory.plugins,
+    ...inventory.runtimes
+  ];
+  const isAvailable = candidates.some((item) => {
+    const id = item.id.toLowerCase();
+    return id === normalized || id.includes(normalized) || normalized.includes(id);
+  });
+  return isAvailable ? "available" : "configured-unverified";
 }
 
 function toCapability(item: InventoryItem, kind: Capability["kind"]): Capability {
@@ -134,6 +162,16 @@ function runtimeIssues(runtimes: readonly InventoryItem[]): readonly DoctorIssue
     }];
   }
   return [];
+}
+
+function adapterIssues(capabilities: readonly Capability[]): readonly DoctorIssue[] {
+  return capabilities
+    .filter((item) => item.kind === "adapter" && item.status === "configured-unverified")
+    .map((item) => ({
+      id: `${item.id}-adapter-unverified`,
+      severity: "warn",
+      message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Install it or keep using Codex fallback before live execution.`
+    }));
 }
 
 function compareVersions(left: string, right: string): number {
