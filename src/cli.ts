@@ -93,7 +93,8 @@ export async function main(args: string[]): Promise<void> {
       process.exitCode = 1;
       return;
     }
-    const plan = buildPipelinePlan(options.friction);
+    const manifest = await loadManifest(options.cwd);
+    const plan = buildPipelinePlan(options.friction, manifest.executors);
     if (options.json) {
       console.log(JSON.stringify(plan, null, 2));
       return;

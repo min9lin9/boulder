@@ -1,3 +1,6 @@
+import { defaultExecutors } from "./executors";
+import type { ExecutorProfiles } from "./types";
+
 export type FrictionLevel = "low" | "medium" | "high";
 
 export type PipelineStageId =
@@ -17,31 +20,31 @@ export type SideEffectCategory =
   | "external-launch";
 
 export type ExecutorRoute = {
-  lane: "plan" | "execute";
-  preferred: string;
-  mode: "detect-and-suggest";
-  fallback: string;
+  readonly lane: "plan" | "execute";
+  readonly preferred: string;
+  readonly mode: "detect-and-suggest";
+  readonly fallback: string;
 };
 
 export type PipelineStage = {
-  id: PipelineStageId;
-  label: string;
-  required: boolean;
-  depth: "light" | "standard" | "deep";
-  outputs: string[];
-  evidence: string[];
-  approvalRequired: boolean;
-  allowedSideEffects: SideEffectCategory[];
+  readonly id: PipelineStageId;
+  readonly label: string;
+  readonly required: boolean;
+  readonly depth: "light" | "standard" | "deep";
+  readonly outputs: readonly string[];
+  readonly evidence: readonly string[];
+  readonly approvalRequired: boolean;
+  readonly allowedSideEffects: readonly SideEffectCategory[];
 };
 
 export type PipelinePlan = {
-  friction: FrictionLevel;
-  stages: PipelineStage[];
-  failClosed: boolean;
-  forbiddenSideEffects: SideEffectCategory[];
-  approvalGates: string[];
-  evidenceRequired: string[];
-  executors: readonly ExecutorRoute[];
+  readonly friction: FrictionLevel;
+  readonly stages: readonly PipelineStage[];
+  readonly failClosed: boolean;
+  readonly forbiddenSideEffects: readonly SideEffectCategory[];
+  readonly approvalGates: readonly string[];
+  readonly evidenceRequired: readonly string[];
+  readonly executors: readonly ExecutorRoute[];
 };
 
 export type PipelineIssue = {
@@ -67,12 +70,12 @@ export function invalidFrictionMessage(value: string): string {
   return `ERROR pipeline.friction.invalid: Unsupported friction level "${value}". Expected one of: ${FRICTION_LEVELS.join(", ")}.`;
 }
 
-export function buildPipelinePlan(friction: FrictionLevel): PipelinePlan {
+export function buildPipelinePlan(friction: FrictionLevel, executors: ExecutorProfiles = defaultExecutors()): PipelinePlan {
   if (friction === "low") {
     return plan(friction, [
       stage("classification", "Classification", "light", ["task-class", "friction-level"], ["repo-context"], false, ["none", "repo-read"]),
       stage("synthesizer", "Synthesizer", "light", ["decision", "next-action"], ["plan-summary"], false, ["none"])
-    ]);
+    ], executors);
   }
 
   if (friction === "medium") {
@@ -81,7 +84,7 @@ export function buildPipelinePlan(friction: FrictionLevel): PipelinePlan {
       stage("deep-interview", "Deep Interview", "standard", ["ambiguities", "assumptions", "required-decisions"], ["operator-intent", "open-questions"], false, ["none"]),
       stage("pm-debate", "PM Debate", "standard", ["tradeoffs", "recommended-path", "rejected-options"], ["debate-notes"], true, ["none"]),
       stage("synthesizer", "Synthesizer", "standard", ["decision", "acceptance-gates", "next-action"], ["synthesis-summary"], false, ["none"])
-    ]);
+    ], executors);
   }
 
   return plan(friction, [
@@ -90,7 +93,7 @@ export function buildPipelinePlan(friction: FrictionLevel): PipelinePlan {
     stage("pm-debate", "PM Debate", "standard", ["tradeoffs", "recommended-path", "rejected-options", "milestone-scope"], ["debate-notes", "scope-boundary"], true, ["none"]),
     stage("synthesizer", "Synthesizer", "deep", ["decision", "acceptance-gates", "next-action", "handoff-contract"], ["synthesis-summary", "implementation-contract"], false, ["none"]),
     stage("cso-qa", "CSO/QA", "standard", ["risk-review", "qa-gates", "approval-result"], ["security-review", "qa-checklist"], true, ["none"])
-  ]);
+  ], executors);
 }
 
 export function validatePipelinePlan(plan: PipelinePlan): PipelineIssue[] {
@@ -128,7 +131,7 @@ export function formatPipelinePlan(plan: PipelinePlan): string {
   ].join("\n");
 }
 
-function plan(friction: FrictionLevel, stages: PipelineStage[]): PipelinePlan {
+function plan(friction: FrictionLevel, stages: PipelineStage[], executors: ExecutorProfiles): PipelinePlan {
   return {
     friction,
     stages,
@@ -136,23 +139,23 @@ function plan(friction: FrictionLevel, stages: PipelineStage[]): PipelinePlan {
     forbiddenSideEffects: [...FORBIDDEN_SIDE_EFFECTS],
     approvalGates: stages.filter((stageItem) => stageItem.approvalRequired).map((stageItem) => stageItem.id),
     evidenceRequired: unique(stages.flatMap((stageItem) => stageItem.evidence)),
-    executors: defaultExecutorRoutes()
+    executors: executorRoutesFromProfiles(executors)
   };
 }
 
-function defaultExecutorRoutes(): readonly ExecutorRoute[] {
+function executorRoutesFromProfiles(executors: ExecutorProfiles): readonly ExecutorRoute[] {
   return [
     {
       lane: "plan",
-      preferred: "gajae-code",
-      mode: "detect-and-suggest",
-      fallback: "codex"
+      preferred: executors.planning.preferred,
+      mode: executors.planning.mode,
+      fallback: executors.fallback.planning
     },
     {
       lane: "execute",
-      preferred: "lazycodex",
-      mode: "detect-and-suggest",
-      fallback: "codex"
+      preferred: executors.execution.preferred,
+      mode: executors.execution.mode,
+      fallback: executors.fallback.execution
     }
   ];
 }

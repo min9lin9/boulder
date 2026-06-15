@@ -14,19 +14,19 @@ export type WorkflowStackComponent = {
 export type ExecutorMode = "detect-and-suggest";
 
 export type ExecutorProfile = {
-  preferred: string;
-  mode: ExecutorMode;
+  readonly preferred: string;
+  readonly mode: ExecutorMode;
 };
 
 export type ExecutorFallback = {
-  planning: string;
-  execution: string;
+  readonly planning: string;
+  readonly execution: string;
 };
 
 export type ExecutorProfiles = {
-  planning: ExecutorProfile;
-  execution: ExecutorProfile;
-  fallback: ExecutorFallback;
+  readonly planning: ExecutorProfile;
+  readonly execution: ExecutorProfile;
+  readonly fallback: ExecutorFallback;
 };
 
 export type BoulderManifest = {

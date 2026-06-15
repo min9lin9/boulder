@@ -1,55 +1,7 @@
-import { exec } from "node:child_process";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
-
-type CliResult = {
-  readonly exitCode: number;
-  readonly stdout: string;
-  readonly stderr: string;
-};
-
-async function tempRepo(): Promise<string> {
-  return mkdtemp(join(tmpdir(), "boulder-cli-e2e-"));
-}
-
-async function removeTempRepo(root: string): Promise<void> {
-  await rm(root, { force: true, recursive: true });
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
-
-async function runBoulder(args: readonly string[]): Promise<CliResult> {
-  const root = join(import.meta.dir, "..");
-  return runCommand(`bun bin/boulder.ts ${args.map(shellQuote).join(" ")}`, root);
-}
-
-async function runCommand(command: string, cwd: string): Promise<CliResult> {
-  return new Promise((resolve, reject) => {
-    exec(command, { cwd }, (error, stdout, stderr) => {
-      if (error && !stdout && !stderr) {
-        reject(error);
-        return;
-      }
-      resolve({ exitCode: exitCodeFrom(error), stdout, stderr });
-    });
-  });
-}
-
-function exitCodeFrom(error: Error | null): number {
-  if (!error) return 0;
-  if ("code" in error && typeof error.code === "number") return error.code;
-  return 1;
-}
-
-function shellQuote(value: string): string {
-  return `'${value.replace(/'/g, "'\\''")}'`;
-}
+import { removeTempRepo, runBoulder, runCommand, tempRepo, write } from "./helpers/cli";
 
 describe("boulder CLI e2e cleanup safety", () => {
   test("prints the package version", async () => {
@@ -214,43 +166,6 @@ describe("boulder CLI e2e cleanup safety", () => {
     } finally {
       await removeTempRepo(target);
     }
-  });
-
-  test("renders high friction pipeline human output", async () => {
-    const result = await runBoulder(["pipeline", "--friction", "high"]);
-    expect(result.exitCode).toBe(0);
-    expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Boulder pipeline plan\n- friction: high");
-    expect(result.stdout).toContain("- stage: classification (required, deep)");
-    expect(result.stdout).toContain("- stage: deep-interview (required, deep)");
-    expect(result.stdout).toContain("- stage: pm-debate (required, standard, approval required)");
-    expect(result.stdout).toContain("- stage: synthesizer (required, deep)");
-    expect(result.stdout).toContain("- stage: cso-qa (required, standard, approval required)");
-    expect(result.stdout).toContain("- fail-closed: true");
-  });
-
-  test("renders high friction pipeline json output", async () => {
-    const result = await runBoulder(["pipeline", "--friction", "high", "--json"]);
-    const payload = JSON.parse(result.stdout);
-    expect(result.exitCode).toBe(0);
-    expect(result.stderr).toBe("");
-    expect(payload.friction).toBe("high");
-    expect(payload.failClosed).toBe(true);
-    expect(JSON.stringify(payload.stages.map((item: { id: string }) => item.id))).toBe(JSON.stringify(["classification", "deep-interview", "pm-debate", "synthesizer", "cso-qa"]));
-    expect(payload.forbiddenSideEffects).toContain("credential-access");
-    expect(payload.forbiddenSideEffects).toContain("package-install");
-    expect(payload.forbiddenSideEffects).toContain("external-launch");
-    expect(payload.forbiddenSideEffects).toContain("provider-call");
-    expect(payload.approvalGates).toContain("cso-qa");
-    expect(payload.executors.some((item: { lane: string; preferred: string; mode: string }) => item.lane === "plan" && item.preferred === "gajae-code" && item.mode === "detect-and-suggest")).toBe(true);
-    expect(payload.executors.some((item: { lane: string; preferred: string; fallback: string }) => item.lane === "execute" && item.preferred === "lazycodex" && item.fallback === "codex")).toBe(true);
-  });
-
-  test("rejects invalid pipeline friction", async () => {
-    const result = await runBoulder(["pipeline", "--friction", "impossible"]);
-    expect(result.exitCode).toBe(1);
-    expect(result.stdout).toBe("");
-    expect(result.stderr.trim()).toBe('ERROR pipeline.friction.invalid: Unsupported friction level "impossible". Expected one of: low, medium, high.');
   });
 
   test("renders capability doctor json for installed Codex tools", async () => {
