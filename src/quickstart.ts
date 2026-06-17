@@ -89,6 +89,8 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     "",
     "This is the first-run guided flow for a maintainer opening Boulder in a repository.",
     "",
+    "GJC and LazyCodex are adapter preferences. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
+    "",
     "## Checks",
     "",
     ...report.checks.map((check) => `- ${check.id}: ${check.status} - ${check.evidence}`),

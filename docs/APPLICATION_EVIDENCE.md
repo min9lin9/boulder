@@ -8,20 +8,29 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 - Package distribution name: `boulder-oss-cli`
 - License: MIT
 - Runtime: Bun + TypeScript
-- Current release: `v0.1.7`
+- Current release candidate: `v0.1.14`
 
 ## M1 Surface
 
-`boulder` currently exposes thirteen maintainer workflow commands:
+`boulder` currently exposes the maintainer workflow commands below:
 
 ```bash
 boulder init
+boulder quickstart
+boulder onboard
 boulder inspect
+boulder profile resolve
+boulder handoff packet --adapter gajae-code
+boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 boulder validate
 boulder verify --dry-run
+boulder pipeline --friction high
 boulder scorecard
 boulder benchmark
 boulder release-plan
+boulder release-check
+boulder replay-check
+boulder replay-run --dry-run
 boulder product-readiness
 boulder service-readiness
 boulder doctor
@@ -111,5 +120,5 @@ External projects and catalogs can be referenced with attribution, but their ado
 
 ## Next Evidence Targets
 
-- Submit the v0.1.7 Codex for OSS application packet.
-- Keep npm publication separate unless package distribution becomes required.
+- Keep `v0.1.14` release evidence, npm package evidence, GitHub tag evidence, and CI evidence aligned.
+- Continue adding external maintainer adoption evidence separately from local readiness claims.

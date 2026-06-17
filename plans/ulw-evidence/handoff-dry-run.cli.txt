@@ -1,0 +1,15 @@
+Boulder handoff packet written: /tmp/boulder-handoff-zV9Hxz/.boulder/handoffs/gajae-code.json
+Boulder handoff packet review
+- adapter: gajae-code
+- raw-workspace-content: excluded
+- redaction: applied
+- approval-code: fda102532bbf1b136b8baa90341515044a429657a62f78fb0f06e4f40d3a04dc
+Boulder handoff send dry-run
+- adapter: gajae-code
+- external execution: skipped
+- raw workspace content: excluded
+- command: bunx gajae-code --help
+- command: bunx gajae-code -p @docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md "Review this Boulder planning packet and return execution handoff notes" (approval required)
+
+TMP:/tmp/boulder-handoff-zV9Hxz
+EXIT:0

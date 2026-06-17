@@ -77,9 +77,10 @@ describe("boulder CLI e2e cleanup safety", () => {
     const result = await runBoulder(["release-check", "--cwd", root, "--json"]);
     const payload = JSON.parse(result.stdout);
 
-    expect(result.exitCode).toBe(0);
-    expect(payload.status).toBe("ready");
+    expect(result.exitCode).toBe(1);
+    expect(payload.status).toBe("blocked");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
   });
 
   test("renders replay-check fixture evidence", async () => {

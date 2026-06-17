@@ -7,6 +7,8 @@ Branch: main
 Event: push
 Status: success
 Commit: 4efbbbe
+Release tag candidate: v0.1.14
+Tag proof: pending until `git tag --list v0.1.14` returns the tag locally and the tag is pushed by the maintainer.
 
 Security workflow:
 

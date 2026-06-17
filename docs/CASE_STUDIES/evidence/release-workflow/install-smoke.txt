@@ -50,7 +50,7 @@ Asserted output included:
 boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
 boulder profile use <name> [--cwd path] [--json]
 boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
-boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code]
+boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
 ```
 
 Candidate first-run smoke:

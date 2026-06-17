@@ -14,35 +14,27 @@ bunx boulder-oss-cli@latest --help
 
 Use `@latest` after npm publish, or an explicit published version for deterministic smoke checks. Before publish, the release evidence uses `npm exec --package file:./boulder-oss-cli-0.1.14.tgz -- boulder ...` against the packed candidate.
 
-Local development:
-
-```bash
-bun install
-bun run boulder -- --help
-bun run ci
-```
+Local development: `bun install`, `bun run boulder -- --help`, then `bun run ci`.
 
 ## First Run
 
 ```bash
 cd path/to/your/repo
 bunx boulder-oss-cli@latest init
-bunx boulder-oss-cli@latest profile list
-bunx boulder-oss-cli@latest profile resolve
-bunx boulder-oss-cli@latest profile use programming-default
 bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
-bunx boulder-oss-cli@latest inspect
 bunx boulder-oss-cli@latest doctor
-bunx boulder-oss-cli@latest verify --dry-run
-bunx boulder-oss-cli@latest service-readiness
 ```
+
+`quickstart` tells you the next repo-specific commands. `doctor` tells you whether GJC, LazyCodex, local skills, MCPs, plugins, and Bun are available or only configured as preferences.
 
 For higher-friction work:
 
 ```bash
 bunx boulder-oss-cli@latest pipeline --friction high
 bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include src/cli.ts
+bunx boulder-oss-cli@latest handoff review --adapter gajae-code
+bunx boulder-oss-cli@latest handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 ```
 
 ## Local Codex Skill
@@ -69,7 +61,7 @@ boulder quickstart --cwd /path/to/repo
 
 The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
-GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports them as `available` only when found in the Codex inventory; otherwise it reports `configured-unverified` and keeps live executor calls approval-gated.
+GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports them as `available` only when found in the Codex inventory; otherwise it reports `configured-unverified` and keeps live executor calls approval-gated. `handoff send --dry-run` prints the candidate command without external execution.
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
 
@@ -80,15 +72,13 @@ boulder init
 boulder quickstart
 boulder onboard
 boulder inspect
-boulder profile list
 boulder profile resolve
-boulder profile use programming-default
 boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
 boulder handoff packet --adapter gajae-code --include src/cli.ts
 boulder handoff review --adapter gajae-code
-boulder handoff send --adapter gajae-code --approve-external --approval-code <code>
+boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 boulder replay-check
 boulder replay-run --dry-run
 boulder release-check
@@ -96,20 +86,6 @@ boulder product-readiness
 boulder service-readiness
 boulder export
 ```
-
-For local development, prefix commands with `bun run boulder --`.
-
-## What Boulder Creates
-
-- `boulder.yaml` - maintainer harness manifest
-- `.boulder/current-profile` - selected workflow profile when `profile use` is called
-- `.boulder/profiles/*.json` - saved project workflow profiles when `profile save` is called
-- `BOULDER.md` - Codex operator contract
-- `docs/REPO_BRIEF.md` - repository brief
-- `docs/OPERATOR_WORKFLOW_STACK.md` - Superpowers, GStack, and Compound workflow contract
-- `docs/VERIFICATION_GATES.md` - verification rules
-- `docs/PROVIDER_POLICY.md` - provider approval boundaries
-- `docs/BOULDER_EXPORT.md` and `docs/CODEX_WORKFLOW_NOTES.md` - shareable handoff notes
 
 Workflow profiles are the preferred routing surface. `boulder.yaml.executors` remains supported as a legacy fallback and migration source, including executor modes such as `local-only`, `packet-only`, and `approval-gated-send`.
 
@@ -139,11 +115,3 @@ Start with GitHub issues labeled `good first issue` or `help wanted`.
 - Development setup: [`docs/contributing/development-setup.md`](docs/contributing/development-setup.md)
 - AI contribution policy: [`docs/contributing/ai-contribution-policy.md`](docs/contributing/ai-contribution-policy.md)
 - Governance: [`GOVERNANCE.md`](GOVERNANCE.md)
-
-## More Docs
-
-- Architecture: [`docs/WORKFLOW_ARCHITECTURE.md`](docs/WORKFLOW_ARCHITECTURE.md)
-- Case studies: [`docs/CASE_STUDIES/README.md`](docs/CASE_STUDIES/README.md)
-- Capability doctor: [`docs/CAPABILITY_DOCTOR.md`](docs/CAPABILITY_DOCTOR.md)
-- Operating metrics: [`docs/OPERATING_METRICS.md`](docs/OPERATING_METRICS.md)
-- Trust/support/security: [`docs/TRUST_SUPPORT_SECURITY.md`](docs/TRUST_SUPPORT_SECURITY.md)

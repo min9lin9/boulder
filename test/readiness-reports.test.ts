@@ -60,15 +60,19 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("checks release evidence without publishing", async () => {
+  test("blocks release evidence when the current tag is not present locally", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.status).toBe("ready");
+    expect(report.status).toBe("blocked");
+    expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("does not publish");
+    expect(markdown).toContain("missing local tag v0.1.14");
   });
 });
 
@@ -87,6 +91,8 @@ describe("quickstart and replay reports", () => {
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
     expect(markdown).toContain("execute=lazycodex");
+    expect(markdown).toContain("GJC and LazyCodex are adapter preferences");
+    expect(markdown).toContain("doctor verifies local installation before live execution");
   });
 
   test("checks public replay fixtures and official docs references", async () => {

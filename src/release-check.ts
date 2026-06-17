@@ -1,3 +1,4 @@
+import { exec } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
@@ -19,9 +20,12 @@ export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckRe
   const version = await packageVersion(root);
   const checks = [
     await contentCheck(root, "release-workflow-doc", "docs/RELEASE_WORKFLOW.md", ["npm publish", "GitHub Release", "tag"]),
+    await contentCheck(root, "ci-bun-engine", ".github/workflows/ci.yml", ['bun-version: "1.3.14"']),
     await contentCheck(root, "changelog-version", "CHANGELOG.md", [`## ${version}`]),
     await contentCheck(root, "install-smoke-evidence", "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", ["bunx boulder-oss-cli"]),
+    await contentCheck(root, "install-smoke-version", "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", [`${version}`]),
     await contentCheck(root, "github-actions-evidence", "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", ["CI"]),
+    await localTagCheck(root, version),
     await contentCheck(root, "pack-dry-run-evidence", "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", ["boulder-oss-cli", "Total files"])
   ];
   return {
@@ -72,11 +76,50 @@ async function contentCheck(root: string, id: string, relativePath: string, term
 }
 
 async function packageVersion(root: string): Promise<string> {
-  const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
-  if (isRecord(parsed) && typeof parsed.version === "string" && parsed.version.trim()) {
-    return parsed.version;
+  try {
+    const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+    if (isRecord(parsed) && typeof parsed.version === "string" && parsed.version.trim()) {
+      return parsed.version;
+    }
+  } catch {
+    return "0.0.0";
   }
   return "0.0.0";
+}
+
+async function localTagCheck(root: string, version: string): Promise<ReleaseEvidenceCheck> {
+  const tag = `v${version}`;
+  try {
+    const stdout = await execStdout(`git tag --list ${shellQuote(tag)}`, root);
+    const found = stdout.split("\n").some((line) => line.trim() === tag);
+    return {
+      id: "git-tag-local",
+      status: found ? "pass" : "fail",
+      evidence: found ? `local tag ${tag}` : `missing local tag ${tag}`
+    };
+  } catch {
+    return {
+      id: "git-tag-local",
+      status: "fail",
+      evidence: "unable to inspect local git tags"
+    };
+  }
+}
+
+async function execStdout(command: string, cwd: string): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    exec(command, { cwd, timeout: 10_000 }, (error, stdout) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(stdout);
+    });
+  });
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -1,0 +1,54 @@
+{
+  "version": "0.1.14",
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "release-workflow-doc",
+      "status": "pass",
+      "evidence": "docs/RELEASE_WORKFLOW.md"
+    },
+    {
+      "id": "ci-bun-engine",
+      "status": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "changelog-version",
+      "status": "pass",
+      "evidence": "CHANGELOG.md"
+    },
+    {
+      "id": "install-smoke-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "install-smoke-version",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "github-actions-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "git-tag-local",
+      "status": "fail",
+      "evidence": "missing local tag v0.1.14"
+    },
+    {
+      "id": "pack-dry-run-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"
+    }
+  ],
+  "nextCommands": [
+    "bun run ci",
+    "npm publish --access public",
+    "git tag v0.1.14 # only when this version has not already been tagged",
+    "gh release create v0.1.14 --notes-file <release-notes.md>"
+  ]
+}
+
+EXIT:1

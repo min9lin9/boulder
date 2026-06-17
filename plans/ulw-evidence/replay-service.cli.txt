@@ -1,0 +1,91 @@
+{
+  "status": "ready",
+  "projects": [
+    {
+      "project": "awesome-codex-subagents",
+      "status": "pass",
+      "replayPath": "fixtures/replay/awesome-codex-subagents/replay.json",
+      "officialDocsPath": "fixtures/replay/awesome-codex-subagents/official-docs.json",
+      "issues": []
+    },
+    {
+      "project": "kimi-agent-swarm-skill",
+      "status": "pass",
+      "replayPath": "fixtures/replay/kimi-agent-swarm-skill/replay.json",
+      "officialDocsPath": "fixtures/replay/kimi-agent-swarm-skill/official-docs.json",
+      "issues": []
+    },
+    {
+      "project": "gajae-code",
+      "status": "pass",
+      "replayPath": "fixtures/replay/gajae-code/replay.json",
+      "officialDocsPath": "fixtures/replay/gajae-code/official-docs.json",
+      "issues": []
+    }
+  ],
+  "policy": [
+    "Read target official docs before command recommendations.",
+    "Use public repositories and share-safe evidence only.",
+    "Do not install agents, launch providers, publish packages, or mutate upstream repositories during fixture checks."
+  ]
+}
+{
+  "status": "ready",
+  "checks": [
+    {
+      "id": "service-loop",
+      "status": "pass",
+      "evidence": "docs/SERVICE_LOOP.md"
+    },
+    {
+      "id": "onboarding",
+      "status": "pass",
+      "evidence": "docs/ONBOARDING.md"
+    },
+    {
+      "id": "official-docs-coverage",
+      "status": "pass",
+      "evidence": "fixtures/replay/awesome-codex-subagents/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json, fixtures/replay/gajae-code/official-docs.json"
+    },
+    {
+      "id": "external-replay",
+      "status": "pass",
+      "evidence": "fixtures/replay/awesome-codex-subagents/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json, fixtures/replay/gajae-code/replay.json"
+    },
+    {
+      "id": "handoff-validation",
+      "status": "pass",
+      "evidence": "fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json"
+    },
+    {
+      "id": "service-acceptance-gates",
+      "status": "pass",
+      "evidence": "fixtures/service-readiness/gates.json"
+    },
+    {
+      "id": "field-evidence",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1"
+    },
+    {
+      "id": "operating-metrics",
+      "status": "pass",
+      "evidence": "docs/OPERATING_METRICS.md"
+    },
+    {
+      "id": "support-routes",
+      "status": "pass",
+      "evidence": ".github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, docs/TRUST_SUPPORT_SECURITY.md"
+    },
+    {
+      "id": "product-readiness",
+      "status": "pass",
+      "evidence": "product-readiness ready"
+    }
+  ],
+  "nextSteps": [
+    "Service workflow is ready; continue separating adoption claims from local evidence."
+  ]
+}
+
+EXIT:0

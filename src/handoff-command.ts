@@ -17,6 +17,7 @@ import {
   writeHandoffPacketText,
   writeReviewReceipt
 } from "./handoff-paths";
+import { formatHandoffSendDryRun } from "./handoff-send-format";
 import { isHandoffPacket } from "./handoff-packet-shape";
 import { prettyJson } from "./cli-format";
 
@@ -102,6 +103,7 @@ async function reviewCommand(args: readonly string[], options: HandoffCommandOpt
 
 async function sendCommand(args: readonly string[], options: HandoffCommandOptions): Promise<void> {
   const approveExternal = args.includes("--approve-external");
+  const dryRun = args.includes("--dry-run");
   const approvalCode = optionValue(args, "--approval-code");
   const packetPath = packetPathOrReport(args, options.cwd);
   if (!packetPath) return;
@@ -128,6 +130,10 @@ async function sendCommand(args: readonly string[], options: HandoffCommandOptio
   if (approveExternal && !await unsafePathGuard(() => hasReviewReceipt(packetPath, options.cwd, packet.text, approvalCode), false)) {
     console.error("ERROR handoff.review_required: Review the sanitized handoff packet before send.");
     process.exitCode = 1;
+    return;
+  }
+  if (dryRun) {
+    console.log(formatHandoffSendDryRun(packet.value));
     return;
   }
   console.log(result.message);

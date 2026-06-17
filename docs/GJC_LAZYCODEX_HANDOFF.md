@@ -82,6 +82,16 @@ Boulder rejects the handoff if:
 - dirty tree state not explicitly explained
 - provider calls, credentials, package installs, or external runtime launch appear in core Boulder commands
 
+## Dry Run
+
+Use dry-run before any approved external handoff:
+
+```bash
+boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
+```
+
+The dry-run prints the candidate adapter command and confirms `external execution: skipped`. It is evidence for routing readiness, not evidence that GJC or LazyCodex executed.
+
 ## Plan Drift Policy
 
 LazyCodex must stop implementation and return the work to GJC/Boulder when:

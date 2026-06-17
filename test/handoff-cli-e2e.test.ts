@@ -120,6 +120,37 @@ describe("boulder handoff CLI e2e", () => {
     }
   });
 
+  test("renders approved handoff send dry-run without external execution", async () => {
+    const root = await tempRepo();
+    try {
+      await runBoulder(["handoff", "packet", "--cwd", root, "--adapter", "gajae-code"]);
+      const review = await runBoulder(["handoff", "review", "--cwd", root, "--adapter", "gajae-code"]);
+      const code = approvalCodeFromReview(review.stdout);
+
+      const result = await runBoulder([
+        "handoff",
+        "send",
+        "--cwd",
+        root,
+        "--adapter",
+        "gajae-code",
+        "--approve-external",
+        "--approval-code",
+        code,
+        "--dry-run"
+      ]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toContain("Boulder handoff send dry-run");
+      expect(result.stdout).toContain("adapter: gajae-code");
+      expect(result.stdout).toContain("command: bunx gajae-code");
+      expect(result.stdout).toContain("external execution: skipped");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("returns bounded protected path errors", async () => {
     const root = await tempRepo();
     try {

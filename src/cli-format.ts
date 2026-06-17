@@ -27,7 +27,7 @@ export function printHelp(): void {
     "  boulder profile use <name> [--cwd path] [--json]",
     "  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]",
     "  boulder handoff review [--cwd path] [--packet path] [--json]",
-    "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code]",
+    "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]",
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",

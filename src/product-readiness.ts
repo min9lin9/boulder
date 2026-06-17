@@ -1,6 +1,7 @@
 import { readFile, readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+import { evaluateReleaseCheck } from "./release-check";
 
 export type ProductReadinessCheck = {
   readonly id: string;
@@ -62,6 +63,7 @@ export async function evaluateProductReadiness(root: string): Promise<ProductRea
       path: "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
       contains: ["bunx boulder-oss-cli --help", "boulder-oss-cli", "Result: success", "exit: 0", "Usage:"]
     }),
+    await publicReleaseCheck(root),
     await contentCheck(root, "limitations-explicit", {
       path: "docs/CODEX_OSS_APPLICATION_PACKET.md",
       contains: ["Does not claim", "OpenAI acceptance", "runtime scale"]
@@ -94,6 +96,18 @@ export async function evaluateProductReadiness(root: string): Promise<ProductRea
     nextSteps: isReady
       ? ["Public product gate is ready; keep OpenAI acceptance and adoption outside Boulder claims."]
       : ["Fill every failed public product evidence path before claiming 9.5+ readiness."]
+  };
+}
+
+async function publicReleaseCheck(root: string): Promise<ProductReadinessCheck> {
+  const release = await evaluateReleaseCheck(root);
+  const failing = release.checks.filter((item) => item.status === "fail");
+  return {
+    id: "public-release-check",
+    status: release.status === "ready" ? "pass" : "fail",
+    evidence: release.status === "ready"
+      ? `release-check ready for ${release.version}`
+      : `release-check ${release.status}: ${failing.map((item) => `${item.id}=${item.evidence}`).join("; ")}`
   };
 }
 
