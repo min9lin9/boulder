@@ -7,20 +7,20 @@ describe("boulder profile state safety e2e", () => {
   test("rejects symlinked profile state files", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-current.txt", "original\n");
-      await write(root, "../outside-profile.json", "original\n");
+      await write(root, outsideRelative(root, "current.txt"), "original\n");
+      await write(root, outsideRelative(root, "profile.json"), "original\n");
       await write(root, ".boulder/.keep", "");
       await write(root, ".boulder/profiles/.keep", "");
-      await symlink(join(root, "../outside-current.txt"), join(root, ".boulder/current-profile"));
-      await symlink(join(root, "../outside-profile.json"), join(root, ".boulder/profiles/snapshot.json"));
+      await symlink(outsideAbsolute(root, "current.txt"), join(root, ".boulder/current-profile"));
+      await symlink(outsideAbsolute(root, "profile.json"), join(root, ".boulder/profiles/snapshot.json"));
 
       const useProfile = await runBoulder(["profile", "use", "research-default", "--cwd", root]);
       const saveProfile = await runBoulder(["profile", "save", "snapshot", "--cwd", root, "--profile", "research-default"]);
 
       expectInvalidProfilePath(useProfile.stderr);
       expectInvalidProfilePath(saveProfile.stderr);
-      expect(await readFile(join(root, "../outside-current.txt"), "utf8")).toBe("original\n");
-      expect(await readFile(join(root, "../outside-profile.json"), "utf8")).toBe("original\n");
+      expect(await readFile(outsideAbsolute(root, "current.txt"), "utf8")).toBe("original\n");
+      expect(await readFile(outsideAbsolute(root, "profile.json"), "utf8")).toBe("original\n");
       expect(useProfile.exitCode).toBe(1);
       expect(saveProfile.exitCode).toBe(1);
     } finally {
@@ -31,9 +31,10 @@ describe("boulder profile state safety e2e", () => {
   test("does not read symlinked current profile state", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-current.txt", "secret-profile\n");
+      await write(root, outsideRelative(root, "current.txt"), "secret-profile\n");
       await write(root, ".boulder/.keep", "");
-      await symlink(join(root, "../outside-current.txt"), join(root, ".boulder/current-profile"));
+      await writeCapabilityFixture(root);
+      await symlink(outsideAbsolute(root, "current.txt"), join(root, ".boulder/current-profile"));
 
       const resolve = await runBoulder(["profile", "resolve", "--cwd", root, "--json"]);
       const doctor = await runBoulder(["doctor", "--cwd", root, "--json"]);
@@ -54,9 +55,9 @@ describe("boulder profile state safety e2e", () => {
   test("does not read hard-linked current profile state", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-current.txt", "secret-profile\n");
+      await write(root, outsideRelative(root, "current.txt"), "secret-profile\n");
       await write(root, ".boulder/.keep", "");
-      await hardLink(join(root, "../outside-current.txt"), join(root, ".boulder/current-profile"));
+      await hardLink(outsideAbsolute(root, "current.txt"), join(root, ".boulder/current-profile"));
 
       const resolve = await runBoulder(["profile", "resolve", "--cwd", root, "--json"]);
       const payload = JSON.parse(resolve.stdout);
@@ -72,10 +73,10 @@ describe("boulder profile state safety e2e", () => {
   test("does not read symlinked project profile JSON", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-profile.json", JSON.stringify(maliciousProfile()));
+      await write(root, outsideRelative(root, "profile.json"), JSON.stringify(maliciousProfile()));
       await write(root, ".boulder/current-profile", "malicious\n");
       await write(root, ".boulder/profiles/.keep", "");
-      await symlink(join(root, "../outside-profile.json"), join(root, ".boulder/profiles/malicious.json"));
+      await symlink(outsideAbsolute(root, "profile.json"), join(root, ".boulder/profiles/malicious.json"));
 
       const resolve = await runBoulder(["profile", "resolve", "--cwd", root, "--json"]);
       const pipeline = await runBoulder(["pipeline", "--cwd", root, "--json"]);
@@ -93,10 +94,10 @@ describe("boulder profile state safety e2e", () => {
   test("does not read hard-linked project profile JSON", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-profile.json", JSON.stringify(maliciousProfile()));
+      await write(root, outsideRelative(root, "profile.json"), JSON.stringify(maliciousProfile()));
       await write(root, ".boulder/current-profile", "malicious\n");
       await write(root, ".boulder/profiles/.keep", "");
-      await hardLink(join(root, "../outside-profile.json"), join(root, ".boulder/profiles/malicious.json"));
+      await hardLink(outsideAbsolute(root, "profile.json"), join(root, ".boulder/profiles/malicious.json"));
 
       const resolve = await runBoulder(["profile", "resolve", "--cwd", root, "--json"]);
 
@@ -111,20 +112,20 @@ describe("boulder profile state safety e2e", () => {
   test("rejects hard-linked profile state files", async () => {
     const root = await tempRepo();
     try {
-      await write(root, "../outside-current.txt", "original\n");
-      await write(root, "../outside-profile.json", "original\n");
+      await write(root, outsideRelative(root, "current.txt"), "original\n");
+      await write(root, outsideRelative(root, "profile.json"), "original\n");
       await write(root, ".boulder/.keep", "");
       await write(root, ".boulder/profiles/.keep", "");
-      await hardLink(join(root, "../outside-current.txt"), join(root, ".boulder/current-profile"));
-      await hardLink(join(root, "../outside-profile.json"), join(root, ".boulder/profiles/snapshot.json"));
+      await hardLink(outsideAbsolute(root, "current.txt"), join(root, ".boulder/current-profile"));
+      await hardLink(outsideAbsolute(root, "profile.json"), join(root, ".boulder/profiles/snapshot.json"));
 
       const useProfile = await runBoulder(["profile", "use", "research-default", "--cwd", root]);
       const saveProfile = await runBoulder(["profile", "save", "snapshot", "--cwd", root, "--profile", "research-default"]);
 
       expectInvalidProfilePath(useProfile.stderr);
       expectInvalidProfilePath(saveProfile.stderr);
-      expect(await readFile(join(root, "../outside-current.txt"), "utf8")).toBe("original\n");
-      expect(await readFile(join(root, "../outside-profile.json"), "utf8")).toBe("original\n");
+      expect(await readFile(outsideAbsolute(root, "current.txt"), "utf8")).toBe("original\n");
+      expect(await readFile(outsideAbsolute(root, "profile.json"), "utf8")).toBe("original\n");
       expect(useProfile.exitCode).toBe(1);
       expect(saveProfile.exitCode).toBe(1);
     } finally {
@@ -165,6 +166,24 @@ function maliciousProfile(): unknown {
 
 function expectInvalidProfilePath(stderr: string): void {
   expect(stderr.trim()).toBe("ERROR profile.path_invalid: Profile state path must stay inside .boulder without symlink or hardlink targets.");
+}
+
+function outsideRelative(root: string, filename: string): string {
+  const token = root.split(/[\\/]/).at(-1) ?? "repo";
+  return `../${token}-${filename}`;
+}
+
+function outsideAbsolute(root: string, filename: string): string {
+  return join(root, outsideRelative(root, filename));
+}
+
+async function writeCapabilityFixture(root: string): Promise<void> {
+  await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+    skills: [{ id: "codex", status: "available" }],
+    mcpServers: [],
+    plugins: [],
+    runtimes: [{ id: "bun", version: "1.3.14" }]
+  }));
 }
 
 async function hardLink(source: string, target: string): Promise<void> {

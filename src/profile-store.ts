@@ -66,9 +66,7 @@ export async function loadProjectProfile(
 }
 
 export async function writeProjectProfile(root: string, name: string, profile: ResolvedWorkflowProfile): Promise<string> {
-  if (!isSafeProfileName(name)) {
-    throw new InvalidProfileNameError();
-  }
+  assertSafeProfileName(name);
   if (isReservedProfileName(name)) {
     throw new InvalidProfileNameError("Built-in profile names are reserved.");
   }
@@ -86,6 +84,12 @@ export async function writeCurrentProfile(root: string, profileId: string): Prom
     throw new InvalidProfileStatePathError();
   }
   await writeText(path, `${profileId}\n`, true);
+}
+
+export function assertSafeProfileName(name: string): void {
+  if (!isSafeProfileName(name)) {
+    throw new InvalidProfileNameError();
+  }
 }
 
 export async function readCurrentProfileText(root: string): Promise<string | null> {

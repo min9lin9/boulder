@@ -1,7 +1,7 @@
 import { at, readText } from "./fs";
 import { defaultExecutors } from "./executors";
 import { loadManifest } from "./manifest";
-import { loadProjectProfile, listProjectProfiles, readCurrentProfileText, writeCurrentProfile, writeProjectProfile } from "./profile-store";
+import { assertSafeProfileName, loadProjectProfile, listProjectProfiles, readCurrentProfileText, writeCurrentProfile, writeProjectProfile } from "./profile-store";
 import { BUILT_IN_WORKFLOW_PROFILE_IDS, builtInProfile, profileWithExternalExecutors } from "./workflow-profile-builtins";
 import type {
   ExecutorProfiles,
@@ -84,6 +84,7 @@ export async function resolveWorkflowProfile(root: string, options: ProfileResol
 }
 
 export async function useWorkflowProfile(root: string, profileId: string): Promise<ResolvedWorkflowProfile> {
+  assertSafeProfileName(profileId);
   const profile = await profileById(root, profileId, "project-current", null, null, []);
   if (!profile) {
     throw new ProfileNotFoundError(profileId);

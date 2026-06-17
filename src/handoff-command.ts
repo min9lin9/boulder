@@ -18,6 +18,7 @@ import {
   writeReviewReceipt
 } from "./handoff-paths";
 import { isHandoffPacket } from "./handoff-packet-shape";
+import { prettyJson } from "./cli-format";
 
 export type HandoffCommandOptions = {
   readonly cwd: string;
@@ -54,12 +55,12 @@ async function packetCommand(args: readonly string[], options: HandoffCommandOpt
     return;
   }
   const written = await unsafePathGuard(
-    () => writeHandoffPacketText(packetPath, options.cwd, `${JSON.stringify(packet, null, 2)}\n`).then(() => true),
+    () => writeHandoffPacketText(packetPath, options.cwd, `${prettyJson(packet)}\n`).then(() => true),
     false
   );
   if (!written) return;
   if (options.json) {
-    console.log(JSON.stringify(packet, null, 2));
+    console.log(prettyJson(packet));
     return;
   }
   console.log(`Boulder handoff packet written: ${packetPath}`);
@@ -87,7 +88,7 @@ async function reviewCommand(args: readonly string[], options: HandoffCommandOpt
   const approvalCode = await unsafePathGuard(() => writeReviewReceipt(packetPath, options.cwd, packet.text), null);
   if (!approvalCode) return;
   if (options.json) {
-    console.log(JSON.stringify({ packet: packet.value, approvalCode }, null, 2));
+    console.log(prettyJson({ packet: packet.value, approvalCode }));
     return;
   }
   console.log([

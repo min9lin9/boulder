@@ -1,0 +1,22 @@
+# Manual QA: unsafe handoff include
+tmp=/private/tmp/boulder-ulw-handoff.7uA3bu
+$ bun bin/boulder.ts init --cwd /private/tmp/boulder-ulw-handoff.7uA3bu
+stdout:
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+stderr:
+exit=0
+
+$ bun bin/boulder.ts handoff packet --cwd /private/tmp/boulder-ulw-handoff.7uA3bu --adapter gjc --include ../../../other-tenant/private/src/auth.ts --json
+stdout:
+stderr:
+ERROR handoff.protected_path: Protected path is not allowed in external handoff packet: ../../../other-tenant/private/src/auth.ts
+exit=1
+
