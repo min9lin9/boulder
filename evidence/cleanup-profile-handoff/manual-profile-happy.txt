@@ -1,0 +1,324 @@
+# Manual QA: profile happy path
+tmp=/private/tmp/boulder-ulw-profile.4ogyb5
+$ bun bin/boulder.ts init --cwd /private/tmp/boulder-ulw-profile.4ogyb5
+stdout:
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+stderr:
+exit=0
+
+$ bun bin/boulder.ts profile use research-default --cwd /private/tmp/boulder-ulw-profile.4ogyb5
+stdout:
+Boulder active workflow profile: research-default
+stderr:
+exit=0
+
+$ bun bin/boulder.ts quickstart --cwd /private/tmp/boulder-ulw-profile.4ogyb5
+stdout:
+# Boulder Quickstart
+
+Status: ready
+
+This is the first-run guided flow for a maintainer opening Boulder in a repository.
+
+## Checks
+
+- manifest: pass - boulder.yaml
+- operator-contract: pass - BOULDER.md
+- repo-brief: pass - docs/REPO_BRIEF.md
+- active-profile: pass - research-default (project-current)
+- executor-planning: pass - plan=codex (local-only; availability checked by doctor)
+- executor-execution: pass - execute=codex (local-only; availability checked by doctor)
+
+## Next Commands
+
+- `boulder inspect --cwd . --json` - Read the repository shape before planning.
+- `boulder profile list --cwd .` - See the available workflow profiles before routing work.
+- `boulder profile resolve --cwd .` - Confirm the active plan/execute adapters and external-call policy.
+- `boulder profile use programming-default --cwd .` - Select the default programming profile, or swap it for research-default or ops-default.
+- `boulder pipeline --cwd . --friction medium` - Choose the default classification -> plan -> verify path.
+- `boulder service-readiness --cwd . --json` - See whether repeatable service evidence is already present.
+- `boulder export --cwd . --force` - Write shareable Codex workflow notes and handoff artifacts.
+
+## Next Docs
+
+- docs/CONTRIBUTOR_START_HERE.md
+- docs/ONBOARDING.md
+- docs/COMMUNITY.md
+
+stderr:
+exit=0
+
+$ bun bin/boulder.ts pipeline --friction high --json --cwd /private/tmp/boulder-ulw-profile.4ogyb5
+stdout:
+{
+  "activeProfile": {
+    "schemaVersion": "boulder.profile.resolved.v1",
+    "source": "project-current",
+    "id": "research-default",
+    "purpose": "research",
+    "surface": [
+      "intake",
+      "plan",
+      "execute",
+      "verify",
+      "record"
+    ],
+    "lanes": {
+      "intake": {
+        "owner": "boulder",
+        "adapter": "boulder",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "context-summary"
+        ]
+      },
+      "plan": {
+        "owner": "codex",
+        "adapter": "codex",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "plan-summary"
+        ]
+      },
+      "critic": {
+        "owner": "codex",
+        "adapter": "codex",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "critic-notes"
+        ]
+      },
+      "handoff": {
+        "owner": "boulder",
+        "adapter": "boulder",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "handoff-packet"
+        ]
+      },
+      "execute": {
+        "owner": "codex",
+        "adapter": "codex",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "work-result"
+        ]
+      },
+      "verify": {
+        "owner": "boulder",
+        "adapter": "boulder",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "verification-report"
+        ]
+      },
+      "compound": {
+        "owner": "boulder",
+        "adapter": "boulder",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "compound-ledger"
+        ]
+      },
+      "record": {
+        "owner": "boulder",
+        "adapter": "boulder",
+        "modelPreference": null,
+        "mode": "local-only",
+        "evidenceRequired": [
+          "decision-log"
+        ]
+      }
+    },
+    "externalPolicy": {
+      "default": "blocked",
+      "requireExplicitApproval": true,
+      "rawWorkspaceContent": "forbidden",
+      "sanitizedPacket": "allowed-after-approval"
+    },
+    "fallback": {
+      "plan": "codex",
+      "execute": "codex",
+      "critic": "codex",
+      "compound": "boulder"
+    },
+    "drift": [],
+    "suggestion": {
+      "profileId": null,
+      "applied": false,
+      "task": null
+    }
+  },
+  "friction": "high",
+  "stages": [
+    {
+      "id": "classification",
+      "label": "Classification",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "task-class",
+        "friction-level",
+        "risk-flags",
+        "approval-scope"
+      ],
+      "evidence": [
+        "repo-context",
+        "manifest-context",
+        "risk-context"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none",
+        "repo-read"
+      ]
+    },
+    {
+      "id": "deep-interview",
+      "label": "Deep Interview",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "ambiguities",
+        "assumptions",
+        "required-decisions",
+        "blocked-unknowns"
+      ],
+      "evidence": [
+        "operator-intent",
+        "open-questions",
+        "decision-log"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "pm-debate",
+      "label": "PM Debate",
+      "required": true,
+      "depth": "standard",
+      "outputs": [
+        "tradeoffs",
+        "recommended-path",
+        "rejected-options",
+        "milestone-scope"
+      ],
+      "evidence": [
+        "debate-notes",
+        "scope-boundary"
+      ],
+      "approvalRequired": true,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "synthesizer",
+      "label": "Synthesizer",
+      "required": true,
+      "depth": "deep",
+      "outputs": [
+        "decision",
+        "acceptance-gates",
+        "next-action",
+        "handoff-contract"
+      ],
+      "evidence": [
+        "synthesis-summary",
+        "implementation-contract"
+      ],
+      "approvalRequired": false,
+      "allowedSideEffects": [
+        "none"
+      ]
+    },
+    {
+      "id": "cso-qa",
+      "label": "CSO/QA",
+      "required": true,
+      "depth": "standard",
+      "outputs": [
+        "risk-review",
+        "qa-gates",
+        "approval-result"
+      ],
+      "evidence": [
+        "security-review",
+        "qa-checklist"
+      ],
+      "approvalRequired": true,
+      "allowedSideEffects": [
+        "none"
+      ]
+    }
+  ],
+  "failClosed": true,
+  "forbiddenSideEffects": [
+    "credential-access",
+    "package-install",
+    "external-launch",
+    "provider-call"
+  ],
+  "approvalGates": [
+    "pm-debate",
+    "cso-qa"
+  ],
+  "evidenceRequired": [
+    "repo-context",
+    "manifest-context",
+    "risk-context",
+    "operator-intent",
+    "open-questions",
+    "decision-log",
+    "debate-notes",
+    "scope-boundary",
+    "synthesis-summary",
+    "implementation-contract",
+    "security-review",
+    "qa-checklist"
+  ],
+  "executors": [
+    {
+      "lane": "plan",
+      "preferred": "codex",
+      "mode": "local-only",
+      "fallback": "codex",
+      "adapterCommands": []
+    },
+    {
+      "lane": "execute",
+      "preferred": "codex",
+      "mode": "local-only",
+      "fallback": "codex",
+      "adapterCommands": []
+    }
+  ]
+}
+stderr:
+exit=0
+
+$ bun bin/boulder.ts export --force --cwd /private/tmp/boulder-ulw-profile.4ogyb5
+stdout:
+Boulder export complete
+- created: docs/BOULDER_EXPORT.md
+- created: docs/CODEX_WORKFLOW_NOTES.md
+stderr:
+exit=0
+

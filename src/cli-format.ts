@@ -5,6 +5,10 @@ export function formatLines(title: string, lines: readonly string[]): string {
   return [title, ...lines.map((line) => `- ${line}`)].join("\n");
 }
 
+export function prettyJson(value: unknown): string {
+  return JSON.stringify(value, null, 2);
+}
+
 export function printHelp(): void {
   console.log([
     "boulder",

@@ -1,6 +1,6 @@
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
-import { formatDoctorReport, formatFieldEvidenceResult, formatLines, printHelp } from "./cli-format";
+import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
 import { parseOptions } from "./cli-options";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
@@ -44,7 +44,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "quickstart" || command === "onboard") {
     const report = await evaluateQuickstart(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(prettyJson(report));
       return;
     }
     console.log(quickstartToMarkdown(report));
@@ -53,7 +53,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "inspect") {
     const inspection = await inspectRepo(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(inspection, null, 2));
+      console.log(prettyJson(inspection));
       return;
     }
     const markdown = inspectionToMarkdown(inspection);
@@ -97,7 +97,7 @@ export async function main(args: string[]): Promise<void> {
     const resolution = await resolveWorkflowProfile(options.cwd, {});
     const plan = buildPipelinePlan(options.friction, executorsFromResolvedProfile(resolution.profile), resolution.profile);
     if (options.json) {
-      console.log(JSON.stringify(plan, null, 2));
+      console.log(prettyJson(plan));
       return;
     }
     console.log(formatPipelinePlan(plan));
@@ -107,7 +107,7 @@ export async function main(args: string[]): Promise<void> {
     const manifest = await loadManifest(options.cwd);
     const scorecard = scoreManifest(manifest);
     if (options.json) {
-      console.log(JSON.stringify(scorecard, null, 2));
+      console.log(prettyJson(scorecard));
       return;
     }
     const markdown = scorecardToMarkdown(scorecard);
@@ -119,7 +119,7 @@ export async function main(args: string[]): Promise<void> {
     const fixtures = await loadBenchmarkFixtures(options.cwd);
     const report = evaluateBenchmarkFixtures(fixtures);
     if (options.json) {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(prettyJson(report));
       return;
     }
     const markdown = benchmarkReportToMarkdown(report);
@@ -130,7 +130,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "release-plan") {
     const plan = await evaluateReleasePlan(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(plan, null, 2));
+      console.log(prettyJson(plan));
       return;
     }
     const markdown = releasePlanToMarkdown(plan);
@@ -141,7 +141,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "release-check") {
     const report = await evaluateReleaseCheck(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(prettyJson(report));
       if (report.status === "blocked") process.exitCode = 1;
       return;
     }
@@ -152,7 +152,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "replay-check") {
     const report = await evaluateReplayCheck(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(prettyJson(report));
       if (report.status === "blocked") process.exitCode = 1;
       return;
     }
@@ -163,7 +163,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "replay-run") {
     const plan = await buildReplayRunPlan(options.cwd, options.dryRun);
     if (options.json) {
-      console.log(JSON.stringify(plan, null, 2));
+      console.log(prettyJson(plan));
       if (plan.status === "blocked") process.exitCode = 1;
       return;
     }
@@ -174,7 +174,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "product-readiness") {
     const readiness = await evaluateProductReadiness(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(readiness, null, 2));
+      console.log(prettyJson(readiness));
       if (readiness.status === "blocked") process.exitCode = 1;
       return;
     }
@@ -187,7 +187,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "service-readiness") {
     const readiness = await evaluateServiceReadiness(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(readiness, null, 2));
+      console.log(prettyJson(readiness));
       if (readiness.status === "blocked") process.exitCode = 1;
       return;
     }
@@ -200,7 +200,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "doctor") {
     const report = await evaluateCapabilityDoctor(options.cwd);
     if (options.json) {
-      console.log(JSON.stringify(report, null, 2));
+      console.log(prettyJson(report));
       if (report.status === "fail") process.exitCode = 1;
       return;
     }
@@ -211,7 +211,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "record" && args.includes("field-readiness")) {
     const result = await recordFieldEvidence(options.cwd, options.runId, options.evidence);
     if (options.json) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(prettyJson(result));
       if (result.status === "fail") process.exitCode = 1;
       return;
     }

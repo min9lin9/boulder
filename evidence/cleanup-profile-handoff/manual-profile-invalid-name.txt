@@ -1,0 +1,21 @@
+# Manual QA: invalid profile name
+tmp=/private/tmp/boulder-ulw-invalid.x9LPme
+$ bun bin/boulder.ts init --cwd /private/tmp/boulder-ulw-invalid.x9LPme
+stdout:
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+stderr:
+exit=0
+
+$ bun bin/boulder.ts profile use ../../../escape --cwd /private/tmp/boulder-ulw-invalid.x9LPme
+stdout:
+stderr:
+ERROR profile.invalid_name: Profile name must contain only letters, numbers, dots, underscores, or hyphens.
+exit=1

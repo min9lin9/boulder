@@ -100,6 +100,19 @@ describe("boulder profile CLI e2e", () => {
     }
   });
 
+  test("rejects profile use path traversal as an invalid profile name", async () => {
+    const root = await tempRepo();
+    try {
+      const result = await runBoulder(["profile", "use", "../../../escape", "--cwd", root]);
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout).toBe("");
+      expect(result.stderr.trim()).toBe("ERROR profile.invalid_name: Profile name must contain only letters, numbers, dots, underscores, or hyphens.");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("rejects saved profile names that collide with built-ins", async () => {
     const root = await tempRepo();
     try {
