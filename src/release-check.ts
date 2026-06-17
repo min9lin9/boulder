@@ -24,6 +24,7 @@ export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckRe
     await contentCheck(root, "changelog-version", "CHANGELOG.md", [`## ${version}`]),
     await contentCheck(root, "install-smoke-evidence", "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", ["bunx boulder-oss-cli"]),
     await contentCheck(root, "install-smoke-version", "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", [`${version}`]),
+    await contentCheck(root, "published-version-evidence", "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", [`Published version: ${version}`]),
     await contentCheck(root, "github-actions-evidence", "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", ["CI"]),
     await localTagCheck(root, version),
     await contentCheck(root, "pack-dry-run-evidence", "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", ["boulder-oss-cli", "Total files"])

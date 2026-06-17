@@ -80,6 +80,7 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(result.exitCode).toBe(1);
     expect(payload.status).toBe("blocked");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
   });
 

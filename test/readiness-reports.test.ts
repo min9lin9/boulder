@@ -68,11 +68,13 @@ describe("benchmark and release reports", () => {
     expect(report.status).toBe("blocked");
     expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("does not publish");
     expect(markdown).toContain("missing local tag v0.1.14");
+    expect(markdown).toContain("missing terms: Published version: 0.1.14");
   });
 });
 

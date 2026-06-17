@@ -13,8 +13,18 @@ Known published baseline before this release candidate:
 
 ```text
 name = 'boulder-oss-cli'
-version = '0.1.11'
+version = '0.1.13'
 ```
+
+Publish attempt for `0.1.14` on 2026-06-18:
+
+```text
+npm publish --access public
+npm error code EOTP
+npm error This operation requires a one-time password.
+```
+
+Published version: pending, expected `0.1.14` after OTP completion.
 
 Published baseline result:
 

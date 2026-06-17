@@ -14,7 +14,7 @@ Status: blocked
 - public-ci-workflow: pass - .github/workflows/ci.yml
 - public-ci-run-evidence: pass - docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
 - published-install-smoke: pass - docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
-- public-release-check: fail - release-check blocked: git-tag-local=missing local tag v0.1.14
+- public-release-check: fail - release-check blocked: published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.14; git-tag-local=missing local tag v0.1.14
 - limitations-explicit: pass - docs/CODEX_OSS_APPLICATION_PACKET.md
 - trust-support-security-posture: pass - docs/TRUST_SUPPORT_SECURITY.md
 - public-support-templates: pass - .github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, SECURITY.md
