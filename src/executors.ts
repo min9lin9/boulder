@@ -1,4 +1,4 @@
-import type { ExecutorProfiles } from "./types";
+import type { ExecutorMode, ExecutorProfiles } from "./types";
 import { yamlNestedGroupScalar } from "./manifest-yaml";
 
 export function defaultExecutors(): ExecutorProfiles {
@@ -35,6 +35,10 @@ export function executorsFromText(text: string, defaults: ExecutorProfiles): Exe
   };
 }
 
-function executorMode(value: string | null): ExecutorProfiles["planning"]["mode"] | null {
-  return value === "detect-and-suggest" ? value : null;
+function executorMode(value: string | null): ExecutorMode | null {
+  if (value === "detect-and-suggest") return value;
+  if (value === "local-only") return value;
+  if (value === "packet-only") return value;
+  if (value === "approval-gated-send") return value;
+  return null;
 }

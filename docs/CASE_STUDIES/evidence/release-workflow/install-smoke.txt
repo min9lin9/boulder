@@ -1,62 +1,91 @@
-Published install smoke
+Published and candidate install smoke evidence
 
-Observed result on 2026-06-15.
+Observed result on 2026-06-17.
 
-Registry command:
+Published registry baseline:
 
 ```bash
 npm view boulder-oss-cli name version
+bunx boulder-oss-cli --help
 ```
 
-Registry output:
+Known published baseline before this release candidate:
 
 ```text
 name = 'boulder-oss-cli'
 version = '0.1.11'
 ```
 
-Execution command:
-
-```bash
-bunx boulder-oss-cli --help
-bunx boulder-oss-cli@latest --version
-bunx boulder-oss-cli@latest --help
-```
-
-Execution output:
+Published baseline result:
 
 ```text
-0.1.11
-boulder
-
-A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
-
-Usage:
-  boulder init [--cwd path] [--force]
-  boulder quickstart [--cwd path] [--json]
-  boulder onboard [--cwd path] [--json]
-  boulder inspect [--cwd path] [--json]
-  boulder validate [--cwd path]
-  boulder verify [--cwd path] [--dry-run]
-  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]
-  boulder scorecard [--cwd path] [--json]
-  boulder benchmark [--cwd path] [--json]
-  boulder release-plan [--cwd path] [--json]
-  boulder release-check [--cwd path] [--json]
-  boulder replay-check [--cwd path] [--json]
-  boulder replay-run [--cwd path] --dry-run [--json]
-  boulder product-readiness [--cwd path] [--json]
-  boulder service-readiness [--cwd path] [--json]
-  boulder doctor [--cwd path] [--json]
-  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]
-  boulder export [--cwd path] [--force]
-
-Package:
-  bunx boulder-oss-cli <command>
-
-```
-
 Result: success
 exit: 0
+Usage:
+  boulder init [--cwd path] [--force]
+```
 
-Conclusion: `boulder-oss-cli@0.1.11` is published to npm and can be executed through `bunx boulder-oss-cli@latest` from a fresh temporary directory.
+Candidate tarball command:
+
+```bash
+npm pack --cache /private/tmp/boulder-npm-cache
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder --version
+```
+
+Candidate output:
+
+```text
+0.1.14
+```
+
+Candidate CLI surface:
+
+```bash
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder --help
+```
+
+Asserted output included:
+
+```text
+boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
+boulder profile use <name> [--cwd path] [--json]
+boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
+boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code]
+```
+
+Candidate first-run smoke:
+
+```bash
+tmpdir=/private/tmp/boulder-tarball-smoke.LHXp4l
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder init --cwd "$tmpdir"
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder profile resolve --cwd "$tmpdir" --task research
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder doctor --cwd "$tmpdir"
+```
+
+Asserted output included:
+
+```text
+Boulder initialized
+Boulder resolved workflow profile
+- active-profile: programming-default
+- suggested-profile: research-default
+Boulder capability doctor
+- active-profile: programming-default (built-in; programming)
+- external-default: blocked
+- external-approval-required: true
+```
+
+Candidate safety smoke:
+
+```bash
+npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder handoff packet --cwd "$tmpdir" --adapter gajae-code --include ../../../other-tenant/private/src/auth.ts --json
+```
+
+Observed output:
+
+```text
+exit: 1
+ERROR handoff.protected_path: Protected path is not allowed in external handoff packet: ../../../other-tenant/private/src/auth.ts
+```
+
+Conclusion: the `0.1.14` candidate tarball can be installed and executed through `npm exec --package file:<tarball> -- boulder ...`, and the candidate blocks repo-escaping handoff includes before external handoff.

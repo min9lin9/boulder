@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current package: `boulder-oss-cli@0.1.13`.
+Current release candidate: `boulder-oss-cli@0.1.14`.
 
 ## Install
 
@@ -12,7 +12,7 @@ Current package: `boulder-oss-cli@0.1.13`.
 bunx boulder-oss-cli@latest --help
 ```
 
-Use `@latest` or an explicit version for deterministic smoke checks.
+Use `@latest` after npm publish, or an explicit published version for deterministic smoke checks. Before publish, the release evidence uses `npm exec --package file:./boulder-oss-cli-0.1.14.tgz -- boulder ...` against the packed candidate.
 
 Local development:
 
@@ -26,8 +26,11 @@ bun run ci
 
 ```bash
 cd path/to/your/repo
-bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest init
+bunx boulder-oss-cli@latest profile list
+bunx boulder-oss-cli@latest profile resolve
+bunx boulder-oss-cli@latest profile use programming-default
+bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
 bunx boulder-oss-cli@latest inspect
 bunx boulder-oss-cli@latest doctor
@@ -39,6 +42,7 @@ For higher-friction work:
 
 ```bash
 bunx boulder-oss-cli@latest pipeline --friction high
+bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include src/cli.ts
 ```
 
 ## Local Codex Skill
@@ -55,7 +59,7 @@ For first-time setup:
 boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
 ```
 
-`init` configures the default executor profile in `boulder.yaml`: planning uses `gajae-code` and execution uses `lazycodex`, both in `detect-and-suggest` mode. `quickstart` and `doctor` report that adapter setup explicitly.
+`init` writes the legacy-compatible `boulder.yaml`, while runtime routing resolves through workflow profiles first. The default active profile is `programming-default`: planning uses `gajae-code` and execution uses `lazycodex`, both in `detect-and-suggest` mode. `profile resolve`, `quickstart`, `pipeline`, `doctor`, and `export` report the active profile explicitly.
 
 If the target repo is not the current working directory, include `--cwd`:
 
@@ -76,9 +80,15 @@ boulder init
 boulder quickstart
 boulder onboard
 boulder inspect
+boulder profile list
+boulder profile resolve
+boulder profile use programming-default
 boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
+boulder handoff packet --adapter gajae-code --include src/cli.ts
+boulder handoff review --adapter gajae-code
+boulder handoff send --adapter gajae-code --approve-external --approval-code <code>
 boulder replay-check
 boulder replay-run --dry-run
 boulder release-check
@@ -92,12 +102,16 @@ For local development, prefix commands with `bun run boulder --`.
 ## What Boulder Creates
 
 - `boulder.yaml` - maintainer harness manifest
+- `.boulder/current-profile` - selected workflow profile when `profile use` is called
+- `.boulder/profiles/*.json` - saved project workflow profiles when `profile save` is called
 - `BOULDER.md` - Codex operator contract
 - `docs/REPO_BRIEF.md` - repository brief
 - `docs/OPERATOR_WORKFLOW_STACK.md` - Superpowers, GStack, and Compound workflow contract
 - `docs/VERIFICATION_GATES.md` - verification rules
 - `docs/PROVIDER_POLICY.md` - provider approval boundaries
 - `docs/BOULDER_EXPORT.md` and `docs/CODEX_WORKFLOW_NOTES.md` - shareable handoff notes
+
+Workflow profiles are the preferred routing surface. `boulder.yaml.executors` remains supported as a legacy fallback and migration source, including executor modes such as `local-only`, `packet-only`, and `approval-gated-send`.
 
 ## Why Boulder
 
@@ -107,7 +121,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release: [`v0.1.13`](https://github.com/min9lin9/boulder/releases/tag/v0.1.13)
+- Release candidate: `v0.1.14`
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

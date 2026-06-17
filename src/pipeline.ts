@@ -1,6 +1,6 @@
 import { defaultExecutors } from "./executors";
 import { adapterCommandsForExecutor } from "./executor-adapters";
-import type { ExecutorAdapterCommand, ExecutorProfiles } from "./types";
+import type { ExecutorAdapterCommand, ExecutorMode, ExecutorProfiles, ResolvedWorkflowProfile } from "./types";
 
 export type FrictionLevel = "low" | "medium" | "high";
 
@@ -23,7 +23,7 @@ export type SideEffectCategory =
 export type ExecutorRoute = {
   readonly lane: "plan" | "execute";
   readonly preferred: string;
-  readonly mode: "detect-and-suggest";
+  readonly mode: ExecutorMode;
   readonly fallback: string;
   readonly adapterCommands: readonly ExecutorAdapterCommand[];
 };
@@ -40,6 +40,7 @@ export type PipelineStage = {
 };
 
 export type PipelinePlan = {
+  readonly activeProfile?: ResolvedWorkflowProfile;
   readonly friction: FrictionLevel;
   readonly stages: readonly PipelineStage[];
   readonly failClosed: boolean;
@@ -72,12 +73,16 @@ export function invalidFrictionMessage(value: string): string {
   return `ERROR pipeline.friction.invalid: Unsupported friction level "${value}". Expected one of: ${FRICTION_LEVELS.join(", ")}.`;
 }
 
-export function buildPipelinePlan(friction: FrictionLevel, executors: ExecutorProfiles = defaultExecutors()): PipelinePlan {
+export function buildPipelinePlan(
+  friction: FrictionLevel,
+  executors: ExecutorProfiles = defaultExecutors(),
+  activeProfile?: ResolvedWorkflowProfile
+): PipelinePlan {
   if (friction === "low") {
     return plan(friction, [
       stage("classification", "Classification", "light", ["task-class", "friction-level"], ["repo-context"], false, ["none", "repo-read"]),
       stage("synthesizer", "Synthesizer", "light", ["decision", "next-action"], ["plan-summary"], false, ["none"])
-    ], executors);
+    ], executors, activeProfile);
   }
 
   if (friction === "medium") {
@@ -86,7 +91,7 @@ export function buildPipelinePlan(friction: FrictionLevel, executors: ExecutorPr
       stage("deep-interview", "Deep Interview", "standard", ["ambiguities", "assumptions", "required-decisions"], ["operator-intent", "open-questions"], false, ["none"]),
       stage("pm-debate", "PM Debate", "standard", ["tradeoffs", "recommended-path", "rejected-options"], ["debate-notes"], true, ["none"]),
       stage("synthesizer", "Synthesizer", "standard", ["decision", "acceptance-gates", "next-action"], ["synthesis-summary"], false, ["none"])
-    ], executors);
+    ], executors, activeProfile);
   }
 
   return plan(friction, [
@@ -95,7 +100,7 @@ export function buildPipelinePlan(friction: FrictionLevel, executors: ExecutorPr
     stage("pm-debate", "PM Debate", "standard", ["tradeoffs", "recommended-path", "rejected-options", "milestone-scope"], ["debate-notes", "scope-boundary"], true, ["none"]),
     stage("synthesizer", "Synthesizer", "deep", ["decision", "acceptance-gates", "next-action", "handoff-contract"], ["synthesis-summary", "implementation-contract"], false, ["none"]),
     stage("cso-qa", "CSO/QA", "standard", ["risk-review", "qa-gates", "approval-result"], ["security-review", "qa-checklist"], true, ["none"])
-  ], executors);
+  ], executors, activeProfile);
 }
 
 export function validatePipelinePlan(plan: PipelinePlan): PipelineIssue[] {
@@ -127,14 +132,26 @@ export function formatPipelinePlan(plan: PipelinePlan): string {
   return [
     "Boulder pipeline plan",
     `- friction: ${plan.friction}`,
+    ...activeProfileLine(plan),
     ...plan.stages.map((stageItem) => `- stage: ${stageItem.id} (${stageMarkers(stageItem).join(", ")})`),
     ...plan.executors.map((route) => `- executor: ${route.lane}=${route.preferred} (${route.mode}, fallback: ${route.fallback})`),
     `- fail-closed: ${plan.failClosed}`
   ].join("\n");
 }
 
-function plan(friction: FrictionLevel, stages: PipelineStage[], executors: ExecutorProfiles): PipelinePlan {
+function activeProfileLine(plan: PipelinePlan): readonly string[] {
+  if (!plan.activeProfile) return [];
+  return [`- active-profile: ${plan.activeProfile.id} (${plan.activeProfile.source}; ${plan.activeProfile.purpose})`];
+}
+
+function plan(
+  friction: FrictionLevel,
+  stages: PipelineStage[],
+  executors: ExecutorProfiles,
+  activeProfile?: ResolvedWorkflowProfile
+): PipelinePlan {
   return {
+    ...(activeProfile ? { activeProfile } : {}),
     friction,
     stages,
     failClosed: true,

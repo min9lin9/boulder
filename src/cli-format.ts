@@ -16,6 +16,14 @@ export function printHelp(): void {
     "  boulder quickstart [--cwd path] [--json]",
     "  boulder onboard [--cwd path] [--json]",
     "  boulder inspect [--cwd path] [--json]",
+    "  boulder profile list [--cwd path] [--json]",
+    "  boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]",
+    "  boulder profile show [name] [--cwd path] [--json]",
+    "  boulder profile save <name> [--cwd path] [--profile source] [--json]",
+    "  boulder profile use <name> [--cwd path] [--json]",
+    "  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]",
+    "  boulder handoff review [--cwd path] [--packet path] [--json]",
+    "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code]",
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",
@@ -38,9 +46,18 @@ export function printHelp(): void {
 }
 
 export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {
+  const activeProfile = report.activeProfile
+    ? [
+      `- active-profile: ${report.activeProfile.id} (${report.activeProfile.source}; ${report.activeProfile.purpose})`,
+      `- external-default: ${report.activeProfile.externalDefault}`,
+      `- external-approval-required: ${report.activeProfile.externalRequiresApproval ? "true" : "false"}`,
+      ...report.activeProfile.drift.map((item) => `- profile-${item.severity}: ${item.id} - ${item.message}`)
+    ]
+    : ["- active-profile: unavailable"];
   return [
     "Boulder capability doctor",
     `- status: ${report.status}`,
+    ...activeProfile,
     ...report.capabilities.map((item) => `- capability: ${item.id} (${item.kind}, ${item.lane})`),
     ...report.issues.map((item) => `- ${item.severity}: ${item.id} - ${item.message}`)
   ].join("\n");

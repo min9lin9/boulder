@@ -1,13 +1,15 @@
-import { resolve } from "node:path";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { formatDoctorReport, formatFieldEvidenceResult, formatLines, printHelp } from "./cli-format";
+import { parseOptions } from "./cli-options";
 import { writeText } from "./fs";
 import { exportHarness } from "./export";
 import { recordFieldEvidence } from "./field-evidence";
+import { runHandoffCommand } from "./handoff-command";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
 import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
+import { runProfileCommand } from "./profile-command";
 import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
@@ -19,18 +21,9 @@ import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
+import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
-type CliOptions = {
-  cwd: string;
-  force: boolean;
-  dryRun: boolean;
-  json: boolean;
-  friction: string;
-  runId: string;
-  evidence: string;
-};
-
-const VERSION = "0.1.13";
+const VERSION = "0.1.14";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
@@ -64,14 +57,22 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = inspectionToMarkdown(inspection);
-    await writeText(resolve(options.cwd, "docs", "REPO_BRIEF.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/REPO_BRIEF.md`, markdown, true);
     console.log(markdown);
+    return;
+  }
+  if (command === "profile") {
+    await runProfileCommand(args, { cwd: options.cwd, json: options.json });
+    return;
+  }
+  if (command === "handoff") {
+    await runHandoffCommand(args, { cwd: options.cwd, json: options.json, force: options.force });
     return;
   }
   if (command === "verify") {
     const results = await verifyHarness(options.cwd, options.dryRun);
     const markdown = verifyResultsToMarkdown(results);
-    await writeText(resolve(options.cwd, "docs", "VERIFICATION_REPORT.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/VERIFICATION_REPORT.md`, markdown, true);
     console.log(markdown);
     if (results.some((item) => item.required && item.status === "failed")) {
       process.exitCode = 1;
@@ -93,8 +94,8 @@ export async function main(args: string[]): Promise<void> {
       process.exitCode = 1;
       return;
     }
-    const manifest = await loadManifest(options.cwd);
-    const plan = buildPipelinePlan(options.friction, manifest.executors);
+    const resolution = await resolveWorkflowProfile(options.cwd, {});
+    const plan = buildPipelinePlan(options.friction, executorsFromResolvedProfile(resolution.profile), resolution.profile);
     if (options.json) {
       console.log(JSON.stringify(plan, null, 2));
       return;
@@ -110,7 +111,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = scorecardToMarkdown(scorecard);
-    await writeText(resolve(options.cwd, "docs", "HARNESS_QUALITY_SCORECARD.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/HARNESS_QUALITY_SCORECARD.md`, markdown, true);
     console.log(markdown);
     return;
   }
@@ -122,7 +123,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = benchmarkReportToMarkdown(report);
-    await writeText(resolve(options.cwd, "docs", "BENCHMARK_FIXTURE_REPORT.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/BENCHMARK_FIXTURE_REPORT.md`, markdown, true);
     console.log(markdown);
     return;
   }
@@ -133,7 +134,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = releasePlanToMarkdown(plan);
-    await writeText(resolve(options.cwd, "docs", "RELEASE_PLAN.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/RELEASE_PLAN.md`, markdown, true);
     console.log(markdown);
     return;
   }
@@ -178,7 +179,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = productReadinessToMarkdown(readiness);
-    await writeText(resolve(options.cwd, "docs", "PRODUCT_READINESS.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/PRODUCT_READINESS.md`, markdown, true);
     console.log(markdown);
     if (readiness.status === "blocked") process.exitCode = 1;
     return;
@@ -191,7 +192,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = serviceReadinessToMarkdown(readiness);
-    await writeText(resolve(options.cwd, "docs", "SERVICE_READINESS.md"), markdown, true);
+    await writeText(`${options.cwd}/docs/SERVICE_READINESS.md`, markdown, true);
     console.log(markdown);
     if (readiness.status === "blocked") process.exitCode = 1;
     return;
@@ -226,25 +227,4 @@ export async function main(args: string[]): Promise<void> {
   console.error(`Unknown command: ${command}`);
   printHelp();
   process.exitCode = 1;
-}
-
-function parseOptions(args: string[]): CliOptions {
-  const cwd = optionValue(args, "--cwd");
-  const friction = optionValue(args, "--friction");
-  const runId = optionValue(args, "--run-id");
-  const evidence = optionValue(args, "--evidence");
-  return {
-    cwd: cwd ? resolve(cwd) : process.cwd(),
-    force: args.includes("--force"),
-    dryRun: args.includes("--dry-run"),
-    json: args.includes("--json"),
-    friction: friction ?? "medium",
-    runId: runId ?? "field-run",
-    evidence: evidence ?? "evidence/field-readiness/field-run"
-  };
-}
-
-function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  return index >= 0 && args[index + 1] ? args[index + 1] : null;
 }

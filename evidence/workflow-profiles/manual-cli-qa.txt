@@ -1,0 +1,156 @@
+Manual CLI QA transcript
+
+Observed date: 2026-06-17
+Repo: /Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder
+Temp repo: /private/tmp/boulder-profile-qa.GMY83X
+
+This transcript records the exact command sequence used for the profile-first
+workflow surface. Long JSON and doctor capability listings are reduced to the
+fields asserted below, but no prerequisite command is omitted.
+
+Profile switch -> quickstart -> pipeline -> doctor -> export:
+
+```bash
+bun bin/boulder.ts init --cwd /private/tmp/boulder-profile-qa.GMY83X
+```
+
+```text
+Boulder initialized
+- created: boulder.yaml
+- created: BOULDER.md
+- created: docs/OPERATOR_WORKFLOW_STACK.md
+- created: docs/MAINTAINER_WORKFLOWS.md
+- created: docs/VERIFICATION_GATES.md
+- created: docs/PROVIDER_POLICY.md
+- created: docs/HARNESS_QUALITY_SCORECARD.md
+- created: docs/REPO_BRIEF.md
+```
+
+```bash
+bun bin/boulder.ts profile resolve --cwd /private/tmp/boulder-profile-qa.GMY83X --task research
+```
+
+```text
+Boulder resolved workflow profile
+- active-profile: programming-default
+- suggested-profile: research-default
+- suggestion-applied: false
+- source: built-in
+- info: profile.suggestion.not-applied - Task "research" suggests research-default, but active profile remains programming-default.
+```
+
+```bash
+bun bin/boulder.ts profile use research-default --cwd /private/tmp/boulder-profile-qa.GMY83X
+```
+
+```text
+Boulder active workflow profile: research-default
+```
+
+```bash
+bun bin/boulder.ts quickstart --cwd /private/tmp/boulder-profile-qa.GMY83X --json
+```
+
+Asserted output:
+
+```text
+status: ready
+checks.active-profile.evidence: research-default (project-current)
+checks.executor-planning.evidence: plan=codex (local-only; availability checked by doctor)
+checks.executor-execution.evidence: execute=codex (local-only; availability checked by doctor)
+```
+
+```bash
+bun bin/boulder.ts pipeline --cwd /private/tmp/boulder-profile-qa.GMY83X --friction medium --json
+```
+
+Asserted output:
+
+```text
+activeProfile.id: research-default
+executors[plan].preferred: codex
+executors[plan].mode: local-only
+executors[execute].preferred: codex
+executors[execute].mode: local-only
+```
+
+```bash
+bun bin/boulder.ts doctor --cwd /private/tmp/boulder-profile-qa.GMY83X
+```
+
+Asserted output:
+
+```text
+Boulder capability doctor
+- status: warn
+- active-profile: research-default (project-current; research)
+- external-default: blocked
+- external-approval-required: true
+```
+
+```bash
+bun bin/boulder.ts export --cwd /private/tmp/boulder-profile-qa.GMY83X --force
+```
+
+```text
+Boulder export complete
+- created: docs/BOULDER_EXPORT.md
+- created: docs/CODEX_WORKFLOW_NOTES.md
+```
+
+```bash
+grep "Active workflow profile" /private/tmp/boulder-profile-qa.GMY83X/docs/BOULDER_EXPORT.md
+grep "executor: plan" /private/tmp/boulder-profile-qa.GMY83X/docs/BOULDER_EXPORT.md
+grep "executor: execute" /private/tmp/boulder-profile-qa.GMY83X/docs/BOULDER_EXPORT.md
+```
+
+```text
+Active workflow profile: research-default
+- executor: plan=codex
+- executor: execute=codex
+```
+
+Tenant-safe handoff:
+
+```bash
+bun bin/boulder.ts handoff packet --cwd /private/tmp/boulder-profile-qa.GMY83X --adapter gajae-code --include ../../../other-tenant/private/src/auth.ts --json
+```
+
+```text
+ERROR handoff.protected_path: Protected path is not allowed in external handoff packet: ../../../other-tenant/private/src/auth.ts
+```
+
+```bash
+bun bin/boulder.ts handoff packet --cwd /private/tmp/boulder-profile-qa.GMY83X --adapter gajae-code --include src/cli.ts --json
+```
+
+Asserted output:
+
+```text
+schemaVersion: boulder.handoff.v1
+destination.adapter: gajae-code
+dataPolicy.rawWorkspaceContentIncluded: false
+dataPolicy.redaction.status: applied
+contextSummary.detectedFiles: src/cli.ts
+excludedContent: raw workspace file bodies, raw diffs, secrets, local absolute paths, protected paths
+```
+
+```bash
+bun bin/boulder.ts handoff review --cwd /private/tmp/boulder-profile-qa.GMY83X --adapter gajae-code
+```
+
+```text
+Boulder handoff packet review
+- adapter: gajae-code
+- raw-workspace-content: excluded
+- redaction: applied
+- approval-code: bd8ea374ad3ccbd231ee5b61f482de838bbd83eddd6bf5ce225e599d8e54a68f
+```
+
+```bash
+bun bin/boulder.ts handoff send --cwd /private/tmp/boulder-profile-qa.GMY83X --adapter gajae-code --approve-external --approval-code bd8ea374ad3ccbd231ee5b61f482de838bbd83eddd6bf5ce225e599d8e54a68f
+```
+
+```text
+Sanitized packet is ready for an explicitly approved external adapter handoff.
+```

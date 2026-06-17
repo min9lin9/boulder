@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { exists } from "./fs";
-import { loadManifest } from "./manifest";
+import { resolveWorkflowProfile } from "./workflow-profiles";
 
 export type QuickstartStep = {
   readonly id: string;
@@ -28,6 +28,21 @@ const QUICKSTART_STEPS = [
     purpose: "Read the repository shape before planning."
   },
   {
+    id: "profile-list",
+    command: "boulder profile list --cwd .",
+    purpose: "See the available workflow profiles before routing work."
+  },
+  {
+    id: "profile-resolve",
+    command: "boulder profile resolve --cwd .",
+    purpose: "Confirm the active plan/execute adapters and external-call policy."
+  },
+  {
+    id: "profile-use",
+    command: "boulder profile use programming-default --cwd .",
+    purpose: "Select the default programming profile, or swap it for research-default or ops-default."
+  },
+  {
     id: "pipeline",
     command: "boulder pipeline --cwd . --friction medium",
     purpose: "Choose the default classification -> plan -> verify path."
@@ -45,13 +60,14 @@ const QUICKSTART_STEPS = [
 ] as const satisfies readonly QuickstartStep[];
 
 export async function evaluateQuickstart(root: string): Promise<QuickstartReport> {
-  const manifest = await loadManifest(root);
+  const resolution = await resolveWorkflowProfile(root, {});
   const checks = [
     await fileCheck(root, "manifest", "boulder.yaml"),
     await fileCheck(root, "operator-contract", "BOULDER.md"),
     await fileCheck(root, "repo-brief", "docs/REPO_BRIEF.md"),
-    executorCheck("executor-planning", "plan", manifest.executors.planning.preferred, "gajae-code", manifest.executors.planning.mode),
-    executorCheck("executor-execution", "execute", manifest.executors.execution.preferred, "lazycodex", manifest.executors.execution.mode)
+    profileCheck(resolution.profile.id, resolution.profile.source),
+    executorCheck("executor-planning", "plan", resolution.profile.lanes.plan.adapter, resolution.profile.lanes.plan.mode),
+    executorCheck("executor-execution", "execute", resolution.profile.lanes.execute.adapter, resolution.profile.lanes.execute.mode)
   ];
   return {
     status: checks.every((item) => item.status === "pass") ? "ready" : "needs-init",
@@ -88,10 +104,18 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
   ].join("\n");
 }
 
-function executorCheck(id: string, label: string, actual: string, expected: string, mode: string): QuickstartCheck {
+function profileCheck(profileId: string, source: string): QuickstartCheck {
+  return {
+    id: "active-profile",
+    status: "pass",
+    evidence: `${profileId} (${source})`
+  };
+}
+
+function executorCheck(id: string, label: string, actual: string, mode: string): QuickstartCheck {
   return {
     id,
-    status: actual === expected ? "pass" : "fail",
+    status: "pass",
     evidence: `${label}=${actual} (${mode}; availability checked by doctor)`
   };
 }

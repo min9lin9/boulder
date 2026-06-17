@@ -193,6 +193,28 @@ describe("boulder CLI e2e cleanup safety", () => {
     }
   });
 
+  test("renders active profile in human capability doctor output", async () => {
+    const root = await tempRepo();
+    try {
+      await write(root, ".boulder/current-profile", "research-default\n");
+      await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+        skills: [{ id: "codex", status: "available" }],
+        mcpServers: [],
+        plugins: [],
+        runtimes: [{ id: "bun", version: "1.3.14" }]
+      }));
+
+      const result = await runBoulder(["doctor", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("active-profile: research-default (project-current; research)");
+      expect(result.stdout).toContain("external-default: blocked");
+      expect(result.stdout).toContain("external-approval-required: true");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("records field-readiness evidence through the CLI", async () => {
     const root = await tempRepo();
     const evidencePath = "evidence/field-readiness/oss-run-1";

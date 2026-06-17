@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "boulder.profile.resolved.v1",
+  "source": "built-in",
+  "id": "ops-default",
+  "purpose": "ops",
+  "surface": ["intake", "plan", "execute", "verify", "record"],
+  "lanes": {
+    "intake": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["context-summary"]
+    },
+    "plan": {
+      "owner": "codex",
+      "adapter": "codex",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["plan-summary"]
+    },
+    "critic": {
+      "owner": "codex",
+      "adapter": "codex",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["critic-notes"]
+    },
+    "handoff": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["handoff-packet"]
+    },
+    "execute": {
+      "owner": "codex",
+      "adapter": "codex",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["work-result"]
+    },
+    "verify": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["verification-report"]
+    },
+    "compound": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["compound-ledger"]
+    },
+    "record": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["decision-log"]
+    }
+  },
+  "externalPolicy": {
+    "default": "blocked",
+    "requireExplicitApproval": true,
+    "rawWorkspaceContent": "forbidden",
+    "sanitizedPacket": "allowed-after-approval"
+  },
+  "fallback": {
+    "plan": "codex",
+    "execute": "codex",
+    "critic": "codex",
+    "compound": "boulder"
+  },
+  "drift": [],
+  "suggestion": {
+    "profileId": null,
+    "applied": false,
+    "task": null
+  }
+}

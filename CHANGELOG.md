@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.14
+
+- Added workflow profile commands for `profile list`, `profile resolve`, `profile show`, `profile save`, and `profile use`.
+- Added built-in `programming-default`, `research-default`, and `ops-default` profiles with task-class suggestions that do not auto-switch active profiles.
+- Added tenant-safe `handoff packet`, `handoff review`, and approval-gated `handoff send` flows.
+- Hardened external handoff safety around raw workspace references, adapter traversal, stale or forged review receipts, symlinked packet paths, and symlinked review-secret paths.
+- Updated `doctor`, `quickstart`, `pipeline`, and `export` to report active profile routing and profile drift.
+- Added runtime guards for repo-controlled project profile JSON so invalid lane owner, mode, adapter, purpose, or surface values fail closed.
+
 ## 0.1.13
 
 - Split executor adapter preference from adapter availability in `boulder doctor`.

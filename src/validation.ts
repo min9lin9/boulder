@@ -1,4 +1,4 @@
-import type { BoulderManifest } from "./types";
+import type { BoulderManifest, ExecutorMode } from "./types";
 import { missingWorkflowStackComponents, REQUIRED_WORKFLOW_STACK, workflowStackRolesMatch } from "./workflow-stack";
 
 export type ManifestIssue = {
@@ -45,13 +45,20 @@ function validateExecutors(issues: ManifestIssue[], manifest: BoulderManifest): 
   requireText(issues, "executors.execution.preferred", manifest.executors.execution.preferred, "Execution executor is required.");
   requireText(issues, "executors.fallback.planning", manifest.executors.fallback.planning, "Planning fallback executor is required.");
   requireText(issues, "executors.fallback.execution", manifest.executors.fallback.execution, "Execution fallback executor is required.");
-  if (manifest.executors.planning.mode !== "detect-and-suggest" || manifest.executors.execution.mode !== "detect-and-suggest") {
-    issues.push({
-      path: "executors",
-      severity: "error",
-      message: "External executors must use detect-and-suggest mode until explicit execution adapters are configured."
-    });
-  }
+  validateExecutorMode(issues, "executors.planning.mode", manifest.executors.planning.mode);
+  validateExecutorMode(issues, "executors.execution.mode", manifest.executors.execution.mode);
+}
+
+function validateExecutorMode(issues: ManifestIssue[], path: string, mode: ExecutorMode): void {
+  if (mode === "detect-and-suggest") return;
+  if (mode === "local-only") return;
+  if (mode === "packet-only") return;
+  if (mode === "approval-gated-send") return;
+  issues.push({
+    path,
+    severity: "error",
+    message: "Executor mode must be one of detect-and-suggest, local-only, packet-only, or approval-gated-send."
+  });
 }
 
 function validateWorkflowStack(issues: ManifestIssue[], manifest: BoulderManifest): void {

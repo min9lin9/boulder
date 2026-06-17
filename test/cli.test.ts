@@ -73,6 +73,22 @@ describe("boulder M1 surface", () => {
     expect(issues.map((item) => item.path)).toContain("providers.approvalRequired");
   });
 
+  test("manifest validation accepts supported executor modes", () => {
+    const base = defaultManifest("fixture");
+    const manifest = {
+      ...base,
+      executors: {
+        planning: { ...base.executors.planning, mode: "packet-only" as const },
+        execution: { ...base.executors.execution, mode: "approval-gated-send" as const },
+        fallback: base.executors.fallback
+      }
+    };
+
+    const issues = validateManifest(manifest);
+
+    expect(issues.some((item) => item.path.startsWith("executors.") && item.severity === "error")).toBe(false);
+  });
+
   test("manifest validation requires the har-maker operator stack", () => {
     const manifest = defaultManifest("fixture");
     manifest.workflowStack = manifest.workflowStack.filter((item) => item.name !== "gstack");

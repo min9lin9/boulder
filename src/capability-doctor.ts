@@ -1,5 +1,6 @@
 import { capabilityInventoryPath, hasValidInventoryItems, loadCapabilityInventory, type CapabilityDiscoveryOptions, type InventoryItem } from "./capability-inventory";
-import { loadManifest } from "./manifest";
+import type { ProfileDriftWarning, ResolvedWorkflowProfile } from "./types";
+import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
 export type CapabilityLane = "intake" | "plan" | "execute" | "verify" | "record" | "compound";
 export type DoctorStatus = "pass" | "warn" | "fail";
@@ -20,18 +21,31 @@ export type DoctorIssue = {
   readonly message: string;
 };
 
+export type ActiveProfileSummary = {
+  readonly id: string;
+  readonly source: ResolvedWorkflowProfile["source"];
+  readonly purpose: ResolvedWorkflowProfile["purpose"];
+  readonly externalDefault: ResolvedWorkflowProfile["externalPolicy"]["default"];
+  readonly externalRequiresApproval: boolean;
+  readonly suggestion: ResolvedWorkflowProfile["suggestion"];
+  readonly drift: readonly ProfileDriftWarning[];
+};
+
 export type CapabilityDoctorReport = {
   readonly status: DoctorStatus;
+  readonly activeProfile: ActiveProfileSummary | null;
   readonly capabilities: readonly Capability[];
   readonly issues: readonly DoctorIssue[];
   readonly nextSteps: readonly string[];
 };
 
 export async function evaluateCapabilityDoctor(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityDoctorReport> {
+  const resolution = await resolveWorkflowProfile(root, {});
   const inventory = await loadCapabilityInventory(root, options);
   if (!inventory) {
     return {
       status: "fail",
+      activeProfile: toActiveProfileSummary(resolution.profile),
       capabilities: [],
       issues: [{ id: "capability-inventory-missing", severity: "error", message: `missing or invalid ${capabilityInventoryPath()}` }],
       nextSteps: ["Run capability discovery and commit fixtures/capabilities/codex-installed.json before routing work."]
@@ -40,6 +54,7 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   if (!hasValidInventoryItems(inventory)) {
     return {
       status: "fail",
+      activeProfile: toActiveProfileSummary(resolution.profile),
       capabilities: [],
       issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} contains malformed capability entries` }],
       nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
@@ -50,14 +65,16 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
     ...inventory.mcpServers.map((item) => toCapability(item, "mcp")),
     ...inventory.plugins.map((item) => toCapability(item, "plugin")),
     ...inventory.runtimes.map((item) => toCapability(item, "runtime")),
-    ...await adapterCapabilities(root, inventory)
+    ...adapterCapabilities(resolution.profile, inventory)
   ];
   const issues = [
-    ...runtimeIssues(inventory.runtimes),
+    ...profileDriftIssues(resolution.profile.drift),
+    ...runtimeIssues(inventory.runtimes, resolution.profile),
     ...adapterIssues(capabilities)
   ];
   return {
     status: issues.some((item) => item.severity === "error") ? "fail" : issues.length ? "warn" : "pass",
+    activeProfile: toActiveProfileSummary(resolution.profile),
     capabilities,
     issues,
     nextSteps: issues.length
@@ -66,26 +83,26 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   };
 }
 
-async function adapterCapabilities(root: string, inventory: {
+function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: {
   readonly skills: readonly InventoryItem[];
   readonly mcpServers: readonly InventoryItem[];
   readonly plugins: readonly InventoryItem[];
   readonly runtimes: readonly InventoryItem[];
-}): Promise<readonly Capability[]> {
-  const manifest = await loadManifest(root);
+}): readonly Capability[] {
+  const executors = executorsFromResolvedProfile(profile);
   return [
     {
-      id: manifest.executors.planning.preferred,
+      id: executors.planning.preferred,
       kind: "adapter",
-      status: adapterStatus(manifest.executors.planning.preferred, inventory),
+      status: adapterStatus(executors.planning.preferred, inventory),
       lane: "plan",
       officialDocsFirst: true,
       routingHint: `plan: ${routingHintFor("plan")}`
     },
     {
-      id: manifest.executors.execution.preferred,
+      id: executors.execution.preferred,
       kind: "adapter",
-      status: adapterStatus(manifest.executors.execution.preferred, inventory),
+      status: adapterStatus(executors.execution.preferred, inventory),
       lane: "execute",
       officialDocsFirst: true,
       routingHint: `execute: ${routingHintFor("execute")}`
@@ -108,9 +125,21 @@ function adapterStatus(executorId: string, inventory: {
   ];
   const isAvailable = candidates.some((item) => {
     const id = item.id.toLowerCase();
-    return id === normalized || id.includes(normalized) || normalized.includes(id);
+    return adapterMatchesInventory(normalized, id);
   });
   return isAvailable ? "available" : "configured-unverified";
+}
+
+function adapterMatchesInventory(adapterId: string, inventoryId: string): boolean {
+  if (adapterId === inventoryId) return true;
+  if (adapterId === "codex") return inventoryId === "codex" || inventoryId === "openai-codex";
+  if (adapterId === "gajae-code") return inventoryId === "gajae-code" || inventoryId === "gjc";
+  if (adapterId === "lazycodex") return inventoryId === "lazycodex" || inventoryId === "lazy-codex";
+  return inventoryTokens(inventoryId).includes(adapterId);
+}
+
+function inventoryTokens(inventoryId: string): readonly string[] {
+  return inventoryId.split(/[:/@\s]+/).filter((item) => item.length > 0);
 }
 
 function toCapability(item: InventoryItem, kind: Capability["kind"]): Capability {
@@ -152,7 +181,11 @@ function routingHintFor(lane: CapabilityLane): string {
   }
 }
 
-function runtimeIssues(runtimes: readonly InventoryItem[]): readonly DoctorIssue[] {
+function runtimeIssues(runtimes: readonly InventoryItem[], profile: ResolvedWorkflowProfile): readonly DoctorIssue[] {
+  const executors = executorsFromResolvedProfile(profile);
+  const usesGajaeCode = executors.planning.preferred === "gajae-code"
+    || executors.execution.preferred === "gajae-code";
+  if (!usesGajaeCode) return [];
   const bun = runtimes.find((item) => item.id === "bun");
   if (bun?.version && compareVersions(bun.version, "1.3.14") < 0) {
     return [{
@@ -172,6 +205,26 @@ function adapterIssues(capabilities: readonly Capability[]): readonly DoctorIssu
       severity: "warn",
       message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Install it or keep using Codex fallback before live execution.`
     }));
+}
+
+function profileDriftIssues(drift: readonly ProfileDriftWarning[]): readonly DoctorIssue[] {
+  return drift.map((item) => ({
+    id: item.id,
+    severity: "warn",
+    message: item.message
+  }));
+}
+
+function toActiveProfileSummary(profile: ResolvedWorkflowProfile): ActiveProfileSummary {
+  return {
+    id: profile.id,
+    source: profile.source,
+    purpose: profile.purpose,
+    externalDefault: profile.externalPolicy.default,
+    externalRequiresApproval: profile.externalPolicy.requireExplicitApproval,
+    suggestion: profile.suggestion,
+    drift: profile.drift
+  };
 }
 
 function compareVersions(left: string, right: string): number {
