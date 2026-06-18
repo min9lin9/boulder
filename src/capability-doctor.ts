@@ -41,22 +41,32 @@ export type CapabilityDoctorReport = {
 
 export async function evaluateCapabilityDoctor(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityDoctorReport> {
   const resolution = await resolveWorkflowProfile(root, {});
-  const inventory = await loadCapabilityInventory(root, options);
-  if (!inventory) {
+  const inventoryResult = await loadCapabilityInventory(root, options);
+  if (inventoryResult.kind === "missing") {
     return {
       status: "fail",
       activeProfile: toActiveProfileSummary(resolution.profile),
       capabilities: [],
-      issues: [{ id: "capability-inventory-missing", severity: "error", message: `missing or invalid ${capabilityInventoryPath()}` }],
-      nextSteps: ["Run capability discovery and commit fixtures/capabilities/codex-installed.json before routing work."]
+      issues: [{ id: "capability-inventory-missing", severity: "error", message: `Missing ${capabilityInventoryPath()}; doctor cannot verify local skills, MCPs, runtimes, or adapters without it.` }],
+      nextSteps: ["Run doctor again after adding the inventory."]
     };
   }
+  if (inventoryResult.kind === "invalid") {
+    return {
+      status: "fail",
+      activeProfile: toActiveProfileSummary(resolution.profile),
+      capabilities: [],
+      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} is malformed; every item needs a string id and each top-level group must be an array.` }],
+      nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
+    };
+  }
+  const inventory = inventoryResult.inventory;
   if (!hasValidInventoryItems(inventory)) {
     return {
       status: "fail",
       activeProfile: toActiveProfileSummary(resolution.profile),
       capabilities: [],
-      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} contains malformed capability entries` }],
+      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} contains malformed capability entries; every item needs a string id.` }],
       nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
     };
   }
@@ -191,7 +201,7 @@ function runtimeIssues(runtimes: readonly InventoryItem[], profile: ResolvedWork
     return [{
       id: "gajae-code-bun-runtime",
       severity: "warn",
-      message: `Gajae-Code requires Bun >=1.3.14; detected Bun ${bun.version}. Upgrade before live GJC execution.`
+      message: `Gajae-Code requires Bun >=1.3.14; detected Bun ${bun.version}. Upgrade Bun before live GJC execution.`
     }];
   }
   return [];
@@ -203,7 +213,7 @@ function adapterIssues(capabilities: readonly Capability[]): readonly DoctorIssu
     .map((item) => ({
       id: `${item.id}-adapter-unverified`,
       severity: "warn",
-      message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Install it or keep using Codex fallback before live execution.`
+      message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Install or enable ${item.id}, or keep using Codex fallback; live execution remains approval-gated.`
     }));
 }
 
