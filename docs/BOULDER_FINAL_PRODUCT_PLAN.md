@@ -38,7 +38,7 @@ MVP contract:
 
 ## Field Evidence MVP
 
-fixture-backed readiness를 field-backed readiness로 올리는 최소 단위는 `field-readiness` run이다.
+Historical note: fixture-backed readiness를 field-backed readiness로 올리는 최소 단위는 `field-readiness` run이다.
 
 필수 파일:
 
@@ -58,7 +58,7 @@ evidence/field-readiness/<run-id>/generated-metrics.json
 boulder record field-readiness --run-id <run-id> --evidence evidence/field-readiness/<run-id> --json
 ```
 
-`service-readiness`는 이제 `field-evidence` gate를 본다. 단순한 문서 계획만으로는 pilot-ready가 될 수 없고, 실제 run evidence가 있어야 한다.
+Historical note: `service-readiness`는 이제 `field-evidence` gate를 본다. 단순한 문서 계획만으로는 pilot-ready가 될 수 없고, 실제 run evidence가 있어야 한다.
 
 ## Milestones
 
@@ -67,15 +67,17 @@ boulder record field-readiness --run-id <run-id> --evidence evidence/field-readi
 | Contract MVP | planner/executor/evaluator 경계 검증 | workflow profile, handoff fixture, validator tests pass |
 | Handoff MVP | GJC-style plan을 LazyCodex execution packet으로 변환 | handoff validation and manual QA evidence pass |
 | Capability Doctor MVP | 설치된 skills/MCP/plugins/runtime을 lane으로 라우팅 | `boulder doctor --json` reports routing and runtime warnings |
-| Field Evidence MVP | fixture-backed에서 local field-backed로 상승 | `record field-readiness` manifest and `service-readiness` field gate pass |
+| Field Evidence MVP | local field evidence로 상승 | `record field-readiness` manifest and `service-readiness` field gate pass |
 | External Maintainer MVP | public OSS maintainer가 재현 | public PR/issue/release evidence link and repeat-run metrics exist |
 
 ## Current Readiness
 
-현재 결론은 보수적으로 잡는다.
+현재 결론은 ready gate와 adoption claim을 분리한다.
 
 - 기획 완성도: 95+ 가능. Capability Doctor와 Field Evidence MVP가 계획과 코드 표면에 들어갔다.
 - 로컬 제품 상태: Field Evidence MVP-ready.
-- 공개 서비스 상태: 아직 `service-ready`가 아니다. 외부 maintainer run, public install smoke, product-readiness evidence가 남아 있다.
+- 공개 서비스 상태: packaged local CLI service workflow is ready by Boulder gates.
+- public-target replay는 재현 가능한 증거다.
+- independent non-maintainer adoption remains unclaimed until public proof exists.
 
-즉 Boulder는 이제 “설치 후 반복 사용 가능한 CLI workflow의 핵심 contract”까지 왔다. 다음 상승 구간은 기능 추가가 아니라 외부 replay와 public evidence 축적이다.
+즉 Boulder는 “설치 후 반복 사용 가능한 CLI workflow의 핵심 contract”까지 왔다. 다음 상승 구간은 기능 추가가 아니라 독립 외부 maintainer 증거 축적이다.

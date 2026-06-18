@@ -1,0 +1,22 @@
+{
+  "runId": "<run-id>",
+  "actorType": "maintainer",
+  "boulderVersion": "0.1.14",
+  "targetRepo": "owner/repo",
+  "startedAt": "2026-06-18T00:00:00Z",
+  "completedAt": "2026-06-18T00:05:00Z",
+  "commands": [
+    "boulder quickstart --cwd . --json",
+    "boulder service-readiness --cwd . --json"
+  ],
+  "readinessBefore": "blocked",
+  "readinessAfter": "ready",
+  "readinessDelta": [
+    "added public evidence"
+  ],
+  "publicEvidenceUrl": "https://github.com/owner/repo/pull/1",
+  "shareSafe": true,
+  "limitations": [
+    "template only; not adoption evidence"
+  ]
+}

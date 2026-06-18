@@ -1,14 +1,14 @@
 # Boulder Service Loop
 
-Status: pilot workflow
+Status: packaged local CLI service workflow is ready
 
-Boulder service is not hosted SaaS. It is a repeatable public OSS workflow delivered through CLI commands, repository files, evidence artifacts, and support operations.
+Boulder service is not hosted SaaS. It is a repeatable public OSS workflow delivered through CLI commands, repository files, evidence artifacts, and support operations. Public-target replay is reproducible evidence; independent non-maintainer adoption remains unclaimed until public proof exists.
 
 Architecture reference: `docs/WORKFLOW_ARCHITECTURE.md`.
 
 ## Loop
 
-1. `install`: use `bunx boulder-oss-cli --help` after publish, or local Bun commands before publish.
+1. `install`: use `bunx boulder-oss-cli --help` for the published package, or local Bun commands for checkout development.
 2. `init`: create a maintainer harness for the target repository.
 3. `inspect`: capture repository context and protected paths.
 4. `pipeline`: classify friction and select planning depth.
@@ -29,7 +29,6 @@ Architecture reference: `docs/WORKFLOW_ARCHITECTURE.md`.
 ## Service Status Model
 
 - `blocked`: required workflow evidence is missing.
-- `pilot-ready`: onboarding, replay, handoff, support, and metrics evidence exists, but product-readiness still blocks public service claims.
 - `ready`: service evidence and product-readiness both pass.
 
 ## Product Loop
@@ -67,7 +66,7 @@ That path is useful setup, but it is not enough to call Boulder a repeatable ser
 Fixture-backed loop:
 
 ```text
-gate fixture -> service-readiness pass -> pilot-ready claim
+Historical note: gate fixture -> service-readiness pass -> pilot-ready claim
 ```
 
 Field-backed loop:

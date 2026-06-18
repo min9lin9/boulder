@@ -21,3 +21,9 @@ Read the target repository official docs first, then run Boulder commands. Bould
 `boulder replay-run --dry-run` produces the share-safe runbook from fixtures. It does not clone, install, publish, or mutate target repositories.
 
 `doctor` may fail closed in replay transcripts when a target repository has no local capability inventory. That is expected; replay evidence records the boundary instead of inventing installed skills or MCP servers.
+
+## Evidence Boundary
+
+Public replay fixtures prove command and path reproducibility against public-target repositories. They do not prove independent third-party adoption.
+
+Independent adoption evidence requires a public issue, PR, release, or discussion link; a non-maintainer actor; command transcript summary; Boulder version; target repo; and share-safe confirmation.

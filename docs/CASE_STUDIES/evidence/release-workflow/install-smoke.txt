@@ -36,12 +36,11 @@ npm view boulder-oss-cli name version dist-tags --json
   }
 }
 
-npm owner ls boulder-oss-cli
-jeonmingyu <jeonmingyu@kakao.com>
+npm owner evidence redacted
+<npm-account-redacted>
 
-npm whoami
-npm error code E401
-npm error 401 Unauthorized - GET https://registry.npmjs.org/-/whoami
+npm identity check redacted
+<npm-account-redacted>
 
 npm publish --access public
 npm error code E404
@@ -69,8 +68,8 @@ Usage:
 Candidate tarball command:
 
 ```bash
-npm pack --cache /private/tmp/boulder-npm-cache
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder --version
+npm pack --cache <temp-repo>
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder --version
 ```
 
 Candidate output:
@@ -82,7 +81,7 @@ Candidate output:
 Candidate CLI surface:
 
 ```bash
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder --help
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder --help
 ```
 
 Asserted output included:
@@ -97,10 +96,10 @@ boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approv
 Candidate first-run smoke:
 
 ```bash
-tmpdir=/private/tmp/boulder-tarball-smoke.LHXp4l
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder init --cwd "$tmpdir"
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder profile resolve --cwd "$tmpdir" --task research
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder doctor --cwd "$tmpdir"
+tmpdir=<temp-repo>
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder init --cwd "$tmpdir"
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder profile resolve --cwd "$tmpdir" --task research
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder doctor --cwd "$tmpdir"
 ```
 
 Asserted output included:
@@ -119,7 +118,7 @@ Boulder capability doctor
 Candidate safety smoke:
 
 ```bash
-npm exec --cache /private/tmp/boulder-npm-cache-014-fixed --package "file:/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder/boulder-oss-cli-0.1.14.tgz" -- boulder handoff packet --cwd "$tmpdir" --adapter gajae-code --include ../../../other-tenant/private/src/auth.ts --json
+npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder handoff packet --cwd "$tmpdir" --adapter gajae-code --include ../../../other-tenant/private/src/auth.ts --json
 ```
 
 Observed output:

@@ -2,27 +2,27 @@
   "skills": [
     {
       "id": "omo:ulw-plan",
-      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-plan/SKILL.md",
+      "path": "<codex-home>/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-plan/SKILL.md",
       "status": "installed"
     },
     {
       "id": "omo:ulw-loop",
-      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-loop/SKILL.md",
+      "path": "<codex-home>/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-loop/SKILL.md",
       "status": "installed"
     },
     {
       "id": "omo:programming",
-      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/programming/SKILL.md",
+      "path": "<codex-home>/plugins/cache/sisyphuslabs/omo/0.1.0/skills/programming/SKILL.md",
       "status": "installed"
     },
     {
       "id": "omo:remove-ai-slops",
-      "path": "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/remove-ai-slops/SKILL.md",
+      "path": "<codex-home>/plugins/cache/sisyphuslabs/omo/0.1.0/skills/remove-ai-slops/SKILL.md",
       "status": "installed"
     },
     {
       "id": "claw-harness-reference",
-      "path": "/Users/burt/.codex/skills/claw-harness-reference/SKILL.md",
+      "path": "<codex-home>/skills/claw-harness-reference/SKILL.md",
       "status": "installed"
     }
   ],

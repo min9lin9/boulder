@@ -24,7 +24,7 @@ Applied synthesis:
 
 ## Lenny MCP Re-Review
 
-Verdict: Boulder has reached a strong `fixture-backed service plan`, but not a fully field-proven repeatable service.
+Archived context: Boulder previously had a strong sample-backed service plan, but not a fully field-proven repeatable service.
 
 The Lenny-style bar is stricter than "the CLI can produce readiness output." The useful unit is a loop:
 
@@ -41,7 +41,7 @@ Planning score remains 90 / 100:
 - - no live maintainer activation transcript yet
 - - no public issue/PR/release link proving artifact distribution
 - - no same-maintainer second-run retention proof
-- - no generated readiness-delta artifact replacing the fixture-backed repeat-run claim
+- - no generated readiness-delta artifact replacing the prior repeat-run claim
 
 Architecture planning score: 94 / 100 after the approved three-stage MVP remediation is written into `docs/WORKFLOW_ARCHITECTURE.md`.
 
@@ -49,7 +49,7 @@ The service score remains lower than the architecture score until Contract MVP, 
 
 ## Current Verdict
 
-Boulder is `pilot-ready` as a service workflow foundation. It is not yet public `ready` because product-readiness remains blocked by release/public evidence, and the service loop has not yet been proven by external repeat use.
+Historical note: Boulder is `pilot-ready` as a service workflow foundation. It is not yet public `ready` because product-readiness remains blocked by release/public evidence, and the service loop has not yet been proven by external repeat use.
 
 Practical service planning score: 90 / 100.
 
@@ -65,18 +65,18 @@ Boulder can claim repeatable public service readiness only when these gates pass
 
 | Gate | Required Evidence | Current State |
 | --- | --- | --- |
-| activation-gate | first readiness delta created within 15 minutes | fixture-backed |
-| repeat-run-gate | second run produces a changed recommendation after repo evidence changes | fixture-backed |
-| share-safe-gate | public artifact has no local paths, secrets, private repo assumptions, or unsupported claims | fixture-backed |
-| decision-impact-gate | maintainer records merge, reject, defer, or request-changes outcome | fixture-backed |
-| external-replay-gate | public OSS replay uses official docs first and produces shareable evidence | fixture-backed |
-| metrics-gate | service metrics are generated from evidence, not hand-written docs | fixture-backed |
+| activation-gate | first readiness delta created within 15 minutes | checked by service gate evidence |
+| repeat-run-gate | second run produces a changed recommendation after repo evidence changes | checked by service gate evidence |
+| share-safe-gate | public artifact has no local paths, secrets, private repo assumptions, or unsupported claims | checked by service gate evidence |
+| decision-impact-gate | maintainer records merge, reject, defer, or request-changes outcome | checked by service gate evidence |
+| external-replay-gate | public OSS replay uses official docs first and produces shareable evidence | checked by service gate evidence |
+| metrics-gate | service metrics are generated from evidence, not hand-written docs | checked by service gate evidence |
 
 Executable evidence source: `fixtures/service-readiness/gates.json`.
 
 ## Field-Backed Upgrade Plan
 
-The next planning target is to replace fixture-backed proof with field-backed proof without adding a hosted product.
+The next planning target is to replace sample-backed proof with field-backed proof without adding a hosted product.
 
 | Upgrade | Current Evidence | Required Field Evidence |
 | --- | --- | --- |
@@ -162,20 +162,20 @@ The wedge is not "AI project management." The wedge is "maintainer-grade proof t
 
 ## Missing Work
 
-- Replace the current fixture-backed first-run proof with an actual first-run transcript that measures time-to-first-readiness-delta.
-- Replace the current fixture-backed repeat-run proof with generated readiness delta output so repeated runs show what changed.
+- Replace the current sample-backed first-run proof with an actual first-run transcript that measures time-to-first-readiness-delta.
+- Replace the current sample-backed repeat-run proof with generated readiness delta output so repeated runs show what changed.
 - Add public evidence link templates for issues, PRs, and releases.
 - Add official-docs refresh policy for replay targets.
 - Add support triage metrics based on issue template completeness.
-- Replace fixture-backed public artifact proof with real public issue, PR, release, or replay links.
-- Replace fixture-backed maintainer decision proof with a real maintainer decision log.
+- Replace sample-backed public artifact proof with real public issue, PR, release, or replay links.
+- Replace sample-backed maintainer decision proof with a real maintainer decision log.
 - Add a `field-readiness` packet that bundles activation transcript, repeat-run delta, share-safe artifact URL, decision outcome, replay evidence, and generated metrics into one reviewable folder.
 - Add `boulder doctor` so installed Codex skills, MCP servers, plugins, and runtime blockers are visible before planner/executor selection.
 - Add a rule that Boulder cannot raise the planning score above 92 until at least one external maintainer or clean-room repo run produces all field evidence.
 
 ## Decision
 
-Boulder should call the current level `service-pilot-ready`, not `service-ready`, until:
+Earlier Boulder should not have claimed service-ready until:
 
 - public product-readiness blockers are cleared
 - one external replay is actually executed against a public target

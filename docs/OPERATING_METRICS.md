@@ -24,6 +24,28 @@ Do not report users acquired, adoption proven, market traction, or runtime scale
 
 Each metric must state its numerator, denominator, and source before it can be used in a service-readiness claim.
 
+## Observed Evidence Template
+
+The supplemental template lives at `fixtures/service-readiness/metric-log-template.json`. It is non-authoritative scaffolding for repeat-use logs, not adoption evidence by itself.
+
+Required fields:
+
+- `runId`
+- `actorType`: `maintainer` or `external-non-maintainer`
+- `boulderVersion`
+- `targetRepo`
+- `startedAt`
+- `completedAt`
+- `commands`
+- `readinessBefore`
+- `readinessAfter`
+- `readinessDelta`
+- `publicEvidenceUrl`
+- `shareSafe`
+- `limitations`
+
+Readiness or adoption claims still require `boulder record field-readiness` and the canonical `evidence/field-readiness/<run-id>/generated-metrics.json` manifest flow.
+
 ## Product Interpretation
 
 - Activation is proven by time-to-first-readiness-delta, not by installation.

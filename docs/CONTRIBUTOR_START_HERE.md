@@ -38,11 +38,47 @@ To try Boulder on another repository:
 ```bash
 cd path/to/your/repo
 bunx boulder-oss-cli init
+bunx boulder-oss-cli quickstart
+bunx boulder-oss-cli onboard
 bunx boulder-oss-cli inspect
 bunx boulder-oss-cli doctor
 bunx boulder-oss-cli verify --dry-run
 bunx boulder-oss-cli service-readiness
 ```
+
+For the full nondeveloper path, see [`docs/ONBOARDING.md`](ONBOARDING.md).
+
+## First Issues to Look For
+
+### docs freshness
+
+Fix stale ready/blocked wording in public docs.
+
+Acceptance:
+
+- include the `rg` command that found the stale wording
+- update only the affected docs
+- run `bun run ci`
+
+### replay fixture refresh
+
+Refresh one public replay fixture after reading the target project's official docs first.
+
+Acceptance:
+
+- update the matching `fixtures/replay/*/official-docs.json`
+- update the matching replay transcript
+- run `boulder replay-check --cwd . --json`
+
+### metric evidence log
+
+Add one share-safe metric log from a public repo run.
+
+Acceptance:
+
+- use `fixtures/service-readiness/metric-log-template.json`
+- include a public evidence URL
+- run `boulder service-readiness --cwd . --json`
 
 ## Before Opening a PR
 

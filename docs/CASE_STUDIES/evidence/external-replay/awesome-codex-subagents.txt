@@ -1,13 +1,13 @@
 # Boulder external replay: awesome-codex-subagents
 
-Target: /private/tmp/boulder-external-replay/awesome-codex-subagents
+Target: awesome-codex-subagents public replay checkout
 Friction: medium
 Recorded at: 2026-06-13
 
 ## Official docs signal
 
-/private/tmp/boulder-external-replay/awesome-codex-subagents/CONTRIBUTING.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/README.md
+CONTRIBUTING.md
+README.md
 
 ## init
 
@@ -52,7 +52,7 @@ This is the first-run guided flow for a maintainer opening Boulder in a reposito
 ## inspect json
 
 {
-  "root": "/private/tmp/boulder-external-replay/awesome-codex-subagents",
+  "root": "<temp-repo>",
   "name": "awesome-codex-subagents",
   "detected": {
     "readme": true,
@@ -129,11 +129,11 @@ Boulder export complete
 
 ## generated artifacts
 
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/BOULDER_EXPORT.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/CODEX_WORKFLOW_NOTES.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/HARNESS_QUALITY_SCORECARD.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/MAINTAINER_WORKFLOWS.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/OPERATOR_WORKFLOW_STACK.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/PROVIDER_POLICY.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/REPO_BRIEF.md
-/private/tmp/boulder-external-replay/awesome-codex-subagents/docs/VERIFICATION_GATES.md
+docs/BOULDER_EXPORT.md
+docs/CODEX_WORKFLOW_NOTES.md
+docs/HARNESS_QUALITY_SCORECARD.md
+docs/MAINTAINER_WORKFLOWS.md
+docs/OPERATOR_WORKFLOW_STACK.md
+docs/PROVIDER_POLICY.md
+docs/REPO_BRIEF.md
+docs/VERIFICATION_GATES.md

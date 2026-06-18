@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "../src/benchmark";
@@ -167,3 +167,65 @@ describe("product readiness and examples", () => {
     }
   });
 });
+
+describe("repeat-use evidence hygiene", () => {
+  test("ships a metric log template with the required field contract", async () => {
+    const root = join(import.meta.dir, "..");
+    const raw = await readFile(join(root, "fixtures/service-readiness/metric-log-template.json"), "utf8");
+    const keys = Object.keys(JSON.parse(raw) as Record<string, unknown>);
+
+    expect(keys.sort()).toEqual([
+      "actorType",
+      "boulderVersion",
+      "commands",
+      "completedAt",
+      "limitations",
+      "publicEvidenceUrl",
+      "readinessAfter",
+      "readinessBefore",
+      "readinessDelta",
+      "runId",
+      "shareSafe",
+      "startedAt",
+      "targetRepo"
+    ].sort());
+  });
+
+  test("keeps public evidence free of local paths and npm identity traces", async () => {
+    const root = join(import.meta.dir, "..");
+    const paths = await packageSurfaceFiles(root);
+    const blocked = /\/Users\/|\/private\/tmp\/|file:\/|npm owner ls|npm whoami|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+    const leaks: string[] = [];
+
+    for (const path of paths) {
+      const content = await readFile(path, "utf8");
+      if (blocked.test(content)) {
+        leaks.push(path);
+      }
+    }
+
+    expect(leaks).toEqual([]);
+  });
+});
+
+async function packageSurfaceFiles(root: string): Promise<readonly string[]> {
+  return [
+    join(root, "README.md"),
+    join(root, "CHANGELOG.md"),
+    join(root, "CONTRIBUTING.md"),
+    join(root, "SECURITY.md"),
+    ...(await recursiveFiles(join(root, "docs"))),
+    ...(await recursiveFiles(join(root, "fixtures")))
+  ].filter((path) => /\.(md|json|txt|ya?ml)$/.test(path));
+}
+
+async function recursiveFiles(root: string): Promise<readonly string[]> {
+  const entries = await readdir(root, { withFileTypes: true });
+  const files: string[] = [];
+  for (const entry of entries) {
+    const path = join(root, entry.name);
+    if (entry.isDirectory()) files.push(...await recursiveFiles(path));
+    else files.push(path);
+  }
+  return files;
+}

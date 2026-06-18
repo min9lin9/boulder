@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current release candidate: `boulder-oss-cli@0.1.14`.
+Current published package: `boulder-oss-cli@0.1.14`.
 
 ## 3-minute route for non-developers
 
@@ -31,7 +31,7 @@ bunx boulder-oss-cli@0.1.14 doctor
 bunx boulder-oss-cli@latest --help
 ```
 
-Use `@latest` after npm publish, or an explicit published version for deterministic smoke checks. Before publish, the release evidence uses `npm exec --package file:./boulder-oss-cli-0.1.14.tgz -- boulder ...` against the packed candidate.
+Use `@latest` for the newest published CLI, or an explicit version for deterministic smoke checks. Maintainers can still verify a local checkout with `bun run ci` before publishing.
 
 Local development: `bun install`, `bun run boulder -- --help`, then `bun run ci`.
 

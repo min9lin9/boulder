@@ -241,7 +241,7 @@ Decision:
 - If planner packet schema is not implemented, GJC remains a narrative reference.
 - If execution packet schema is not implemented, LazyCodex handoff remains informal.
 - If workflow profiles are not machine-readable, profile selection stays manual.
-- If field evidence is not captured, Boulder remains fixture-backed.
+- If field evidence is not captured, external adoption remains unproven.
 
 ### Required Next Plan
 

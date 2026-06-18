@@ -52,12 +52,12 @@ Required sources:
    - docs/harness-manifest.md, if present
    - any CLI/runtime docs that define detect, inject, profile, manifest, or isolation behavior
 3. claw-code reference sources:
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/README.md
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/PARITY.md
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/src/main.py
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/src/tools.py
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/src/commands.py
-   - /Users/burt/Documents/Reference/Github_repo/claw-code/rust/
+   - `<local-reference-repo>/claw-code/README.md`
+   - `<local-reference-repo>/claw-code/PARITY.md`
+   - `<local-reference-repo>/claw-code/src/main.py`
+   - `<local-reference-repo>/claw-code/src/tools.py`
+   - `<local-reference-repo>/claw-code/src/commands.py`
+   - `<local-reference-repo>/claw-code/rust/`
 
 Context discipline:
 - Keep raw source output out of the final answer.

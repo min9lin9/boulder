@@ -290,7 +290,7 @@ Default evaluator:
 
 ## Current Service Readiness Implication
 
-Boulder is currently `fixture-backed` and `service-pilot-ready`.
+Boulder has a packaged local CLI service workflow ready; independent non-maintainer adoption remains unclaimed.
 
 To become field-backed:
 
@@ -375,7 +375,7 @@ Acceptance criteria:
 - workflow profile maps five public verbs to internal lanes
 - installed capabilities map to intake/plan/execute/verify/record/compound lanes
 - runtime blockers, including Gajae-Code Bun compatibility, are explicit warnings
-- service-readiness remains `pilot-ready`
+- service-readiness remains tied to executable service and product gates
 
 Score impact:
 
@@ -421,7 +421,7 @@ Score impact:
 
 Purpose:
 
-- Replace fixture-backed readiness with field-backed evidence from a real repository run.
+- Replace sample-backed readiness with field-backed evidence from a real repository run.
 - Prove activation, repeat use, distribution, decision impact, replay discipline, and metrics generation outside local fixture claims.
 
 Deliverables:
