@@ -45,7 +45,7 @@ No hard blocker remains for local candidate application-readiness:
 
 Public release completion is recorded for `boulder-oss-cli@0.1.14`, Git tag `v0.1.14`, and GitHub Release `v0.1.14`.
 
-Public service-ready cannot yet be claimed because `product-readiness --json` is blocked by missing tag evidence. The service loop remains pilot-ready: onboarding, replay, handoff, support, metrics, and field evidence pass, while public product readiness is still gated.
+Public service workflow is ready for the packaged local CLI evidence gate. Independent external maintainer adoption is not yet claimed.
 
 ## Public Product Readiness
 

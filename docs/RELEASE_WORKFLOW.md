@@ -10,7 +10,7 @@ Boulder releases must keep npm, GitHub tags, GitHub Releases, changelog entries,
 2. Update `CHANGELOG.md`.
 3. Run `bun run ci`.
 4. Run `bun bin/boulder.ts release-check --cwd . --json`.
-5. Run `npm pack --dry-run` or `npm_config_cache=/private/tmp/npm-cache-boulder npm pack --dry-run`.
+5. Run `npm pack --dry-run` or `npm_config_cache=<temp-npm-cache> npm pack --dry-run`.
 6. Publish with npm 2FA: `npm publish --access public`.
 7. Verify `npm view boulder-oss-cli name version`.
 8. Verify install smoke from a fresh directory:

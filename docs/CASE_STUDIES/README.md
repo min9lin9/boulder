@@ -24,6 +24,8 @@ Case studies must be reproducible without private credentials and must produce p
 - `docs/CASE_STUDIES/evidence/external-replay/`
 - `fixtures/replay/*/`
 
+External replay is public-target reproducibility evidence. It is not independent third-party adoption proof.
+
 ## Non-Goals
 
 - No private repo evidence as primary proof.

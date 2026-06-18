@@ -2,7 +2,7 @@
 
 Status: repo-file baseline complete; GitHub settings verification pending
 
-Source reference: `/Users/burt/Downloads/naiya_repo_setup_visual.html`
+Source reference: local NAIYA repository setup visual review.
 
 This review maps the NAIYA open-source repository setup structure onto Boulder. Boulder is a Bun and TypeScript CLI project, so this review adapts the contribution-safety model without copying NAIYA-specific app package directories.
 

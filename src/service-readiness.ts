@@ -23,6 +23,7 @@ export type ServiceReadiness = {
 type ContentRequirement = {
   readonly path: string;
   readonly contains: readonly string[];
+  readonly excludes?: readonly string[];
 };
 
 type OfficialDocs = {
@@ -46,7 +47,8 @@ export async function evaluateServiceReadiness(root: string): Promise<ServiceRea
     }),
     await contentCheck(root, "onboarding", {
       path: "docs/ONBOARDING.md",
-      contains: ["--help", "init", "inspect", "pipeline", "export", "product-readiness", "pre-publish", "post-publish"]
+      contains: ["--help", "init", "inspect", "pipeline", "export", "product-readiness", "Published Package Path", "Local Checkout Path", "quickstart", "onboard", "doctor", "service-readiness", "configured-unverified", "does not mutate"],
+      excludes: ["pre-publish", "post-publish"]
     }),
     await officialDocsCoverageCheck(root),
     await replayManifestCheck(root),
@@ -99,13 +101,20 @@ export function serviceReadinessToMarkdown(readiness: ServiceReadiness): string 
 async function contentCheck(root: string, id: string, requirement: ContentRequirement): Promise<ServiceReadinessCheck> {
   const content = await safeRead(join(root, requirement.path));
   const missing = requirement.contains.filter((item) => !content.includes(item));
+  const forbidden = requirement.excludes?.filter((item) => content.includes(item)) ?? [];
   return {
     id,
-    status: content && missing.length === 0 ? "pass" : "fail",
+    status: content && missing.length === 0 && forbidden.length === 0 ? "pass" : "fail",
     evidence: content
-      ? missing.length ? `${requirement.path} missing terms: ${missing.join(", ")}` : requirement.path
+      ? contentCheckEvidence(requirement.path, missing, forbidden)
       : `missing ${requirement.path}`
   };
+}
+
+function contentCheckEvidence(path: string, missing: readonly string[], forbidden: readonly string[]): string {
+  if (missing.length) return `${path} missing terms: ${missing.join(", ")}`;
+  if (forbidden.length) return `${path} forbidden terms: ${forbidden.join(", ")}`;
+  return path;
 }
 
 async function officialDocsCoverageCheck(root: string): Promise<ServiceReadinessCheck> {

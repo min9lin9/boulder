@@ -34,7 +34,7 @@ Recommended M8 path: adopt the validation, planning, and evidence patterns from 
 | `docs/OPERATOR_WORKFLOW_STACK.md` | Boulder uses Superpowers, GStack, and Compound as workflow contracts rather than runtime dependencies. | The stack maps planning, review gates, and learning capture, bounded by repo context, approval gates, local verification, and evidence. | High |
 | [`harness-manager` README](https://github.com/INONONO66/harness-manager#readme) | `hm` is a runtime manager for local AI coding agents and harness isolation. | The README describes clean launch boundaries, runtime inventory, profile-driven env injection, isolated homes, TOML manifests, and fail-closed registry validation. | High |
 | [`harness-manager` manifest guide](https://github.com/INONONO66/harness-manager/blob/main/docs/harness-manifest.md) | Harness manifests are declarative data, not executable shell snippets, and invalid manifests block side effects. | The guide documents manifest locations, structured package strategies, isolation tokens, security rules, and per-harness runtime locks. | High |
-| `/Users/burt/Documents/Reference/Github_repo/claw-code/PARITY.md` | claw-code uses parity lanes and harness-validated flows as measurable implementation evidence. | PARITY describes lane status, permission enforcement, file tool flows, and scripted mock parity scenarios. | Medium |
+| `<local-reference-repo>/claw-code/PARITY.md` | claw-code uses parity lanes and harness-validated flows as measurable implementation evidence. | PARITY describes lane status, permission enforcement, file tool flows, and scripted mock parity scenarios. | Medium |
 | Product inference | Boulder should benchmark runtime-governance patterns but not copy runtime-launcher behavior. | This follows from Boulder product scope and the `harness-manager` category difference. | Medium |
 
 ## Source-backed Difference Matrix
@@ -529,7 +529,7 @@ Acceptance gate:
 
 ### M10 plan
 
-Goal: convert benchmark claims into fixture-backed evidence.
+Historical note: Goal: convert benchmark claims into fixture-backed evidence.
 
 Deliverables:
 

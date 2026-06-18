@@ -17,7 +17,7 @@ async function write(root: string, path: string, content: string): Promise<void>
 
 async function writeServiceFixture(root: string): Promise<void> {
   await write(root, "docs/SERVICE_LOOP.md", "install\ninit\ninspect\npipeline\nhandoff\nverify\nexport\nreadiness\nreplay\nsupport\nnot hosted\nprovider launch\n");
-  await write(root, "docs/ONBOARDING.md", "bun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\npre-publish\npost-publish\n");
+  await write(root, "docs/ONBOARDING.md", "Published Package Path\nLocal Checkout Path\nbun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\nquickstart\nonboard\ndoctor\nservice-readiness\nconfigured-unverified\ndoes not mutate\n");
   await write(root, "docs/EXTERNAL_REPLAY.md", "official-docs.json\nreplay.json\nofficial docs\n");
   await write(root, "docs/HANDOFF_VALIDATION.md", "officialDocsSources\nacceptanceCriteria\nmanualQaPlan\nlazycodexResult\n");
   await write(root, "docs/OPERATING_METRICS.md", "Activation\nOnboarding\nReplay\nHandoff\nofficial-docs-coverage\nReadiness pass rate\nSupport intake\nnumerator\ndenominator\nsource\n");
@@ -193,5 +193,27 @@ describe("service readiness", () => {
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "field-evidence" && item.status === "fail" && item.evidence.includes("oss-run-2"))).toBe(true);
+  });
+
+  test("blocks when onboarding uses stale pre-publish terms", async () => {
+    const root = await tempRepo();
+    await writeServiceFixture(root);
+    await write(root, "docs/ONBOARDING.md", "bun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\npre-publish\npost-publish\n");
+
+    const readiness = await evaluateServiceReadiness(root);
+
+    expect(readiness.status).toBe("blocked");
+    expect(readiness.checks.some((item) => item.id === "onboarding" && item.status === "fail" && item.evidence.includes("Published Package Path"))).toBe(true);
+  });
+
+  test("blocks when onboarding mixes current and stale publish terms", async () => {
+    const root = await tempRepo();
+    await writeServiceFixture(root);
+    await write(root, "docs/ONBOARDING.md", "Published Package Path\nLocal Checkout Path\nbun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\nquickstart\nonboard\ndoctor\nservice-readiness\nconfigured-unverified\ndoes not mutate\npre-publish\n");
+
+    const readiness = await evaluateServiceReadiness(root);
+
+    expect(readiness.status).toBe("blocked");
+    expect(readiness.checks.some((item) => item.id === "onboarding" && item.status === "fail" && item.evidence.includes("forbidden terms"))).toBe(true);
   });
 });
