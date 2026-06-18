@@ -21,12 +21,21 @@ export type CapabilityDiscoveryOptions = {
   readonly codexHome?: string;
 };
 
+export type CapabilityInventoryLoadResult =
+  | { readonly kind: "loaded"; readonly inventory: CapabilityInventory }
+  | { readonly kind: "missing" }
+  | { readonly kind: "invalid" };
+
 const INVENTORY_PATH = "fixtures/capabilities/codex-installed.json";
 
-export async function loadCapabilityInventory(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityInventory | null> {
-  const fixture = parseInventory(await readText(join(root, INVENTORY_PATH)));
-  if (fixture) return fixture;
-  return await discoverCapabilityInventory(root, options);
+export async function loadCapabilityInventory(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityInventoryLoadResult> {
+  const content = await readText(join(root, INVENTORY_PATH));
+  if (content !== null) {
+    const fixture = parseInventory(content);
+    return fixture ? { kind: "loaded", inventory: fixture } : { kind: "invalid" };
+  }
+  const discovered = await discoverCapabilityInventory(root, options);
+  return discovered ? { kind: "loaded", inventory: discovered } : { kind: "missing" };
 }
 
 export function capabilityInventoryPath(): string {
@@ -39,7 +48,7 @@ export function hasValidInventoryItems(inventory: CapabilityInventory): boolean 
     ...inventory.mcpServers,
     ...inventory.plugins,
     ...inventory.runtimes
-  ].every((item) => isRecord(item) && typeof item["id"] === "string");
+  ].every(isInventoryItem);
 }
 
 async function discoverCapabilityInventory(root: string, options: CapabilityDiscoveryOptions): Promise<CapabilityInventory | null> {
@@ -133,6 +142,17 @@ function parseInventory(content: string | null): CapabilityInventory | null {
 function isInventory(value: unknown): value is CapabilityInventory {
   if (!isRecord(value)) return false;
   return ["skills", "mcpServers", "plugins", "runtimes"].every((key) => Array.isArray(value[key]));
+}
+
+function isInventoryItem(value: unknown): value is InventoryItem {
+  if (!isRecord(value) || typeof value["id"] !== "string") return false;
+  return isOptionalString(value["status"])
+    && isOptionalString(value["version"])
+    && isOptionalString(value["officialDocsUrl"]);
+}
+
+function isOptionalString(value: unknown): boolean {
+  return value === undefined || typeof value === "string";
 }
 
 async function safeReaddir(path: string): Promise<readonly string[]> {

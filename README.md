@@ -6,6 +6,25 @@ Boulder makes an OSS repo agent-ready without giving up maintainer control. It c
 
 Current release candidate: `boulder-oss-cli@0.1.14`.
 
+## 3-minute route for non-developers
+
+In local Codex, start in the target repo and ask:
+
+```text
+boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
+```
+
+Prefer the local `boulder` skill when it is installed. For CLI use after trusting the npm package:
+
+```bash
+bunx boulder-oss-cli@0.1.14 init
+bunx boulder-oss-cli@0.1.14 quickstart
+bunx boulder-oss-cli@0.1.14 inspect
+bunx boulder-oss-cli@0.1.14 doctor
+```
+
+`doctor` does not install GJC or LazyCodex. It reports whether they are available, missing, or safe to use through Codex fallback.
+
 ## Install
 
 ```bash
@@ -43,12 +62,6 @@ If you use Boulder from local Codex, start a new Codex session in the target rep
 
 ```text
 boulder quickstart
-```
-
-For first-time setup:
-
-```text
-boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
 ```
 
 `init` writes the legacy-compatible `boulder.yaml`, while runtime routing resolves through workflow profiles first. The default active profile is `programming-default`: planning uses `gajae-code` and execution uses `lazycodex`, both in `detect-and-suggest` mode. `profile resolve`, `quickstart`, `pipeline`, `doctor`, and `export` report the active profile explicitly.

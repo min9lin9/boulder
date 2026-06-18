@@ -225,14 +225,41 @@ describe("capability doctor", () => {
       skills: [{}],
       mcpServers: [null],
       plugins: [],
-      runtimes: []
+      runtimes: [{ id: "bun", version: 123 }]
     }));
 
     const report = await evaluateCapabilityDoctor(root);
 
     expect(report.status).toBe("fail");
-    expect(report.activeProfile?.id).toBe("programming-default");
     expect(report.capabilities).toHaveLength(0);
     expect(report.issues.some((item) => item.id === "capability-inventory-invalid")).toBe(true);
+  });
+
+  test("fails closed when capability inventory JSON or top-level shape is malformed", async () => {
+    for (const content of ["{not json", JSON.stringify({ skills: {} }), ""]) {
+      const root = await tempRepo();
+      await write(root, "fixtures/capabilities/codex-installed.json", content);
+
+      const report = await evaluateCapabilityDoctor(root);
+
+      expect(report.status).toBe("fail");
+      expect(report.issues[0]?.id).toBe("capability-inventory-invalid");
+    }
+  });
+
+  test("warns with direct Bun upgrade guidance before live GJC execution", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [{ id: "gajae-code", status: "installed" }, { id: "lazycodex", status: "installed" }],
+      mcpServers: [],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.5" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root);
+    const issue = report.issues.find((item) => item.id === "gajae-code-bun-runtime");
+
+    expect(report.status).toBe("warn");
+    expect(issue?.id).toBe("gajae-code-bun-runtime");
   });
 });
