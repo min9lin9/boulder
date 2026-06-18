@@ -14,7 +14,7 @@ Local readiness: 9.56 / 10.
 
 Weighted score: 95.65 / 100.
 
-Public product readiness: blocked until the current package version has matching npm publish and tag evidence. The candidate install smoke is recorded, but `release-check` currently reports `published-version-evidence` missing `Published version: 0.1.14` and `git-tag-local=missing local tag v0.1.14`.
+Public product readiness: ready for the packaged CLI workflow. `boulder-oss-cli@0.1.14` is published, `v0.1.14` is tagged and released on GitHub, and the install smoke evidence records `Published version: 0.1.14`.
 
 ## Final Local Readiness
 
@@ -24,7 +24,7 @@ Public product readiness: blocked until the current package version has matching
 | Public OSS credibility | 15 | 9.5 | `README.md`, `LICENSE`, `docs/APPLICATION_EVIDENCE.md`, `docs/TRUST_SUPPORT_SECURITY.md`, and package name `boulder-oss-cli`. |
 | Repeatable workflow proof | 20 | 9.5 | `docs/CASE_STUDIES/pr-review.md`, `docs/CASE_STUDIES/release-workflow.md`, and `docs/CASE_STUDIES/core-implementation.md`. |
 | Codex-specific value | 15 | 9.6 | `docs/GJC_LAZYCODEX_HANDOFF.md`, `docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md`, and `docs/CASE_STUDIES/evidence/core-implementation/lazycodex-implementation-summary.md`. |
-| Product readiness | 10 | 9.0 | `docs/PRODUCT_READINESS.md`, `src/product-readiness.ts`, `docs/RELEASE_PLAN.md`, and `.omo/ulw-loop/evidence/codex-oss-9-5/`. Public-ready remains blocked by missing `boulder-oss-cli@0.1.14` npm publish evidence and `v0.1.14` tag evidence. |
+| Product readiness | 10 | 9.6 | `docs/PRODUCT_READINESS.md`, `src/product-readiness.ts`, `docs/RELEASE_PLAN.md`, and `.omo/ulw-loop/evidence/codex-oss-9-5/`. Public-ready release evidence is aligned for `boulder-oss-cli@0.1.14` and `v0.1.14`. |
 | Safety and boundaries | 10 | 9.7 | `docs/TRUST_SUPPORT_SECURITY.md`, `docs/PROVIDER_POLICY.md`, `SECURITY.md`, and no hosted service or provider-launch claim. |
 | Narrative quality | 10 | 9.5 | `docs/CODEX_OSS_APPLICATION_PACKET.md` is claim-to-evidence mapped and keeps limitations visible. |
 
@@ -43,7 +43,7 @@ No hard blocker remains for local candidate application-readiness:
 - Core Boulder commands remain local and do not require credential access.
 - Boulder makes no provider launch, hosted service, benchmark leadership, acceptance, runtime scale, or external adoption claim.
 
-Public release completion remains pending until the maintainer creates and pushes the matching Git tag, publishes the package version, and records the GitHub Release evidence.
+Public release completion is recorded for `boulder-oss-cli@0.1.14`, Git tag `v0.1.14`, and GitHub Release `v0.1.14`.
 
 Public service-ready cannot yet be claimed because `product-readiness --json` is blocked by missing tag evidence. The service loop remains pilot-ready: onboarding, replay, handoff, support, metrics, and field evidence pass, while public product readiness is still gated.
 

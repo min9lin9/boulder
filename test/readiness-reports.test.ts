@@ -60,21 +60,20 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("blocks release evidence when the current tag is not present locally", async () => {
+  test("reports root release evidence as ready after publish and tag", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.status).toBe("blocked");
+    expect(report.status).toBe("ready");
     expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
-    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("does not publish");
-    expect(markdown).toContain("missing local tag v0.1.14");
-    expect(markdown).toContain("missing terms: Published version: 0.1.14");
+    expect(markdown).toContain("Status: ready");
   });
 });
 

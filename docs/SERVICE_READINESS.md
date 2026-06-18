@@ -1,6 +1,6 @@
 # Service Readiness
 
-Status: pilot-ready
+Status: ready
 
 ## Checks
 
@@ -13,8 +13,8 @@ Status: pilot-ready
 - field-evidence: pass - evidence/field-readiness/oss-run-1
 - operating-metrics: pass - docs/OPERATING_METRICS.md
 - support-routes: pass - .github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, docs/TRUST_SUPPORT_SECURITY.md
-- product-readiness: fail - product-readiness blocked
+- product-readiness: pass - product-readiness ready
 
 ## Next Steps
 
-- Service pilot is ready; product-readiness must pass before claiming public service-ready.
+- Service workflow is ready; continue separating adoption claims from local evidence.

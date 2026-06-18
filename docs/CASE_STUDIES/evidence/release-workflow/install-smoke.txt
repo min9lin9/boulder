@@ -24,7 +24,38 @@ npm error code EOTP
 npm error This operation requires a one-time password.
 ```
 
-Published version: pending, expected `0.1.14` after OTP completion.
+Retry after continuing release work on 2026-06-18:
+
+```text
+npm view boulder-oss-cli name version dist-tags --json
+{
+  "name": "boulder-oss-cli",
+  "version": "0.1.13",
+  "dist-tags": {
+    "latest": "0.1.13"
+  }
+}
+
+npm owner ls boulder-oss-cli
+jeonmingyu <jeonmingyu@kakao.com>
+
+npm whoami
+npm error code E401
+npm error 401 Unauthorized - GET https://registry.npmjs.org/-/whoami
+
+npm publish --access public
+npm error code E404
+npm error 404 Not Found - PUT https://registry.npmjs.org/boulder-oss-cli - Not found
+```
+
+Successful publish verification on 2026-06-18:
+
+```text
+npm view boulder-oss-cli version
+0.1.14
+```
+
+Published version: 0.1.14
 
 Published baseline result:
 

@@ -85,13 +85,15 @@ describe("tight product readiness", () => {
   });
 
   test("blocks when release tag or published install evidence does not match package version", async () => {
-    const root = join(import.meta.dir, "..");
+    const root = await tempRepo();
+    await writeReadyPublicProductFixture(root);
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli --help\nboulder-oss-cli\n1.2.3\nPublished version: 0.0.0\nResult: success\nUsage:\nexit: 0\n");
 
     const readiness = await evaluateProductReadiness(root);
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "public-release-check" && item.status === "fail")).toBe(true);
-    expect(readiness.checks.some((item) => item.evidence.includes("git-tag-local"))).toBe(true);
+    expect(readiness.checks.some((item) => item.evidence.includes("published-version-evidence"))).toBe(true);
   });
 
   test("blocks duplicate copy artifacts in the release tree", async () => {

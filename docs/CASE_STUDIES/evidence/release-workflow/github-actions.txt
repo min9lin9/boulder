@@ -7,8 +7,9 @@ Branch: main
 Event: push
 Status: success
 Commit: 4efbbbe
-Release tag candidate: v0.1.14
-Tag proof: pending until `git tag --list v0.1.14` returns the tag locally and the tag is pushed by the maintainer.
+Release tag: v0.1.14
+Tag proof: `git tag --list v0.1.14` returns the local tag and `git push origin v0.1.14` pushed it to GitHub.
+GitHub Release: https://github.com/min9lin9/boulder/releases/tag/v0.1.14
 
 Security workflow:
 
