@@ -23,7 +23,7 @@ bunx boulder-oss-cli@0.1.14 inspect
 bunx boulder-oss-cli@0.1.14 doctor
 ```
 
-`doctor` does not install GJC or LazyCodex. It reports whether they are available, missing, or safe to use through Codex fallback.
+`doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
 
 ## Install
 
@@ -74,7 +74,16 @@ boulder quickstart --cwd /path/to/repo
 
 The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
-GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports them as `available` only when found in the Codex inventory; otherwise it reports `configured-unverified` and keeps live executor calls approval-gated. `handoff send --dry-run` prints the candidate command without external execution.
+GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports GJC as `available` only when local inventory includes `gajae-code`, `gjc`, the Hermes coordinator MCP bridge (`gjc_coordinator`, `gjc-coordinator`, `gjc-coordinator-mcp`), `gjc-delegation`, or `gjc_delegate_*` delegate tools. Otherwise it reports `configured-unverified` and keeps live executor calls approval-gated. `handoff send --dry-run` prints the candidate command without external execution.
+
+For GJC, Boulder follows the Hermes MCP bridge surface:
+
+```bash
+gjc mcp-serve coordinator --check --json
+gjc setup hermes --root . --smoke
+```
+
+Live planning delegation through `gjc_delegate_plan` is suggested only after packet review and explicit approval.
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
 

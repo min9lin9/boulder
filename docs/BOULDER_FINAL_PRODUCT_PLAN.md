@@ -33,6 +33,8 @@ MVP contract:
 - command: `boulder doctor [--json]`
 - output: capability list, lane mapping, official-docs-first flag, runtime compatibility issues
 - first warning: Gajae-Code live execution requires Bun `>=1.3.14`
+- GJC availability: detect `gajae-code`/`gjc`, Hermes coordinator MCP ids, `gjc-delegation`, or `gjc_delegate_*`; otherwise keep `gajae-code` as `configured-unverified`
+- GJC bridge smoke: suggest `gjc mcp-serve coordinator --check --json` and `gjc setup hermes --root . --smoke` without auto-running live delegation
 
 이 기능은 사용자의 기존 환경을 Boulder가 흡수하는 장치다. 새 agent 생태계를 강요하지 않고, 이미 설치된 `ulw-plan`, `ulw-loop`, `programming`, `remove-ai-slops`, LSP, AST, MCP, Superpowers를 분류해 쓸 수 있게 한다.
 
