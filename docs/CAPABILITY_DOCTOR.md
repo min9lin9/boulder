@@ -64,6 +64,15 @@ This keeps Boulder modular. Boulder can still validate packets and record eviden
 
 With Bun `>=1.3.14`, the warning is removed. Boulder still treats live GJC/LazyCodex commands as adapter candidates, not automatic launches.
 
+For Gajae Code, `doctor` accepts the official Hermes bridge surfaces as the planning adapter:
+
+- `gajae-code` or `gjc` skill/plugin/runtime ids
+- `gjc_coordinator`, `gjc-coordinator`, or `gjc-coordinator-mcp` MCP ids
+- `gjc-delegation` skill/plugin id
+- `gjc_delegate_*` delegate tool ids
+
+The non-mutating smoke commands are `gjc mcp-serve coordinator --check --json` and `gjc setup hermes --root . --smoke`. Delegate calls remain approval-gated.
+
 When this warning appears, Boulder should keep routing in `detect-and-suggest` mode:
 
 - planning preference: `gajae-code`

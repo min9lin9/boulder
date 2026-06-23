@@ -66,6 +66,27 @@ describe("capability doctor", () => {
     expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "available")).toBe(true);
   });
 
+  test("recognizes the GJC Hermes coordinator MCP bridge as the planning adapter", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [
+        { id: "gjc-delegation", status: "installed" },
+        { id: "lazycodex", status: "installed" }
+      ],
+      mcpServers: [
+        { id: "gjc_coordinator", status: "available", officialDocsUrl: "https://gajae-code.com/docs/hermes-mcp-bridge.html" }
+      ],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.14" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root);
+
+    expect(report.status).toBe("pass");
+    expect(report.capabilities.some((item) => item.kind === "mcp" && item.id === "gjc_coordinator" && item.lane === "plan" && item.officialDocsFirst)).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "available")).toBe(true);
+  });
+
   test("passes when Bun supports live GJC execution", async () => {
     const root = await tempRepo();
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({

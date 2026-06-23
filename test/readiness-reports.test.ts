@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "../src/benchmark";
@@ -220,11 +220,11 @@ async function packageSurfaceFiles(root: string): Promise<readonly string[]> {
 }
 
 async function recursiveFiles(root: string): Promise<readonly string[]> {
-  const entries = await readdir(root, { withFileTypes: true });
+  const entries = await readdir(root);
   const files: string[] = [];
   for (const entry of entries) {
-    const path = join(root, entry.name);
-    if (entry.isDirectory()) files.push(...await recursiveFiles(path));
+    const path = join(root, entry);
+    if ((await stat(path)).isDirectory()) files.push(...await recursiveFiles(path));
     else files.push(path);
   }
   return files;

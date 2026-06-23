@@ -144,7 +144,9 @@ describe("boulder handoff CLI e2e", () => {
       expect(result.stderr).toBe("");
       expect(result.stdout).toContain("Boulder handoff send dry-run");
       expect(result.stdout).toContain("adapter: gajae-code");
-      expect(result.stdout).toContain("command: bunx gajae-code");
+      expect(result.stdout).toContain("command: gjc mcp-serve coordinator --check --json");
+      expect(result.stdout).toContain("command: gjc setup hermes --root . --smoke");
+      expect(result.stdout).toContain("command: gjc_delegate_plan");
       expect(result.stdout).toContain("external execution: skipped");
     } finally {
       await removeTempRepo(root);

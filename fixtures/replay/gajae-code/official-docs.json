@@ -3,7 +3,8 @@
   "repoUrl": "https://github.com/Yeachan-Heo/gajae-code",
   "docsUrls": [
     "https://github.com/Yeachan-Heo/gajae-code#readme",
-    "https://github.com/Yeachan-Heo/gajae-code/blob/main/docs/bridge.md"
+    "https://github.com/Yeachan-Heo/gajae-code/blob/main/docs/bridge.md",
+    "https://gajae-code.com/docs/hermes-mcp-bridge.html"
   ],
   "versionOrRef": "main",
   "setupCommands": [
@@ -15,7 +16,9 @@
     "bun scripts/check-visible-definitions.ts",
     "bun scripts/verify-g002-gates.ts",
     "bun scripts/rebrand-inventory.ts --strict",
-    "bun test packages/coding-agent/test/default-gjc-definitions.test.ts"
+    "bun test packages/coding-agent/test/default-gjc-definitions.test.ts",
+    "gjc mcp-serve coordinator --check --json",
+    "gjc setup hermes --root /path/to/repo --smoke"
   ],
   "contributionPolicy": "Use the public README, GitHub issues, pull requests, and Discord community only for share-safe coordination.",
   "securityPolicy": "GJC is beta-stage; verify outputs before relying on them and never include provider tokens, credentials, or private worktree logs in replay evidence.",
@@ -23,7 +26,9 @@
     "External runner; do not patch Codex, Claude Code, OpenCode, or Claw Code runtimes.",
     "Use deep-interview before planning ambiguous work.",
     "Use ralplan before mutation.",
-    "Use ultragoal evidence before completion claims."
+    "Use ultragoal evidence before completion claims.",
+    "Prefer visible routed sessions first; move to the coordinator MCP bridge for pure machine control.",
+    "Mutating coordinator calls require startup opt-in and per-call allow_mutation."
   ],
   "retrievedAt": "2026-06-13"
 }

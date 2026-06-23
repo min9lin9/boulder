@@ -19,6 +19,19 @@ Boulder classify/export -> GJC plan/review -> LazyCodex implement -> Boulder ver
 | LazyCodex | implementation lane for source edits, tests, manual QA, PR-sized work, and unresolved-risk reporting from a GJC-approved plan | does not silently rewrite the plan or expand scope |
 | Boulder | final verification, release/product readiness, package hygiene, and claim-to-evidence audit | blocks readiness when plan or implementation evidence is missing |
 
+## Supported GJC Surfaces
+
+Boulder treats GJC as available when `doctor` sees the official Hermes bridge or delegation surfaces: `gjc_coordinator`, `gjc-coordinator-mcp`, `gjc-delegation`, `gjc_delegate_*`, `gjc`, or `gajae-code`.
+
+Non-mutating checks:
+
+```bash
+gjc mcp-serve coordinator --check --json
+gjc setup hermes --root . --smoke
+```
+
+Live delegation, such as `gjc_delegate_plan`, remains approval-gated and should be confirmed by durable turn state, not terminal scrollback.
+
 ## Boulder to GJC Input Schema
 
 This is the Boulder to GJC input schema.

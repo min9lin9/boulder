@@ -143,9 +143,19 @@ function adapterStatus(executorId: string, inventory: {
 function adapterMatchesInventory(adapterId: string, inventoryId: string): boolean {
   if (adapterId === inventoryId) return true;
   if (adapterId === "codex") return inventoryId === "codex" || inventoryId === "openai-codex";
-  if (adapterId === "gajae-code") return inventoryId === "gajae-code" || inventoryId === "gjc";
+  if (adapterId === "gajae-code") return isGajaeCodeInventory(inventoryId);
   if (adapterId === "lazycodex") return inventoryId === "lazycodex" || inventoryId === "lazy-codex";
   return inventoryTokens(inventoryId).includes(adapterId);
+}
+
+function isGajaeCodeInventory(inventoryId: string): boolean {
+  return inventoryId === "gajae-code"
+    || inventoryId === "gjc"
+    || inventoryId === "gjc-delegation"
+    || inventoryId === "gjc_coordinator"
+    || inventoryId === "gjc-coordinator"
+    || inventoryId === "gjc-coordinator-mcp"
+    || inventoryId.startsWith("gjc_delegate_");
 }
 
 function inventoryTokens(inventoryId: string): readonly string[] {
@@ -166,7 +176,7 @@ function toCapability(item: InventoryItem, kind: Capability["kind"]): Capability
 
 function laneFor(id: string, kind: Capability["kind"]): CapabilityLane {
   const normalized = id.toLowerCase();
-  if (normalized.includes("ulw-plan") || normalized.includes("gajae") || normalized.includes("deep-interview")) return "plan";
+  if (normalized.includes("ulw-plan") || normalized.includes("gajae") || normalized.includes("gjc") || normalized.includes("deep-interview")) return "plan";
   if (normalized.includes("ulw-loop") || normalized.includes("lazycodex") || normalized.includes("programming")) return "execute";
   if (normalized.includes("lsp") || normalized.includes("review") || normalized.includes("qa")) return "verify";
   if (normalized.includes("ledger") || normalized.includes("notion")) return "record";
