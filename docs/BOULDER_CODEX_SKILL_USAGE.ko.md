@@ -57,6 +57,22 @@ bash <codex-home>/skills/boulder/scripts/boulder-local.sh export --cwd <repo>
 
 `init`은 기본 executor preference를 `boulder.yaml`에 설정합니다. planning은 `gajae-code`, execution은 `lazycodex`, mode는 둘 다 `detect-and-suggest`입니다. 다만 이것은 설치 완료를 뜻하지 않습니다. `quickstart`에서는 `executor-planning`, `executor-execution` 체크로 preference가 보이고, `doctor --json`에서는 로컬 Codex inventory에서 발견될 때만 `status: available`, 없으면 `status: configured-unverified`로 보여야 합니다.
 
+GJC는 최신 Hermes MCP bridge 기준으로 감지합니다. `doctor`가 아래 표면 중 하나를 보면 planning adapter를 실제 사용 가능 상태로 봅니다.
+
+- `gajae-code` 또는 `gjc`
+- `gjc_coordinator`, `gjc-coordinator`, `gjc-coordinator-mcp`
+- `gjc-delegation`
+- `gjc_delegate_*`
+
+GJC bridge 자체를 확인할 때는 Boulder가 아래 비파괴 smoke command를 후보로 보여줍니다.
+
+```bash
+gjc mcp-serve coordinator --check --json
+gjc setup hermes --root . --smoke
+```
+
+`gjc_delegate_plan` 같은 실제 delegation은 packet review와 사용자 승인 이후에만 후보 명령으로 취급합니다.
+
 단, 이것은 자동 실행이 아닙니다. GJC와 LazyCodex live command는 사용자가 명시적으로 승인할 때만 실행합니다.
 
 `--cwd`는 항상 Boulder command 뒤에 둡니다.

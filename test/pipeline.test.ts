@@ -30,8 +30,10 @@ describe("pipeline planning surface", () => {
     const planning = plan.executors.find((item) => item.lane === "plan");
     const execution = plan.executors.find((item) => item.lane === "execute");
 
-    expect(planning?.adapterCommands.some((item) => item.command === "bunx gajae-code --help")).toBe(true);
+    expect(planning?.adapterCommands.some((item) => item.command === "gjc mcp-serve coordinator --check --json")).toBe(true);
+    expect(planning?.adapterCommands.some((item) => item.command === "gjc setup hermes --root . --smoke")).toBe(true);
     expect(planning?.adapterCommands.some((item) => item.command.includes("gjc-plan.md"))).toBe(true);
+    expect(planning?.adapterCommands.some((item) => item.requiresApproval)).toBe(true);
     expect(execution?.adapterCommands.some((item) => item.command.includes("lazycodex"))).toBe(true);
     expect(execution?.adapterCommands.some((item) => item.requiresApproval)).toBe(true);
   });

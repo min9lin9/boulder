@@ -24,6 +24,7 @@ declare module "node:child_process" {
 declare module "node:fs/promises" {
   type FileStat = {
     readonly nlink: number;
+    isDirectory(): boolean;
     isFile(): boolean;
     isSymbolicLink(): boolean;
   };
@@ -36,13 +37,14 @@ declare module "node:fs/promises" {
   export function mkdir(path: string, options?: { recursive?: boolean }): Promise<void>;
   export function mkdtemp(prefix: string): Promise<string>;
   export function lstat(path: string): Promise<FileStat>;
+  export function link(existingPath: string, newPath: string): Promise<void>;
   export function open(path: string, flags: number, mode?: number): Promise<FileHandle>;
   export function readFile(path: string, encoding: "utf8"): Promise<string>;
   export function readdir(path: string): Promise<string[]>;
   export function realpath(path: string): Promise<string>;
   export function rename(oldPath: string, newPath: string): Promise<void>;
   export function rm(path: string, options?: { force?: boolean; recursive?: boolean }): Promise<void>;
-  export function stat(path: string): Promise<unknown>;
+  export function stat(path: string): Promise<FileStat>;
   export function symlink(target: string, path: string): Promise<void>;
   export function unlink(path: string): Promise<void>;
   export function writeFile(path: string, content: string, encoding: "utf8"): Promise<void>;

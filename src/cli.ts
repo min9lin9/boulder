@@ -1,4 +1,5 @@
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
+import { runCapabilityCommand } from "./capability-command";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
 import { parseOptions } from "./cli-options";
@@ -63,6 +64,10 @@ export async function main(args: string[]): Promise<void> {
   }
   if (command === "profile") {
     await runProfileCommand(args, { cwd: options.cwd, json: options.json });
+    return;
+  }
+  if (command === "capability") {
+    await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
   if (command === "handoff") {

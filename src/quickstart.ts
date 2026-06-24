@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import { loadSourceCandidateManifests } from "./capability-source";
 import { exists } from "./fs";
 import { resolveWorkflowProfile } from "./workflow-profiles";
 
@@ -59,8 +60,22 @@ const QUICKSTART_STEPS = [
   }
 ] as const satisfies readonly QuickstartStep[];
 
+const SOURCE_IMPORT_STEPS = [
+  {
+    id: "source-gajae-code",
+    command: "boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run",
+    purpose: "Preview the GJC planning adapter source before recording it."
+  },
+  {
+    id: "source-lazycodex",
+    command: "boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run",
+    purpose: "Preview the LazyCodex execution adapter source before recording it."
+  }
+] as const satisfies readonly QuickstartStep[];
+
 export async function evaluateQuickstart(root: string): Promise<QuickstartReport> {
   const resolution = await resolveWorkflowProfile(root, {});
+  const sourceCandidates = await loadSourceCandidateManifests(root);
   const checks = [
     await fileCheck(root, "manifest", "boulder.yaml"),
     await fileCheck(root, "operator-contract", "BOULDER.md"),
@@ -72,7 +87,7 @@ export async function evaluateQuickstart(root: string): Promise<QuickstartReport
   return {
     status: checks.every((item) => item.status === "pass") ? "ready" : "needs-init",
     checks,
-    steps: QUICKSTART_STEPS,
+    steps: sourceCandidates.candidates.length ? QUICKSTART_STEPS : [...SOURCE_IMPORT_STEPS, ...QUICKSTART_STEPS],
     nextDocs: [
       "docs/CONTRIBUTOR_START_HERE.md",
       "docs/ONBOARDING.md",

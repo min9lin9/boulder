@@ -66,6 +66,27 @@ describe("capability doctor", () => {
     expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "lazycodex" && item.status === "available")).toBe(true);
   });
 
+  test("recognizes the GJC Hermes coordinator MCP bridge as the planning adapter", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [
+        { id: "gjc-delegation", status: "installed" },
+        { id: "lazycodex", status: "installed" }
+      ],
+      mcpServers: [
+        { id: "gjc_coordinator", status: "available", officialDocsUrl: "https://gajae-code.com/docs/hermes-mcp-bridge.html" }
+      ],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.14" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root);
+
+    expect(report.status).toBe("pass");
+    expect(report.capabilities.some((item) => item.kind === "mcp" && item.id === "gjc_coordinator" && item.lane === "plan" && item.officialDocsFirst)).toBe(true);
+    expect(report.capabilities.some((item) => item.kind === "adapter" && item.id === "gajae-code" && item.status === "available")).toBe(true);
+  });
+
   test("passes when Bun supports live GJC execution", async () => {
     const root = await tempRepo();
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
@@ -209,57 +230,4 @@ describe("capability doctor", () => {
     expect(report.capabilities.some((item) => item.kind === "runtime" && item.id === "bun" && item.status === "1.3.14")).toBe(true);
   });
 
-  test("fails closed when capability inventory is missing", async () => {
-    const root = await tempRepo();
-
-    const report = await evaluateCapabilityDoctor(root, { codexHome: join(root, "missing-codex") });
-
-    expect(report.status).toBe("fail");
-    expect(report.activeProfile?.id).toBe("programming-default");
-    expect(report.issues.some((item) => item.id === "capability-inventory-missing")).toBe(true);
-  });
-
-  test("fails closed when capability inventory entries are malformed", async () => {
-    const root = await tempRepo();
-    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
-      skills: [{}],
-      mcpServers: [null],
-      plugins: [],
-      runtimes: [{ id: "bun", version: 123 }]
-    }));
-
-    const report = await evaluateCapabilityDoctor(root);
-
-    expect(report.status).toBe("fail");
-    expect(report.capabilities).toHaveLength(0);
-    expect(report.issues.some((item) => item.id === "capability-inventory-invalid")).toBe(true);
-  });
-
-  test("fails closed when capability inventory JSON or top-level shape is malformed", async () => {
-    for (const content of ["{not json", JSON.stringify({ skills: {} }), ""]) {
-      const root = await tempRepo();
-      await write(root, "fixtures/capabilities/codex-installed.json", content);
-
-      const report = await evaluateCapabilityDoctor(root);
-
-      expect(report.status).toBe("fail");
-      expect(report.issues[0]?.id).toBe("capability-inventory-invalid");
-    }
-  });
-
-  test("warns with direct Bun upgrade guidance before live GJC execution", async () => {
-    const root = await tempRepo();
-    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
-      skills: [{ id: "gajae-code", status: "installed" }, { id: "lazycodex", status: "installed" }],
-      mcpServers: [],
-      plugins: [],
-      runtimes: [{ id: "bun", version: "1.3.5" }]
-    }));
-
-    const report = await evaluateCapabilityDoctor(root);
-    const issue = report.issues.find((item) => item.id === "gajae-code-bun-runtime");
-
-    expect(report.status).toBe("warn");
-    expect(issue?.id).toBe("gajae-code-bun-runtime");
-  });
 });

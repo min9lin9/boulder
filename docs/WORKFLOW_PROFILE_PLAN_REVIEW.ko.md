@@ -245,9 +245,16 @@ externalAdapters:
 금지되는 기본 통합:
 
 ```bash
-bunx gajae-code @plans/workflow-profiles.md
-bunx gajae-code @src/index.ts
+gjc_delegate_plan --cwd . --task @plans/workflow-profiles.md
+gjc_delegate_execute --cwd . --task @src/index.ts
 lazycodex run --repo .
+```
+
+GJC Hermes bridge 자체 확인은 비파괴 smoke로만 허용한다.
+
+```bash
+gjc mcp-serve coordinator --check --json
+gjc setup hermes --root . --smoke
 ```
 
 허용되는 기본 통합:

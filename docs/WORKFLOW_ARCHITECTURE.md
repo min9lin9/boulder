@@ -23,6 +23,7 @@ Runtime constraint:
 
 - Boulder now requires Bun `>=1.3.14`, matching the GJC live adapter floor.
 - The architecture applies the public GJC contract and exposes approval-gated command adapter candidates. It must still be validated with a real GJC session or compatible planning packet before claiming production-grade executor telemetry.
+- Capability sources are tracked as project-local manifests from canonical source URLs. `doctor` reads those manifests as candidates, but installation, update checks, and live execution stay outside read-only doctor behavior.
 
 ## Thesis / Antithesis / Synthesis
 

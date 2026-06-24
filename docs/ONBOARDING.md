@@ -47,6 +47,8 @@ A new maintainer should see repository-specific context, friction classification
 
 - Missing Bun: install Bun first.
 - GJC/LazyCodex `configured-unverified`: keep them as adapter preferences until `doctor` finds local inventory evidence.
+- GJC not detected: confirm the Hermes bridge or delegation surface is visible as `gjc`, `gajae-code`, `gjc_coordinator`, `gjc-coordinator-mcp`, `gjc-delegation`, or `gjc_delegate_*`.
+- GJC bridge smoke needed: run `gjc mcp-serve coordinator --check --json` and `gjc setup hermes --root . --smoke` outside Boulder before claiming live GJC availability.
 - Blocked product-readiness: inspect the failed checks and provide public evidence.
 - Stale public evidence: regenerate readiness docs after replacing local paths with share-safe placeholders.
 - External replay mismatch: refresh the target project official docs source before changing commands.

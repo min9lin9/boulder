@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "../src/benchmark";
@@ -88,6 +88,8 @@ describe("quickstart and replay reports", () => {
     expect(quickstart.checks.some((item) => item.id === "executor-planning" && item.status === "pass")).toBe(true);
     expect(quickstart.checks.some((item) => item.id === "executor-execution" && item.status === "pass")).toBe(true);
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
@@ -220,11 +222,11 @@ async function packageSurfaceFiles(root: string): Promise<readonly string[]> {
 }
 
 async function recursiveFiles(root: string): Promise<readonly string[]> {
-  const entries = await readdir(root, { withFileTypes: true });
+  const entries = await readdir(root);
   const files: string[] = [];
   for (const entry of entries) {
-    const path = join(root, entry.name);
-    if (entry.isDirectory()) files.push(...await recursiveFiles(path));
+    const path = join(root, entry);
+    if ((await stat(path)).isDirectory()) files.push(...await recursiveFiles(path));
     else files.push(path);
   }
   return files;

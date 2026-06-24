@@ -5,13 +5,18 @@ export function adapterCommandsForExecutor(executorId: string): readonly Executo
   if (normalized === "gajae-code" || normalized === "gjc" || normalized.includes("gajae")) {
     return [
       {
-        command: "bunx gajae-code --help",
-        purpose: "confirm the planning adapter is installed and compatible",
+        command: "gjc mcp-serve coordinator --check --json",
+        purpose: "confirm the GJC Hermes coordinator MCP bridge is installed and compatible",
         requiresApproval: false
       },
       {
-        command: "bunx gajae-code -p @docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md \"Review this Boulder planning packet and return execution handoff notes\"",
-        purpose: "candidate live planning review handoff from Boulder evidence to GJC",
+        command: "gjc setup hermes --root . --smoke",
+        purpose: "render and smoke-check the Hermes-compatible GJC setup without mutating files",
+        requiresApproval: false
+      },
+      {
+        command: "gjc_delegate_plan --cwd . --task @docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md",
+        purpose: "candidate live planning delegation through the GJC coordinator contract",
         requiresApproval: true
       }
     ];

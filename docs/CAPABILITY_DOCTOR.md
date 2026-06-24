@@ -52,6 +52,32 @@ For public OSS targets, Boulder should treat MCPs and external adapters as offic
 
 The planner must then refresh official documentation before recommending setup, tests, replay, or adapter behavior.
 
+## Source Candidates
+
+When a preferred capability is not installed, Boulder can record a project-local source candidate from a canonical source URL:
+
+```bash
+boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+boulder capability import --from https://github.com/code-yeongyu/lazycodex --write
+```
+
+The persisted manifest lives under:
+
+```text
+.boulder/capabilities/imports/<registry-id>.json
+```
+
+Supported source grammar:
+
+- `https://github.com/<owner>/<repo>`
+- `github.com/<owner>/<repo>`
+- `clawhub:<slug>`
+
+GitHub sources are canonicalized to `https://github.com/<owner>/<repo>`. GJC is stored as `github__yeachan-heo__gajae-code`; LazyCodex is stored as `github__code-yeongyu__lazycodex`.
+
+Doctor reads these manifests and reports them as source candidates. It does not install, update, clone, or launch the capability. `doctor` remains read-only; future update checks belong to a separate `update` command.
+
 ## Runtime Compatibility
 
 Doctor checks runtime blockers that affect downstream executors. The first supported warning is:
@@ -63,6 +89,15 @@ Gajae-Code requires Bun >=1.3.14; detected Bun <version>.
 This keeps Boulder modular. Boulder can still validate packets and record evidence, but live GJC execution remains blocked until the runtime is upgraded.
 
 With Bun `>=1.3.14`, the warning is removed. Boulder still treats live GJC/LazyCodex commands as adapter candidates, not automatic launches.
+
+For Gajae Code, `doctor` accepts the official Hermes bridge surfaces as the planning adapter:
+
+- `gajae-code` or `gjc` skill/plugin/runtime ids
+- `gjc_coordinator`, `gjc-coordinator`, or `gjc-coordinator-mcp` MCP ids
+- `gjc-delegation` skill/plugin id
+- `gjc_delegate_*` delegate tool ids
+
+The non-mutating smoke commands are `gjc mcp-serve coordinator --check --json` and `gjc setup hermes --root . --smoke`. Delegate calls remain approval-gated.
 
 When this warning appears, Boulder should keep routing in `detect-and-suggest` mode:
 
