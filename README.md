@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current published package: `boulder-oss-cli@0.1.14`.
+Current published package: `boulder-oss-cli@0.1.15`.
 
 ## 3-minute route for non-developers
 
@@ -17,10 +17,10 @@ boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실�
 Prefer the local `boulder` skill when it is installed. For CLI use after trusting the npm package:
 
 ```bash
-bunx boulder-oss-cli@0.1.14 init
-bunx boulder-oss-cli@0.1.14 quickstart
-bunx boulder-oss-cli@0.1.14 inspect
-bunx boulder-oss-cli@0.1.14 doctor
+bunx boulder-oss-cli@0.1.15 init
+bunx boulder-oss-cli@0.1.15 quickstart
+bunx boulder-oss-cli@0.1.15 inspect
+bunx boulder-oss-cli@0.1.15 doctor
 ```
 
 `doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
@@ -28,10 +28,10 @@ bunx boulder-oss-cli@0.1.14 doctor
 If GJC or LazyCodex is not installed yet, register their canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
 
 ```bash
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/code-yeongyu/lazycodex --write
-bunx boulder-oss-cli@0.1.14 doctor
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/code-yeongyu/lazycodex --write
+bunx boulder-oss-cli@0.1.15 doctor
 ```
 
 `--dry-run` prints the manifest path and adapter guess without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
@@ -132,7 +132,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release candidate: `v0.1.14`
+- Release candidate: `v0.1.15`
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

@@ -1,6 +1,6 @@
 Release CI evidence
 
-Observed result on 2026-06-17 for the 0.1.14 release candidate.
+Observed result on 2026-06-24 for the 0.1.15 release candidate.
 
 Command:
 
@@ -63,7 +63,7 @@ Package:
 Bun package dry-run evidence:
 
 ```text
-boulder-oss-cli-0.1.14.tgz
+boulder-oss-cli-0.1.15.tgz
 Bun total files: 147
 Unpacked size: 0.49MB
 ```

@@ -36,6 +36,6 @@ bunx --no-cache boulder-oss-cli --help
 
 ## Current Release Note
 
-`boulder-oss-cli@0.1.14` is the current release candidate in this tree. The release evidence must keep npm version, Git tag `v0.1.14`, GitHub Release notes, CI run, package dry-run, and install smoke aligned before claiming product-ready status.
+`boulder-oss-cli@0.1.15` is the current release candidate in this tree. The release evidence must keep npm version, Git tag `v0.1.15`, GitHub Release notes, CI run, package dry-run, and install smoke aligned before claiming product-ready status.
 
 `release-check` is evidence automation only. It does not publish, tag, push, or create GitHub Releases.

@@ -24,7 +24,7 @@ import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
-const VERSION = "0.1.14";
+const VERSION = "0.1.15";
 
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
