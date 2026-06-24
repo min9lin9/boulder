@@ -25,6 +25,17 @@ bunx boulder-oss-cli@0.1.14 doctor
 
 `doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
 
+If GJC or LazyCodex is not installed yet, register their canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
+
+```bash
+bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/code-yeongyu/lazycodex --write
+bunx boulder-oss-cli@0.1.14 doctor
+```
+
+`--dry-run` prints the manifest path and adapter guess without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
+
 ## Install
 
 ```bash
@@ -42,6 +53,7 @@ cd path/to/your/repo
 bunx boulder-oss-cli@latest init
 bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
+bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 bunx boulder-oss-cli@latest doctor
 ```
 
@@ -95,6 +107,7 @@ boulder quickstart
 boulder onboard
 boulder inspect
 boulder profile resolve
+boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high

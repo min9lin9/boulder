@@ -67,6 +67,17 @@ For a target OSS repository, start with:
 
 `init` configures the default executor preferences in `boulder.yaml`: planning uses `gajae-code`, execution uses `lazycodex`, and both stay in `detect-and-suggest` mode. This does not prove GJC or LazyCodex are installed. `quickstart` reports the preferences; `doctor` reports adapters as `available` only when they are found in the local Codex inventory, otherwise `configured-unverified`. Do not auto-run GJC or LazyCodex unless the user explicitly approves the live executor command.
 
+If GJC or LazyCodex is not installed, record their canonical source URLs as candidates before recommending manual setup:
+
+```bash
+./scripts/boulder-local.sh capability import --cwd /path/to/repo --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+./scripts/boulder-local.sh capability import --cwd /path/to/repo --from https://github.com/Yeachan-Heo/gajae-code --write
+./scripts/boulder-local.sh capability import --cwd /path/to/repo --from https://github.com/code-yeongyu/lazycodex --write
+./scripts/boulder-local.sh doctor --cwd /path/to/repo --json
+```
+
+Source candidates are read-only planning metadata under `.boulder/capabilities/imports/`. They are not installed tools and do not authorize cloning, updating, package installation, provider calls, or live adapter execution.
+
 Use `low` friction for small doc/config changes, `medium` for normal feature work, and `high` for release, CI, security, or cross-repo changes.
 
 ## Product Gates

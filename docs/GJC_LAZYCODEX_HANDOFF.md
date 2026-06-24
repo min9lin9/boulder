@@ -23,6 +23,14 @@ Boulder classify/export -> GJC plan/review -> LazyCodex implement -> Boulder ver
 
 Boulder treats GJC as available when `doctor` sees the official Hermes bridge or delegation surfaces: `gjc_coordinator`, `gjc-coordinator-mcp`, `gjc-delegation`, `gjc_delegate_*`, `gjc`, or `gajae-code`.
 
+When GJC is only known by source, register it as a project-local candidate:
+
+```bash
+boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+```
+
+The source candidate is not the same as an installed adapter. It lets `quickstart` and `doctor` explain the intended planner source while keeping live planner calls approval-gated.
+
 Non-mutating checks:
 
 ```bash
@@ -136,3 +144,11 @@ Expected files:
 ## Runtime Boundary
 
 GJC and LazyCodex are optional operator tools outside Boulder core. Boulder may generate files they can consume, but core commands must not install them, require them, launch them, or depend on profile-local credentials.
+
+LazyCodex follows the same boundary. Its canonical project-local source candidate is:
+
+```bash
+boulder capability import --from https://github.com/code-yeongyu/lazycodex --write
+```
+
+This records the intended execution adapter source for the repo. It does not clone, update, or run LazyCodex.

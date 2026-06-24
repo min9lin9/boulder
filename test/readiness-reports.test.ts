@@ -88,6 +88,8 @@ describe("quickstart and replay reports", () => {
     expect(quickstart.checks.some((item) => item.id === "executor-planning" && item.status === "pass")).toBe(true);
     expect(quickstart.checks.some((item) => item.id === "executor-execution" && item.status === "pass")).toBe(true);
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");

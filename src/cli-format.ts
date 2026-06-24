@@ -25,6 +25,7 @@ export function printHelp(): void {
     "  boulder profile show [name] [--cwd path] [--json]",
     "  boulder profile save <name> [--cwd path] [--profile source] [--json]",
     "  boulder profile use <name> [--cwd path] [--json]",
+    "  boulder capability import --from source --dry-run|--write [--kind skill|adapter] [--id id] [--cwd path] [--json]",
     "  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]",
     "  boulder handoff review [--cwd path] [--packet path] [--json]",
     "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]",
@@ -63,6 +64,7 @@ export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCap
     `- status: ${report.status}`,
     ...activeProfile,
     ...report.capabilities.map((item) => `- capability: ${item.id} (${item.kind}, ${item.lane})`),
+    ...report.sourceCandidates.map((item) => `- source-candidate: ${item.capabilityId} (${item.kind}, ${item.status}) - ${item.source}`),
     ...report.issues.map((item) => `- ${item.severity}: ${item.id} - ${item.message}`)
   ].join("\n");
 }

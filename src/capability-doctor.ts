@@ -1,74 +1,44 @@
 import { capabilityInventoryPath, hasValidInventoryItems, loadCapabilityInventory, type CapabilityDiscoveryOptions, type InventoryItem } from "./capability-inventory";
+import { loadSourceCandidateManifests, type SourceCandidateManifest } from "./capability-source";
 import type { ProfileDriftWarning, ResolvedWorkflowProfile } from "./types";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
 export type CapabilityLane = "intake" | "plan" | "execute" | "verify" | "record" | "compound";
 export type DoctorStatus = "pass" | "warn" | "fail";
 export type DoctorSeverity = "warn" | "error";
+type InventoryView = { readonly skills: readonly InventoryItem[]; readonly mcpServers: readonly InventoryItem[]; readonly plugins: readonly InventoryItem[]; readonly runtimes: readonly InventoryItem[] };
 
-export type Capability = {
-  readonly id: string;
-  readonly kind: "skill" | "mcp" | "plugin" | "runtime" | "adapter";
-  readonly status: string;
-  readonly lane: CapabilityLane;
-  readonly officialDocsFirst: boolean;
-  readonly routingHint: string;
-};
+export type Capability = { readonly id: string; readonly kind: "skill" | "mcp" | "plugin" | "runtime" | "adapter"; readonly status: string; readonly lane: CapabilityLane; readonly officialDocsFirst: boolean; readonly routingHint: string };
+export type DoctorIssue = { readonly id: string; readonly severity: DoctorSeverity; readonly message: string };
 
-export type DoctorIssue = {
-  readonly id: string;
-  readonly severity: DoctorSeverity;
-  readonly message: string;
-};
-
-export type ActiveProfileSummary = {
-  readonly id: string;
-  readonly source: ResolvedWorkflowProfile["source"];
-  readonly purpose: ResolvedWorkflowProfile["purpose"];
-  readonly externalDefault: ResolvedWorkflowProfile["externalPolicy"]["default"];
-  readonly externalRequiresApproval: boolean;
-  readonly suggestion: ResolvedWorkflowProfile["suggestion"];
-  readonly drift: readonly ProfileDriftWarning[];
-};
-
-export type CapabilityDoctorReport = {
-  readonly status: DoctorStatus;
-  readonly activeProfile: ActiveProfileSummary | null;
-  readonly capabilities: readonly Capability[];
-  readonly issues: readonly DoctorIssue[];
-  readonly nextSteps: readonly string[];
-};
+export type ActiveProfileSummary = { readonly id: string; readonly source: ResolvedWorkflowProfile["source"]; readonly purpose: ResolvedWorkflowProfile["purpose"]; readonly externalDefault: ResolvedWorkflowProfile["externalPolicy"]["default"]; readonly externalRequiresApproval: boolean; readonly suggestion: ResolvedWorkflowProfile["suggestion"]; readonly drift: readonly ProfileDriftWarning[] };
+export type CapabilityDoctorReport = { readonly status: DoctorStatus; readonly activeProfile: ActiveProfileSummary | null; readonly capabilities: readonly Capability[]; readonly sourceCandidates: readonly SourceCandidateManifest[]; readonly issues: readonly DoctorIssue[]; readonly nextSteps: readonly string[] };
 
 export async function evaluateCapabilityDoctor(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityDoctorReport> {
   const resolution = await resolveWorkflowProfile(root, {});
+  const sourceCandidates = await loadSourceCandidateManifests(root);
   const inventoryResult = await loadCapabilityInventory(root, options);
   if (inventoryResult.kind === "missing") {
-    return {
-      status: "fail",
-      activeProfile: toActiveProfileSummary(resolution.profile),
-      capabilities: [],
-      issues: [{ id: "capability-inventory-missing", severity: "error", message: `Missing ${capabilityInventoryPath()}; doctor cannot verify local skills, MCPs, runtimes, or adapters without it.` }],
-      nextSteps: ["Run doctor again after adding the inventory."]
-    };
+    return failedReport(resolution.profile, sourceCandidates, {
+      id: "capability-inventory-missing",
+      severity: "error",
+      message: `Missing ${capabilityInventoryPath()}; doctor cannot verify local skills, MCPs, runtimes, or adapters without it.`
+    }, "Run doctor again after adding the inventory.");
   }
   if (inventoryResult.kind === "invalid") {
-    return {
-      status: "fail",
-      activeProfile: toActiveProfileSummary(resolution.profile),
-      capabilities: [],
-      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} is malformed; every item needs a string id and each top-level group must be an array.` }],
-      nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
-    };
+    return failedReport(resolution.profile, sourceCandidates, {
+      id: "capability-inventory-invalid",
+      severity: "error",
+      message: `${capabilityInventoryPath()} is malformed; every item needs a string id and each top-level group must be an array.`
+    }, "Fix capability inventory entries so every item has a string id before routing work.");
   }
   const inventory = inventoryResult.inventory;
   if (!hasValidInventoryItems(inventory)) {
-    return {
-      status: "fail",
-      activeProfile: toActiveProfileSummary(resolution.profile),
-      capabilities: [],
-      issues: [{ id: "capability-inventory-invalid", severity: "error", message: `${capabilityInventoryPath()} contains malformed capability entries; every item needs a string id.` }],
-      nextSteps: ["Fix capability inventory entries so every item has a string id before routing work."]
-    };
+    return failedReport(resolution.profile, sourceCandidates, {
+      id: "capability-inventory-invalid",
+      severity: "error",
+      message: `${capabilityInventoryPath()} contains malformed capability entries; every item needs a string id.`
+    }, "Fix capability inventory entries so every item has a string id before routing work.");
   }
   const capabilities = [
     ...inventory.skills.map((item) => toCapability(item, "skill")),
@@ -80,12 +50,14 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   const issues = [
     ...profileDriftIssues(resolution.profile.drift),
     ...runtimeIssues(inventory.runtimes, resolution.profile),
-    ...adapterIssues(capabilities)
+    ...adapterIssues(capabilities),
+    ...sourceCandidates.issues
   ];
   return {
     status: issues.some((item) => item.severity === "error") ? "fail" : issues.length ? "warn" : "pass",
     activeProfile: toActiveProfileSummary(resolution.profile),
     capabilities,
+    sourceCandidates: sourceCandidates.candidates,
     issues,
     nextSteps: issues.length
       ? issues.map((item) => item.message)
@@ -93,12 +65,23 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   };
 }
 
-function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: {
-  readonly skills: readonly InventoryItem[];
-  readonly mcpServers: readonly InventoryItem[];
-  readonly plugins: readonly InventoryItem[];
-  readonly runtimes: readonly InventoryItem[];
-}): readonly Capability[] {
+function failedReport(
+  profile: ResolvedWorkflowProfile,
+  sourceCandidates: Awaited<ReturnType<typeof loadSourceCandidateManifests>>,
+  issue: DoctorIssue,
+  nextStep: string
+): CapabilityDoctorReport {
+  return {
+    status: "fail",
+    activeProfile: toActiveProfileSummary(profile),
+    capabilities: [],
+    sourceCandidates: sourceCandidates.candidates,
+    issues: [issue, ...sourceCandidates.issues],
+    nextSteps: [nextStep]
+  };
+}
+
+function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: InventoryView): readonly Capability[] {
   const executors = executorsFromResolvedProfile(profile);
   return [
     {
@@ -120,12 +103,7 @@ function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: {
   ];
 }
 
-function adapterStatus(executorId: string, inventory: {
-  readonly skills: readonly InventoryItem[];
-  readonly mcpServers: readonly InventoryItem[];
-  readonly plugins: readonly InventoryItem[];
-  readonly runtimes: readonly InventoryItem[];
-}): string {
+function adapterStatus(executorId: string, inventory: InventoryView): string {
   const normalized = executorId.toLowerCase();
   const candidates = [
     ...inventory.skills,
