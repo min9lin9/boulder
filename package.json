@@ -30,6 +30,7 @@
     "src",
     "docs",
     "fixtures",
+    "skills/boulder-bootstrap-designer",
     "README.md",
     "boulder.yaml",
     "LICENSE",

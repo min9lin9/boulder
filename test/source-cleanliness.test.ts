@@ -18,4 +18,22 @@ describe("source cleanliness", () => {
       expect(source.includes("JSON.stringify")).toBe(false);
     }
   });
+
+  test("bootstrap designer skill is packaged with profile guidance", async () => {
+    const skill = await readFile(join(root, "skills/boulder-bootstrap-designer/SKILL.md"), "utf8");
+    const metadata = await readFile(join(root, "skills/boulder-bootstrap-designer/agents/openai.yaml"), "utf8");
+    const packageJson = await readFile(join(root, "package.json"), "utf8");
+
+    for (const profile of ["programming-heavy", "research-corpus", "release-safe", "issue-triage", "docs-reviewer"]) {
+      expect(skill).toContain(profile);
+    }
+
+    expect(skill).toContain("profile save");
+    expect(skill).toContain("capability import");
+    expect(skill).toContain("doctor");
+    expect(skill).toContain("docs-reviewer -> research-default");
+    expect(metadata).toContain("display_name:");
+    expect(metadata).toContain("default_prompt:");
+    expect(packageJson).toContain("\"skills/boulder-bootstrap-designer\"");
+  });
 });

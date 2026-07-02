@@ -33,6 +33,14 @@ boulder로 이 repo가 외부 사용자가 반복해서 쓸 수 있는 OSS 제�
 release-check, replay-check, product-readiness, service-readiness를 실행하고 부족점을 우선순위로 정리해줘.
 ```
 
+반복 작업을 repo 단위 workflow로 만들고 싶으면 먼저 bootstrap designer를 씁니다.
+
+```text
+Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile.
+```
+
+이 흐름은 skill first, CLI later입니다. `boulder-bootstrap-designer`는 `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, `docs-reviewer` 중 하나로 반복 작업을 분류하고, 이후 `boulder profile save/use`, `capability import`, `quickstart`, `doctor` 명령을 제안합니다. GJC, LazyCodex, context-mode, private corpus는 `doctor`가 로컬 설치나 inventory를 확인하기 전까지 후보 capability입니다.
+
 ## Codex 내부 실행 방식
 
 로컬 Codex에서는 `bunx`나 `npx`를 기본 호출로 쓰지 않습니다. Codex sandbox에서 tempdir 쓰기나 npm registry 접근이 막힐 수 있기 때문입니다.
@@ -73,7 +81,7 @@ gjc setup hermes --root . --smoke
 
 `gjc_delegate_plan` 같은 실제 delegation은 packet review와 사용자 승인 이후에만 후보 명령으로 취급합니다.
 
-단, 이것은 자동 실행이 아닙니다. GJC와 LazyCodex live command는 사용자가 명시적으로 승인할 때만 실행합니다.
+단, 이것은 live command 허가가 아닙니다. GJC와 LazyCodex live command는 사용자가 명시적으로 승인할 때만 실행합니다.
 
 `--cwd`는 항상 Boulder command 뒤에 둡니다.
 

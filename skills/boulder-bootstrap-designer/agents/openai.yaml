@@ -1,0 +1,7 @@
+interface:
+  display_name: "boulder-bootstrap-designer"
+  short_description: "Design repo-local Boulder workflow profiles"
+  default_prompt: "Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile."
+
+policy:
+  allow_implicit_invocation: true

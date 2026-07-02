@@ -86,6 +86,14 @@ boulder quickstart --cwd /path/to/repo
 
 The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
+For a repeated workflow, ask Codex to design the repo-local profile before wiring commands:
+
+```text
+Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile.
+```
+
+This is skill first, CLI later. The designer chooses one of `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, or `docs-reviewer`, then returns `boulder profile save/use`, `capability import`, `quickstart`, and `doctor` commands. GJC, LazyCodex, context-mode, and private corpus repositories are candidate capabilities until `doctor` verifies the local installation or inventory.
+
 GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports GJC as `available` only when local inventory includes `gajae-code`, `gjc`, the Hermes coordinator MCP bridge (`gjc_coordinator`, `gjc-coordinator`, `gjc-coordinator-mcp`), `gjc-delegation`, or `gjc_delegate_*` delegate tools. Otherwise it reports `configured-unverified` and keeps live executor calls approval-gated. `handoff send --dry-run` prints the candidate command without external execution.
 
 For GJC, Boulder follows the Hermes MCP bridge surface:
