@@ -24,13 +24,13 @@ describe("workflow profile resolution", () => {
     }
   });
 
-  test("suggests research-default without applying it", async () => {
+  test("suggests bootstrap profiles without applying them", async () => {
     const root = await tempRepo();
     try {
       const resolution = await resolveWorkflowProfile(root, { task: "research" });
 
       expect(resolution.profile.id).toBe("programming-default");
-      expect(resolution.profile.suggestion.profileId).toBe("research-default");
+      expect(resolution.profile.suggestion.profileId).toBe("research-corpus");
       expect(resolution.profile.suggestion.applied).toBe(false);
       expect(resolution.profile.drift.some((item) => item.id === "profile.suggestion.not-applied")).toBe(true);
     } finally {
@@ -88,9 +88,12 @@ describe("workflow profile resolution", () => {
   });
 
   test("maps task classes to suggestions without changing active profile", () => {
-    expect(taskClassFor("research")).toBe("research-default");
+    expect(taskClassFor("research")).toBe("research-corpus");
+    expect(taskClassFor("release")).toBe("release-safe");
+    expect(taskClassFor("docs")).toBe("docs-reviewer");
     expect(taskClassFor("ops")).toBe("ops-default");
-    expect(taskClassFor("programming")).toBe("programming-default");
+    expect(taskClassFor("programming")).toBe("programming-heavy");
+    expect(taskClassFor("research official docs and synthesize citations")).toBe("research-corpus");
   });
 
   test("keeps resolved profile fixtures for the built-in profiles", async () => {

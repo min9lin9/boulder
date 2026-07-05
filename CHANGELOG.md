@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Added `boulder routine capture` for repo-local repeated-work metadata.
+- Added `boulder retro weekly --dry-run` for review-only weekly routine summaries.
+- Added `boulder skill propose --from-routine` for metadata-only, reviewable skill proposal packets.
+- Added bootstrap interview/profile scoring guidance and profile-scoped capability recommendations.
+- Kept the release boundary explicit: no scheduler, calendar mutation, auto-install/update/apply, external model call, or private corpus dependency is introduced by the routine loop.
+
 ## 0.1.15
 
 - Published `boulder-oss-cli@0.1.15` after the capability source registry release.

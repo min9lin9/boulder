@@ -70,6 +70,11 @@ const SOURCE_IMPORT_STEPS = [
     id: "source-lazycodex",
     command: "boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run",
     purpose: "Preview the LazyCodex execution adapter source before recording it."
+  },
+  {
+    id: "source-agency-agents",
+    command: "boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run",
+    purpose: "Preview the profile-scoped subagent catalog before importing only the selected agents."
   }
 ] as const satisfies readonly QuickstartStep[];
 
@@ -104,7 +109,7 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     "",
     "This is the first-run guided flow for a maintainer opening Boulder in a repository.",
     "",
-    "GJC and LazyCodex are adapter preferences. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
+    "GJC and LazyCodex are adapter preferences. agency-agents is a profile-scoped subagent catalog. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
     "",
     "## Checks",
     "",

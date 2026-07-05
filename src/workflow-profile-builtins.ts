@@ -9,7 +9,16 @@ import type {
 } from "./types";
 
 const SURFACE = ["intake", "plan", "execute", "verify", "record"] as const;
-export const BUILT_IN_WORKFLOW_PROFILE_IDS = ["programming-default", "research-default", "ops-default"] as const;
+export const BUILT_IN_WORKFLOW_PROFILE_IDS = [
+  "programming-default",
+  "research-default",
+  "ops-default",
+  "programming-heavy",
+  "research-corpus",
+  "release-safe",
+  "issue-triage",
+  "docs-reviewer"
+] as const;
 
 const EXTERNAL_POLICY: ExternalPolicy = {
   default: "blocked",
@@ -28,6 +37,11 @@ export function builtInProfile(
   if (profileId === "programming-default") return programmingDefault(source, drift, task, suggestion);
   if (profileId === "research-default") return researchDefault(source, drift, task, suggestion);
   if (profileId === "ops-default") return opsDefault(source, drift, task, suggestion);
+  if (profileId === "programming-heavy") return programmingProfile("programming-heavy", source, drift, task, suggestion);
+  if (profileId === "research-corpus") return localProfile("research-corpus", "research", source, drift, task, suggestion);
+  if (profileId === "release-safe") return localProfile("release-safe", "ops", source, drift, task, suggestion);
+  if (profileId === "issue-triage") return localProfile("issue-triage", "ops", source, drift, task, suggestion);
+  if (profileId === "docs-reviewer") return localProfile("docs-reviewer", "research", source, drift, task, suggestion);
   return null;
 }
 
@@ -87,8 +101,18 @@ function programmingDefault(
   task: string | null,
   suggestion: string | null
 ): ResolvedWorkflowProfile {
+  return programmingProfile("programming-default", source, drift, task, suggestion);
+}
+
+function programmingProfile(
+  id: string,
+  source: ProfileSource,
+  drift: readonly ProfileDriftWarning[],
+  task: string | null,
+  suggestion: string | null
+): ResolvedWorkflowProfile {
   return profileWithExternalExecutors({
-    id: "programming-default",
+    id,
     source,
     purpose: "programming",
     planAdapter: "gajae-code",

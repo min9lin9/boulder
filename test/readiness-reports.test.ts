@@ -90,11 +90,13 @@ describe("quickstart and replay reports", () => {
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
     expect(markdown).toContain("execute=lazycodex");
     expect(markdown).toContain("GJC and LazyCodex are adapter preferences");
+    expect(markdown).toContain("agency-agents is a profile-scoped subagent catalog");
     expect(markdown).toContain("doctor verifies local installation before live execution");
   });
 

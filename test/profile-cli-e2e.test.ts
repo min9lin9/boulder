@@ -15,7 +15,7 @@ describe("boulder profile CLI e2e", () => {
       expect(payload.externalPolicy.default).toBe("blocked");
       expect(humanResult.exitCode).toBe(0);
       expect(humanResult.stdout).toContain("active-profile: programming-default");
-      expect(humanResult.stdout).toContain("suggested-profile: research-default");
+      expect(humanResult.stdout).toContain("suggested-profile: research-corpus");
       expect(humanResult.stdout).toContain("suggestion-applied: false");
     } finally {
       await removeTempRepo(root);
@@ -33,6 +33,8 @@ describe("boulder profile CLI e2e", () => {
       expect(list.exitCode).toBe(0);
       expect(list.stdout).toContain("programming-default");
       expect(list.stdout).toContain("research-default");
+      expect(list.stdout).toContain("release-safe");
+      expect(list.stdout).toContain("docs-reviewer");
       expect(show.exitCode).toBe(0);
       expect(JSON.parse(show.stdout).id).toBe("research-default");
       expect(save.exitCode).toBe(0);

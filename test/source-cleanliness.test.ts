@@ -28,7 +28,7 @@ describe("source cleanliness", () => {
       expect(skill).toContain(profile);
     }
 
-    expect(skill).toContain("profile save");
+    expect(skill).toContain("profile use");
     expect(skill).toContain("capability import");
     expect(skill).toContain("doctor");
     expect(skill).toContain("docs-reviewer -> research-default");

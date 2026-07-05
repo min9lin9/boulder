@@ -42,14 +42,13 @@ Use `ops-default` for `docs-reviewer` only when the repeated docs work is releas
 
 Allowed:
 
-- Save profile JSON under `.boulder/profiles/`.
-- Set the active profile with `boulder profile use`.
+- Recommend a built-in profile and show the separate `boulder profile use` command.
 - Record capability source candidates under `.boulder/capabilities/imports/`.
 - Show bootstrap state in `quickstart` and `doctor`.
 
 Not allowed in MVP:
 
-- Add `boulder bootstrap <profile>`.
+- Add a one-step install or setup shortcut.
 - Clone private repos.
 - Modify MCP config.
 - Install context-mode or corpus tooling.
@@ -58,6 +57,6 @@ Not allowed in MVP:
 
 ## Recommended Order
 
-1. Add `boulder-bootstrap-designer` skill first.
+1. Keep `boulder-bootstrap-designer` as the profile design skill.
 2. Encode these five profiles as documented templates.
-3. Add a CLI bootstrap command only after real repo use stabilizes the templates.
+3. Use `boulder bootstrap interview` to surface read-only profile scores, capability scores, and setup recommendations before considering any approved setup shortcut.

@@ -55,6 +55,18 @@ describe("capability source manifests", () => {
     expect(manifest.source).toBe("https://github.com/yeachan-heo/gajae-code");
   });
 
+  test("recognizes agency-agents as a subagent catalog source", () => {
+    const manifest = buildSourceCandidateManifest(
+      parseCapabilitySource("https://github.com/msitarzewski/agency-agents"),
+      {},
+      FIXED_DATE
+    );
+
+    expect(manifest.registryId).toBe("github__msitarzewski__agency-agents");
+    expect(manifest.capabilityId).toBe("agency-agents");
+    expect(manifest.kind).toBe("agent-catalog");
+  });
+
   test("defaults unknown GitHub and ClawHub sources to skill manifests", () => {
     const github = buildSourceCandidateManifest(
       parseCapabilitySource("https://github.com/mattpocock/skills"),

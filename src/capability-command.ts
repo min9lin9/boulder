@@ -56,10 +56,10 @@ async function importCapabilitySource(args: readonly string[], cwd: string): Pro
   return { manifest, path, writes: result.status === "created" ? [result.path] : [] };
 }
 
-function parseKind(value: string | null): "skill" | "adapter" | undefined {
+function parseKind(value: string | null): "skill" | "adapter" | "agent-catalog" | undefined {
   if (!value) return undefined;
-  if (value === "skill" || value === "adapter") return value;
-  throw new CapabilitySourceError("capability.kind_invalid", "Kind must be skill or adapter.");
+  if (value === "skill" || value === "adapter" || value === "agent-catalog") return value;
+  throw new CapabilitySourceError("capability.kind_invalid", "Kind must be skill, adapter, or agent-catalog.");
 }
 
 function optionValue(args: readonly string[], flag: string): string | null {

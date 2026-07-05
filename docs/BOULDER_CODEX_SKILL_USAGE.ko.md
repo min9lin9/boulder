@@ -39,7 +39,18 @@ release-check, replay-check, product-readiness, service-readiness를 실행하�
 Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile.
 ```
 
-이 흐름은 skill first, CLI later입니다. `boulder-bootstrap-designer`는 `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, `docs-reviewer` 중 하나로 반복 작업을 분류하고, 이후 `boulder profile save/use`, `capability import`, `quickstart`, `doctor` 명령을 제안합니다. GJC, LazyCodex, context-mode, private corpus는 `doctor`가 로컬 설치나 inventory를 확인하기 전까지 후보 capability입니다.
+`boulder-bootstrap-designer`는 `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, `docs-reviewer` 중 하나로 반복 작업을 분류하고, 이후 `boulder profile use`, `capability import`, `quickstart`, `doctor` 명령을 제안합니다. 사용자가 하려는 일을 bootstrap 인터뷰로 받은 뒤 built-in profile을 활성화하고, 그 profile에 맞는 subagent만 `https://github.com/msitarzewski/agency-agents`에서 고르는 경로도 지원합니다. GJC, LazyCodex, agency-agents, context-mode, private corpus는 `doctor`가 로컬 설치나 inventory를 확인하기 전까지 후보 capability입니다.
+
+subagent catalog는 전체 설치가 아니라 profile-scoped import 후보로 다룹니다.
+
+```bash
+boulder bootstrap interview --task "release npm package safely"
+boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run
+```
+
+예를 들어 `programming-heavy`는 Codebase Onboarding Engineer, Software Architect, Code Reviewer, Minimal Change Engineer처럼 작은 묶음만 추천하고, `release-safe`는 SRE, Git Workflow Master, Code Reviewer, Technical Writer 중심으로 추천합니다.
+
+`bootstrap interview`는 질문, 추천 profile, 선택할 subagent 이름, skill/MCP/RAG/DB capability 계획, `profileScores`, `capabilityScores`, 추천 근거, dry-run import 명령을 출력합니다. 점수는 task와 profile의 적합도 및 capability 설정 우선순위를 설명하는 결정론적 안내입니다. profile 저장, active profile 변경, subagent 설치, 외부 모델 호출은 사용자가 출력된 명령을 승인해 별도로 실행해야 합니다. 근거는 `docs/BOOTSTRAP_INTERVIEW_RESEARCH.md`에 정리합니다.
 
 ## Codex 내부 실행 방식
 

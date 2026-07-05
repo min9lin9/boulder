@@ -1,4 +1,5 @@
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
+import { bootstrapInterviewToMarkdown, buildBootstrapInterview } from "./bootstrap-interview";
 import { runCapabilityCommand } from "./capability-command";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
@@ -17,6 +18,7 @@ import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
 import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
+import { runRoutineCommand } from "./routine-command";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -29,14 +31,8 @@ const VERSION = "0.1.15";
 export async function main(args: string[]): Promise<void> {
   const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
   const options = parseOptions(args);
-  if (command === "version" || args.includes("--version")) {
-    console.log(VERSION);
-    return;
-  }
-  if (command === "help" || args.includes("--help") || args.includes("-h")) {
-    printHelp();
-    return;
-  }
+  if (command === "version" || args.includes("--version")) { console.log(VERSION); return; }
+  if (command === "help" || args.includes("--help") || args.includes("-h")) { printHelp(); return; }
   if (command === "init") {
     const results = await initHarness(options.cwd, options.force);
     console.log(formatLines("Boulder initialized", results));
@@ -68,6 +64,18 @@ export async function main(args: string[]): Promise<void> {
   }
   if (command === "capability") {
     await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
+    return;
+  }
+  if (await runRoutineCommand(args, options)) {
+    return;
+  }
+  if (command === "bootstrap" && args.includes("interview")) {
+    const report = buildBootstrapInterview(optionValue(args, "--task"));
+    if (options.json) {
+      console.log(prettyJson(report));
+      return;
+    }
+    console.log(bootstrapInterviewToMarkdown(report));
     return;
   }
   if (command === "handoff") {
@@ -232,4 +240,10 @@ export async function main(args: string[]): Promise<void> {
   console.error(`Unknown command: ${command}`);
   printHelp();
   process.exitCode = 1;
+}
+
+function optionValue(args: readonly string[], flag: string): string | null {
+  const index = args.findIndex((arg) => arg === flag);
+  const value = index >= 0 ? args[index + 1] : undefined;
+  return value && !value.startsWith("--") ? value : null;
 }

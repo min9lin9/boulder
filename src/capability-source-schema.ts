@@ -1,7 +1,7 @@
 export const SCHEMA_VERSION = "boulder.capability.import.v1";
 
 export type SourceKind = "github" | "clawhub";
-export type SourceCandidateKind = "skill" | "adapter";
+export type SourceCandidateKind = "skill" | "adapter" | "agent-catalog";
 export type WriteStatus = "created" | "unchanged";
 export type CandidateCommand = { readonly argv: readonly string[]; readonly preview: string; readonly purpose: string; readonly requiresApproval: boolean };
 export type ParsedCapabilitySource = {
@@ -42,7 +42,7 @@ export function isSourceCandidateManifest(value: unknown): value is SourceCandid
     && typeof item["source"] === "string"
     && (typeof item["sourceUrl"] === "string" || item["sourceUrl"] === null)
     && (item["sourceKind"] === "github" || item["sourceKind"] === "clawhub")
-    && (item["kind"] === "skill" || item["kind"] === "adapter")
+    && (item["kind"] === "skill" || item["kind"] === "adapter" || item["kind"] === "agent-catalog")
     && item["status"] === "configured-unverified"
     && item["trustStatus"] === "unreviewed"
     && item["license"] === "unknown"

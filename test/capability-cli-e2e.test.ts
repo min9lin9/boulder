@@ -32,6 +32,32 @@ describe("boulder capability import", () => {
     }
   });
 
+  test("previews the agency-agents subagent catalog without writing", async () => {
+    const root = await tempRepo();
+    try {
+      const result = await runBoulder([
+        "capability",
+        "import",
+        "--cwd",
+        root,
+        "--from",
+        "https://github.com/msitarzewski/agency-agents",
+        "--dry-run",
+        "--json"
+      ]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(payload.writes).toEqual([]);
+      expect(payload.manifest.registryId).toBe("github__msitarzewski__agency-agents");
+      expect(payload.manifest.capabilityId).toBe("agency-agents");
+      expect(payload.manifest.kind).toBe("agent-catalog");
+      await expect(readFile(join(root, ".boulder", "capabilities", "imports", "github__msitarzewski__agency-agents.json"), "utf8")).rejects.toThrow("ENOENT");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("writes source manifests for known and explicit adapter sources", async () => {
     const root = await tempRepo();
     try {

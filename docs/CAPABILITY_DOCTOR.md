@@ -60,6 +60,7 @@ When a preferred capability is not installed, Boulder can record a project-local
 boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --write
 boulder capability import --from https://github.com/code-yeongyu/lazycodex --write
+boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run
 ```
 
 The persisted manifest lives under:
@@ -74,7 +75,9 @@ Supported source grammar:
 - `github.com/<owner>/<repo>`
 - `clawhub:<slug>`
 
-GitHub sources are canonicalized to `https://github.com/<owner>/<repo>`. GJC is stored as `github__yeachan-heo__gajae-code`; LazyCodex is stored as `github__code-yeongyu__lazycodex`.
+GitHub sources are canonicalized to `https://github.com/<owner>/<repo>`. GJC is stored as `github__yeachan-heo__gajae-code`; LazyCodex is stored as `github__code-yeongyu__lazycodex`; agency-agents is stored as `github__msitarzewski__agency-agents` with kind `agent-catalog`.
+
+Subagent catalogs are profile-scoped capability sources. Bootstrap may use an existing profile to choose a small subagent subset, or run an interview first, create the profile, and then choose the matching subset. Doctor reports the catalog candidate; it does not install all subagents.
 
 Doctor reads these manifests and reports them as source candidates. It does not install, update, clone, or launch the capability. `doctor` remains read-only; future update checks belong to a separate `update` command.
 

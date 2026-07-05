@@ -17,6 +17,10 @@ const KNOWN_ADAPTERS: Record<string, string> = {
   "https://github.com/yeachan-heo/gajae-code": "gajae-code",
   "https://github.com/code-yeongyu/lazycodex": "lazycodex"
 } as const;
+
+const KNOWN_AGENT_CATALOGS: Record<string, string> = {
+  "https://github.com/msitarzewski/agency-agents": "agency-agents"
+} as const;
 export type { SourceCandidateManifest } from "./capability-source-schema";
 
 export class CapabilitySourceError extends Error {
@@ -156,14 +160,15 @@ function parseGitHubSource(input: string): ParsedCapabilitySource {
     throw sourceError("GitHub owner and repo names are invalid.");
   }
   const source = `https://github.com/${owner}/${repo}`;
-  const defaultCapabilityId = KNOWN_ADAPTERS[source.toLowerCase()] ?? repo.toLowerCase();
+  const key = source.toLowerCase();
+  const defaultCapabilityId = KNOWN_ADAPTERS[key] ?? KNOWN_AGENT_CATALOGS[key] ?? repo.toLowerCase();
   return {
     source,
     sourceUrl: source,
     sourceKind: "github",
     registryId: `github__${owner.toLowerCase()}__${repo.toLowerCase()}`,
     defaultCapabilityId,
-    defaultKind: KNOWN_ADAPTERS[source.toLowerCase()] ? "adapter" : "skill"
+    defaultKind: KNOWN_ADAPTERS[key] ? "adapter" : KNOWN_AGENT_CATALOGS[key] ? "agent-catalog" : "skill"
   };
 }
 
