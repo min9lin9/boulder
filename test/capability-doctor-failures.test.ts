@@ -1,22 +1,10 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { evaluateCapabilityDoctor } from "../src/capability-doctor";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-capability-doctor-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 describe("capability doctor failure reporting", () => {
   test("fails closed when capability inventory entries are malformed", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [{}],
       mcpServers: [null],
@@ -33,7 +21,7 @@ describe("capability doctor failure reporting", () => {
 
   test("fails closed when capability inventory JSON or top-level shape is malformed", async () => {
     for (const content of ["{not json", JSON.stringify({ skills: {} }), ""]) {
-      const root = await tempRepo();
+      const root = await tempRepo("boulder-capability-doctor-");
       await write(root, "fixtures/capabilities/codex-installed.json", content);
 
       const report = await evaluateCapabilityDoctor(root);
@@ -44,7 +32,7 @@ describe("capability doctor failure reporting", () => {
   });
 
   test("warns with direct Bun upgrade guidance before live GJC execution", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [{ id: "gajae-code", status: "installed" }, { id: "lazycodex", status: "installed" }],
       mcpServers: [],

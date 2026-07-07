@@ -1,19 +1,9 @@
-import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises";
+import { symlink } from "node:fs/promises";
 import { exec } from "node:child_process";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { evaluateProductReadiness } from "../src/product-readiness";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-product-readiness-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 async function writeReadyPublicProductFixture(root: string): Promise<void> {
   const version = "1.2.3";
@@ -98,7 +88,7 @@ async function gitOutput(cwd: string, args: readonly string[]): Promise<string> 
 
 describe("tight product readiness", () => {
   test("rates a public evidence fixture as ready", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-product-readiness-");
     await writeReadyPublicProductFixture(root);
 
     const readiness = await evaluateProductReadiness(root);
@@ -108,7 +98,7 @@ describe("tight product readiness", () => {
   });
 
   test("blocks when published install smoke evidence is missing", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-product-readiness-");
     await writeReadyPublicProductFixture(root);
     await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "manual publish pending\n");
 
@@ -119,7 +109,7 @@ describe("tight product readiness", () => {
   });
 
   test("blocks when release tag or published install evidence does not match package version", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-product-readiness-");
     await writeReadyPublicProductFixture(root);
     await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli --help\nboulder-oss-cli\n1.2.3\nPublished version: 0.0.0\nResult: success\nUsage:\nexit: 0\n");
 
@@ -131,7 +121,7 @@ describe("tight product readiness", () => {
   });
 
   test("blocks duplicate copy artifacts in the release tree", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-product-readiness-");
     await writeReadyPublicProductFixture(root);
     await write(root, "src/pipeline 2.ts", "export const duplicate = true;\n");
 
@@ -142,7 +132,7 @@ describe("tight product readiness", () => {
   });
 
   test("ignores broken local codegraph symlinks during release tree scan", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-product-readiness-");
     await writeReadyPublicProductFixture(root);
     await symlink(join(root, "missing-codegraph-target"), join(root, ".codegraph"));
 

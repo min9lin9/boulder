@@ -1,5 +1,5 @@
 import { formatLines, formatWeeklyRetroReport, prettyJson } from "./cli-format";
-import type { CliOptions } from "./cli-options";
+import { optionValue, type CliOptions } from "./cli-options";
 import { captureRoutine, InvalidRoutinePathError, InvalidRoutineTaskError } from "./routine";
 import { evaluateWeeklyRetro } from "./routine-retro";
 import { InvalidSkillProposalArtifactError, InvalidSkillProposalRoutineIdError, MissingSkillProposalRoutineError, proposeSkillFromRoutine } from "./skill-proposal";
@@ -113,10 +113,4 @@ async function runSkillPropose(args: readonly string[], options: RoutineCommandO
     }
     throw error;
   }
-}
-
-function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  const value = index >= 0 ? args[index + 1] : undefined;
-  return value && !value.startsWith("--") ? value : null;
 }

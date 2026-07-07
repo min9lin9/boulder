@@ -26,7 +26,28 @@ export function parseOptions(args: readonly string[]): CliOptions {
   };
 }
 
-function optionValue(args: readonly string[], flag: string): string | null {
+export function optionValue(args: readonly string[], flag: string): string | null {
   const index = args.findIndex((arg) => arg === flag);
-  return index >= 0 && args[index + 1] ? args[index + 1] : null;
+  return index >= 0 ? valueAfter(args, index) : null;
+}
+
+export function allOptionValues(args: readonly string[], flag: string): readonly string[] {
+  const values: string[] = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] !== flag) continue;
+    const value = valueAfter(args, index);
+    if (value) values.push(value);
+  }
+  return values;
+}
+
+export function subcommandAfter(args: readonly string[], command: string): string | null {
+  const index = args.findIndex((arg) => arg === command);
+  const value = index >= 0 ? valueAfter(args, index) : null;
+  return value && !value.startsWith("-") ? value : null;
+}
+
+export function valueAfter(args: readonly string[], index: number): string | null {
+  const value = args[index + 1];
+  return value && !value.startsWith("--") ? value : null;
 }
