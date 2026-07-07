@@ -1,3 +1,4 @@
+import { optionValue, subcommandAfter } from "./cli-options";
 import {
   ProfileNotFoundError,
   formatProfileResolve,
@@ -105,17 +106,6 @@ async function useCommand(args: readonly string[], options: ProfileCommandOption
     if (reportProfileError(error)) return;
     throw error;
   }
-}
-
-function subcommandAfter(args: readonly string[], command: string): string | null {
-  const index = args.findIndex((item) => item === command);
-  const value = index >= 0 ? args[index + 1] : null;
-  return value && !value.startsWith("-") ? value : null;
-}
-
-function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  return index >= 0 && args[index + 1] ? args[index + 1] : null;
 }
 
 function isNamedError(error: unknown, name: string): boolean {

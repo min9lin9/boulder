@@ -1,3 +1,4 @@
+import { allOptionValues, optionValue, subcommandAfter } from "./cli-options";
 import {
   InvalidHandoffAdapterError,
   ProtectedHandoffPathError,
@@ -8,7 +9,6 @@ import {
 } from "./handoff-packet";
 import {
   hasReviewReceipt,
-  optionValue,
   packetFile,
   packetPathIsSafe,
   packetPathFromArgs,
@@ -200,22 +200,6 @@ async function unsafePathGuard<T>(action: () => Promise<T>, fallback: T): Promis
     }
     throw error;
   }
-}
-
-function subcommandAfter(args: readonly string[], command: string): string | null {
-  const index = args.findIndex((item) => item === command);
-  const value = index >= 0 ? args[index + 1] : null;
-  return value && !value.startsWith("-") ? value : null;
-}
-
-function allOptionValues(args: readonly string[], flag: string): readonly string[] {
-  const values: string[] = [];
-  for (let index = 0; index < args.length; index += 1) {
-    if (args[index] === flag && args[index + 1]) {
-      values.push(args[index + 1]);
-    }
-  }
-  return values;
 }
 
 function missingPacket(): void {

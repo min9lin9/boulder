@@ -47,6 +47,19 @@ describe("boulder handoff CLI e2e", () => {
     }
   });
 
+  test("treats missing repeated include values followed by another flag as absent", async () => {
+    const root = await tempRepo();
+    try {
+      const packet = await runBoulder(["handoff", "packet", "--cwd", root, "--include", "--json"]);
+      const payload = JSON.parse(packet.stdout);
+
+      expect(packet.exitCode).toBe(0);
+      expect(payload.contextSummary.detectedFiles).toEqual([]);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("requires a packet before approved external send", async () => {
     const root = await tempRepo();
     try {

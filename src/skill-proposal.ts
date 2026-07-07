@@ -1,9 +1,9 @@
 import { constants } from "node:fs";
 import type { FileHandle } from "node:fs/promises";
-import { lstat, mkdir, open, rename, unlink } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
-import { at } from "./fs";
-import { isMissingPath, isRoutineArtifact, noFollowFlag, pathIsProtectedLink, type EvidenceRef, type RoutineArtifact } from "./routine";
+import { lstat, open } from "node:fs/promises";
+import { relative, resolve } from "node:path";
+import { at, isMissingPath, noFollowFlag, pathIsProtectedLink, protectedWritePathIsSafe, safeReplaceText } from "./fs";
+import { isRoutineArtifact, isSafeEvidencePath, type EvidenceRef, type RoutineArtifact } from "./routine";
 
 export type SkillProposalResult = {
   readonly status: "dry-run" | "written";
@@ -124,23 +124,11 @@ function containsSensitiveText(value: string): boolean {
 }
 
 function safeEvidenceRefs(refs: readonly EvidenceRef[]): readonly EvidenceRef[] {
-  return refs.filter((ref) => safeEvidenceKind(ref.kind) && safeEvidencePath(ref.path) && !containsSensitiveText(`${ref.kind} ${ref.path} ${ref.hash ?? ""} ${ref.note ?? ""}`));
+  return refs.filter((ref) => safeEvidenceKind(ref.kind) && isSafeEvidencePath(ref.path) && !containsSensitiveText(`${ref.kind} ${ref.path} ${ref.hash ?? ""} ${ref.note ?? ""}`));
 }
 
 function safeEvidenceKind(kind: string): boolean {
   return /^(routine|retro|test|verification|manual)$/.test(kind);
-}
-
-function safeEvidencePath(path: string): boolean {
-  const normalized = path.replace(/\\/g, "/");
-  return normalized.length > 0
-    && !/[\u0000-\u001F\u007F]/.test(path)
-    && !path.includes("\\0")
-    && !normalized.startsWith("/")
-    && normalized !== ".."
-    && !normalized.startsWith("../")
-    && !normalized.includes("/../")
-    && !/^[A-Za-z]:[\\/]/.test(path);
 }
 
 function formatEvidence(refs: readonly EvidenceRef[]): readonly string[] {
@@ -159,31 +147,5 @@ function proposalPathIsValid(root: string, path: string): boolean {
 }
 
 async function proposalPathIsSafe(root: string, path: string): Promise<boolean> {
-  await mkdir(at(root, ".boulder"), { recursive: true });
-  if (await pathIsProtectedLink(at(root, ".boulder"))) return false;
-  await mkdir(at(root, ".boulder", "skill-proposals"), { recursive: true });
-  return !await pathIsProtectedLink(at(root, ".boulder", "skill-proposals"))
-    && !await pathIsProtectedLink(path);
-}
-
-async function safeReplaceText(path: string, content: string): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
-  const temporary = `${path}.${crypto.randomUUID()}.tmp`;
-  let handle: FileHandle | null = null;
-  try {
-    handle = await open(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
-    await handle.writeFile(content, "utf8");
-    await handle.close();
-    handle = null;
-    await rename(temporary, path);
-  } catch (error) {
-    try {
-      await unlink(temporary);
-    } catch (cleanupError) {
-      if (!isMissingPath(cleanupError)) throw cleanupError;
-    }
-    throw error;
-  } finally {
-    await handle?.close();
-  }
+  return protectedWritePathIsSafe(root, at(root, ".boulder", "skill-proposals"), path);
 }

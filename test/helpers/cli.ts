@@ -10,8 +10,8 @@ export type CliResult = {
   readonly stderr: string;
 };
 
-export async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-cli-e2e-"));
+export async function tempRepo(prefix = "boulder-cli-e2e-"): Promise<string> {
+  return await mkdtemp(join(tmpdir(), prefix));
 }
 
 export async function removeTempRepo(root: string): Promise<void> {

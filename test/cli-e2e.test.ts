@@ -175,6 +175,20 @@ describe("boulder CLI e2e cleanup safety", () => {
     }
   });
 
+  test("treats missing global value flags followed by another flag as absent", async () => {
+    const root = await tempRepo();
+    try {
+      const result = await runBoulder(["pipeline", "--cwd", root, "--friction", "--json"]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(payload.activeProfile.id).toBe("programming-default");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("renders release-check blockers without publishing", async () => {
     const root = join(import.meta.dir, "..");
 
