@@ -1,6 +1,6 @@
 Release CI evidence
 
-Observed result on 2026-06-24 for the 0.1.15 release candidate.
+Observed result on 2026-07-07 for the 0.1.16 release.
 
 Command:
 
@@ -11,12 +11,7 @@ bun run ci
 Result:
 
 ```text
-boulder help: includes quickstart, onboard, inspect, profile, handoff,
-validate, verify, pipeline, scorecard, benchmark, release-plan,
-release-check, replay-check, replay-run, product-readiness,
-service-readiness, doctor, record, and export.
-
-bun test: pass (132 tests)
+bun test: pass (205 tests, 1049 expects)
 TypeScript build: pass
 Package dry-run: pass
 ```
@@ -24,51 +19,32 @@ Package dry-run: pass
 Current CLI surface:
 
 ```text
-boulder
-
-A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
-
-Usage:
-  boulder init [--cwd path] [--force]
-  boulder quickstart [--cwd path] [--json]
-  boulder onboard [--cwd path] [--json]
-  boulder inspect [--cwd path] [--json]
-  boulder profile list [--cwd path] [--json]
-  boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
-  boulder profile show [name] [--cwd path] [--json]
-  boulder profile save <name> [--cwd path] [--profile source] [--json]
-  boulder profile use <name> [--cwd path] [--json]
-  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
-  boulder handoff review [--cwd path] [--packet path] [--json]
-  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
-  boulder validate [--cwd path]
-  boulder verify [--cwd path] [--dry-run]
-  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]
-  boulder scorecard [--cwd path] [--json]
-  boulder benchmark [--cwd path] [--json]
-  boulder release-plan [--cwd path] [--json]
-  boulder release-check [--cwd path] [--json]
-  boulder replay-check [--cwd path] [--json]
-  boulder replay-run [--cwd path] --dry-run [--json]
-  boulder product-readiness [--cwd path] [--json]
-  boulder service-readiness [--cwd path] [--json]
-  boulder doctor [--cwd path] [--json]
-  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]
-  boulder export [--cwd path] [--force]
-
-Package:
-  bunx boulder-oss-cli <command>
+boulder init [--cwd path] [--force]
+boulder quickstart [--cwd path] [--json]
+boulder onboard [--cwd path] [--json]
+boulder bootstrap interview [--cwd path] [--task text] [--json]
+boulder inspect [--cwd path] [--json]
+boulder profile list [--cwd path] [--json]
+boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
+boulder profile show [name] [--cwd path] [--json]
+boulder profile save <name> [--cwd path] [--profile source] [--json]
+boulder profile use <name> [--cwd path] [--json]
+boulder capability import --from source --dry-run|--write [--kind skill|adapter|agent-catalog] [--id id] [--cwd path] [--json]
+boulder capability status [--cwd path] [--json]
+boulder routine capture --task text --dry-run|--write [--cwd path] [--json]
+boulder retro weekly --dry-run [--cwd path] [--json]
+boulder skill propose --from-routine id --dry-run|--write [--cwd path] [--json]
+boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
+boulder handoff review [--cwd path] [--packet path] [--json]
+boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
 ```
 
 Bun package dry-run evidence:
 
 ```text
-boulder-oss-cli-0.1.15.tgz
-Bun total files: 147
-Unpacked size: 0.49MB
+boulder-oss-cli-0.1.16.tgz
+Total files: 169
+Unpacked size: 0.60MB
 ```
 
-Conclusion: the release candidate includes the workflow profile and
-tenant-safe handoff surface. This file records `bun run ci`; npm
-publish dry-run evidence is recorded separately in
-`docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt`.
+Conclusion: the 0.1.16 release candidate passed the local CI gate before publish.

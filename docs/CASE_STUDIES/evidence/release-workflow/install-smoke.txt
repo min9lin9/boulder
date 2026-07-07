@@ -1,149 +1,47 @@
-Published and candidate install smoke evidence
+Published install smoke evidence
 
-Observed result on 2026-06-17.
+Observed result on 2026-07-07.
 
-Published registry baseline:
+Published registry verification:
 
 ```bash
-npm view boulder-oss-cli name version
+npm view boulder-oss-cli@0.1.16 name version --json
+npm dist-tag ls boulder-oss-cli
+bunx boulder-oss-cli@0.1.16 --version
 bunx boulder-oss-cli --help
+bunx boulder-oss-cli@0.1.16 --help
 ```
 
-Known published baseline before this release candidate:
+Registry output:
 
 ```text
-name = 'boulder-oss-cli'
-version = '0.1.13'
-```
-
-Publish attempt for `0.1.14` on 2026-06-18:
-
-```text
-npm publish --access public
-npm error code EOTP
-npm error This operation requires a one-time password.
-```
-
-Retry after continuing release work on 2026-06-18:
-
-```text
-npm view boulder-oss-cli name version dist-tags --json
 {
   "name": "boulder-oss-cli",
-  "version": "0.1.13",
-  "dist-tags": {
-    "latest": "0.1.13"
-  }
+  "version": "0.1.16"
 }
 
-npm owner evidence redacted
-<npm-account-redacted>
-
-npm identity check redacted
-<npm-account-redacted>
-
-npm publish --access public
-npm error code E404
-npm error 404 Not Found - PUT https://registry.npmjs.org/boulder-oss-cli - Not found
+latest: 0.1.16
 ```
 
-Successful publish verification on 2026-06-18:
-
-```text
-npm view boulder-oss-cli version
-0.1.14
-```
-
-Published version: 0.1.14
-
-Successful publish verification on 2026-06-24:
-
-```text
-npm view boulder-oss-cli name version dist-tags --json
-{
-  "name": "boulder-oss-cli",
-  "version": "0.1.15",
-  "dist-tags": {
-    "latest": "0.1.15"
-  }
-}
-
-bunx boulder-oss-cli@0.1.15 --version
-0.1.15
-```
-
-Published version: 0.1.15
-
-Published baseline result:
+Install smoke output:
 
 ```text
 Result: success
 exit: 0
+0.1.16
+```
+
+Published version: 0.1.16
+
+Help smoke asserted the published CLI includes:
+
+```text
 Usage:
-  boulder init [--cwd path] [--force]
-```
-
-Candidate tarball command:
-
-```bash
-npm pack --cache <temp-repo>
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder --version
-```
-
-Candidate output:
-
-```text
-0.1.15
-```
-
-Candidate CLI surface:
-
-```bash
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder --help
-```
-
-Asserted output included:
-
-```text
-boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
-boulder profile use <name> [--cwd path] [--json]
-boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
+boulder init [--cwd path] [--force]
+boulder bootstrap interview [--cwd path] [--task text] [--json]
+boulder capability import --from source --dry-run|--write [--kind skill|adapter|agent-catalog] [--id id] [--cwd path] [--json]
+boulder routine capture --task text --dry-run|--write [--cwd path] [--json]
 boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
 ```
 
-Candidate first-run smoke:
-
-```bash
-tmpdir=<temp-repo>
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder init --cwd "$tmpdir"
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder profile resolve --cwd "$tmpdir" --task research
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder doctor --cwd "$tmpdir"
-```
-
-Asserted output included:
-
-```text
-Boulder initialized
-Boulder resolved workflow profile
-- active-profile: programming-default
-- suggested-profile: research-default
-Boulder capability doctor
-- active-profile: programming-default (built-in; programming)
-- external-default: blocked
-- external-approval-required: true
-```
-
-Candidate safety smoke:
-
-```bash
-npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder handoff packet --cwd "$tmpdir" --adapter gajae-code --include ../../../other-tenant/private/src/auth.ts --json
-```
-
-Observed output:
-
-```text
-exit: 1
-ERROR handoff.protected_path: Protected path is not allowed in external handoff packet: ../../../other-tenant/private/src/auth.ts
-```
-
-Conclusion: the `0.1.15` candidate tarball can be installed and executed through `npm exec --package file:<tarball> -- boulder ...`, and the candidate blocks repo-escaping handoff includes before external handoff.
+Conclusion: `bunx boulder-oss-cli@0.1.16` installs and executes the published package.
