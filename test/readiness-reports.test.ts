@@ -60,25 +60,77 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("reports root release evidence as ready after publish and tag", async () => {
+  test("reports root release evidence as blocked until 0.1.16 is published and tagged", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.status).toBe("ready");
+    expect(report.version).toBe("0.1.16");
+    expect(report.status).toBe("blocked");
     expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "changelog-version" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "release-evidence-manifest" && item.status === "pass")).toBe(true);
-    expect(report.nextCommands).toEqual([]);
+    expect(report.checks.some((item) => item.id === "release-evidence-manifest" && item.status === "fail")).toBe(true);
+    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.");
+    expect(report.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
+    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16.");
     expect(markdown).toContain("does not publish");
-    expect(markdown).toContain("Status: ready");
+    expect(markdown).toContain("Status: blocked");
     expect(markdown).not.toContain("npm publish --access public");
     expect(markdown).not.toContain("git tag v");
     expect(markdown).not.toContain("gh release create");
+  });
+
+  test("reports release evidence as ready after publish and tag in a release fixture", async () => {
+    const root = await tempRepo();
+    await write(root, "package.json", JSON.stringify({ name: "boulder-oss-cli", version: "1.2.3" }));
+    await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
+    await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
+    await write(root, "CHANGELOG.md", "## 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli\n1.2.3\nPublished version: 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", "boulder-oss-cli\nTotal files\n");
+    await runCommand("git init", root);
+    await runCommand("git config user.email test@example.com", root);
+    await runCommand("git config user.name Test", root);
+    await runCommand("git add .", root);
+    await runCommand("git commit -m init", root);
+    await runCommand("git tag v1.2.3", root);
+    const releaseCommit = (await runCommand("git rev-parse HEAD", root)).stdout.trim();
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", `CI\nCommit: ${releaseCommit}\n`);
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
+      schemaVersion: 1,
+      packageName: "boulder-oss-cli",
+      packageJsonVersion: "1.2.3",
+      cliVersion: "1.2.3",
+      tag: "v1.2.3",
+      tagCommit: releaseCommit,
+      releaseCommit,
+      publishedVersion: "1.2.3",
+      installSmoke: {
+        command: "bunx boulder-oss-cli@1.2.3 --version",
+        exitCode: 0,
+        generatedAt: "2026-07-07"
+      },
+      githubActions: {
+        runUrl: "https://github.com/example/repo/actions/runs/1"
+      },
+      packDryRun: {
+        fileCount: 10,
+        packageVersion: "1.2.3"
+      },
+      limitations: []
+    }));
+
+    const report = await evaluateReleaseCheck(root);
+
+    expect(report.status).toBe("ready");
+    expect(report.nextCommands).toEqual([]);
+    expect(report.checks.every((item) => item.status === "pass")).toBe(true);
   });
 
   test("reports blocker-first release next commands without publish automation", async () => {

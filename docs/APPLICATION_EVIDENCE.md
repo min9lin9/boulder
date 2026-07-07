@@ -8,7 +8,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 - Package distribution name: `boulder-oss-cli`
 - License: MIT
 - Runtime: Bun + TypeScript
-- Current release candidate: `v0.1.15`
+- Current release candidate: `v0.1.16`
 
 ## M1 Surface
 

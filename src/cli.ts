@@ -26,7 +26,7 @@ import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
-const VERSION = "0.1.15";
+const VERSION = "0.1.16";
 
 export async function main(args: string[]): Promise<void> {
   try {

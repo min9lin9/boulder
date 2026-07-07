@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, symlink, writeFile } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -139,5 +139,16 @@ describe("tight product readiness", () => {
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "clean-release-tree" && item.status === "fail")).toBe(true);
+  });
+
+  test("ignores broken local codegraph symlinks during release tree scan", async () => {
+    const root = await tempRepo();
+    await writeReadyPublicProductFixture(root);
+    await symlink(join(root, "missing-codegraph-target"), join(root, ".codegraph"));
+
+    const readiness = await evaluateProductReadiness(root);
+
+    expect(readiness.status).toBe("ready");
+    expect(readiness.checks.some((item) => item.id === "clean-release-tree" && item.status === "pass")).toBe(true);
   });
 });

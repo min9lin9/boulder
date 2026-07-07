@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.16
+
 - Added `boulder routine capture` for repo-local repeated-work metadata.
 - Added `boulder retro weekly --dry-run` for review-only weekly routine summaries.
 - Added `boulder skill propose --from-routine` for metadata-only, reviewable skill proposal packets.

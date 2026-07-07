@@ -5,6 +5,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
 Current published package: `boulder-oss-cli@0.1.15`.
+Current release candidate: `v0.1.16`.
 
 ## 3-minute route for non-developers
 
@@ -181,7 +182,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release candidate: `v0.1.15`
+- Release candidate: `v0.1.16`
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

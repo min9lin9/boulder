@@ -1,4 +1,4 @@
-import { readFile, readdir, stat } from "node:fs/promises";
+import { lstat, readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
 import { evaluateReleaseCheck } from "./release-check";
@@ -174,7 +174,7 @@ async function collectDuplicateCopyArtifacts(root: string, relativeDir: string, 
   const entries = await readdir(join(root, relativeDir));
   for (const entry of entries) {
     const relativePath = relativeDir ? `${relativeDir}/${entry}` : entry;
-    const entryStat = await stat(join(root, relativePath)) as { isDirectory(): boolean; isFile(): boolean };
+    const entryStat = await lstat(join(root, relativePath)) as { isDirectory(): boolean; isFile(): boolean };
     if (entryStat.isDirectory()) {
       if (!SKIPPED_SCAN_DIRECTORIES.has(entry)) {
         await collectDuplicateCopyArtifacts(root, relativePath, artifacts);
