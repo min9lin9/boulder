@@ -1,4 +1,4 @@
-import { at, writeText } from "./fs";
+import { writeGeneratedText } from "./fs";
 import { inspectionToMarkdown, inspectRepo } from "./inspect";
 import { loadManifest } from "./manifest";
 import { buildPipelinePlan, formatPipelinePlan } from "./pipeline";
@@ -11,8 +11,8 @@ export async function exportHarness(root: string, force = false): Promise<string
   const resolution = await resolveWorkflowProfile(root, {});
   const pipeline = formatPipelinePlan(buildPipelinePlan("medium", executorsFromResolvedProfile(resolution.profile), resolution.profile));
   const writes = [
-    [`docs/BOULDER_EXPORT.md`, await writeText(at(root, "docs", "BOULDER_EXPORT.md"), exportMarkdown(inspectionToMarkdown(inspection), manifest.workflows, manifest.workflowStack, pipeline, resolution.profile.id), force)] as const,
-    [`docs/CODEX_WORKFLOW_NOTES.md`, await writeText(at(root, "docs", "CODEX_WORKFLOW_NOTES.md"), codexNotes(manifest.workflows, manifest.workflowStack), force)] as const
+    [`docs/BOULDER_EXPORT.md`, await writeGeneratedText(root, "docs/BOULDER_EXPORT.md", exportMarkdown(inspectionToMarkdown(inspection), manifest.workflows, manifest.workflowStack, pipeline, resolution.profile.id), force)] as const,
+    [`docs/CODEX_WORKFLOW_NOTES.md`, await writeGeneratedText(root, "docs/CODEX_WORKFLOW_NOTES.md", codexNotes(manifest.workflows, manifest.workflowStack), force)] as const
   ];
   return writes.map(([file, status]) => `${status}: ${file}`);
 }

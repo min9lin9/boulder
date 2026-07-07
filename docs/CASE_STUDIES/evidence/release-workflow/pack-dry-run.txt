@@ -12,8 +12,8 @@ Result:
 
 ```text
 name: boulder-oss-cli
-version: 0.1.14
-filename: boulder-oss-cli-0.1.14.tgz
+version: 0.1.15
+filename: boulder-oss-cli-0.1.15.tgz
 entry count: 146
 Total files: 146
 ```
@@ -169,4 +169,4 @@ src/workflow-stack.ts
 src/workflows.ts
 ```
 
-Conclusion: the `0.1.14` npm release candidate package includes the workflow profile, profile state, tenant-safe handoff, and release evidence surface validated by `bun run ci` and candidate tarball smoke.
+Conclusion: the `0.1.15` npm release candidate package includes the workflow profile, profile state, tenant-safe handoff, and release evidence surface validated by `bun run ci` and candidate tarball smoke.

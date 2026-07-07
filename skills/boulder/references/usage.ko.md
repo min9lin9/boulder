@@ -13,7 +13,7 @@ boulder로 현재 repo 초기설정 해줘.
 대상 repo가 현재 작업 디렉터리가 아니면 절대경로를 함께 줍니다.
 
 ```text
-boulder로 /Users/burt/path/to/repo 초기설정 해줘.
+boulder로 /path/to/repo 초기설정 해줘.
 ```
 
 ## 권장 첫 실행 프롬프트
@@ -29,13 +29,13 @@ init -> quickstart -> inspect -> doctor -> pipeline medium -> verify --dry-run -
 Codex 로컬 환경에서는 `bunx`나 `npx` 대신 skill wrapper를 씁니다.
 
 ```bash
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh init --cwd /path/to/repo
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh quickstart --cwd /path/to/repo
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh doctor --cwd /path/to/repo --json
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh pipeline --cwd /path/to/repo --friction medium --json
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh verify --cwd /path/to/repo --dry-run
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh export --cwd /path/to/repo
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh init --cwd /path/to/repo
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh quickstart --cwd /path/to/repo
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh doctor --cwd /path/to/repo --json
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh pipeline --cwd /path/to/repo --friction medium --json
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh verify --cwd /path/to/repo --dry-run
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh export --cwd /path/to/repo
 ```
 
 `init`은 기본 executor preference를 `boulder.yaml`에 설정합니다. planning은 `gajae-code`, execution은 `lazycodex`, mode는 둘 다 `detect-and-suggest`입니다. 다만 이것은 설치 완료를 뜻하지 않습니다. `quickstart`에서는 `executor-planning`, `executor-execution` 체크로 preference가 보이고, `doctor --json`에서는 로컬 Codex inventory에서 발견될 때만 `status: available`, 없으면 `status: configured-unverified`로 보여야 합니다.
@@ -84,7 +84,7 @@ boulder로 release 전 점검해줘. GitHub CI evidence, npm install smoke, chan
 새로 설치한 skill은 현재 Codex 세션에 바로 로드되지 않을 수 있습니다. 이 경우 새 Codex 세션을 열거나 아래처럼 wrapper를 직접 호출합니다.
 
 ```bash
-bash /Users/burt/.codex/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
+bash <codex-home>/skills/boulder/scripts/boulder-local.sh inspect --cwd /path/to/repo --json
 ```
 
 `bunx boulder-oss-cli`가 Codex 안에서 실패해도 정상입니다. 로컬 Codex sandbox에서는 tempdir 권한이나 npm registry 네트워크 접근이 막힐 수 있으므로 `boulder` skill은 로컬 checkout을 직접 호출합니다.

@@ -1,5 +1,6 @@
 import type { evaluateCapabilityDoctor } from "./capability-doctor";
 import type { recordFieldEvidence } from "./field-evidence";
+import type { WeeklyRetroReport } from "./routine-retro";
 
 export function formatLines(title: string, lines: readonly string[]): string {
   return [title, ...lines.map((line) => `- ${line}`)].join("\n");
@@ -19,13 +20,18 @@ export function printHelp(): void {
     "  boulder init [--cwd path] [--force]",
     "  boulder quickstart [--cwd path] [--json]",
     "  boulder onboard [--cwd path] [--json]",
+    "  boulder bootstrap interview [--cwd path] [--task text] [--json]",
     "  boulder inspect [--cwd path] [--json]",
     "  boulder profile list [--cwd path] [--json]",
     "  boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]",
-    "  boulder profile show [name] [--cwd path] [--json]",
-    "  boulder profile save <name> [--cwd path] [--profile source] [--json]",
-    "  boulder profile use <name> [--cwd path] [--json]",
-    "  boulder capability import --from source --dry-run|--write [--kind skill|adapter] [--id id] [--cwd path] [--json]",
+  "  boulder profile show [name] [--cwd path] [--json]",
+  "  boulder profile save <name> [--cwd path] [--profile source] [--json]",
+  "  boulder profile use <name> [--cwd path] [--json]",
+  "  boulder capability import --from source --dry-run|--write [--kind skill|adapter|agent-catalog] [--id id] [--cwd path] [--json]",
+  "  boulder capability status [--cwd path] [--json]",
+  "  boulder routine capture --task text --dry-run|--write [--cwd path] [--json]",
+    "  boulder retro weekly --dry-run [--cwd path] [--json]",
+    "  boulder skill propose --from-routine id --dry-run|--write [--cwd path] [--json]",
     "  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]",
     "  boulder handoff review [--cwd path] [--packet path] [--json]",
     "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]",
@@ -48,6 +54,17 @@ export function printHelp(): void {
     "  bunx boulder-oss-cli <command>",
     ""
   ].join("\n"));
+}
+
+export function formatWeeklyRetroReport(report: WeeklyRetroReport): string {
+  return [
+    "Boulder weekly retro dry-run",
+    `- status: ${report.status}`,
+    `- routines: ${report.routineCount}`,
+    ...report.improvementCandidates.map((item) => `- improvement-candidate: ${item.routineId} (${item.seenCount}) - ${item.reason}`),
+    ...report.skillProposalCandidates.map((item) => `- skill-proposal-candidate: ${item.routineId} (${item.seenCount}) - ${item.reason}`),
+    ...report.warnings.map((item) => `- warning: ${item}`)
+  ].join("\n");
 }
 
 export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {

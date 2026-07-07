@@ -14,7 +14,7 @@ Status: ready
 - public-ci-workflow: pass - .github/workflows/ci.yml
 - public-ci-run-evidence: pass - docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
 - published-install-smoke: pass - docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
-- public-release-check: pass - release-check ready for 0.1.14
+- public-release-check: pass - release-check ready for 0.1.15
 - limitations-explicit: pass - docs/CODEX_OSS_APPLICATION_PACKET.md
 - trust-support-security-posture: pass - docs/TRUST_SUPPORT_SECURITY.md
 - public-support-templates: pass - .github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, SECURITY.md

@@ -1,4 +1,4 @@
-import { at, readText, writeText } from "./fs";
+import { at, readText, writeGeneratedText } from "./fs";
 import { defaultExecutors, executorsFromText } from "./executors";
 import { yamlBool, yamlList, yamlNestedScalar, yamlScalar, yamlSectionLines } from "./manifest-yaml";
 import type { BoulderManifest, RepoInspection, VerificationCommand, WorkflowStackComponent } from "./types";
@@ -88,11 +88,11 @@ export function manifestToYaml(manifest: BoulderManifest): string {
 
 export async function writeDefaultManifest(root: string, force = false): Promise<"created" | "skipped"> {
   const name = root.split(/[\\/]/).filter(Boolean).at(-1) ?? "oss-repository";
-  return await writeText(at(root, MANIFEST_FILE), manifestToYaml(defaultManifest(name)), force);
+  return await writeGeneratedText(root, MANIFEST_FILE, manifestToYaml(defaultManifest(name)), force);
 }
 
 export async function writeManifest(root: string, manifest: BoulderManifest, force = false): Promise<"created" | "skipped"> {
-  return await writeText(at(root, MANIFEST_FILE), manifestToYaml(manifest), force);
+  return await writeGeneratedText(root, MANIFEST_FILE, manifestToYaml(manifest), force);
 }
 
 export function manifestFromInspection(inspection: RepoInspection): BoulderManifest {

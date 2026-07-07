@@ -1,9 +1,10 @@
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
+import { bootstrapInterviewToMarkdown, buildBootstrapInterview } from "./bootstrap-interview";
 import { runCapabilityCommand } from "./capability-command";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
-import { parseOptions } from "./cli-options";
-import { writeText } from "./fs";
+import { optionValue, parseOptions, valueAfter } from "./cli-options";
+import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
 import { recordFieldEvidence } from "./field-evidence";
 import { runHandoffCommand } from "./handoff-command";
@@ -17,6 +18,7 @@ import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
 import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
+import { runRoutineCommand } from "./routine-command";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -24,19 +26,27 @@ import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
-const VERSION = "0.1.14";
+const VERSION = "0.1.16";
 
 export async function main(args: string[]): Promise<void> {
-  const command = args.find((arg) => !arg.startsWith("-")) ?? "help";
+  try {
+    await runMain(args);
+  } catch (error) {
+    if (error instanceof UnsafeGeneratedWritePathError) {
+      console.error(`ERROR fs.path_invalid: ${error.message}`);
+      process.exitCode = 1;
+      return;
+    }
+    throw error;
+  }
+}
+
+async function runMain(args: string[]): Promise<void> {
+  const parsed = parseArgv(args);
+  const command = parsed.command;
   const options = parseOptions(args);
-  if (command === "version" || args.includes("--version")) {
-    console.log(VERSION);
-    return;
-  }
-  if (command === "help" || args.includes("--help") || args.includes("-h")) {
-    printHelp();
-    return;
-  }
+  if (command === "version" || args.includes("--version")) { console.log(VERSION); return; }
+  if (command === "help" || args.includes("--help") || args.includes("-h")) { printHelp(); return; }
   if (command === "init") {
     const results = await initHarness(options.cwd, options.force);
     console.log(formatLines("Boulder initialized", results));
@@ -58,7 +68,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = inspectionToMarkdown(inspection);
-    await writeText(`${options.cwd}/docs/REPO_BRIEF.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/REPO_BRIEF.md", markdown, true);
     console.log(markdown);
     return;
   }
@@ -70,6 +80,18 @@ export async function main(args: string[]): Promise<void> {
     await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
+  if (await runRoutineCommand(parsed.commandArgs, options)) {
+    return;
+  }
+  if (command === "bootstrap" && args.includes("interview")) {
+    const report = buildBootstrapInterview(optionValue(args, "--task"));
+    if (options.json) {
+      console.log(prettyJson(report));
+      return;
+    }
+    console.log(bootstrapInterviewToMarkdown(report));
+    return;
+  }
   if (command === "handoff") {
     await runHandoffCommand(args, { cwd: options.cwd, json: options.json, force: options.force });
     return;
@@ -77,7 +99,7 @@ export async function main(args: string[]): Promise<void> {
   if (command === "verify") {
     const results = await verifyHarness(options.cwd, options.dryRun);
     const markdown = verifyResultsToMarkdown(results);
-    await writeText(`${options.cwd}/docs/VERIFICATION_REPORT.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/VERIFICATION_REPORT.md", markdown, true);
     console.log(markdown);
     if (results.some((item) => item.required && item.status === "failed")) {
       process.exitCode = 1;
@@ -116,7 +138,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = scorecardToMarkdown(scorecard);
-    await writeText(`${options.cwd}/docs/HARNESS_QUALITY_SCORECARD.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/HARNESS_QUALITY_SCORECARD.md", markdown, true);
     console.log(markdown);
     return;
   }
@@ -128,7 +150,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = benchmarkReportToMarkdown(report);
-    await writeText(`${options.cwd}/docs/BENCHMARK_FIXTURE_REPORT.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/BENCHMARK_FIXTURE_REPORT.md", markdown, true);
     console.log(markdown);
     return;
   }
@@ -139,7 +161,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = releasePlanToMarkdown(plan);
-    await writeText(`${options.cwd}/docs/RELEASE_PLAN.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/RELEASE_PLAN.md", markdown, true);
     console.log(markdown);
     return;
   }
@@ -184,7 +206,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = productReadinessToMarkdown(readiness);
-    await writeText(`${options.cwd}/docs/PRODUCT_READINESS.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/PRODUCT_READINESS.md", markdown, true);
     console.log(markdown);
     if (readiness.status === "blocked") process.exitCode = 1;
     return;
@@ -197,7 +219,7 @@ export async function main(args: string[]): Promise<void> {
       return;
     }
     const markdown = serviceReadinessToMarkdown(readiness);
-    await writeText(`${options.cwd}/docs/SERVICE_READINESS.md`, markdown, true);
+    await writeGeneratedText(options.cwd, "docs/SERVICE_READINESS.md", markdown, true);
     console.log(markdown);
     if (readiness.status === "blocked") process.exitCode = 1;
     return;
@@ -233,3 +255,25 @@ export async function main(args: string[]): Promise<void> {
   printHelp();
   process.exitCode = 1;
 }
+
+function parseArgv(args: readonly string[]): { readonly command: string; readonly commandArgs: readonly string[] } {
+  const commandArgs: string[] = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (GLOBAL_VALUE_FLAGS.has(arg)) {
+      if (valueAfter(args, index)) index += 1;
+      continue;
+    }
+    if (GLOBAL_BOOLEAN_FLAGS.has(arg)) {
+      continue;
+    }
+    commandArgs.push(arg);
+  }
+  return {
+    command: commandArgs.find((arg) => !arg.startsWith("-")) ?? "help",
+    commandArgs
+  };
+}
+
+const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence"]);
+const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run"]);

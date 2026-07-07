@@ -1,6 +1,5 @@
-import { link, mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { link, mkdir, readFile, symlink } from "node:fs/promises";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import {
   buildSourceCandidateManifest,
@@ -8,18 +7,9 @@ import {
   parseCapabilitySource,
   writeSourceCandidateManifest
 } from "../src/capability-source";
+import { tempRepo, write } from "./helpers/cli";
 
 const FIXED_DATE = new Date("2026-06-24T00:00:00.000Z");
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-capability-source-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
 
 describe("capability source manifests", () => {
   test("canonicalizes known GitHub adapter source URLs", () => {
@@ -55,6 +45,18 @@ describe("capability source manifests", () => {
     expect(manifest.source).toBe("https://github.com/yeachan-heo/gajae-code");
   });
 
+  test("recognizes agency-agents as a subagent catalog source", () => {
+    const manifest = buildSourceCandidateManifest(
+      parseCapabilitySource("https://github.com/msitarzewski/agency-agents"),
+      {},
+      FIXED_DATE
+    );
+
+    expect(manifest.registryId).toBe("github__msitarzewski__agency-agents");
+    expect(manifest.capabilityId).toBe("agency-agents");
+    expect(manifest.kind).toBe("agent-catalog");
+  });
+
   test("defaults unknown GitHub and ClawHub sources to skill manifests", () => {
     const github = buildSourceCandidateManifest(
       parseCapabilitySource("https://github.com/mattpocock/skills"),
@@ -84,7 +86,7 @@ describe("capability source manifests", () => {
   });
 
   test("loads explicit adapter manifests only when capability id matches the source repo", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     const manifest = buildSourceCandidateManifest(
       parseCapabilitySource("https://github.com/example/custom-agent"),
       { kind: "adapter", capabilityId: "custom-agent" },
@@ -121,7 +123,7 @@ describe("capability source manifests", () => {
   });
 
   test("writes manifests idempotently and rejects conflicting duplicates", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     const source = parseCapabilitySource("https://github.com/code-yeongyu/lazycodex");
     const manifest = buildSourceCandidateManifest(source, {}, FIXED_DATE);
 
@@ -136,8 +138,8 @@ describe("capability source manifests", () => {
   });
 
   test("rejects unsafe manifest paths", async () => {
-    const root = await tempRepo();
-    const outside = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
+    const outside = await tempRepo("boulder-capability-source-");
     await mkdir(join(root, ".boulder", "capabilities"), { recursive: true });
     await symlink(outside, join(root, ".boulder", "capabilities", "imports"));
 
@@ -147,8 +149,8 @@ describe("capability source manifests", () => {
   });
 
   test("rejects existing manifest hardlinks before writing", async () => {
-    const root = await tempRepo();
-    const outside = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
+    const outside = await tempRepo("boulder-capability-source-");
     const manifest = buildSourceCandidateManifest(parseCapabilitySource("clawhub:kimi-skills"), {}, FIXED_DATE);
     await write(outside, "shared.json", JSON.stringify(manifest));
     await mkdir(join(root, ".boulder", "capabilities", "imports"), { recursive: true });
@@ -158,8 +160,8 @@ describe("capability source manifests", () => {
   });
 
   test("ignores unsafe manifest load paths", async () => {
-    const root = await tempRepo();
-    const outside = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
+    const outside = await tempRepo("boulder-capability-source-");
     await mkdir(join(root, ".boulder", "capabilities"), { recursive: true });
     await symlink(outside, join(root, ".boulder", "capabilities", "imports"));
 
@@ -170,8 +172,8 @@ describe("capability source manifests", () => {
   });
 
   test("ignores hard-linked manifest files when loading", async () => {
-    const root = await tempRepo();
-    const outside = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
+    const outside = await tempRepo("boulder-capability-source-");
     const manifest = buildSourceCandidateManifest(parseCapabilitySource("clawhub:kimi-skills"), {}, FIXED_DATE);
     await write(outside, "shared.json", JSON.stringify(manifest));
     await mkdir(join(root, ".boulder", "capabilities", "imports"), { recursive: true });
@@ -184,7 +186,7 @@ describe("capability source manifests", () => {
   });
 
   test("loads valid source manifests and reports malformed ones", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     const manifest = buildSourceCandidateManifest(parseCapabilitySource("https://github.com/Yeachan-Heo/gajae-code"), {}, FIXED_DATE);
     await writeSourceCandidateManifest(root, manifest);
     await write(root, ".boulder/capabilities/imports/bad.json", "{not json");
@@ -196,7 +198,7 @@ describe("capability source manifests", () => {
   });
 
   test("does not echo unsafe malformed manifest filenames", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     await write(root, ".boulder/capabilities/imports/bad\n- status: pass.json", "{not json");
 
     const result = await loadSourceCandidateManifests(root);

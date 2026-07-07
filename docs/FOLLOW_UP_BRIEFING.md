@@ -11,7 +11,7 @@ Boulder turns OSS repositories into evidence-backed Codex operator harnesses.
 
 - Public repository: `min9lin9/boulder`
 - Package name: `boulder-oss-cli`
-- Current release track: `v0.1.14`
+- Current release track: `v0.1.15`
 - Current CLI surface: `init`, `quickstart`, `onboard`, `inspect`, `profile`, `handoff`, `validate`, `verify`, `pipeline`, `scorecard`, `benchmark`, `release-plan`, `release-check`, `replay-check`, `replay-run`, `product-readiness`, `service-readiness`, `doctor`, `record`, and `export`
 - Latest engineering pass tightened release evidence checks, first-run adapter clarity, and tenant-safe handoff dry-run evidence.
 - Product direction: move from a harness-document generator toward an executable operator workflow system.

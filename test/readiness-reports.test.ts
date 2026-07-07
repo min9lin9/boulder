@@ -12,7 +12,7 @@ import { evaluateReplayCheck, replayCheckToMarkdown } from "../src/replay-check"
 import { buildReplayRunPlan, replayRunPlanToMarkdown } from "../src/replay-run";
 import { scorecardToMarkdown, scoreManifest } from "../src/scorecard";
 import { initHarness } from "../src/workflows";
-import { tempRepo } from "./helpers/cli";
+import { runCommand, tempRepo, write } from "./helpers/cli";
 
 describe("harness quality scorecard", () => {
   test("scores the root Boulder harness as ready", async () => {
@@ -60,20 +60,138 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("reports root release evidence as ready after publish and tag", async () => {
+  test("reports root release evidence as blocked until 0.1.16 is published and tagged", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.status).toBe("ready");
+    expect(report.version).toBe("0.1.16");
+    expect(report.status).toBe("blocked");
     expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "changelog-version" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "release-evidence-manifest" && item.status === "fail")).toBe(true);
+    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.");
+    expect(report.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
+    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16.");
     expect(markdown).toContain("does not publish");
-    expect(markdown).toContain("Status: ready");
+    expect(markdown).toContain("Status: blocked");
+    expect(markdown).not.toContain("npm publish --access public");
+    expect(markdown).not.toContain("git tag v");
+    expect(markdown).not.toContain("gh release create");
+  });
+
+  test("reports release evidence as ready after publish and tag in a release fixture", async () => {
+    const root = await tempRepo();
+    await write(root, "package.json", JSON.stringify({ name: "boulder-oss-cli", version: "1.2.3" }));
+    await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
+    await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
+    await write(root, "CHANGELOG.md", "## 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli\n1.2.3\nPublished version: 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", "boulder-oss-cli\nTotal files\n");
+    await runCommand("git init", root);
+    await runCommand("git config user.email test@example.com", root);
+    await runCommand("git config user.name Test", root);
+    await runCommand("git add .", root);
+    await runCommand("git commit -m init", root);
+    await runCommand("git tag v1.2.3", root);
+    const releaseCommit = (await runCommand("git rev-parse HEAD", root)).stdout.trim();
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", `CI\nCommit: ${releaseCommit}\n`);
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
+      schemaVersion: 1,
+      packageName: "boulder-oss-cli",
+      packageJsonVersion: "1.2.3",
+      cliVersion: "1.2.3",
+      tag: "v1.2.3",
+      tagCommit: releaseCommit,
+      releaseCommit,
+      publishedVersion: "1.2.3",
+      installSmoke: {
+        command: "bunx boulder-oss-cli@1.2.3 --version",
+        exitCode: 0,
+        generatedAt: "2026-07-07"
+      },
+      githubActions: {
+        runUrl: "https://github.com/example/repo/actions/runs/1"
+      },
+      packDryRun: {
+        fileCount: 10,
+        packageVersion: "1.2.3"
+      },
+      limitations: []
+    }));
+
+    const report = await evaluateReleaseCheck(root);
+
+    expect(report.status).toBe("ready");
+    expect(report.nextCommands).toEqual([]);
+    expect(report.checks.every((item) => item.status === "pass")).toBe(true);
+  });
+
+  test("reports blocker-first release next commands without publish automation", async () => {
+    const root = await tempRepo();
+    await writeFile(join(root, "package.json"), JSON.stringify({ name: "fixture", version: "1.2.3" }), "utf8");
+
+    const report = await evaluateReleaseCheck(root);
+
+    expect(report.status).toBe("blocked");
+    expect(report.nextCommands.length).toBeGreaterThan(0);
+    expect(report.nextCommands.join("\n")).toContain("Update docs/RELEASE_WORKFLOW.md");
+    expect(report.nextCommands.join("\n")).not.toContain("npm publish --access public");
+    expect(report.nextCommands.join("\n")).not.toContain("git tag v");
+    expect(report.nextCommands.join("\n")).not.toContain("gh release create");
+  });
+
+  test("blocks malformed structured release evidence manifests", async () => {
+    const root = await tempRepo();
+    await write(root, "package.json", JSON.stringify({ name: "fixture", version: "1.2.3" }));
+    await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
+    await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
+    await write(root, "CHANGELOG.md", "## 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli\n1.2.3\nPublished version: 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nCommit: 1111111\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", "boulder-oss-cli\nTotal files\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
+      schemaVersion: 1,
+      packageName: "boulder-oss-cli",
+      packageJsonVersion: "1.2.3",
+      cliVersion: "1.2.3",
+      tag: "v1.2.3",
+      tagCommit: "0000000000000000000000000000000000000000",
+      releaseCommit: "0000000000000000000000000000000000000000",
+      publishedVersion: "1.2.3",
+      installSmoke: {
+        command: "bunx boulder-oss-cli@1.2.3 --version",
+        exitCode: 0,
+        generatedAt: "2026-07-07"
+      },
+      githubActions: {
+        runUrl: "https://github.com/example/repo/actions/runs/1"
+      },
+      packDryRun: {
+        fileCount: 10,
+        packageVersion: "1.2.3"
+      },
+      limitations: []
+    }));
+    await runCommand("git init", root);
+    await runCommand("git config user.email test@example.com", root);
+    await runCommand("git config user.name Test", root);
+    await runCommand("git add .", root);
+    await runCommand("git commit -m init", root);
+    await runCommand("git tag v1.2.3", root);
+
+    const report = await evaluateReleaseCheck(root);
+    const manifest = report.checks.find((item) => item.id === "release-evidence-manifest");
+
+    expect(report.status).toBe("blocked");
+    expect(manifest?.status).toBe("fail");
+    expect(manifest?.evidence).toContain("tagCommit must match local tag");
   });
 });
 
@@ -88,13 +206,17 @@ describe("quickstart and replay reports", () => {
     expect(quickstart.checks.some((item) => item.id === "executor-planning" && item.status === "pass")).toBe(true);
     expect(quickstart.checks.some((item) => item.id === "executor-execution" && item.status === "pass")).toBe(true);
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder inspect --cwd . --json");
+    expect(quickstart.steps.map((item) => item.command)).toContain('boulder bootstrap interview --cwd . --task "<repeated work>"');
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run");
+    expect(quickstart.steps.map((item) => item.command)).toContain("boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run");
     expect(quickstart.steps.map((item) => item.command)).toContain("boulder service-readiness --cwd . --json");
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
     expect(markdown).toContain("execute=lazycodex");
     expect(markdown).toContain("GJC and LazyCodex are adapter preferences");
+    expect(markdown).toContain("Bootstrap task-category profiles");
+    expect(markdown).toContain("agency-agents is a profile-scoped subagent catalog");
     expect(markdown).toContain("doctor verifies local installation before live execution");
   });
 
@@ -108,6 +230,40 @@ describe("quickstart and replay reports", () => {
     expect(report.projects.some((item) => item.project === "gajae-code" && item.status === "pass")).toBe(true);
     expect(report.projects.some((item) => item.project === "awesome-codex-subagents" && item.status === "pass")).toBe(true);
     expect(markdown).toContain("official-docs-first");
+  });
+
+  test("blocks stale replay docs and replay ref mismatches", async () => {
+    const root = await tempRepo();
+    await write(root, "docs/CASE_STUDIES/evidence/external-replay/example.txt", "share-safe replay evidence\n");
+    await write(root, "fixtures/replay/example/replay.json", JSON.stringify({
+      project: "example",
+      repoUrl: "https://github.com/example/repo",
+      ref: "v1.0.0",
+      officialDocsPath: "fixtures/replay/example/official-docs.json",
+      commands: ["bunx boulder-oss-cli inspect --cwd . --json"],
+      expectedArtifacts: ["docs/REPO_BRIEF.md"],
+      evidencePaths: ["docs/CASE_STUDIES/evidence/external-replay/example.txt"],
+      limitations: ["dry-run replay only"]
+    }));
+    await write(root, "fixtures/replay/example/official-docs.json", JSON.stringify({
+      project: "example",
+      repoUrl: "https://github.com/example/repo",
+      docsUrls: ["https://github.com/example/repo#readme"],
+      versionOrRef: "main",
+      setupCommands: ["read the README"],
+      testCommands: ["run documented tests"],
+      contributionPolicy: "Use public issues.",
+      securityPolicy: "No secrets.",
+      constraints: ["No mutation"],
+      retrievedAt: "2025-01-01"
+    }));
+
+    const report = await evaluateReplayCheck(root);
+    const issues = report.projects.flatMap((item) => item.issues).join("\n");
+
+    expect(report.status).toBe("blocked");
+    expect(issues).toContain("replay ref v1.0.0 must match official docs versionOrRef main");
+    expect(issues).toContain("official docs are stale");
   });
 
   test("builds a dry-run command plan from replay fixtures", async () => {
@@ -170,6 +326,19 @@ describe("product readiness and examples", () => {
   });
 });
 
+describe("readiness wording hygiene", () => {
+  test("service strategy separates local readiness from external field backing", async () => {
+    const root = join(import.meta.dir, "..");
+    const review = await readFile(join(root, "docs", "SERVICE_STRATEGY_REVIEW.md"), "utf8");
+
+    expect(review).toContain("Current executable gate");
+    expect(review).toContain("Boulder is `ready` for the local CLI service workflow");
+    expect(review).toContain("External adoption evidence: not field-backed");
+    expect(review).not.toContain("product-readiness remains blocked");
+    expect(review).not.toContain("Boulder is `pilot-ready` as a service workflow foundation");
+  });
+});
+
 describe("repeat-use evidence hygiene", () => {
   test("ships a metric log template with the required field contract", async () => {
     const root = join(import.meta.dir, "..");
@@ -218,7 +387,9 @@ async function packageSurfaceFiles(root: string): Promise<readonly string[]> {
     join(root, "SECURITY.md"),
     ...(await recursiveFiles(join(root, "docs"))),
     ...(await recursiveFiles(join(root, "fixtures")))
-  ].filter((path) => /\.(md|json|txt|ya?ml)$/.test(path));
+  ].filter((path) => /\.(md|json|txt|ya?ml)$/.test(path)
+    && !/SESSION_SUMMARY/.test(path)
+    && !/NEXT_.*GAP.*PLAN/.test(path));
 }
 
 async function recursiveFiles(root: string): Promise<readonly string[]> {

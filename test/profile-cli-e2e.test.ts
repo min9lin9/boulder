@@ -15,7 +15,7 @@ describe("boulder profile CLI e2e", () => {
       expect(payload.externalPolicy.default).toBe("blocked");
       expect(humanResult.exitCode).toBe(0);
       expect(humanResult.stdout).toContain("active-profile: programming-default");
-      expect(humanResult.stdout).toContain("suggested-profile: research-default");
+      expect(humanResult.stdout).toContain("suggested-profile: research-corpus");
       expect(humanResult.stdout).toContain("suggestion-applied: false");
     } finally {
       await removeTempRepo(root);
@@ -33,6 +33,8 @@ describe("boulder profile CLI e2e", () => {
       expect(list.exitCode).toBe(0);
       expect(list.stdout).toContain("programming-default");
       expect(list.stdout).toContain("research-default");
+      expect(list.stdout).toContain("release-safe");
+      expect(list.stdout).toContain("docs-reviewer");
       expect(show.exitCode).toBe(0);
       expect(JSON.parse(show.stdout).id).toBe("research-default");
       expect(save.exitCode).toBe(0);
@@ -82,6 +84,20 @@ describe("boulder profile CLI e2e", () => {
       expect(result.exitCode).toBe(1);
       expect(result.stdout).toBe("");
       expect(result.stderr.trim()).toBe('ERROR profile.not_found: Profile "missing" was not found.');
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("treats missing profile flag values followed by another flag as absent", async () => {
+    const root = await tempRepo();
+    try {
+      const result = await runBoulder(["profile", "resolve", "--cwd", root, "--profile", "--json"]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(payload.id).toBe("programming-default");
     } finally {
       await removeTempRepo(root);
     }

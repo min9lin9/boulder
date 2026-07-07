@@ -34,6 +34,11 @@ const QUICKSTART_STEPS = [
     purpose: "See the available workflow profiles before routing work."
   },
   {
+    id: "bootstrap-interview",
+    command: "boulder bootstrap interview --cwd . --task \"<repeated work>\"",
+    purpose: "Map repeated work to a task-category profile such as programming-heavy or release-safe before changing active profile state."
+  },
+  {
     id: "profile-resolve",
     command: "boulder profile resolve --cwd .",
     purpose: "Confirm the active plan/execute adapters and external-call policy."
@@ -41,7 +46,7 @@ const QUICKSTART_STEPS = [
   {
     id: "profile-use",
     command: "boulder profile use programming-default --cwd .",
-    purpose: "Select the default programming profile, or swap it for research-default or ops-default."
+    purpose: "Select the broad default programming profile, or use a bootstrap-recommended task-category profile for repeated work."
   },
   {
     id: "pipeline",
@@ -70,6 +75,11 @@ const SOURCE_IMPORT_STEPS = [
     id: "source-lazycodex",
     command: "boulder capability import --from https://github.com/code-yeongyu/lazycodex --dry-run",
     purpose: "Preview the LazyCodex execution adapter source before recording it."
+  },
+  {
+    id: "source-agency-agents",
+    command: "boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run",
+    purpose: "Preview the profile-scoped subagent catalog before importing only the selected agents."
   }
 ] as const satisfies readonly QuickstartStep[];
 
@@ -104,7 +114,7 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     "",
     "This is the first-run guided flow for a maintainer opening Boulder in a repository.",
     "",
-    "GJC and LazyCodex are adapter preferences. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
+    "GJC and LazyCodex are adapter preferences. agency-agents is a profile-scoped subagent catalog. Bootstrap task-category profiles such as programming-heavy and release-safe sit on top of broader base profiles such as programming-default and ops-default. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
     "",
     "## Checks",
     "",

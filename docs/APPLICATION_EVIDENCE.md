@@ -8,7 +8,7 @@ This page records the public evidence that `boulder` is a runnable, maintained O
 - Package distribution name: `boulder-oss-cli`
 - License: MIT
 - Runtime: Bun + TypeScript
-- Current release candidate: `v0.1.14`
+- Current release candidate: `v0.1.16`
 
 ## M1 Surface
 
@@ -120,5 +120,5 @@ External projects and catalogs can be referenced with attribution, but their ado
 
 ## Next Evidence Targets
 
-- Keep `v0.1.14` release evidence, npm package evidence, GitHub tag evidence, and CI evidence aligned.
+- Keep `v0.1.15` release evidence, npm package evidence, GitHub tag evidence, and CI evidence aligned.
 - Continue adding external maintainer adoption evidence separately from local readiness claims.

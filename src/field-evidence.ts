@@ -1,6 +1,6 @@
 import { lstat, realpath } from "node:fs/promises";
 import { join } from "node:path";
-import { readText, writeText } from "./fs";
+import { readText, writeGeneratedText } from "./fs";
 
 export type FieldEvidenceStatus = "pass" | "fail";
 
@@ -89,7 +89,7 @@ export async function recordFieldEvidence(root: string, runId: string, evidenceP
   if (result.checks.some((item) => item.id === "evidence-path" && item.status === "fail")) {
     return result;
   }
-  await writeText(join(root, result.manifestPath), JSON.stringify(result, null, 2), true);
+  await writeGeneratedText(root, result.manifestPath, JSON.stringify(result, null, 2), true);
   return result;
 }
 

@@ -4,7 +4,8 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current published package: `boulder-oss-cli@0.1.14`.
+Current published package: `boulder-oss-cli@0.1.15`.
+Current release candidate: `v0.1.16`.
 
 ## 3-minute route for non-developers
 
@@ -12,29 +13,43 @@ In local Codex, start in the target repo and ask:
 
 ```text
 boulder로 현재 repo 초기설정하고 quickstart, inspect, doctor까지 실행해줘.
+
+반복되는 업무가 있으면 함께:
+boulder로 반복작업 캡처하고 루프를 돌려줘.
 ```
 
 Prefer the local `boulder` skill when it is installed. For CLI use after trusting the npm package:
 
 ```bash
-bunx boulder-oss-cli@0.1.14 init
-bunx boulder-oss-cli@0.1.14 quickstart
-bunx boulder-oss-cli@0.1.14 inspect
-bunx boulder-oss-cli@0.1.14 doctor
+bunx boulder-oss-cli@0.1.15 init
+bunx boulder-oss-cli@0.1.15 routine capture --task "release note draft" --write
+bunx boulder-oss-cli@0.1.15 quickstart
+bunx boulder-oss-cli@0.1.15 inspect
+bunx boulder-oss-cli@0.1.15 doctor
 ```
 
 `doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
 
-If GJC or LazyCodex is not installed yet, register their canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
+Then close the weekly learning loop (repo-local only):
 
 ```bash
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
-bunx boulder-oss-cli@0.1.14 capability import --from https://github.com/code-yeongyu/lazycodex --write
-bunx boulder-oss-cli@0.1.14 doctor
+bunx boulder-oss-cli@0.1.15 retro weekly --dry-run
+bunx boulder-oss-cli@0.1.15 skill propose --from-routine release-note-draft --dry-run
 ```
 
-`--dry-run` prints the manifest path and adapter guess without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
+`routine capture`, `retro weekly --dry-run`, and `skill propose --from-routine` are review-first: they keep recurring-work evidence in `.boulder/**`, surface what would change, and do **not** run schedulers, mutate calendars, install/update/apply tools, call external models by default, or archive existing skills.
+
+If GJC, LazyCodex, or a subagent catalog is not installed yet, register canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
+
+```bash
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/code-yeongyu/lazycodex --write
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/msitarzewski/agency-agents --dry-run
+bunx boulder-oss-cli@0.1.15 doctor
+```
+
+`--dry-run` prints the manifest path and capability kind without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
 
 ## Install
 
@@ -51,6 +66,7 @@ Local development: `bun install`, `bun run boulder -- --help`, then `bun run ci`
 ```bash
 cd path/to/your/repo
 bunx boulder-oss-cli@latest init
+bunx boulder-oss-cli@latest bootstrap interview --task "release npm package safely"
 bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
 bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
@@ -86,6 +102,35 @@ boulder quickstart --cwd /path/to/repo
 
 The `boulder` skill uses the local Boulder checkout instead of `bunx` or `npx`, because local Codex sandboxes may block tempdir writes or npm registry access.
 
+For a repeated workflow, ask Codex to design the repo-local profile before wiring commands:
+
+```text
+Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile.
+```
+
+The designer chooses one of the built-in bootstrap profiles: `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, or `docs-reviewer`. It returns `boulder profile use`, `capability import`, `quickstart`, and `doctor` commands. It can also use an interview path: ask what repeated work the user does, activate the matching profile, then select a small subagent subset from `https://github.com/msitarzewski/agency-agents`. `GJC`, `LazyCodex`, `agency-agents`, `context-mode`, and `private corpus` repositories are candidate capabilities until `doctor` verifies the local installation or inventory.
+
+For recurring work outside interviews, use the learning loop docs directly:
+
+```bash
+boulder routine capture --task "weekly release note draft"
+boulder retro weekly --dry-run
+boulder skill propose --from-routine <routine-id>
+```
+
+Recommended order:
+1. Capture repeating tasks after they happen and keep evidence in `.boulder/routines/`.
+2. Run `retro weekly --dry-run` to surface stable patterns and proposal candidates.
+3. Run `skill propose --from-routine <routine-id>` and review manually before any future install/apply step outside this MVP.
+
+CLI users can get the same first draft without an interactive Codex skill:
+
+```bash
+boulder bootstrap interview --task "release npm package safely"
+```
+
+This prints interview questions, the recommended profile, selected subagent names, skill/MCP/RAG/DB capability suggestions, deterministic `profileScores`, `capabilityScores`, rationale, and dry-run import commands. Scores explain task-to-profile fit and setup priority; they do not install subagents, call external models, or write profile state. The interview model is summarized in [`docs/BOOTSTRAP_INTERVIEW_RESEARCH.md`](docs/BOOTSTRAP_INTERVIEW_RESEARCH.md).
+
 GJC and LazyCodex are configured automatically as adapter preferences, but they may not be installed locally. `doctor` reports GJC as `available` only when local inventory includes `gajae-code`, `gjc`, the Hermes coordinator MCP bridge (`gjc_coordinator`, `gjc-coordinator`, `gjc-coordinator-mcp`), `gjc-delegation`, or `gjc_delegate_*` delegate tools. Otherwise it reports `configured-unverified` and keeps live executor calls approval-gated. `handoff send --dry-run` prints the candidate command without external execution.
 
 For GJC, Boulder follows the Hermes MCP bridge surface:
@@ -103,11 +148,16 @@ See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.m
 
 ```bash
 boulder init
+boulder bootstrap interview --task "release npm package safely"
 boulder quickstart
+boulder routine capture --task "<text>"
+boulder retro weekly --dry-run
+boulder skill propose --from-routine <routine-id>
 boulder onboard
 boulder inspect
 boulder profile resolve
 boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run
 boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
@@ -132,7 +182,7 @@ It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement
 
 ## Public Evidence
 
-- Release candidate: `v0.1.14`
+- Release candidate: `v0.1.16`
 - npm package: [`boulder-oss-cli`](https://www.npmjs.com/package/boulder-oss-cli)
 - CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Product readiness: [`docs/PRODUCT_READINESS.md`](docs/PRODUCT_READINESS.md)

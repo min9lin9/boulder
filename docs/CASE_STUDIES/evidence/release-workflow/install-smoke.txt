@@ -56,6 +56,24 @@ npm view boulder-oss-cli version
 
 Published version: 0.1.14
 
+Successful publish verification on 2026-06-24:
+
+```text
+npm view boulder-oss-cli name version dist-tags --json
+{
+  "name": "boulder-oss-cli",
+  "version": "0.1.15",
+  "dist-tags": {
+    "latest": "0.1.15"
+  }
+}
+
+bunx boulder-oss-cli@0.1.15 --version
+0.1.15
+```
+
+Published version: 0.1.15
+
 Published baseline result:
 
 ```text
@@ -75,7 +93,7 @@ npm exec --cache <temp-repo> --package "file:<local-tarball>" -- boulder --versi
 Candidate output:
 
 ```text
-0.1.14
+0.1.15
 ```
 
 Candidate CLI surface:
@@ -128,4 +146,4 @@ exit: 1
 ERROR handoff.protected_path: Protected path is not allowed in external handoff packet: ../../../other-tenant/private/src/auth.ts
 ```
 
-Conclusion: the `0.1.14` candidate tarball can be installed and executed through `npm exec --package file:<tarball> -- boulder ...`, and the candidate blocks repo-escaping handoff includes before external handoff.
+Conclusion: the `0.1.15` candidate tarball can be installed and executed through `npm exec --package file:<tarball> -- boulder ...`, and the candidate blocks repo-escaping handoff includes before external handoff.

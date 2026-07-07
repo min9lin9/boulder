@@ -1,6 +1,7 @@
 import { constants } from "node:fs";
 import { lstat, mkdir, open, rename, unlink } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
+import { optionValue } from "./cli-options";
 import { at } from "./fs";
 import { InvalidHandoffAdapterError } from "./handoff-packet";
 
@@ -73,11 +74,6 @@ export async function writeHandoffPacketText(path: string, root: string, content
   if (!await packetPathIsSafe(path, root)) throw new UnsafeHandoffPathError();
   await safeReplaceText(path, content);
   if (!await packetPathIsSafe(path, root)) throw new UnsafeHandoffPathError();
-}
-
-export function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  return index >= 0 && args[index + 1] ? args[index + 1] : null;
 }
 
 function receiptFile(path: string): string {

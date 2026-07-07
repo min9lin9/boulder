@@ -201,7 +201,7 @@ function adapterIssues(capabilities: readonly Capability[]): readonly DoctorIssu
     .map((item) => ({
       id: `${item.id}-adapter-unverified`,
       severity: "warn",
-      message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Install or enable ${item.id}, or keep using Codex fallback; live execution remains approval-gated.`
+      message: `${item.id} is configured as the ${item.lane} adapter but was not found in the local Codex inventory. Separate approved setup is required before using ${item.id}; Codex fallback remains available and live execution stays approval-gated.`
     }));
 }
 

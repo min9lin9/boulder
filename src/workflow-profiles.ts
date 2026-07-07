@@ -3,6 +3,7 @@ import { defaultExecutors } from "./executors";
 import { loadManifest } from "./manifest";
 import { assertSafeProfileName, loadProjectProfile, listProjectProfiles, readCurrentProfileText, writeCurrentProfile, writeProjectProfile } from "./profile-store";
 import { BUILT_IN_WORKFLOW_PROFILE_IDS, builtInProfile, profileWithExternalExecutors } from "./workflow-profile-builtins";
+import { profileIdForTask } from "./task-scoring";
 import type {
   ExecutorProfiles,
   ProfileDriftWarning,
@@ -151,10 +152,8 @@ export function executorsFromResolvedProfile(profile: ResolvedWorkflowProfile): 
 
 export function taskClassFor(task: string): string | null {
   const normalized = task.trim().toLowerCase();
-  if (normalized === "research") return "research-default";
   if (normalized === "ops" || normalized === "operations") return "ops-default";
-  if (normalized === "programming" || normalized === "code" || normalized === "coding") return "programming-default";
-  return null;
+  return profileIdForTask(task);
 }
 
 export function formatProfileResolve(profile: ResolvedWorkflowProfile): string {
