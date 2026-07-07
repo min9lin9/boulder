@@ -30,6 +30,7 @@
     "src",
     "docs",
     "fixtures",
+    "skills/boulder",
     "skills/boulder-bootstrap-designer",
     "README.md",
     "boulder.yaml",
@@ -38,6 +39,8 @@
     "ROADMAP.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
+    "!docs/*SESSION_SUMMARY*.md",
+    "!docs/NEXT_*GAP*PLAN*.md",
     "!**/* 2.*"
   ],
   "engines": {

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BOULDER_HOME="${BOULDER_HOME:-/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder}"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_BOULDER_HOME="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
+BOULDER_HOME="${BOULDER_HOME:-$DEFAULT_BOULDER_HOME}"
 BOULDER_BIN="$BOULDER_HOME/bin/boulder.ts"
 BUN_BIN="${BUN_BIN:-}"
 

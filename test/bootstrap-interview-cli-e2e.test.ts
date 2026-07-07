@@ -11,6 +11,7 @@ describe("boulder bootstrap interview CLI e2e", () => {
       expect(result.exitCode).toBe(0);
       expect(payload.recommendedProfile).toBe("release-safe");
       expect(payload.baseProfile).toBe("ops-default");
+      expect(payload.profileRelationship).toContain("release-safe is a task-category profile built on ops-default");
       expect(payload.questions.length).toBeGreaterThan(0);
       expect(payload.basis).toContain("hierarchical-task-analysis");
       expect(payload.basis).toContain("react-tool-use");
@@ -20,6 +21,8 @@ describe("boulder bootstrap interview CLI e2e", () => {
       expect(payload.capabilityPlan.mcpServers).toContain("github");
       expect(payload.capabilityPlan.rag).toEqual(["release evidence docs", "changelog", "CI logs"]);
       expect(payload.capabilityPlan.db).toEqual(["field evidence ledger"]);
+      expect(payload.unsupportedCapabilityNotes.some((item: { dimension: string; note: string }) => item.dimension === "rag" && item.note.includes("Candidate only"))).toBe(true);
+      expect(payload.unsupportedCapabilityNotes.some((item: { dimension: string; note: string }) => item.dimension === "db" && item.note.includes("does not provision DBs"))).toBe(true);
       expect(payload.commands).toContain("boulder capability import --from https://github.com/msitarzewski/agency-agents --dry-run --cwd .");
       expect(payload.commands).toContain("boulder profile use release-safe --cwd .");
       expect(payload.profileScores[0].profileId).toBe("release-safe");
@@ -32,6 +35,7 @@ describe("boulder bootstrap interview CLI e2e", () => {
       expect(payload.recommendationRationale.some((item: string) => item.includes("candidate only"))).toBe(true);
       expect(payload.recommendationRationale.some((item: string) => item.includes("No install"))).toBe(true);
       expect(payload.recommendationRationale.every(hasSafeRecommendationText)).toBe(true);
+      expect(payload.unsupportedCapabilityNotes.every((item: { note: string }) => hasSafeRecommendationText(item.note))).toBe(true);
       expect(payload.rubricScores).toBe(undefined);
     } finally {
       await removeTempRepo(root);
@@ -55,11 +59,13 @@ describe("boulder bootstrap interview CLI e2e", () => {
 
       expect(result.exitCode).toBe(0);
       expect(payload.recommendedProfile).toBe(item.profile);
+      expect(payload.profileRelationship).toContain(`${item.profile} is a task-category profile built on`);
       expect(payload.profileScores[0].profileId).toBe(item.profile);
       expect(payload.profileScores.every(hasBoundedIntegerScore)).toBe(true);
       expect(payload.capabilityScores.every(hasBoundedIntegerScore)).toBe(true);
       expect(payload.capabilityScores.some((score: { dimension: string; score: number }) => score.dimension === item.capability && score.score > 0)).toBe(true);
       expect(payload.recommendationRationale.length).toBeGreaterThan(0);
+      expect(payload.unsupportedCapabilityNotes.length).toBeGreaterThan(0);
     }
   });
 

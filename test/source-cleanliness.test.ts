@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 
@@ -36,4 +36,48 @@ describe("source cleanliness", () => {
     expect(metadata).toContain("default_prompt:");
     expect(packageJson).toContain("\"skills/boulder-bootstrap-designer\"");
   });
+
+  test("packaged skills and release docs do not contain local-only paths", async () => {
+    const files = [
+      ...(await filesUnder("skills/boulder")),
+      ...(await filesUnder("skills/boulder-bootstrap-designer")),
+      "README.md",
+      "docs/BOULDER_CODEX_SKILL_USAGE.ko.md"
+    ];
+
+    for (const file of files) {
+      const source = await readFile(join(root, file), "utf8");
+
+      expect(source).not.toContain("/Users/");
+      expect(source).not.toContain("/private/");
+      expect(source).not.toContain("Documents/Codex");
+    }
+  });
+
+  test("package surface includes the public boulder skill and excludes local planning notes", async () => {
+    const packageJson = await readFile(join(root, "package.json"), "utf8");
+
+    expect(packageJson).toContain("\"skills/boulder\"");
+    expect(packageJson).toContain("\"skills/boulder-bootstrap-designer\"");
+    expect(packageJson).toContain("\"!docs/*SESSION_SUMMARY*.md\"");
+    expect(packageJson).toContain("\"!docs/NEXT_*GAP*PLAN*.md\"");
+  });
 });
+
+async function filesUnder(relativePath: string): Promise<string[]> {
+  const absolute = join(root, relativePath);
+  const entries = await readdir(absolute);
+  const files: string[] = [];
+
+  for (const entry of entries) {
+    const child = join(relativePath, entry);
+    const childStat = await stat(join(root, child));
+    if (childStat.isDirectory()) {
+      files.push(...await filesUnder(child));
+    } else if (childStat.isFile()) {
+      files.push(child);
+    }
+  }
+
+  return files;
+}

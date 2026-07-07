@@ -36,6 +36,7 @@ type OfficialDocs = {
   readonly repoUrl: string;
   readonly docsUrls: readonly string[];
   readonly versionOrRef: string;
+  readonly freshnessPolicyDays?: number;
   readonly setupCommands: readonly string[];
   readonly testCommands: readonly string[];
   readonly contributionPolicy: string;
@@ -93,10 +94,12 @@ async function evaluateReplayProject(root: string, project: string): Promise<Rep
   const replay = isReplayManifest(parsedReplay) ? parsedReplay : null;
   const officialDocsPath = replay?.officialDocsPath ?? `fixtures/replay/${project}/official-docs.json`;
   const parsedDocs = parseJsonObject(await safeRead(join(root, officialDocsPath)));
+  const officialDocs = isOfficialDocs(parsedDocs) ? parsedDocs : null;
   const issues = [
     ...replay ? [] : [`invalid ${replayPath}`],
-    ...isOfficialDocs(parsedDocs) ? [] : [`invalid ${officialDocsPath}`],
-    ...replay ? await replayManifestIssues(root, replay) : []
+    ...officialDocs ? [] : [`invalid ${officialDocsPath}`],
+    ...replay ? await replayManifestIssues(root, replay) : [],
+    ...replay && officialDocs ? officialDocsIssues(replay, officialDocs) : []
   ];
   return {
     project: replay?.project ?? project,
@@ -147,6 +150,7 @@ function isOfficialDocs(value: unknown): value is OfficialDocs {
     && typeof value["repoUrl"] === "string"
     && isStringArray(value["docsUrls"])
     && typeof value["versionOrRef"] === "string"
+    && (value["freshnessPolicyDays"] === undefined || isPositiveInteger(value["freshnessPolicyDays"]))
     && isStringArray(value["setupCommands"])
     && isStringArray(value["testCommands"])
     && typeof value["contributionPolicy"] === "string"
@@ -155,8 +159,38 @@ function isOfficialDocs(value: unknown): value is OfficialDocs {
     && typeof value["retrievedAt"] === "string";
 }
 
+function officialDocsIssues(replay: ReplayManifest, docs: OfficialDocs): readonly string[] {
+  const issues = [];
+  if (replay.ref !== docs.versionOrRef) {
+    issues.push(`replay ref ${replay.ref} must match official docs versionOrRef ${docs.versionOrRef}`);
+  }
+  const retrieved = Date.parse(docs.retrievedAt);
+  if (!Number.isFinite(retrieved)) {
+    issues.push("official docs retrievedAt must be an ISO date");
+  } else {
+    const freshnessPolicyDays = docs.freshnessPolicyDays ?? 90;
+    const ageDays = (Date.now() - retrieved) / 86_400_000;
+    if (ageDays < 0) {
+      issues.push("official docs retrievedAt must not be in the future");
+    } else if (ageDays > freshnessPolicyDays) {
+      issues.push(`official docs are stale: retrievedAt exceeds ${freshnessPolicyDays} days`);
+    }
+  }
+  if (replay.project !== docs.project) {
+    issues.push("replay project must match official docs project");
+  }
+  if (replay.repoUrl !== docs.repoUrl) {
+    issues.push("replay repoUrl must match official docs repoUrl");
+  }
+  return issues;
+}
+
 function isStringArray(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.length > 0 && value.every((item) => typeof item === "string");
+}
+
+function isPositiveInteger(value: unknown): boolean {
+  return typeof value === "number" && Number.isInteger(value) && value > 0;
 }
 
 function parseJsonObject(content: string): unknown {

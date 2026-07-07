@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
+import { scoreProfiles } from "../src/task-scoring";
+import { BUILT_IN_WORKFLOW_PROFILE_IDS } from "../src/workflow-profile-builtins";
 import { resolveWorkflowProfile, taskClassFor } from "../src/workflow-profiles";
 import { removeTempRepo, tempRepo, write, writeCustomExecutorManifest } from "./helpers/cli";
 
@@ -121,6 +123,32 @@ describe("workflow profile resolution", () => {
           "verify"
         ]);
       }
+    }
+  });
+
+  test("keeps bootstrap profile taxonomy synchronized across docs and skills", async () => {
+    const root = join(import.meta.dir, "..");
+    const bootstrapProfiles = scoreProfiles(null).map((item) => item.profileId);
+    const baseProfiles = ["programming-default", "research-default", "ops-default"];
+    const surfaces = [
+      await readFile(join(root, "docs", "BOOTSTRAP_INTERVIEW_RESEARCH.md"), "utf8"),
+      await readFile(join(root, "docs", "BOOTSTRAP_PROFILE_RESEARCH.md"), "utf8"),
+      await readFile(join(root, "skills", "boulder-bootstrap-designer", "SKILL.md"), "utf8"),
+      await readFile(join(root, "docs", "BOULDER_CODEX_SKILL_USAGE.ko.md"), "utf8")
+    ].join("\n");
+
+    for (const profile of [...bootstrapProfiles, ...baseProfiles]) {
+      expect(BUILT_IN_WORKFLOW_PROFILE_IDS).toContain(profile as (typeof BUILT_IN_WORKFLOW_PROFILE_IDS)[number]);
+      expect(surfaces).toContain(profile);
+    }
+    for (const [bootstrap, base] of [
+      ["programming-heavy", "programming-default"],
+      ["research-corpus", "research-default"],
+      ["release-safe", "ops-default"],
+      ["issue-triage", "ops-default"],
+      ["docs-reviewer", "research-default"]
+    ]) {
+      expect(surfaces).toContain(`${bootstrap} -> ${base}`);
     }
   });
 });

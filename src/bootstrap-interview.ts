@@ -10,10 +10,12 @@ export type BootstrapInterviewReport = {
   readonly task: string | null;
   readonly recommendedProfile: string;
   readonly baseProfile: string;
+  readonly profileRelationship: string;
   readonly basis: readonly string[];
   readonly questions: readonly string[];
   readonly selectedSubagents: readonly string[];
   readonly capabilityPlan: CapabilityPlan;
+  readonly unsupportedCapabilityNotes: readonly UnsupportedCapabilityNote[];
   readonly profileScores: readonly ProfileScore[];
   readonly capabilityScores: readonly CapabilityScore[];
   readonly recommendationRationale: readonly string[];
@@ -26,6 +28,12 @@ export type CapabilityPlan = {
   readonly mcpServers: readonly string[];
   readonly rag: readonly string[];
   readonly db: readonly string[];
+};
+
+export type UnsupportedCapabilityNote = {
+  readonly dimension: "rag" | "db";
+  readonly candidates: readonly string[];
+  readonly note: string;
 };
 
 type BootstrapProfile = {
@@ -102,6 +110,7 @@ export function buildBootstrapInterview(task: string | null): BootstrapInterview
     task: cleanTask,
     recommendedProfile: profile.id,
     baseProfile: profile.base,
+    profileRelationship: `${profile.id} is a task-category profile built on ${profile.base}. Use the recommended profile for repeated work; use the base profile when you want the broader default lane policy.`,
     basis: [
       "hierarchical-task-analysis",
       "cognitive-task-analysis",
@@ -118,6 +127,7 @@ export function buildBootstrapInterview(task: string | null): BootstrapInterview
     ],
     selectedSubagents: profile.subagents,
     capabilityPlan: profile.capabilityPlan,
+    unsupportedCapabilityNotes: unsupportedCapabilityNotes(profile.capabilityPlan),
     profileScores,
     capabilityScores,
     recommendationRationale: recommendationRationale(profileScores, capabilityScores),
@@ -161,6 +171,14 @@ export function bootstrapInterviewToMarkdown(report: BootstrapInterviewReport): 
     `- rag: ${report.capabilityPlan.rag.join(", ")}`,
     `- db: ${report.capabilityPlan.db.join(", ")}`,
     "",
+    "## Profile Relationship",
+    "",
+    report.profileRelationship,
+    "",
+    "## Unsupported Capability Notes",
+    "",
+    ...report.unsupportedCapabilityNotes.map((item) => `- ${item.dimension}: ${item.candidates.join(", ")} - ${item.note}`),
+    "",
     "## Scores",
     "",
     "### Profiles",
@@ -184,6 +202,25 @@ export function bootstrapInterviewToMarkdown(report: BootstrapInterviewReport): 
     ...report.guardrails.map((item) => `- ${item}`),
     ""
   ].join("\n");
+}
+
+function unsupportedCapabilityNotes(plan: CapabilityPlan): readonly UnsupportedCapabilityNote[] {
+  const notes: UnsupportedCapabilityNote[] = [];
+  if (plan.rag.length) {
+    notes.push({
+      dimension: "rag",
+      candidates: plan.rag,
+      note: "Candidate only; Boulder can record and report this grounding need, but it does not index corpora or fetch sources from this report."
+    });
+  }
+  if (plan.db.length) {
+    notes.push({
+      dimension: "db",
+      candidates: plan.db,
+      note: "Candidate only; Boulder can name the ledger need, but it does not provision DBs or durable stores from this report."
+    });
+  }
+  return notes;
 }
 
 function recommendationRationale(

@@ -79,6 +79,10 @@ GitHub sources are canonicalized to `https://github.com/<owner>/<repo>`. GJC is 
 
 Subagent catalogs are profile-scoped capability sources. Bootstrap may use an existing profile to choose a small subagent subset, or run an interview first, create the profile, and then choose the matching subset. Doctor reports the catalog candidate; it does not install all subagents.
 
+## Lifecycle Status
+
+Use `boulder capability status --cwd . --json` for read-only lifecycle reconciliation of imported source candidates against the local inventory. `doctor` stays focused on local availability and routing; `capability status` reports source candidate freshness, trust state, installed visibility, linked active profile, and lifecycle issues without installing, updating, cloning, or fetching anything.
+
 Doctor reads these manifests and reports them as source candidates. It does not install, update, clone, or launch the capability. `doctor` remains read-only; future update checks belong to a separate `update` command.
 
 ## Runtime Compatibility

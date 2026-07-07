@@ -51,6 +51,31 @@ async function writeReadyPublicProductFixture(root: string): Promise<void> {
   await git(root, ["add", "."]);
   await git(root, ["commit", "-m", "fixture"]);
   await git(root, ["tag", `v${version}`]);
+  const releaseCommit = await gitOutput(root, ["rev-parse", "HEAD"]);
+  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", `https://github.com/min9lin9/boulder/actions/runs/27290627860\nCI\nsuccess\nCommit: ${releaseCommit}\n`);
+  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
+    schemaVersion: 1,
+    packageName: "boulder-oss-cli",
+    packageJsonVersion: version,
+    cliVersion: version,
+    tag: `v${version}`,
+    tagCommit: releaseCommit,
+    releaseCommit,
+    publishedVersion: version,
+    installSmoke: {
+      command: `bunx boulder-oss-cli@${version} --version`,
+      exitCode: 0,
+      generatedAt: "2026-07-07"
+    },
+    githubActions: {
+      runUrl: "https://github.com/min9lin9/boulder/actions/runs/27290627860"
+    },
+    packDryRun: {
+      fileCount: 10,
+      packageVersion: version
+    },
+    limitations: []
+  }));
 }
 
 async function git(cwd: string, args: readonly string[]): Promise<void> {
@@ -58,6 +83,15 @@ async function git(cwd: string, args: readonly string[]): Promise<void> {
     exec(`git ${args.join(" ")}`, { cwd }, (error) => {
       if (error) reject(error);
       else resolve();
+    });
+  });
+}
+
+async function gitOutput(cwd: string, args: readonly string[]): Promise<string> {
+  return await new Promise<string>((resolve, reject) => {
+    exec(`git ${args.join(" ")}`, { cwd }, (error, stdout) => {
+      if (error) reject(error);
+      else resolve(stdout.trim());
     });
   });
 }

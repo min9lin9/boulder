@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "packageName": "boulder-oss-cli",
+  "packageJsonVersion": "0.1.15",
+  "cliVersion": "0.1.15",
+  "tag": "v0.1.15",
+  "tagCommit": "4c970203a1991a0a3df60bf3322a6c0a9d565fda",
+  "releaseCommit": "806330e00faabc78decefeeb4f68a514f55f0ee0",
+  "publishedVersion": "0.1.15",
+  "installSmoke": {
+    "command": "bunx boulder-oss-cli@0.1.15 --version",
+    "exitCode": 0,
+    "generatedAt": "2026-06-24"
+  },
+  "githubActions": {
+    "runUrl": "https://github.com/min9lin9/boulder/actions/runs/27739209640"
+  },
+  "packDryRun": {
+    "fileCount": 146,
+    "packageVersion": "0.1.15"
+  },
+  "limitations": []
+}

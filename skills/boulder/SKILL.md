@@ -25,11 +25,7 @@ Use the bundled wrapper script from this skill:
 ./scripts/boulder-local.sh <command> --cwd <target-repo>
 ```
 
-The wrapper defaults `BOULDER_HOME` to:
-
-```bash
-/Users/burt/Documents/Codex/2026-06-02/files-mentioned-by-the-user-codex/work/boulder
-```
+The wrapper resolves `BOULDER_HOME` from the packaged skill location by default.
 
 Override it only when the Boulder checkout moved:
 

@@ -32,7 +32,7 @@ The Lenny-style bar is stricter than "the CLI can produce readiness output." The
 maintainer event -> first value -> shared artifact -> decision -> second event -> changed recommendation
 ```
 
-Boulder now has executable evidence for that loop through `fixtures/service-readiness/gates.json`. That raises planning confidence, but the service is still not field-backed because the evidence is not yet produced by a real maintainer using Boulder across multiple repo events.
+Boulder now has executable local evidence for that loop through `fixtures/service-readiness/gates.json` and recorded field-readiness artifacts. That supports the CLI `service-readiness` gate, but it still does not prove broad external adoption because the evidence is not yet produced by multiple independent maintainers across repeated repo events.
 
 Planning score remains 90 / 100:
 
@@ -49,15 +49,17 @@ The service score remains lower than the architecture score until Contract MVP, 
 
 ## Current Verdict
 
-Historical note: Boulder is `pilot-ready` as a service workflow foundation. It is not yet public `ready` because product-readiness remains blocked by release/public evidence, and the service loop has not yet been proven by external repeat use.
+Current executable gate: Boulder is `ready` for the local CLI service workflow checked by `boulder service-readiness --cwd . --json`.
+
+External adoption evidence: not field-backed beyond the recorded local readiness run. Do not treat the local `ready` gate as proof of broad public service adoption.
 
 Practical service planning score: 90 / 100.
 
 Interpretation:
 
-- The workflow is coherent enough for maintainer pilots.
+- The workflow is coherent enough for maintainer pilots and local service-readiness checks.
 - The service claim is stronger because activation, repeat value, public artifact quality, decision impact, replay discipline, and metrics now have an executable evidence fixture.
-- The next planning target is not more broad capability; it is real external maintainer usage that produces evidence outside local fixtures.
+- The next planning target is not more broad capability; it is real external maintainer usage that produces evidence outside local fixtures and the current recorded field-readiness run.
 
 ## Service Acceptance Gates
 

@@ -83,6 +83,7 @@ async function writeServiceFixture(root: string): Promise<void> {
     evidencePaths: ["docs/CASE_STUDIES/evidence/external-replay/kimi-agent-swarm-skill.txt"],
     limitations: ["Public replay requires network checkout."]
   }));
+  await write(root, "docs/CASE_STUDIES/evidence/external-replay/kimi-agent-swarm-skill.txt", "share-safe external replay evidence\n");
   for (const friction of ["low", "medium", "high"]) {
     await write(root, `fixtures/handoffs/${friction}.json`, JSON.stringify({
       friction,
@@ -147,6 +148,31 @@ describe("service readiness", () => {
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "official-docs-coverage" && item.status === "fail")).toBe(true);
+  });
+
+  test("blocks when replay docs are stale or ref-mismatched", async () => {
+    const root = await tempRepo();
+    await writeServiceFixture(root);
+    await write(root, "fixtures/replay/kimi-agent-swarm-skill/official-docs.json", JSON.stringify({
+      project: "kimi-agent-swarm-skill",
+      repoUrl: "https://github.com/min9lin9/kimi-agent-swarm-skill",
+      docsUrls: ["https://github.com/min9lin9/kimi-agent-swarm-skill#readme"],
+      versionOrRef: "older-ref",
+      setupCommands: ["bun install"],
+      testCommands: ["bun test"],
+      contributionPolicy: "Use repository README and issues.",
+      securityPolicy: "Do not include secrets.",
+      constraints: ["No credentials"],
+      retrievedAt: "2025-01-01"
+    }));
+
+    const readiness = await evaluateServiceReadiness(root);
+    const externalReplay = readiness.checks.find((item) => item.id === "external-replay");
+
+    expect(readiness.status).toBe("blocked");
+    expect(externalReplay?.status).toBe("fail");
+    expect(externalReplay?.evidence).toContain("official docs are stale");
+    expect(externalReplay?.evidence).toContain("must match official docs versionOrRef");
   });
 
   test("blocks when field evidence is not complete", async () => {

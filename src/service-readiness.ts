@@ -4,6 +4,7 @@ import { exists } from "./fs";
 import { validateHandoffFile } from "./handoff-validation";
 import { evaluateProductReadiness } from "./product-readiness";
 import { fieldEvidenceCheck } from "./service-field-evidence";
+import { evaluateReplayCheck } from "./replay-check";
 import { evaluateServiceGates } from "./service-gates";
 
 export type ServiceReadinessStatus = "ready" | "pilot-ready" | "blocked";
@@ -133,27 +134,17 @@ async function officialDocsCoverageCheck(root: string): Promise<ServiceReadiness
 }
 
 async function replayManifestCheck(root: string): Promise<ServiceReadinessCheck> {
-  const manifestPaths = await findReplayFiles(root, "replay.json");
-  if (manifestPaths.length === 0) {
+  const replay = await evaluateReplayCheck(root);
+  if (replay.projects.length === 0) {
     return { id: "external-replay", status: "fail", evidence: "missing fixtures/replay/*/replay.json" };
   }
-  const missingOfficialDocs = [];
-  for (const path of manifestPaths) {
-    const raw = await safeRead(join(root, path));
-    const parsed = parseJsonObject(raw);
-    const officialDocsPath = isObject(parsed) && typeof parsed["officialDocsPath"] === "string"
-      ? parsed["officialDocsPath"]
-      : "";
-    if (!officialDocsPath || !await exists(join(root, officialDocsPath))) {
-      missingOfficialDocs.push(path);
-    }
-  }
+  const failures = replay.projects.filter((item) => item.status === "fail");
   return {
     id: "external-replay",
-    status: missingOfficialDocs.length ? "fail" : "pass",
-    evidence: missingOfficialDocs.length
-      ? `missing official docs reference: ${missingOfficialDocs.join(", ")}`
-      : manifestPaths.join(", ")
+    status: replay.status === "ready" ? "pass" : "fail",
+    evidence: failures.length
+      ? failures.map((item) => `${item.project}: ${item.issues.join(", ")}`).join("; ")
+      : replay.projects.map((item) => item.replayPath).join(", ")
   };
 }
 
