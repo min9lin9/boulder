@@ -60,26 +60,19 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("reports root release evidence as blocked until 0.1.16 is published and tagged", async () => {
+  test("reports root release evidence as ready after 0.1.16 is published and tagged", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
     expect(report.version).toBe("0.1.16");
-    expect(report.status).toBe("blocked");
-    expect(report.checks.some((item) => item.id === "ci-bun-engine" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "changelog-version" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "fail")).toBe(true);
-    expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
-    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
-    expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
-    expect(report.checks.some((item) => item.id === "release-evidence-manifest" && item.status === "fail")).toBe(true);
-    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.");
-    expect(report.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
-    expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16.");
-    expect(markdown).toContain("does not publish");
-    expect(markdown).toContain("Status: blocked");
+    expect(report.status).toBe("ready");
+    expect(report.checks.every((item) => item.status === "pass")).toBe(true);
+    expect(report.checks.some((item) => item.id === "published-version-evidence")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local")).toBe(true);
+    expect(report.checks.some((item) => item.id === "release-evidence-manifest")).toBe(true);
+    expect(report.nextCommands).toEqual([]);
+    expect(markdown).toContain("Status: ready");
     expect(markdown).not.toContain("npm publish --access public");
     expect(markdown).not.toContain("git tag v");
     expect(markdown).not.toContain("gh release create");

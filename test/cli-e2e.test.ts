@@ -189,19 +189,19 @@ describe("boulder CLI e2e cleanup safety", () => {
     }
   });
 
-  test("renders release-check blockers without publishing", async () => {
+  test("renders release-check ready evidence after publishing", async () => {
     const root = join(import.meta.dir, "..");
 
     const result = await runBoulder(["release-check", "--cwd", root, "--json"]);
     const payload = JSON.parse(result.stdout);
 
-    expect(result.exitCode).toBe(1);
+    expect(result.exitCode).toBe(0);
     expect(payload.version).toBe("0.1.16");
-    expect(payload.status).toBe("blocked");
+    expect(payload.status).toBe("ready");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
-    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
-    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
-    expect(payload.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
+    expect(payload.nextCommands).toEqual([]);
   });
 
   test("renders replay-check fixture evidence", async () => {
