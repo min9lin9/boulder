@@ -1,3 +1,4 @@
+// allow: SIZE_OK - readiness regression suite keeps cross-gate fixture assertions together; split when adding a new readiness domain.
 import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
@@ -166,6 +167,48 @@ describe("benchmark and release reports", () => {
     expect(report.status).toBe("blocked");
     expect(manifest?.status).toBe("fail");
     expect(manifest?.evidence).toContain("releaseCommit must match HEAD or the documented GitHub Actions commit");
+  });
+
+  test("blocks archive releaseCommit without documented GitHub Actions commit evidence", async () => {
+    const root = await tempRepo();
+    const releaseCommit = "1111111111111111111111111111111111111111";
+    await write(root, "package.json", JSON.stringify(releasePackageJson("1.2.3")));
+    await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
+    await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
+    await write(root, "CHANGELOG.md", "## 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "bunx boulder-oss-cli\n1.2.3\nPublished version: 1.2.3\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nResult: success\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", "boulder-oss-cli\nTotal files\n");
+    await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
+      schemaVersion: 1,
+      packageName: "boulder-oss-cli",
+      packageJsonVersion: "1.2.3",
+      cliVersion: "1.2.3",
+      tag: "v1.2.3",
+      tagCommit: releaseCommit,
+      releaseCommit,
+      publishedVersion: "1.2.3",
+      installSmoke: {
+        command: "bunx boulder-oss-cli@1.2.3 --version",
+        exitCode: 0,
+        generatedAt: "2026-07-07"
+      },
+      githubActions: {
+        runUrl: "https://github.com/example/repo/actions/runs/1"
+      },
+      packDryRun: {
+        fileCount: 10,
+        packageVersion: "1.2.3"
+      },
+      limitations: []
+    }));
+
+    const report = await evaluateReleaseCheck(root);
+    const manifest = report.checks.find((item) => item.id === "release-evidence-manifest");
+
+    expect(report.status).toBe("blocked");
+    expect(manifest?.status).toBe("fail");
+    expect(manifest?.evidence).toContain("releaseCommit requires local HEAD or documented GitHub Actions commit evidence");
   });
 
   test("reports blocker-first release next commands without publish automation", async () => {

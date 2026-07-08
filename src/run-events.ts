@@ -1,7 +1,8 @@
 import { constants } from "node:fs";
-import { lstat, mkdir, open, readdir, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
+import { lstat, mkdir, open, readdir, readFile, rename, rm, unlink } from "node:fs/promises";
 import { dirname } from "node:path";
 import { join, resolve } from "node:path";
+import { DEFAULT_PROTECTED_PATTERNS, sanitizeEvent } from "./run-event-redaction";
 import { isRunEventRecord, type RecordRunEventInput, type RecordRunEventResult, type RunEventRecord, type RunEventsList, type RunEventsPruneResult } from "./run-event-shape";
 export type { RecordRunEventInput, RecordRunEventResult, RunEventName, RunEventRecord, RunEventSeverity, RunEventsList, RunEventsPruneResult, RunEventStatus } from "./run-event-shape";
 
@@ -95,51 +96,6 @@ export function runEventsList(events: readonly RunEventRecord[]): RunEventsList 
   return { schemaVersion: "boulder.runs.list.v1", runs: events };
 }
 
-function sanitizeEvent(root: string, protectedPatterns: readonly string[], event: RunEventRecord): RunEventRecord {
-  return {
-    ...event,
-    command: sanitizeString(root, protectedPatterns, event.command),
-    packageVersion: sanitizeString(root, protectedPatterns, event.packageVersion),
-    checkIds: event.checkIds.map((item) => sanitizeString(root, protectedPatterns, item)),
-    recoveryHintIds: event.recoveryHintIds.map((item) => sanitizeString(root, protectedPatterns, item)),
-    artifactPaths: event.artifactPaths.map((item) => sanitizeString(root, protectedPatterns, item))
-  };
-}
-
-function sanitizeString(root: string, protectedPatterns: readonly string[], value: string): string {
-  if (value.includes("\n") || value.includes("\r")) return "[REDACTED_FILE_BODY]";
-  let redacted = value
-    .replace(/\bsk-proj-[A-Za-z0-9_-]+/g, "[REDACTED_SECRET]")
-    .replace(/\bsk-[A-Za-z0-9_-]+/g, "[REDACTED_SECRET]")
-    .replace(/\bghp_[A-Za-z0-9_-]+/g, "[REDACTED_SECRET]")
-    .replace(/\bnpm_[A-Za-z0-9_-]+/g, "[REDACTED_SECRET]")
-    .replace(/Bearer\s+\S+/g, "Bearer [REDACTED_SECRET]");
-  for (const pattern of protectedPatterns) {
-    redacted = redactProtectedPath(root, pattern, redacted);
-  }
-  return redacted.split(resolve(root)).join("[CWD]");
-}
-
-function redactProtectedPath(root: string, pattern: string, value: string): string {
-  const clean = pattern.trim();
-  if (!clean) return value;
-  const prefix = clean.endsWith("*") ? clean.slice(0, -1) : clean;
-  const absolute = resolve(root, prefix);
-  const escaped = escapeRegExp(absolute);
-  const relative = relativeProtectedPathPattern(prefix, clean.endsWith("*"));
-  const absoluteMatch = clean.endsWith("*") ? new RegExp(`${escaped}[^\\s"']*`, "g") : new RegExp(escaped, "g");
-  const relativeMatch = new RegExp(`(^|[\\s"'=:])(${relative})`, "g");
-  return value
-    .replace(absoluteMatch, "[REDACTED_PROTECTED_PATH]")
-    .replace(relativeMatch, "$1[REDACTED_PROTECTED_PATH]");
-}
-
-function relativeProtectedPathPattern(prefix: string, wildcard: boolean): string {
-  const escaped = escapeRegExp(prefix);
-  const segment = prefix.includes("/") ? escaped : `(?:[^\\s"']*/)*${escaped}`;
-  return wildcard ? `${segment}[^\\s"']*` : segment;
-}
-
 async function readRunEvent(path: string): Promise<RunEventRecord | null> {
   try {
     const info = await lstat(path);
@@ -224,7 +180,7 @@ async function readProtectedPatterns(root: string): Promise<readonly string[]> {
   try {
     text = await readFile(join(root, "boulder.yaml"), "utf8");
   } catch (error) {
-    if (hasErrorCode(error, "ENOENT")) return [];
+    if (hasErrorCode(error, "ENOENT")) return DEFAULT_PROTECTED_PATTERNS;
     throw error;
   }
   const lines = text.split("\n");
@@ -236,7 +192,7 @@ async function readProtectedPatterns(root: string): Promise<readonly string[]> {
     const match = /^\s*-\s+(.+?)\s*$/.exec(line);
     if (match?.[1]) patterns.push(match[1]);
   }
-  return patterns;
+  return patterns.length ? patterns : DEFAULT_PROTECTED_PATTERNS;
 }
 
 function runsDir(root: string): string {
@@ -256,10 +212,6 @@ function compareRunEvents(left: RunEventRecord, right: RunEventRecord): number {
 async function hashText(value: string): Promise<string> {
   const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(buffer)).map((item) => item.toString(16).padStart(2, "0")).join("");
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

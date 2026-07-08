@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 183,
-  "totalPackedFiles": 184,
+  "totalUniqueFiles": 186,
+  "totalPackedFiles": 187,
   "classes": [
     {
       "class": "runtime",
-      "count": 67,
+      "count": 68,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -55,6 +55,7 @@
         "src/routine-command.ts",
         "src/routine-retro.ts",
         "src/routine.ts",
+        "src/run-event-redaction.ts",
         "src/run-event-shape.ts",
         "src/run-events.ts",
         "src/runs-command.ts",
@@ -148,7 +149,7 @@
     },
     {
       "class": "case-study-evidence",
-      "count": 19,
+      "count": 21,
       "files": [
         "docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md",
         "docs/CASE_STUDIES/evidence/core-implementation/export-command.txt",
@@ -167,8 +168,10 @@
         "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
+        "docs/CASE_STUDIES/evidence/release-workflow/pr26-review-closure.md",
         "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
-        "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json"
+        "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json",
+        "docs/CASE_STUDIES/evidence/release-workflow/run-event-redaction-repro.json"
       ]
     },
     {

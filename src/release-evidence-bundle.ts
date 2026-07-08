@@ -6,7 +6,7 @@ export const RELEASE_EVIDENCE_TARGETS = [
   "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
   "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
   "docs/CASE_STUDIES/evidence/release-workflow/ci.txt",
-  "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json",
+  "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json",
   "docs/PRODUCT_READINESS.md"
 ] as const;
 
@@ -106,7 +106,7 @@ export function renderReleaseEvidenceBundle(bundle: ReleaseEvidenceBundleV1): Re
     "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt": `${bundle.installSmoke.command}\nPublished help smoke:\nbunx boulder-oss-cli --help\nUsage:\nPublished version: ${bundle.publishedVersion}\nResult: success\nGenerated at: ${bundle.installSmoke.generatedAt}\nexit: ${bundle.installSmoke.exitCode}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt": `${bundle.packageName}\nPackage version: ${bundle.packDryRun.packageVersion}\nTotal files: ${bundle.packDryRun.fileCount}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/ci.txt": `bun run ci\nResult: success\nCommit: ${bundle.releaseCommit}\n`,
-    "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json": `${JSON.stringify({
+    "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json": `${JSON.stringify({
       version: bundle.packageJsonVersion,
       status: "ready",
       checks: [

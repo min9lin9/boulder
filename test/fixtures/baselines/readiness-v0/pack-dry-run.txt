@@ -40,13 +40,15 @@ packed 76B docs/CASE_STUDIES/evidence/release-workflow/ci.txt
 packed 134B docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
 packed 170B docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
 packed 57B docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt
+packed 0.93KB docs/CASE_STUDIES/evidence/release-workflow/pr26-review-closure.md
+packed 0.75KB docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json
 packed 0.63KB docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json
-packed 0.75KB docs/CASE_STUDIES/evidence/release-workflow/release-plan.json
+packed 1.0KB docs/CASE_STUDIES/evidence/release-workflow/run-event-redaction-repro.json
 packed 2.0KB docs/CASE_STUDIES/external-replay.md
 packed 1.10KB docs/CASE_STUDIES/issue-pr-ci-cycle.md
 packed 2.0KB docs/CASE_STUDIES/pr-review.md
-packed 1.93KB docs/CASE_STUDIES/release-workflow.md
-packed 3.90KB docs/CODEX_OSS_APPLICATION_PACKET.md
+packed 1.94KB docs/CASE_STUDIES/release-workflow.md
+packed 3.91KB docs/CODEX_OSS_APPLICATION_PACKET.md
 packed 6.17KB docs/CODEX_OSS_FINAL_AUDIT.md
 packed 8.28KB docs/CODEX_OSS_SCORECARD.md
 packed 0.77KB docs/CODEX_WORKFLOW_NOTES.md
@@ -73,7 +75,7 @@ packed 1.18KB docs/RELEASE_PLAN.md
 packed 2.90KB docs/RELEASE_WORKFLOW.md
 packed 0.56KB docs/REPO_BRIEF.md
 packed 3.29KB docs/SERVICE_LOOP.md
-packed 1.20KB docs/SERVICE_READINESS.md
+packed 1.18KB docs/SERVICE_READINESS.md
 packed 10.17KB docs/SERVICE_STRATEGY_REVIEW.md
 packed 446B docs/SUBAGENT_RECOMMENDATIONS.md
 packed 4.28KB docs/TRUST_SUPPORT_SECURITY.md
@@ -93,11 +95,11 @@ packed 0.70KB fixtures/benchmarks/mcp-server.json
 packed 0.69KB fixtures/benchmarks/python-package.json
 packed 0.72KB fixtures/benchmarks/typescript-library.json
 packed 1.47KB fixtures/capabilities/codex-installed.json
-packed 18.81KB fixtures/docs/doc-registry.v0.json
+packed 19.46KB fixtures/docs/doc-registry.v0.json
 packed 0.91KB fixtures/handoffs/high.json
 packed 0.63KB fixtures/handoffs/low.json
 packed 0.74KB fixtures/handoffs/medium.json
-packed 8.65KB fixtures/package-inventory/packaged-files.v0.json
+packed 8.86KB fixtures/package-inventory/packaged-files.v0.json
 packed 2.0KB fixtures/profiles/resolved/ops-default.json
 packed 2.12KB fixtures/profiles/resolved/programming-default.json
 packed 2.0KB fixtures/profiles/resolved/research-default.json
@@ -156,17 +158,18 @@ packed 5.61KB src/quickstart.ts
 packed 11.12KB src/readiness-registry.ts
 packed 0.73KB src/recovery-codes.ts
 packed 9.58KB src/release-check.ts
-packed 7.71KB src/release-evidence-bundle.ts
-packed 7.83KB src/release-evidence.ts
-packed 6.14KB src/release-manifest-check.ts
+packed 7.73KB src/release-evidence-bundle.ts
+packed 7.86KB src/release-evidence.ts
+packed 6.26KB src/release-manifest-check.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
 packed 3.80KB src/replay-run.ts
 packed 4.37KB src/routine-command.ts
 packed 5.17KB src/routine-retro.ts
 packed 5.76KB src/routine.ts
+packed 2.79KB src/run-event-redaction.ts
 packed 3.17KB src/run-event-shape.ts
-packed 10.81KB src/run-events.ts
+packed 8.62KB src/run-events.ts
 packed 1.99KB src/runs-command.ts
 packed 7.1KB src/scorecard.ts
 packed 2.62KB src/service-field-evidence.ts
@@ -187,5 +190,5 @@ packed 1.75KB src/workflows.ts
 
 boulder-oss-cli-0.1.16.tgz
 
-Total files: 184
+Total files: 187
 Unpacked size: 0.73MB

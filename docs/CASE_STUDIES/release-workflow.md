@@ -22,7 +22,7 @@ bun run ci
 
 ## Evidence
 
-- `docs/CASE_STUDIES/evidence/release-workflow/release-plan.json`
+- `docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json`
 - `docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt`
 - `docs/CASE_STUDIES/evidence/release-workflow/ci.txt`
 

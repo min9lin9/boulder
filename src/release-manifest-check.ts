@@ -68,7 +68,11 @@ async function expectCommitFields(errors: string[], root: string, version: strin
   if (releaseCommit) {
     const currentCommit = await gitStdout(root, "git rev-parse HEAD");
     const documentedCommit = await documentedGithubActionsCommit(root);
-    if ((currentCommit || documentedCommit) && !commitMatches(releaseCommit, currentCommit) && !commitMatches(releaseCommit, documentedCommit)) {
+    if (!currentCommit && !documentedCommit) {
+      errors.push("releaseCommit requires local HEAD or documented GitHub Actions commit evidence");
+      return;
+    }
+    if (!commitMatches(releaseCommit, currentCommit) && !commitMatches(releaseCommit, documentedCommit)) {
       errors.push("releaseCommit must match HEAD or the documented GitHub Actions commit");
     }
   }

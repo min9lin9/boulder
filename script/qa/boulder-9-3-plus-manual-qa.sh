@@ -35,7 +35,6 @@ run_json_strict() {
 mkdir -p "$EVIDENCE_DIR"
 rm -rf "$JSON_EVIDENCE_DIR"
 mkdir -p "$JSON_EVIDENCE_DIR"
-git -C "$ROOT" archive HEAD | tar -x -C "$TMP_ROOT"
 CLEAN_ROOT="$TMP_ROOT/clean"
 mkdir "$CLEAN_ROOT"
 git -C "$ROOT" archive HEAD | tar -x -C "$CLEAN_ROOT"
@@ -114,9 +113,6 @@ function assertExit(key, expected, label) {
   }
   console.log(`assert:${label} exit ${expected}`);
 }
-function failingIds(report) {
-  return (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
-}
 function assertSameIds(actual, expected, label) {
   const sortedActual = [...actual].sort();
   const sortedExpected = [...expected].sort();
@@ -125,38 +121,6 @@ function assertSameIds(actual, expected, label) {
     process.exit(1);
   }
   console.log(`assert:${label} ${expected.join(",")}`);
-}
-function assertReleaseBlocked(report, label, expectedFailures) {
-  assertBlocked(report, label);
-  const failing = failingIds(report);
-  const missing = expectedFailures.filter((id) => !failing.includes(id));
-  const unexpected = failing.filter((id) => !expectedFailures.includes(id));
-  if (missing.length || unexpected.length) {
-    console.error(`${label} release-check blockers mismatch missing:${missing.join(", ")} unexpected:${unexpected.join(", ")}`);
-    process.exit(1);
-  }
-  console.log(`assert:${label} release-check ${expectedFailures.join(",")}`);
-}
-function assertProductBlocked(report, label) {
-  assertBlocked(report, label);
-  const publicRelease = (report.checks || []).find((check) => check.id === "public-release-check");
-  if (!publicRelease || publicRelease.status !== "fail") {
-    console.error(`${label} product-readiness must fail public-release-check`);
-    process.exit(1);
-  }
-  console.log(`assert:${label} product-readiness public-release-check`);
-}
-function assertServicePilotReady(report, label) {
-  if (report.status !== "pilot-ready") {
-    console.error(`${label} service-readiness must remain pilot-ready`);
-    process.exit(1);
-  }
-  const productReadiness = (report.checks || []).find((check) => check.id === "product-readiness");
-  if (!productReadiness || productReadiness.status !== "fail") {
-    console.error(`${label} service-readiness must fail product-readiness`);
-    process.exit(1);
-  }
-  console.log(`assert:${label} service-readiness product-readiness`);
 }
 function assertRefreshExpected(report, label) {
   if (report.status === "ready") {

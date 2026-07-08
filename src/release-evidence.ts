@@ -198,11 +198,13 @@ function blocked(code: ReleaseEvidenceIssue["code"], message: string): ReleaseEv
 }
 
 function isPackageInfo(value: unknown): value is PackageInfo {
-  return typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value) &&
-    typeof (value as { readonly name?: unknown }).name === "string" &&
-    typeof (value as { readonly version?: unknown }).version === "string";
+  return isRecord(value) &&
+    typeof value["name"] === "string" &&
+    typeof value["version"] === "string";
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function shellQuote(value: string): string {

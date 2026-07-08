@@ -18,7 +18,7 @@ const PLAN_TARGETS = [
   "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
   "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
   "docs/CASE_STUDIES/evidence/release-workflow/ci.txt",
-  "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json",
+  "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json",
   "docs/PRODUCT_READINESS.md"
 ] as const;
 

@@ -35,7 +35,7 @@ describe("release evidence refresh CLI", () => {
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nCommit: 806330e\n");
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "old install smoke\n");
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/ci.txt", "old ci\n");
-      await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json", "{}\n");
+      await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json", "{}\n");
       await write(root, "docs/PRODUCT_READINESS.md", "- public-release-check: pass - release-check ready for 0.1.15\n");
 
       const result = await runBoulder(["release", "evidence", "refresh", "--write", "--json", "--cwd", root]);
@@ -152,7 +152,7 @@ async function writeRefreshFixture(root: string, manifest: string): Promise<void
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nCommit: 806330e\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "old install smoke\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/ci.txt", "old ci\n");
-  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json", "{}\n");
+  await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json", "{}\n");
   await write(root, "docs/PRODUCT_READINESS.md", [
     "# Product Readiness",
     "",
