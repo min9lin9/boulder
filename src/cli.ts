@@ -15,12 +15,14 @@ import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFricti
 import { runProfileCommand } from "./profile-command";
 import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
+import { readinessEntriesForReport, type ReadinessReportId } from "./readiness-registry";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
 import { planReleaseEvidenceRefresh, writeReleaseEvidenceRefresh, type ReleaseEvidenceRefreshPlan } from "./release-evidence";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
 import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
 import { runRoutineCommand } from "./routine-command";
+import { latestRunEvent, listRunEvents, pruneRunEvents, recordRunEvent, runEventsList, showRunEvent, type RecordRunEventInput, type RunEventName, type RunEventSeverity, type RunEventStatus } from "./run-events";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
 import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
@@ -48,6 +50,7 @@ async function runMain(args: string[]): Promise<void> {
   const parsed = parseArgv(args);
   const command = parsed.command;
   const options = parseOptions(args);
+  const startedAt = new Date().toISOString();
   if (command === "version" || args.includes("--version")) { console.log(VERSION); return; }
   if (command === "help" || args.includes("--help") || args.includes("-h")) { printHelp(); return; }
   if (command === "init") {
@@ -93,6 +96,10 @@ async function runMain(args: string[]): Promise<void> {
     return;
   }
   if (await runRoutineCommand(parsed.commandArgs, options)) {
+    return;
+  }
+  if (command === "runs") {
+    await runRunsCommand(parsed.commandArgs, args, options.cwd, options.json);
     return;
   }
   if (command === "bootstrap" && args.includes("interview")) {
@@ -168,6 +175,17 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "release-plan") {
     const plan = await evaluateReleasePlan(options.cwd);
+    await recordRunIfRequested(args, options.cwd, {
+      eventName: "release-plan",
+      command: runEventCommand(args),
+      startedAt,
+      completedAt: new Date().toISOString(),
+      severity: severityForStatus(plan.status),
+      status: plan.status,
+      checkIds: checkIds(plan.checks),
+      recoveryHintIds: [],
+      artifactPaths: options.json ? [] : ["docs/RELEASE_PLAN.md"]
+    });
     if (options.json) {
       console.log(prettyJson(plan));
       return;
@@ -190,6 +208,17 @@ async function runMain(args: string[]): Promise<void> {
     if (wantsWrite && plan.status === "ready") {
       await writeReleaseEvidenceRefresh(options.cwd, plan);
     }
+    await recordRunIfRequested(args, options.cwd, {
+      eventName: "release evidence refresh",
+      command: runEventCommand(args),
+      startedAt,
+      completedAt: new Date().toISOString(),
+      severity: severityForStatus(plan.status),
+      status: plan.status,
+      checkIds: plan.targets.map((target) => target.path),
+      recoveryHintIds: plan.issues.map((issue) => issue.code),
+      artifactPaths: plan.targets.map((target) => target.path)
+    });
     if (options.json) {
       console.log(prettyJson(refreshPlanForJson(plan, wantsWrite ? "write" : "dry-run")));
       if (plan.status === "blocked") process.exitCode = 1;
@@ -201,6 +230,7 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "release-check") {
     const report = await evaluateReleaseCheck(options.cwd);
+    await recordReadinessRunIfRequested(args, options.cwd, "release-check", "release-check", startedAt, report.status, report.checks, []);
     if (options.json) {
       console.log(prettyJson(report));
       if (report.status === "blocked") process.exitCode = 1;
@@ -211,13 +241,36 @@ async function runMain(args: string[]): Promise<void> {
     return;
   }
   if (command === "evidence" && parsed.commandArgs[1] === "inspect") {
-    console.log(prettyJson(await inspectEvidence(options.cwd)));
+    const report = await inspectEvidence(options.cwd);
+    await recordRunIfRequested(args, options.cwd, {
+      eventName: "evidence inspect",
+      command: runEventCommand(args),
+      startedAt,
+      completedAt: new Date().toISOString(),
+      severity: severityForStatus(report.status),
+      status: report.status,
+      checkIds: report.evidence.map((item) => item.id),
+      recoveryHintIds: [],
+      artifactPaths: report.evidence.map((item) => item.evidence)
+    });
+    console.log(prettyJson(report));
     return;
   }
   if (command === "evidence" && parsed.commandArgs[1] === "diff") {
     const from = optionValue(args, "--from");
     const to = optionValue(args, "--to");
     const report = await diffEvidence(from ? resolve(from) : "", to ? resolve(to) : "");
+    await recordRunIfRequested(args, options.cwd, {
+      eventName: "evidence diff",
+      command: runEventCommand(args),
+      startedAt,
+      completedAt: new Date().toISOString(),
+      severity: severityForStatus(report.status),
+      status: report.status,
+      checkIds: report.changedEvidenceIds,
+      recoveryHintIds: report.issues.map((issue) => issue.code),
+      artifactPaths: report.issues.map((issue) => issue.path)
+    });
     console.log(prettyJson(report));
     if (report.status === "blocked") process.exitCode = 1;
     return;
@@ -246,6 +299,7 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "product-readiness") {
     const readiness = await evaluateProductReadiness(options.cwd);
+    await recordReadinessRunIfRequested(args, options.cwd, "product-readiness", "product-readiness", startedAt, readiness.status, readiness.checks, options.json ? [] : ["docs/PRODUCT_READINESS.md"]);
     if (options.json) {
       console.log(prettyJson(readiness));
       if (readiness.status === "blocked") process.exitCode = 1;
@@ -259,6 +313,7 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "service-readiness") {
     const readiness = await evaluateServiceReadiness(options.cwd);
+    await recordReadinessRunIfRequested(args, options.cwd, "service-readiness", "service-readiness", startedAt, readiness.status, readiness.checks, options.json ? [] : ["docs/SERVICE_READINESS.md"]);
     if (options.json) {
       console.log(prettyJson(readiness));
       if (readiness.status === "blocked") process.exitCode = 1;
@@ -327,8 +382,116 @@ function parseArgv(args: readonly string[]): { readonly command: string; readonl
   };
 }
 
-const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence", "--from", "--to"]);
-const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run"]);
+const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence", "--from", "--to", "--older-than", "--keep"]);
+const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run", "--record-run", "--latest"]);
+
+type ReportCheck = {
+  readonly id: string;
+};
+
+async function runRunsCommand(commandArgs: readonly string[], args: readonly string[], cwd: string, json: boolean): Promise<void> {
+  if (!json) {
+    console.error("ERROR runs.json_required: runs list/show/prune require --json.");
+    process.exitCode = 1;
+    return;
+  }
+
+  const action = commandArgs[1] ?? "list";
+  if (action === "list") {
+    console.log(prettyJson(runEventsList(await listRunEvents(cwd))));
+    return;
+  }
+
+  if (action === "show") {
+    const event = args.includes("--latest") ? await latestRunEvent(cwd) : await showRunEvent(cwd, runIdFromCommandArgs(commandArgs));
+    if (!event) {
+      console.error("ERROR runs.not_found: No matching run event found.");
+      process.exitCode = 1;
+      return;
+    }
+    console.log(prettyJson(event));
+    return;
+  }
+
+  if (action === "prune") {
+    console.log(prettyJson(await pruneRunEvents(cwd, retentionDays(args), retentionKeep(args))));
+    return;
+  }
+
+  console.error(`Unknown runs command: ${action}`);
+  process.exitCode = 1;
+}
+
+async function recordReadinessRunIfRequested(
+  args: readonly string[],
+  cwd: string,
+  eventName: RunEventName,
+  report: ReadinessReportId,
+  startedAt: string,
+  status: RunEventStatus,
+  checks: readonly ReportCheck[],
+  artifactPaths: readonly string[]
+): Promise<void> {
+  await recordRunIfRequested(args, cwd, {
+    eventName,
+    command: runEventCommand(args),
+    startedAt,
+    completedAt: new Date().toISOString(),
+    severity: severityForStatus(status),
+    status,
+    checkIds: checkIds(checks),
+    recoveryHintIds: recoveryHintIds(report, checks),
+    artifactPaths
+  });
+}
+
+async function recordRunIfRequested(args: readonly string[], cwd: string, input: RecordRunEventInput): Promise<void> {
+  if (!args.includes("--record-run")) return;
+  await recordRunEvent(cwd, input);
+}
+
+function runEventCommand(args: readonly string[]): string {
+  const command = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === "--record-run") continue;
+    if (arg === "--cwd") {
+      index += 1;
+      continue;
+    }
+    command.push(arg);
+  }
+  return command.join(" ");
+}
+
+function severityForStatus(status: RunEventStatus): RunEventSeverity {
+  return status === "ready" || status === "pilot-ready" || status === "pass" ? "info" : "error";
+}
+
+function checkIds(checks: readonly ReportCheck[]): readonly string[] {
+  return checks.map((check) => check.id);
+}
+
+function recoveryHintIds(report: ReadinessReportId, checks: readonly ReportCheck[]): readonly string[] {
+  const ids = new Set(checkIds(checks));
+  return readinessEntriesForReport(report).filter((entry) => ids.has(entry.id)).map((entry) => entry.recoveryHintId);
+}
+
+function runIdFromCommandArgs(commandArgs: readonly string[]): string {
+  return commandArgs.find((arg, index) => index > 1 && !arg.startsWith("-")) ?? "";
+}
+
+function retentionDays(args: readonly string[]): number {
+  const value = optionValue(args, "--older-than") ?? "30d";
+  const match = /^(\d+)d$/.exec(value);
+  return match?.[1] ? Number(match[1]) : 30;
+}
+
+function retentionKeep(args: readonly string[]): number {
+  const value = optionValue(args, "--keep") ?? "200";
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : 200;
+}
 
 function refreshPlanForJson(plan: ReleaseEvidenceRefreshPlan, mode: "dry-run" | "write"): {
   readonly mode: "dry-run" | "write";

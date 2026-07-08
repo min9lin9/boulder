@@ -1,0 +1,35 @@
+$ bun test test/run-events-redaction.test.ts test/run-events-cli-e2e.test.ts test/cli-e2e.test.ts test/workflow-map.test.ts
+bun test v1.3.14 (0d9b296a)
+
+test/run-events-cli-e2e.test.ts:
+(pass) runs CLI > records lists shows and prunes run events as JSON [220.90ms]
+
+test/cli-e2e.test.ts:
+(pass) boulder CLI e2e cleanup safety > prints the package version [41.00ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [9.24ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [213.17ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [488.13ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [189.85ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [278.50ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [63.87ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [48.45ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [54.86ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [101.39ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [163.48ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [51.57ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [46.33ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [51.56ms]
+
+test/run-events-redaction.test.ts:
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [3.69ms]
+
+test/workflow-map.test.ts:
+(pass) primary workflow map > renders the primary workflow map json fixture [40.63ms]
+(pass) primary workflow map > rejects primary workflow without release-check [0.41ms]
+(pass) primary workflow map > keeps secondary loops below the main help route [46.05ms]
+
+ 19 pass
+ 0 fail
+ 120 expect() calls
+Ran 19 tests across 4 files. [2.15s]
+$ bunx tsc --noEmit

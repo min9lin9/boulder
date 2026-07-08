@@ -1,0 +1,25 @@
+bun test v1.3.14 (0d9b296a)
+
+test/run-events-cli-e2e.test.ts:
+(pass) runs CLI > records lists shows and prunes run events as JSON [387.84ms]
+
+test/cli-e2e.test.ts:
+(pass) boulder CLI e2e cleanup safety > prints the package version [55.77ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [15.28ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [324.03ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [674.41ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [187.95ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [391.89ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [96.15ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [71.15ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [67.50ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [142.79ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [190.61ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [73.11ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [54.96ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [69.36ms]
+
+ 15 pass
+ 0 fail
+ 101 expect() calls
+Ran 15 tests across 2 files. [2.87s]

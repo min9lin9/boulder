@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "boulder.run-event.v1",
+  "runId": "506f4d61-a631-4fd0-a828-9abb31c127e6",
+  "eventName": "release-check",
+  "command": "release-check --json",
+  "cwdHash": "c550aab4ace3f3752f4cdce0a6045729379eb74d3bb536975fbad26d7bcdbe88",
+  "packageVersion": "0.1.16",
+  "startedAt": "2026-07-08T08:33:03.165Z",
+  "completedAt": "2026-07-08T08:33:03.227Z",
+  "severity": "error",
+  "status": "blocked",
+  "checkIds": [
+    "release-workflow-doc",
+    "ci-bun-engine",
+    "changelog-version",
+    "install-smoke-evidence",
+    "install-smoke-version",
+    "published-version-evidence",
+    "github-actions-evidence",
+    "git-tag-local",
+    "release-evidence-manifest",
+    "pack-dry-run-evidence"
+  ],
+  "recoveryHintIds": [
+    "release.workflow_doc",
+    "release.ci_bun_engine",
+    "release.changelog_version",
+    "release.install_smoke",
+    "release.install_smoke_version",
+    "release.published_version",
+    "release.github_actions",
+    "release.git_tag_local",
+    "release.evidence_manifest",
+    "release.pack_dry_run"
+  ],
+  "artifactPaths": []
+}
