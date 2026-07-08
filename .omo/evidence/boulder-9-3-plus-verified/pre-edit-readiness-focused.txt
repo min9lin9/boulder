@@ -1,0 +1,16 @@
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-baseline-fixtures.test.ts:
+(pass) readiness v0 baseline fixtures > match current release and readiness gate outputs [131.56ms]
+(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [20.81ms]
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.77ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [101.78ms]
+(pass) readiness registry > preserves baseline readiness JSON output [88.23ms]
+(pass) readiness registry > rejects duplicate check ids [0.23ms]
+
+ 6 pass
+ 0 fail
+ 237 expect() calls
+Ran 6 tests across 2 files. [375.00ms]

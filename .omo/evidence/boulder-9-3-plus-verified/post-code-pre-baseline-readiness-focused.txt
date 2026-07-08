@@ -1,0 +1,86 @@
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-baseline-fixtures.test.ts:
+52 | 
+53 | function expectWithLabel(actual: unknown, expected: unknown, label: string): void {
+54 |   try {
+55 |     expect(actual).toEqual(expected);
+56 |   } catch (error) {
+57 |     throw new Error(`${label} mismatch`, { cause: error });
+                   ^
+error: release-check.json mismatch
+      at expectWithLabel (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:57:15)
+      at expectJsonBaseline (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:50:3)
+      at async expectCurrentBaselines (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:39:9)
+      at async <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:16:11)
+
+50 |   expectWithLabel(actual, JSON.parse(await readFile(join(baselineDir, name), "utf8")), name);
+51 | }
+52 | 
+53 | function expectWithLabel(actual: unknown, expected: unknown, label: string): void {
+54 |   try {
+55 |     expect(actual).toEqual(expected);
+                        ^
+error: expect(received).toEqual(expected)
+
+@@ -44,11 +44,11 @@
+        "evidence": "release tag evidence available for v0.1.16",
+        "id": "git-tag-local",
+        "status": "pass",
+      },
+      {
+-       "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16",
++       "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16",
+        "id": "release-evidence-manifest",
+        "status": "fail",
+      },
+      {
+        "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
+
+- Expected  - 1
++ Received  + 1
+
+      at expectWithLabel (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:55:20)
+      at expectJsonBaseline (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:50:3)
+      at async expectCurrentBaselines (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:39:9)
+      at async <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:16:11)
+(fail) readiness v0 baseline fixtures > match current release and readiness gate outputs [32.86ms]
+(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [29.13ms]
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.15ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [96.61ms]
+30 |     expect(product.checks.map((check) => check.id)).toEqual(readinessEntriesForReport("product-readiness").map((entry) => entry.id));
+31 |     expect(service.checks.map((check) => check.id)).toEqual(readinessEntriesForReport("service-readiness").map((entry) => entry.id));
+32 |   });
+33 | 
+34 |   test("preserves baseline readiness JSON output", async () => {
+35 |     expect(await evaluateReleaseCheck(ROOT)).toEqual(await readBaseline("release-check.json"));
+                                                  ^
+error: expect(received).toEqual(expected)
+
+@@ -44,11 +44,11 @@
+        "evidence": "release tag evidence available for v0.1.16",
+        "id": "git-tag-local",
+        "status": "pass",
+      },
+      {
+-       "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16",
++       "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16",
+        "id": "release-evidence-manifest",
+        "status": "fail",
+      },
+      {
+        "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-registry.test.ts:35:46)
+(fail) readiness registry > preserves baseline readiness JSON output [13.15ms]
+(pass) readiness registry > rejects duplicate check ids [0.18ms]
+
+ 4 pass
+ 2 fail
+ 230 expect() calls
+Ran 6 tests across 2 files. [207.00ms]

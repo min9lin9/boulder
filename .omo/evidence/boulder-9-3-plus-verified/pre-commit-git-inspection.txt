@@ -1,0 +1,18 @@
+ M src/release-manifest-check.ts
+ M test/fixtures/baselines/readiness-v0/pack-dry-run.txt
+ M test/fixtures/baselines/readiness-v0/product-readiness.json
+ M test/fixtures/baselines/readiness-v0/release-check.json
+ src/release-manifest-check.ts                               | 8 +++++---
+ test/fixtures/baselines/readiness-v0/pack-dry-run.txt       | 2 +-
+ test/fixtures/baselines/readiness-v0/product-readiness.json | 2 +-
+ test/fixtures/baselines/readiness-v0/release-check.json     | 2 +-
+ 4 files changed, 8 insertions(+), 6 deletions(-)
+5409314 fix(qa): validate durable manual evidence
+a7d9baa fix(release): keep archive readiness deterministic
+f85d6f4 fix(review): close final readiness blockers
+4d51d7c fix(qa): harden final review surfaces
+d8980a6 chore(omo): refresh post-fix final evidence
+a7d9baa fix(release): keep archive readiness deterministic
+f85d6f4 fix(review): close final readiness blockers
+93a0be5 docs(release): add provenance hardening checklist
+cd3c49a test(readiness): capture current gate baselines

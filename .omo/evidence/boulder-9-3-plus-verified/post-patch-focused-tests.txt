@@ -1,0 +1,126 @@
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-baseline-fixtures.test.ts:
+52 | 
+53 | function expectWithLabel(actual: unknown, expected: unknown, label: string): void {
+54 |   try {
+55 |     expect(actual).toEqual(expected);
+56 |   } catch (error) {
+57 |     throw new Error(`${label} mismatch`, { cause: error });
+                   ^
+error: product-readiness.json mismatch
+      at expectWithLabel (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:57:15)
+      at expectJsonBaseline (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:50:3)
+      at async expectCurrentBaselines (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:40:9)
+      at async <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:16:11)
+
+50 |   expectWithLabel(actual, JSON.parse(await readFile(join(baselineDir, name), "utf8")), name);
+51 | }
+52 | 
+53 | function expectWithLabel(actual: unknown, expected: unknown, label: string): void {
+54 |   try {
+55 |     expect(actual).toEqual(expected);
+                        ^
+error: expect(received).toEqual(expected)
+
+@@ -49,11 +49,11 @@
+        "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
+        "id": "published-install-smoke",
+        "status": "pass",
+      },
+      {
+-       "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16",
++       "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16",
+        "id": "public-release-check",
+        "status": "fail",
+      },
+      {
+        "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md",
+
+- Expected  - 1
++ Received  + 1
+
+      at expectWithLabel (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:55:20)
+      at expectJsonBaseline (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:50:3)
+      at async expectCurrentBaselines (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:40:9)
+      at async <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-baseline-fixtures.test.ts:16:11)
+(fail) readiness v0 baseline fixtures > match current release and readiness gate outputs [243.02ms]
+(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [51.89ms]
+
+test/readiness-reports.test.ts:
+(pass) harness quality scorecard > scores the root Boulder harness as ready [3.35ms]
+(pass) harness quality scorecard > penalizes unsafe external provider policy [1.65ms]
+(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [3.32ms]
+(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [3.23ms]
+(pass) benchmark and release reports > reports root release evidence as blocked until 0.1.16 is published and tagged [25.79ms]
+(pass) benchmark and release reports > reports release evidence as ready after publish and tag in a release fixture [120.77ms]
+(pass) benchmark and release reports > reports blocker-first release next commands without publish automation [38.57ms]
+(pass) benchmark and release reports > blocks malformed structured release evidence manifests [112.86ms]
+(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [28.96ms]
+(pass) quickstart and replay reports > checks public replay fixtures and official docs references [4.83ms]
+(pass) quickstart and replay reports > blocks stale replay docs and replay ref mismatches [1.03ms]
+(pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [1.13ms]
+(pass) product readiness and examples > reports root product readiness evidence gates [60.44ms]
+(pass) product readiness and examples > blocks when GJC planning evidence is missing [11.80ms]
+(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [1.78ms]
+(pass) readiness wording hygiene > service strategy separates local readiness from external field backing [0.47ms]
+(pass) repeat-use evidence hygiene > ships a metric log template with the required field contract [0.87ms]
+(pass) repeat-use evidence hygiene > keeps public evidence free of local paths and npm identity traces [21.90ms]
+
+test/cli-e2e.test.ts:
+(pass) boulder CLI e2e cleanup safety > prints the package version [124.30ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [12.74ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [293.63ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [621.03ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [211.05ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [345.49ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [89.11ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [63.45ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [57.09ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [93.91ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [185.03ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [84.76ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [58.34ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [78.21ms]
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.15ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [73.83ms]
+31 |     expect(service.checks.map((check) => check.id)).toEqual(readinessEntriesForReport("service-readiness").map((entry) => entry.id));
+32 |   });
+33 | 
+34 |   test("preserves baseline readiness JSON output", async () => {
+35 |     expect(await evaluateReleaseCheck(ROOT)).toEqual(await readBaseline("release-check.json"));
+36 |     expect(await evaluateProductReadiness(ROOT)).toEqual(await readBaseline("product-readiness.json"));
+                                                      ^
+error: expect(received).toEqual(expected)
+
+@@ -49,11 +49,11 @@
+        "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
+        "id": "published-install-smoke",
+        "status": "pass",
+      },
+      {
+-       "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16",
++       "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16",
+        "id": "public-release-check",
+        "status": "fail",
+      },
+      {
+        "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md",
+
+- Expected  - 1
++ Received  + 1
+
+      at <anonymous> (/home/burt/Documents/Boulder-9-3-plus/test/readiness-registry.test.ts:36:50)
+(fail) readiness registry > preserves baseline readiness JSON output [43.81ms]
+(pass) readiness registry > rejects duplicate check ids [0.24ms]
+
+2 tests failed:
+(fail) readiness v0 baseline fixtures > match current release and readiness gate outputs [243.02ms]
+(fail) readiness registry > preserves baseline readiness JSON output [43.81ms]
+
+ 36 pass
+ 2 fail
+ 419 expect() calls
+Ran 38 tests across 4 files. [3.31s]

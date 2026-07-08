@@ -1,0 +1,52 @@
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-baseline-fixtures.test.ts:
+(pass) readiness v0 baseline fixtures > match current release and readiness gate outputs [168.93ms]
+(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [25.81ms]
+
+test/readiness-reports.test.ts:
+(pass) harness quality scorecard > scores the root Boulder harness as ready [9.27ms]
+(pass) harness quality scorecard > penalizes unsafe external provider policy [0.18ms]
+(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [10.84ms]
+(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [2.90ms]
+(pass) benchmark and release reports > reports root release evidence as blocked until 0.1.16 is published and tagged [32.83ms]
+(pass) benchmark and release reports > reports release evidence as ready after publish and tag in a release fixture [140.93ms]
+(pass) benchmark and release reports > reports blocker-first release next commands without publish automation [33.40ms]
+(pass) benchmark and release reports > blocks malformed structured release evidence manifests [174.41ms]
+(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [26.39ms]
+(pass) quickstart and replay reports > checks public replay fixtures and official docs references [1.12ms]
+(pass) quickstart and replay reports > blocks stale replay docs and replay ref mismatches [1.20ms]
+(pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [0.94ms]
+(pass) product readiness and examples > reports root product readiness evidence gates [58.12ms]
+(pass) product readiness and examples > blocks when GJC planning evidence is missing [24.76ms]
+(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [3.15ms]
+(pass) readiness wording hygiene > service strategy separates local readiness from external field backing [0.28ms]
+(pass) repeat-use evidence hygiene > ships a metric log template with the required field contract [0.26ms]
+(pass) repeat-use evidence hygiene > keeps public evidence free of local paths and npm identity traces [27.14ms]
+
+test/cli-e2e.test.ts:
+(pass) boulder CLI e2e cleanup safety > prints the package version [115.78ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [25.71ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [469.80ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [824.30ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [203.04ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [451.97ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [99.84ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [64.80ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [91.75ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [139.43ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [215.86ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [59.25ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [54.27ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [51.18ms]
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.21ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [105.22ms]
+(pass) readiness registry > preserves baseline readiness JSON output [72.32ms]
+(pass) readiness registry > rejects duplicate check ids [0.38ms]
+
+ 38 pass
+ 0 fail
+ 424 expect() calls
+Ran 38 tests across 4 files. [3.86s]

@@ -54,11 +54,13 @@ async function validateReleaseManifest(root: string, version: string, manifest: 
 }
 
 async function expectCommitFields(errors: string[], root: string, version: string, manifest: Record<string, unknown>): Promise<void> {
+  const expectedTag = `v${version}`;
+  const manifestTag = typeof manifest.tag === "string" ? manifest.tag : "";
   const tagCommit = typeof manifest.tagCommit === "string" ? manifest.tagCommit.trim() : "";
-  if (tagCommit) {
-    const expectedTagCommit = await gitStdout(root, `git rev-list -n 1 ${shellQuote(`v${version}`)}`);
+  if (tagCommit && manifestTag === expectedTag) {
+    const expectedTagCommit = await gitStdout(root, `git rev-list -n 1 ${shellQuote(expectedTag)}`);
     if (expectedTagCommit && tagCommit !== expectedTagCommit) {
-      errors.push(`tagCommit must match local tag v${version}`);
+      errors.push(`tagCommit must match local tag ${expectedTag}`);
     }
   }
 
