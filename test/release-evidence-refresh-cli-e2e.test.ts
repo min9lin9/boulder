@@ -5,7 +5,7 @@ import { describe, expect, test } from "bun:test";
 import releaseManifest from "../docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json" with { type: "json" };
 import packageJson from "../package.json" with { type: "json" };
 import { RELEASE_EVIDENCE_TARGETS } from "../src/release-evidence";
-import { removeTempRepo, runBoulder, tempRepo, write } from "./helpers/cli";
+import { removeTempRepo, runBoulder, runCommand, tempRepo, write } from "./helpers/cli";
 
 describe("release evidence refresh CLI", () => {
   test("reports every renderer target in dry-run JSON", async () => {
@@ -23,10 +23,7 @@ describe("release evidence refresh CLI", () => {
 
     try {
       await write(root, "package.json", JSON.stringify({ name: packageJson.name, version: packageJson.version }, null, 2));
-      await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", JSON.stringify({
-        ...releaseManifest,
-        packDryRun: { ...releaseManifest.packDryRun, fileCount: 999 }
-      }, null, 2));
+      await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", "{\"schemaVersion\":2}\n");
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", untouched);
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nCommit: 806330e\n");
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt", "old install smoke\n");
@@ -38,7 +35,7 @@ describe("release evidence refresh CLI", () => {
 
       expect(result.exitCode).toBe(1);
       expect(result.stderr).toBe("");
-      expect(result.stdout).toContain("release.pack_file_count_mismatch");
+      expect(result.stdout).toContain("release.malformed_input");
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"), "utf8")).toBe(untouched);
     } finally {
       await removeTempRepo(root);
@@ -52,6 +49,7 @@ describe("release evidence refresh CLI", () => {
     try {
       await writeRefreshFixture(root, JSON.stringify(releaseManifest, null, 2));
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt", adjacent);
+      const packTotal = await currentPackTotal(root);
 
       const result = await runBoulder(["release", "evidence", "refresh", "--write", "--json", "--cwd", root]);
       const releaseCheck = await runBoulder(["release-check", "--json", "--cwd", root]);
@@ -60,6 +58,7 @@ describe("release evidence refresh CLI", () => {
       expect(result.stderr).toBe("");
       if (releaseCheck.exitCode !== 0) throw new Error(releaseCheck.stdout);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt"), "utf8")).toBe(adjacent);
+      expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"), "utf8")).toContain(`Total files: ${packTotal}`);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"), "utf8")).toContain(`bunx boulder-oss-cli@${packageJson.version} --version`);
       expect(await readFile(join(root, "docs/PRODUCT_READINESS.md"), "utf8")).toContain(`- public-release-check: pass - release-check ready for ${packageJson.version}`);
     } finally {
@@ -118,6 +117,13 @@ function refreshTargetPaths(source: string): string[] {
     if (!isRecord(target) || typeof target.path !== "string") return [];
     return [target.path];
   });
+}
+
+async function currentPackTotal(root: string): Promise<number> {
+  const result = await runCommand("bun pm pack --dry-run --ignore-scripts", root);
+  const match = /^Total files:\s*(\d+)$/im.exec(`${result.stdout}\n${result.stderr}`);
+  if (!match?.[1]) throw new Error("pack dry-run did not report total files");
+  return Number(match[1]);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

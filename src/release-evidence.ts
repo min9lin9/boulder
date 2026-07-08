@@ -161,18 +161,25 @@ export async function planReleaseEvidenceRefresh(root: string): Promise<ReleaseE
     await currentGitCommit(root, ["rev-parse", "HEAD"])
   );
   const packDryRunFileCount = await currentPackDryRunFileCount(root) ?? bundle.packDryRun.fileCount;
-  const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(bundle), {
+  const bundleWithPackCount: ReleaseEvidenceBundleV1 = {
+    ...bundle,
+    packDryRun: {
+      ...bundle.packDryRun,
+      fileCount: packDryRunFileCount
+    }
+  };
+  const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(bundleWithPackCount), {
     packageJsonVersion: packageInfo.version,
     cliVersion: packageInfo.version,
     tag: `v${packageInfo.version}`,
-    releaseCommit: bundle.releaseCommit,
+    releaseCommit: bundleWithPackCount.releaseCommit,
     packDryRunFileCount
   });
   if (validation.status === "fail") {
     return { status: "blocked", targets: [], issues: validation.issues };
   }
 
-  const rendered = renderReleaseEvidenceBundle(bundle);
+  const rendered = renderReleaseEvidenceBundle(bundleWithPackCount);
   const targets = await Promise.all(RELEASE_EVIDENCE_TARGETS.map(async (path) => {
     const current = await readExisting(root, path);
     const content = path === "docs/PRODUCT_READINESS.md" ? mergeProductReadinessLine(current, rendered[path]) : rendered[path];
@@ -301,9 +308,24 @@ function shellQuote(value: string): string {
 }
 
 async function currentPackDryRunFileCount(root: string): Promise<number | null> {
+  const live = await currentPackDryRunTotal(root);
+  if (live !== null) return live;
   const content = await readExisting(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt");
   const match = /^Total files:\s*(\d+)$/im.exec(content);
   return match ? Number(match[1]) : null;
+}
+
+async function currentPackDryRunTotal(root: string): Promise<number | null> {
+  return await new Promise<number | null>((resolve) => {
+    exec("bun pm pack --dry-run --ignore-scripts", { cwd: root }, (error, stdout, stderr) => {
+      if (error && !stdout && !stderr) {
+        resolve(null);
+        return;
+      }
+      const match = /^Total files:\s*(\d+)$/im.exec(`${stdout}\n${stderr}`);
+      resolve(match?.[1] ? Number(match[1]) : null);
+    });
+  });
 }
 
 async function readExisting(root: string, path: ReleaseEvidenceTarget): Promise<string> {

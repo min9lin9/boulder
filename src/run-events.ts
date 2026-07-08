@@ -59,6 +59,11 @@ export type RunEventsPruneResult = {
   readonly kept: number;
 };
 
+type StoredRunEvent = {
+  readonly event: RunEventRecord;
+  readonly fileName: string;
+};
+
 export class UnsafeRunEventPathError extends Error {
   constructor() {
     super("Run event path changed during safe file access.");
@@ -92,6 +97,10 @@ export async function recordRunEvent(root: string, input: RecordRunEventInput): 
 }
 
 export async function listRunEvents(root: string): Promise<readonly RunEventRecord[]> {
+  return (await listStoredRunEvents(root)).map((item) => item.event);
+}
+
+async function listStoredRunEvents(root: string): Promise<readonly StoredRunEvent[]> {
   const runsPath = runsDir(root);
   if (!await runsDirIsSafe(root, false)) return [];
   let names: readonly string[];
@@ -101,13 +110,13 @@ export async function listRunEvents(root: string): Promise<readonly RunEventReco
     if (hasErrorCode(error, "ENOENT")) return [];
     throw error;
   }
-  const events = [];
+  const events: StoredRunEvent[] = [];
   for (const name of names) {
-    if (!name.endsWith(".json")) continue;
+    if (!safeRunEventFileName(name)) continue;
     const event = await readRunEvent(join(runsPath, name));
-    if (event) events.push(event);
+    if (event) events.push({ event, fileName: name });
   }
-  return events.sort(compareRunEvents);
+  return events.sort((left, right) => compareRunEvents(left.event, right.event));
 }
 
 export async function latestRunEvent(root: string): Promise<RunEventRecord | null> {
@@ -122,15 +131,15 @@ export async function pruneRunEvents(root: string, olderThanDays: number, keep: 
   const runsPath = runsDir(root);
   if (!await runsDirIsSafe(root, false)) return { schemaVersion: "boulder.runs.prune.v1", pruned: 0, kept: 0 };
   const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
-  const events = await listRunEvents(root);
+  const events = await listStoredRunEvents(root);
   let pruned = 0;
   for (let index = 0; index < events.length; index += 1) {
-    const event = events[index];
-    if (!event) continue;
+    const stored = events[index];
+    if (!stored) continue;
+    const event = stored.event;
     if (index < keep) continue;
     if (Date.parse(event.completedAt) >= cutoff) continue;
-    const path = join(runsPath, `${event.completedAt.replace(/[:.]/g, "-")}-${event.eventName.replace(/\s+/g, "-")}-${event.runId}.json`);
-    await rm(path, { force: true });
+    await rm(join(runsPath, stored.fileName), { force: true });
     pruned += 1;
   }
   return { schemaVersion: "boulder.runs.prune.v1", pruned, kept: events.length - pruned };
@@ -274,6 +283,10 @@ async function readProtectedPatterns(root: string): Promise<readonly string[]> {
 
 function runsDir(root: string): string {
   return join(root, ".boulder", "runs");
+}
+
+function safeRunEventFileName(name: string): boolean {
+  return /^[0-9TZ-]+-[a-z-]+-[0-9a-f-]+\.json$/.test(name);
 }
 
 function compareRunEvents(left: RunEventRecord, right: RunEventRecord): number {

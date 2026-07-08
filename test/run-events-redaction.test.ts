@@ -1,7 +1,7 @@
-import { mkdir, readFile, symlink } from "node:fs/promises";
+import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
-import { listRunEvents, recordRunEvent } from "../src/run-events";
+import { listRunEvents, pruneRunEvents, recordRunEvent } from "../src/run-events";
 import { removeTempRepo, tempRepo, write } from "./helpers/cli";
 
 describe("run event redaction", () => {
@@ -70,6 +70,36 @@ describe("run event redaction", () => {
     } finally {
       await removeTempRepo(root);
       await removeTempRepo(outside);
+    }
+  });
+
+  test("prune ignores malicious run ids when deleting event files", async () => {
+    const root = await tempRepo();
+
+    try {
+      await write(root, "package.json", JSON.stringify({ name: "fixture", version: "9.9.9" }, null, 2));
+      await write(root, "victim.json", "do not delete\n");
+      await mkdir(join(root, ".boulder", "runs"), { recursive: true });
+      await writeFile(join(root, ".boulder", "runs", "2026-01-01T00-00-00-000Z-release-check-11111111-1111-4111-8111-111111111111.json"), JSON.stringify({
+        schemaVersion: "boulder.run-event.v1",
+        runId: "../../../../victim",
+        eventName: "release-check",
+        command: "release-check",
+        cwdHash: "hash",
+        packageVersion: "9.9.9",
+        startedAt: "2026-01-01T00:00:00.000Z",
+        completedAt: "2026-01-01T00:00:00.000Z",
+        severity: "error",
+        status: "blocked",
+        checkIds: [],
+        recoveryHintIds: [],
+        artifactPaths: []
+      }, null, 2), "utf8");
+
+      expect((await pruneRunEvents(root, 1, 0)).pruned).toBe(1);
+      expect(await readFile(join(root, "victim.json"), "utf8")).toBe("do not delete\n");
+    } finally {
+      await removeTempRepo(root);
     }
   });
 });
