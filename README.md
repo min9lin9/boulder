@@ -4,7 +4,7 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current published package: `boulder-oss-cli@0.1.15`.
+Current published package: `boulder-oss-cli@0.1.16`.
 Current release candidate: `v0.1.16`.
 
 ## 3-minute route for non-developers
@@ -21,11 +21,15 @@ boulder로 반복작업 캡처하고 루프를 돌려줘.
 Prefer the local `boulder` skill when it is installed. For CLI use after trusting the npm package:
 
 ```bash
-bunx boulder-oss-cli@0.1.15 init
-bunx boulder-oss-cli@0.1.15 routine capture --task "release note draft" --write
-bunx boulder-oss-cli@0.1.15 quickstart
-bunx boulder-oss-cli@0.1.15 inspect
-bunx boulder-oss-cli@0.1.15 doctor
+bunx boulder-oss-cli@latest init
+bunx boulder-oss-cli@latest workflow map --json
+bunx boulder-oss-cli@latest quickstart
+bunx boulder-oss-cli@latest inspect
+bunx boulder-oss-cli@latest profile resolve
+bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@latest doctor
+bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include <path> --json
+bunx boulder-oss-cli@latest release-check --json
 ```
 
 `doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
@@ -33,8 +37,9 @@ bunx boulder-oss-cli@0.1.15 doctor
 Then close the weekly learning loop (repo-local only):
 
 ```bash
-bunx boulder-oss-cli@0.1.15 retro weekly --dry-run
-bunx boulder-oss-cli@0.1.15 skill propose --from-routine release-note-draft --dry-run
+bunx boulder-oss-cli@latest routine capture --task "release note draft" --write
+bunx boulder-oss-cli@latest retro weekly --dry-run
+bunx boulder-oss-cli@latest skill propose --from-routine release-note-draft --dry-run
 ```
 
 `routine capture`, `retro weekly --dry-run`, and `skill propose --from-routine` are review-first: they keep recurring-work evidence in `.boulder/**`, surface what would change, and do **not** run schedulers, mutate calendars, install/update/apply tools, call external models by default, or archive existing skills.
@@ -42,11 +47,11 @@ bunx boulder-oss-cli@0.1.15 skill propose --from-routine release-note-draft --dr
 If GJC, LazyCodex, or a subagent catalog is not installed yet, register canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
 
 ```bash
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/code-yeongyu/lazycodex --write
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/msitarzewski/agency-agents --dry-run
-bunx boulder-oss-cli@0.1.15 doctor
+bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+bunx boulder-oss-cli@latest capability import --from https://github.com/code-yeongyu/lazycodex --write
+bunx boulder-oss-cli@latest capability import --from https://github.com/msitarzewski/agency-agents --dry-run
+bunx boulder-oss-cli@latest doctor
 ```
 
 `--dry-run` prints the manifest path and capability kind without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
@@ -66,11 +71,18 @@ Local development: `bun install`, `bun run boulder -- --help`, then `bun run ci`
 ```bash
 cd path/to/your/repo
 bunx boulder-oss-cli@latest init
-bunx boulder-oss-cli@latest bootstrap interview --task "release npm package safely"
+bunx boulder-oss-cli@latest workflow map --json
 bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
+bunx boulder-oss-cli@latest inspect --json
+bunx boulder-oss-cli@latest profile resolve --json
 bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 bunx boulder-oss-cli@latest doctor
+bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include <path> --json
+bunx boulder-oss-cli@latest handoff review --packet .boulder/handoffs/gajae-code.json
+bunx boulder-oss-cli@latest release-check --json
+bunx boulder-oss-cli@latest product-readiness --json
+bunx boulder-oss-cli@latest service-readiness --json
 ```
 
 `quickstart` tells you the next repo-specific commands. `doctor` tells you whether GJC, LazyCodex, local skills, MCPs, plugins, and Bun are available or only configured as preferences.
@@ -80,7 +92,7 @@ For higher-friction work:
 ```bash
 bunx boulder-oss-cli@latest pipeline --friction high
 bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include src/cli.ts
-bunx boulder-oss-cli@latest handoff review --adapter gajae-code
+bunx boulder-oss-cli@latest handoff review --packet .boulder/handoffs/gajae-code.json
 bunx boulder-oss-cli@latest handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 ```
 
@@ -148,11 +160,9 @@ See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.m
 
 ```bash
 boulder init
+boulder workflow map --json
 boulder bootstrap interview --task "release npm package safely"
 boulder quickstart
-boulder routine capture --task "<text>"
-boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
 boulder onboard
 boulder inspect
 boulder profile resolve
@@ -162,13 +172,16 @@ boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
 boulder handoff packet --adapter gajae-code --include src/cli.ts
-boulder handoff review --adapter gajae-code
+boulder handoff review --packet .boulder/handoffs/gajae-code.json
 boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 boulder replay-check
 boulder replay-run --dry-run
 boulder release-check
 boulder product-readiness
 boulder service-readiness
+boulder routine capture --task "<text>"
+boulder retro weekly --dry-run
+boulder skill propose --from-routine <routine-id>
 boulder export
 ```
 

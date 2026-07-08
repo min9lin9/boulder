@@ -1,24 +1,4 @@
-GitHub Actions evidence
-
-Repository: https://github.com/min9lin9/boulder
-Workflow: CI
+CI
+Result: success
 Run: https://github.com/min9lin9/boulder/actions/runs/28885567998
-Branch: main
-Event: push
-Status: success
-Commit: df3538c
-Release tag: v0.1.16
-
-Security workflow:
-
-- Run: https://github.com/min9lin9/boulder/actions/runs/28885567994
-- Status: success
-- Job: CodeQL
-
-Command covered by the workflow:
-
-```bash
-bun run ci
-```
-
-Recorded as public CI evidence for Boulder release workflow review.
+Commit: 6671bcaceb4b35180a5756d6a340798ccdf3c206

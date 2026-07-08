@@ -1,6 +1,7 @@
 import { lstat, readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+import { orderReadinessChecks } from "./readiness-registry";
 import { evaluateReleaseCheck } from "./release-check";
 
 export type ProductReadinessCheck = {
@@ -92,7 +93,7 @@ export async function evaluateProductReadiness(root: string): Promise<ProductRea
   const isReady = checks.every((item) => item.status === "pass");
   return {
     status: isReady ? "ready" : "blocked",
-    checks,
+    checks: orderReadinessChecks("product-readiness", checks),
     nextSteps: isReady
       ? ["Public product gate is ready; keep OpenAI acceptance and adoption outside Boulder claims."]
       : ["Fill every failed public product evidence path before claiming 9.5+ readiness."]

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "boulder.review-evidence.run-event-redaction.v1",
+  "headScope": "current PR 26 final branch head",
+  "status": "pass",
+  "scenario": "recordRunEvent without boulder.yaml redacts default protected .env*, secrets/**, vendor/**, node_modules/**, dist/** paths in command and artifactPaths",
+  "observed": {
+    "command": "release-check --include [REDACTED_PROTECTED_PATH] --log [REDACTED_PROTECTED_PATH] --secret [REDACTED_PROTECTED_PATH] --vendor [REDACTED_PROTECTED_PATH] --node [REDACTED_PROTECTED_PATH] --dist [REDACTED_PROTECTED_PATH] --abs [REDACTED_PROTECTED_PATH]",
+    "artifactPaths": [
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]",
+      "[REDACTED_PROTECTED_PATH]"
+    ]
+  },
+  "forbiddenPlaintextAbsent": [
+    ".env.local",
+    "nested/.env.local",
+    "secrets/api.key",
+    "vendor/lib.js",
+    "node_modules/pkg/index.js",
+    "dist/app.js"
+  ]
+}

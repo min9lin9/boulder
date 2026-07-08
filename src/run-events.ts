@@ -1,0 +1,227 @@
+import { constants } from "node:fs";
+import { lstat, mkdir, open, readdir, readFile, rename, rm, unlink } from "node:fs/promises";
+import { dirname } from "node:path";
+import { join, resolve } from "node:path";
+import { DEFAULT_PROTECTED_PATTERNS, sanitizeEvent } from "./run-event-redaction";
+import { isRunEventRecord, type RecordRunEventInput, type RecordRunEventResult, type RunEventRecord, type RunEventsList, type RunEventsPruneResult } from "./run-event-shape";
+export type { RecordRunEventInput, RecordRunEventResult, RunEventName, RunEventRecord, RunEventSeverity, RunEventsList, RunEventsPruneResult, RunEventStatus } from "./run-event-shape";
+
+type StoredRunEvent = {
+  readonly event: RunEventRecord;
+  readonly fileName: string;
+};
+
+export class UnsafeRunEventPathError extends Error {
+  constructor() {
+    super("Run event path changed during safe file access.");
+    this.name = "UnsafeRunEventPathError";
+  }
+}
+
+export async function recordRunEvent(root: string, input: RecordRunEventInput): Promise<RecordRunEventResult> {
+  const runsPath = runsDir(root);
+  await ensureRunsDirSafe(root);
+  const packageVersion = await readPackageVersion(root);
+  const protectedPatterns = await readProtectedPatterns(root);
+  const event = sanitizeEvent(root, protectedPatterns, {
+    schemaVersion: "boulder.run-event.v1",
+    runId: crypto.randomUUID(),
+    eventName: input.eventName,
+    command: input.command,
+    cwdHash: await hashText(resolve(root)),
+    packageVersion,
+    startedAt: input.startedAt,
+    completedAt: input.completedAt,
+    severity: input.severity,
+    status: input.status,
+    checkIds: input.checkIds,
+    recoveryHintIds: input.recoveryHintIds,
+    artifactPaths: input.artifactPaths
+  });
+  const path = join(runsPath, `${event.completedAt.replace(/[:.]/g, "-")}-${event.eventName.replace(/\s+/g, "-")}-${event.runId}.json`);
+  await safeReplaceText(path, `${JSON.stringify(event, null, 2)}\n`);
+  return { event, path };
+}
+
+export async function listRunEvents(root: string): Promise<readonly RunEventRecord[]> {
+  return (await listStoredRunEvents(root)).map((item) => item.event);
+}
+
+async function listStoredRunEvents(root: string): Promise<readonly StoredRunEvent[]> {
+  const runsPath = runsDir(root);
+  if (!await runsDirIsSafe(root, false)) return [];
+  let names: readonly string[];
+  try {
+    names = await readdir(runsPath);
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return [];
+    throw error;
+  }
+  const events: StoredRunEvent[] = [];
+  for (const name of names) {
+    if (!safeRunEventFileName(name)) continue;
+    const event = await readRunEvent(join(runsPath, name));
+    if (event) events.push({ event, fileName: name });
+  }
+  return events.sort((left, right) => compareRunEvents(left.event, right.event));
+}
+
+export async function latestRunEvent(root: string): Promise<RunEventRecord | null> {
+  return (await listRunEvents(root))[0] ?? null;
+}
+
+export async function showRunEvent(root: string, runId: string): Promise<RunEventRecord | null> {
+  return (await listRunEvents(root)).find((event) => event.runId === runId) ?? null;
+}
+
+export async function pruneRunEvents(root: string, olderThanDays: number, keep: number): Promise<RunEventsPruneResult> {
+  const runsPath = runsDir(root);
+  if (!await runsDirIsSafe(root, false)) return { schemaVersion: "boulder.runs.prune.v1", pruned: 0, kept: 0 };
+  const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
+  const events = await listStoredRunEvents(root);
+  let pruned = 0;
+  for (let index = 0; index < events.length; index += 1) {
+    const stored = events[index];
+    if (!stored) continue;
+    const event = stored.event;
+    if (index < keep) continue;
+    if (Date.parse(event.completedAt) >= cutoff) continue;
+    await rm(join(runsPath, stored.fileName), { force: true });
+    pruned += 1;
+  }
+  return { schemaVersion: "boulder.runs.prune.v1", pruned, kept: events.length - pruned };
+}
+
+export function runEventsList(events: readonly RunEventRecord[]): RunEventsList {
+  return { schemaVersion: "boulder.runs.list.v1", runs: events };
+}
+
+async function readRunEvent(path: string): Promise<RunEventRecord | null> {
+  try {
+    const info = await lstat(path);
+    if (!info.isFile() || info.isSymbolicLink() || info.nlink > 1) return null;
+    const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
+    return isRunEventRecord(parsed) ? parsed : null;
+  } catch (error) {
+    if (error instanceof SyntaxError || hasErrorCode(error, "ENOENT")) return null;
+    throw error;
+  }
+}
+
+async function ensureRunsDirSafe(root: string): Promise<void> {
+  await mkdir(join(root, ".boulder"), { recursive: true });
+  if (await protectedLink(join(root, ".boulder"))) throw new UnsafeRunEventPathError();
+  await mkdir(runsDir(root), { recursive: true });
+  if (!await runsDirIsSafe(root, true)) throw new UnsafeRunEventPathError();
+}
+
+async function runsDirIsSafe(root: string, requirePresent: boolean): Promise<boolean> {
+  const boulder = join(root, ".boulder");
+  const runs = runsDir(root);
+  if (await protectedLink(boulder)) return false;
+  try {
+    const info = await lstat(runs);
+    return info.isDirectory() && !info.isSymbolicLink() && info.nlink >= 1;
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return !requirePresent;
+    throw error;
+  }
+}
+
+async function protectedLink(path: string): Promise<boolean> {
+  try {
+    const info = await lstat(path);
+    return info.isSymbolicLink() || (info.isFile() && info.nlink > 1);
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return false;
+    throw error;
+  }
+}
+
+async function safeReplaceText(path: string, content: string): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  const temporary = `${path}.${crypto.randomUUID()}.tmp`;
+  let handle: Awaited<ReturnType<typeof open>> | null = null;
+  try {
+    handle = await open(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
+    await handle.writeFile(content, "utf8");
+    await handle.close();
+    handle = null;
+    await rename(temporary, path);
+  } catch (error) {
+    try {
+      await unlink(temporary);
+    } catch (cleanupError) {
+      if (!hasErrorCode(cleanupError, "ENOENT")) throw cleanupError;
+    }
+    throw error;
+  } finally {
+    await handle?.close();
+  }
+}
+
+function noFollowFlag(): number {
+  return typeof constants.O_NOFOLLOW === "number" ? constants.O_NOFOLLOW : 0;
+}
+
+async function readPackageVersion(root: string): Promise<string> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+    if (isRecord(parsed) && typeof parsed.version === "string" && parsed.version.trim()) return parsed.version;
+  } catch (error) {
+    if (error instanceof SyntaxError || hasErrorCode(error, "ENOENT")) return "0.0.0";
+    throw error;
+  }
+  return "0.0.0";
+}
+
+async function readProtectedPatterns(root: string): Promise<readonly string[]> {
+  let text: string;
+  try {
+    text = await readFile(join(root, "boulder.yaml"), "utf8");
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return DEFAULT_PROTECTED_PATTERNS;
+    throw error;
+  }
+  const lines = text.split("\n");
+  const patterns = [];
+  let inProtectedPaths = false;
+  for (const line of lines) {
+    if (/^\S/.test(line)) inProtectedPaths = line.trim() === "protectedPaths:";
+    if (!inProtectedPaths) continue;
+    const match = /^\s*-\s+(.+?)\s*$/.exec(line);
+    if (match?.[1]) patterns.push(match[1]);
+  }
+  return patterns.length ? patterns : DEFAULT_PROTECTED_PATTERNS;
+}
+
+function runsDir(root: string): string {
+  return join(root, ".boulder", "runs");
+}
+
+function safeRunEventFileName(name: string): boolean {
+  return /^[0-9TZ-]+-[a-z-]+-[0-9a-f-]+\.json$/.test(name);
+}
+
+function compareRunEvents(left: RunEventRecord, right: RunEventRecord): number {
+  const completed = Date.parse(right.completedAt) - Date.parse(left.completedAt);
+  if (completed !== 0) return completed;
+  return right.runId.localeCompare(left.runId);
+}
+
+async function hashText(value: string): Promise<string> {
+  const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(buffer)).map((item) => item.toString(16).padStart(2, "0")).join("");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasErrorCode(error: unknown, code: string): boolean {
+  return error instanceof Error &&
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === code;
+}

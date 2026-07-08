@@ -7,7 +7,14 @@ import { tempRepo, write } from "./helpers/cli";
 
 async function writeReadyPublicProductFixture(root: string): Promise<void> {
   const version = "1.2.3";
-  await write(root, "package.json", JSON.stringify({ name: "fixture", version }, null, 2));
+  await write(root, "package.json", JSON.stringify({
+    name: "boulder-oss-cli",
+    version,
+    license: "MIT",
+    repository: { type: "git", url: "git+https://github.com/min9lin9/boulder.git" },
+    homepage: "https://github.com/min9lin9/boulder#readme",
+    bugs: { url: "https://github.com/min9lin9/boulder/issues" }
+  }, null, 2));
   await write(root, "CHANGELOG.md", `# Changelog\n\n## ${version}\n\n- Fixture release.\n`);
   await write(root, "README.md", `# Fixture\n\nboulder-oss-cli@${version}\n`);
   await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");

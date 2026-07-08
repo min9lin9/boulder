@@ -1,0 +1,17 @@
+export const RELEASE_RECOVERY_CODES = {
+  malformedInput: "release.malformed_input",
+  packageJsonVersionMismatch: "release.package_json_version_mismatch",
+  versionMismatch: "release.version_mismatch",
+  tagMismatch: "release.tag_mismatch",
+  packVersionMismatch: "release.pack_version_mismatch",
+  releaseCommitMismatch: "release.release_commit_mismatch",
+  packFileCountMismatch: "release.pack_file_count_mismatch"
+} as const;
+
+export type ReleaseRecoveryCode = typeof RELEASE_RECOVERY_CODES[keyof typeof RELEASE_RECOVERY_CODES];
+
+export const EVIDENCE_RECOVERY_CODES = {
+  inputMissing: "evidence.input_missing"
+} as const;
+
+export type EvidenceRecoveryCode = typeof EVIDENCE_RECOVERY_CODES[keyof typeof EVIDENCE_RECOVERY_CODES];

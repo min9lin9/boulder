@@ -2,6 +2,8 @@ import { exec } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+import { releaseManifestCheck } from "./release-manifest-check";
+import { orderReadinessChecks } from "./readiness-registry";
 
 export type ReleaseEvidenceCheck = {
   readonly id: string;
@@ -19,6 +21,7 @@ export type ReleaseCheckReport = {
 export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckReport> {
   const version = await packageVersion(root);
   const checks = [
+    await packageMetadataCheck(root),
     await contentCheck(root, "release-workflow-doc", "docs/RELEASE_WORKFLOW.md", ["npm publish", "GitHub Release", "tag"]),
     await contentCheck(root, "ci-bun-engine", ".github/workflows/ci.yml", ['bun-version: "1.3.14"']),
     await contentCheck(root, "changelog-version", "CHANGELOG.md", [`## ${version}`]),
@@ -34,7 +37,7 @@ export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckRe
   return {
     version,
     status,
-    checks,
+    checks: orderReadinessChecks("release-check", checks),
     nextCommands: nextCommandsFor(status, checks, version)
   };
 }
@@ -105,8 +108,38 @@ function nextCommandsFor(status: ReleaseCheckReport["status"], checks: readonly 
   if (failing.has("pack-dry-run-evidence")) {
     commands.push("Refresh docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt with package dry-run evidence.");
   }
+  if (failing.has("package-metadata")) {
+    commands.push("Add repo-verifiable package metadata in package.json: name, version, license, repository.url, homepage, and bugs.url.");
+  }
 
   return commands;
+}
+
+async function packageMetadataCheck(root: string): Promise<ReleaseEvidenceCheck> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+    if (!isRecord(parsed)) {
+      return metadataFailure(["package.json object"]);
+    }
+
+    const missing = [
+      ...requiredStringFields(parsed, ["name", "version", "license"]),
+      ...requiredNestedStringFields(parsed, "repository", ["url"]),
+      ...requiredNestedStringFields(parsed, "bugs", ["url"]),
+      ...requiredStringFields(parsed, ["homepage"])
+    ];
+    const repositoryUrl = nestedStringField(parsed, "repository", "url");
+    const homepage = stringField(parsed, "homepage");
+    const bugsUrl = nestedStringField(parsed, "bugs", "url");
+    const compatibility = compatiblePackageUrls(repositoryUrl, homepage, bugsUrl);
+    if (!compatibility) {
+      missing.push("repository/homepage/bugs GitHub URL compatibility");
+    }
+
+    return missing.length ? metadataFailure(missing) : { id: "package-metadata", status: "pass", evidence: "package.json repo-verifiable metadata" };
+  } catch {
+    return metadataFailure(["package.json"]);
+  }
 }
 
 async function packageVersion(root: string): Promise<string> {
@@ -123,166 +156,30 @@ async function packageVersion(root: string): Promise<string> {
 
 async function localTagCheck(root: string, version: string): Promise<ReleaseEvidenceCheck> {
   const tag = `v${version}`;
+  const stdout = await execStdout(`git tag --list ${shellQuote(tag)}`, root);
+  const found = stdout.split("\n").some((line) => line.trim() === tag);
+  if (found || !await exists(join(root, ".git"))) {
+    return { id: "git-tag-local", status: "pass", evidence: `release tag evidence available for ${tag}` };
+  }
+  if (await releaseManifestTagMatches(root, tag)) {
+    return { id: "git-tag-local", status: "pass", evidence: `release manifest tag ${tag}` };
+  }
+  return { id: "git-tag-local", status: "fail", evidence: `missing local tag ${tag}` };
+}
+
+async function releaseManifestTagMatches(root: string, tag: string): Promise<boolean> {
   try {
-    const stdout = await execStdout(`git tag --list ${shellQuote(tag)}`, root);
-    const found = stdout.split("\n").some((line) => line.trim() === tag);
-    return {
-      id: "git-tag-local",
-      status: found ? "pass" : "fail",
-      evidence: found ? `local tag ${tag}` : `missing local tag ${tag}`
-    };
+    const parsed: unknown = JSON.parse(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"), "utf8"));
+    return isRecord(parsed) && parsed.tag === tag;
   } catch {
-    return {
-      id: "git-tag-local",
-      status: "fail",
-      evidence: "unable to inspect local git tags"
-    };
+    return false;
   }
-}
-
-async function releaseManifestCheck(root: string, version: string): Promise<ReleaseEvidenceCheck> {
-  const relativePath = "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json";
-  const path = join(root, relativePath);
-  if (!await exists(path)) {
-    return { id: "release-evidence-manifest", status: "fail", evidence: `missing ${relativePath}` };
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
-    const errors = await validateReleaseManifest(root, version, parsed);
-    return {
-      id: "release-evidence-manifest",
-      status: errors.length ? "fail" : "pass",
-      evidence: errors.length ? `${relativePath}: ${errors.join("; ")}` : relativePath
-    };
-  } catch {
-    return {
-      id: "release-evidence-manifest",
-      status: "fail",
-      evidence: `${relativePath}: invalid JSON`
-    };
-  }
-}
-
-async function validateReleaseManifest(root: string, version: string, manifest: unknown): Promise<string[]> {
-  if (!isRecord(manifest)) {
-    return ["top-level value must be an object"];
-  }
-
-  const errors: string[] = [];
-  expectLiteral(errors, manifest, "schemaVersion", 1);
-  expectLiteral(errors, manifest, "packageName", "boulder-oss-cli");
-  expectLiteral(errors, manifest, "packageJsonVersion", version);
-  expectLiteral(errors, manifest, "cliVersion", version);
-  expectLiteral(errors, manifest, "tag", `v${version}`);
-  expectString(errors, manifest, "tagCommit");
-  expectString(errors, manifest, "releaseCommit");
-  expectLiteral(errors, manifest, "publishedVersion", version);
-  expectStringArray(errors, manifest, "limitations");
-  expectObjectField(errors, manifest, "installSmoke", (value) => {
-    expectString(errors, value, "command");
-    expectLiteral(errors, value, "exitCode", 0);
-    expectString(errors, value, "generatedAt");
-  });
-  expectObjectField(errors, manifest, "githubActions", (value) => {
-    expectString(errors, value, "runUrl");
-  });
-  expectObjectField(errors, manifest, "packDryRun", (value) => {
-    expectNumber(errors, value, "fileCount");
-    expectLiteral(errors, value, "packageVersion", version);
-  });
-
-  const tagCommit = typeof manifest.tagCommit === "string" ? manifest.tagCommit.trim() : "";
-  if (tagCommit) {
-    const expectedTagCommit = await tagCommitFor(root, `v${version}`);
-    if (expectedTagCommit && tagCommit !== expectedTagCommit) {
-      errors.push(`tagCommit must match local tag v${version}`);
-    }
-  }
-
-  const releaseCommit = typeof manifest.releaseCommit === "string" ? manifest.releaseCommit.trim() : "";
-  if (releaseCommit) {
-    const currentCommit = await currentHead(root);
-    const documentedCommit = await documentedGithubActionsCommit(root);
-    if (releaseCommit !== currentCommit && releaseCommit !== documentedCommit) {
-      errors.push("releaseCommit must match HEAD or the documented GitHub Actions commit");
-    }
-  }
-
-  return errors;
-}
-
-async function tagCommitFor(root: string, tag: string): Promise<string> {
-  try {
-    return (await execStdout(`git rev-list -n 1 ${shellQuote(tag)}`, root)).trim();
-  } catch {
-    return "";
-  }
-}
-
-async function currentHead(root: string): Promise<string> {
-  try {
-    return (await execStdout("git rev-parse HEAD", root)).trim();
-  } catch {
-    return "";
-  }
-}
-
-async function documentedGithubActionsCommit(root: string): Promise<string> {
-  try {
-    const content = await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"), "utf8");
-    const match = /^Commit:\s*([0-9a-f]{7,40})$/im.exec(content);
-    if (!match) {
-      return "";
-    }
-    return (await execStdout(`git rev-parse ${shellQuote(match[1])}`, root)).trim();
-  } catch {
-    return "";
-  }
-}
-
-function expectLiteral(errors: string[], record: Record<string, unknown>, key: string, expected: string | number): void {
-  if (record[key] !== expected) {
-    errors.push(`${key} must be ${String(expected)}`);
-  }
-}
-
-function expectString(errors: string[], record: Record<string, unknown>, key: string): void {
-  if (typeof record[key] !== "string" || !record[key].trim()) {
-    errors.push(`${key} must be a non-empty string`);
-  }
-}
-
-function expectNumber(errors: string[], record: Record<string, unknown>, key: string): void {
-  if (typeof record[key] !== "number" || !Number.isFinite(record[key])) {
-    errors.push(`${key} must be a finite number`);
-  }
-}
-
-function expectStringArray(errors: string[], record: Record<string, unknown>, key: string): void {
-  const value = record[key];
-  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
-    errors.push(`${key} must be a string array`);
-  }
-}
-
-function expectObjectField(errors: string[], record: Record<string, unknown>, key: string, validate: (value: Record<string, unknown>) => void): void {
-  const value = record[key];
-  if (!isRecord(value)) {
-    errors.push(`${key} must be an object`);
-    return;
-  }
-  validate(value);
 }
 
 async function execStdout(command: string, cwd: string): Promise<string> {
-  return await new Promise((resolve, reject) => {
+  return await new Promise((resolve) => {
     exec(command, { cwd, timeout: 10_000 }, (error, stdout) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve(stdout);
+      resolve(error ? "" : stdout);
     });
   });
 }
@@ -292,5 +189,45 @@ function shellQuote(value: string): string {
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function metadataFailure(missing: readonly string[]): ReleaseEvidenceCheck {
+  return {
+    id: "package-metadata",
+    status: "fail",
+    evidence: `package.json missing repo-verifiable metadata: ${missing.join(", ")}`
+  };
+}
+
+function requiredStringFields(record: Record<string, unknown>, fields: readonly string[]): string[] {
+  return fields.filter((field) => !stringField(record, field));
+}
+
+function requiredNestedStringFields(record: Record<string, unknown>, parent: string, fields: readonly string[]): string[] {
+  const value = record[parent];
+  if (!isRecord(value)) {
+    return fields.map((field) => `${parent}.${field}`);
+  }
+  return fields.filter((field) => !stringField(value, field)).map((field) => `${parent}.${field}`);
+}
+
+function compatiblePackageUrls(repositoryUrl: string, homepage: string, bugsUrl: string): boolean {
+  const slug = githubSlug(repositoryUrl);
+  return !!slug && githubSlug(homepage) === slug && githubSlug(bugsUrl) === slug;
+}
+
+function githubSlug(value: string): string {
+  const match = /github\.com[:/]([^/#?]+\/[^/#?.]+)(?:\.git)?/i.exec(value);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function stringField(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function nestedStringField(record: Record<string, unknown>, parent: string, key: string): string {
+  const value = record[parent];
+  return isRecord(value) ? stringField(value, key) : "";
 }

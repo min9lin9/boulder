@@ -41,16 +41,29 @@ describe("source cleanliness", () => {
     const files = [
       ...(await filesUnder("skills/boulder")),
       ...(await filesUnder("skills/boulder-bootstrap-designer")),
+      ...(await filesUnder("docs")),
+      ...(await filesUnder("fixtures")),
       "README.md",
-      "docs/BOULDER_CODEX_SKILL_USAGE.ko.md"
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "ROADMAP.md",
+      "SECURITY.md",
+      "boulder.yaml",
+      "LICENSE",
     ];
 
     for (const file of files) {
       const source = await readFile(join(root, file), "utf8");
 
       expect(source).not.toContain("/Users/");
-      expect(source).not.toContain("/private/");
+      expect(source).not.toContain("/home/");
+      expect(source).not.toMatch(/(^|\s)\/private\//);
       expect(source).not.toContain("Documents/Codex");
+      expect(source).not.toMatch(/sk-proj-[A-Za-z0-9_-]{20,}/);
+      expect(source).not.toMatch(/sk-[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/ghp_[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/npm_[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/Bearer [A-Za-z0-9._-]{20,}/);
     }
   });
 

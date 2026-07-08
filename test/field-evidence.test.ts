@@ -1,7 +1,7 @@
 import { mkdir, readFile, stat, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
-import { evaluateFieldEvidence, recordFieldEvidence } from "../src/field-evidence";
+import { diffEvidence, evaluateFieldEvidence, inspectEvidence, recordFieldEvidence } from "../src/field-evidence";
 import { tempRepo, write } from "./helpers/cli";
 
 async function writeCompleteFieldRun(root: string, runId = "oss-run-1"): Promise<string> {
@@ -17,6 +17,46 @@ async function writeCompleteFieldRun(root: string, runId = "oss-run-1"): Promise
 }
 
 describe("field evidence", () => {
+  test("inspects release package and docs evidence states", async () => {
+    const root = await tempRepo();
+    await write(root, "package.json", "{\"version\":\"0.1.16\"}\n");
+    await write(root, "fixtures/package-inventory/packaged-files.v0.json", "{\"schemaVersion\":\"packaged-files.v0\",\"classes\":[]}\n");
+    await write(root, "fixtures/docs/doc-registry.v0.json", "[]\n");
+
+    const result = await inspectEvidence(root);
+
+    expect(result.schemaVersion).toBe("boulder.evidence.inspect.v1");
+    expect(result.evidence.some((item) => item.id === "release.release-workflow-doc" && item.area === "release")).toBe(true);
+    expect(result.evidence.some((item) => item.id === "package.inventory" && item.area === "package" && item.state === "pass")).toBe(true);
+    expect(result.evidence.some((item) => item.id === "docs.registry" && item.area === "docs" && item.state === "pass")).toBe(true);
+  });
+
+  test("diff reports changed evidence ids between roots", async () => {
+    const from = await tempRepo();
+    const to = await tempRepo();
+    await write(from, "package.json", "{\"version\":\"0.1.16\"}\n");
+    await write(to, "package.json", "{\"version\":\"0.1.16\"}\n");
+    await write(from, "fixtures/package-inventory/packaged-files.v0.json", "{\"schemaVersion\":\"packaged-files.v0\",\"classes\":[]}\n");
+    await write(to, "fixtures/package-inventory/packaged-files.v0.json", "not json\n");
+    await write(from, "fixtures/docs/doc-registry.v0.json", "[]\n");
+    await write(to, "fixtures/docs/doc-registry.v0.json", "[]\n");
+
+    const result = await diffEvidence(from, to);
+
+    expect(result.status).toBe("ready");
+    expect(result.changedEvidenceIds).toContain("package.inventory");
+  });
+
+  test("diff fails with evidence input recovery code when a path is missing", async () => {
+    const root = await tempRepo();
+
+    const result = await diffEvidence(join(root, "missing-from"), join(root, "missing-to"));
+
+    expect(result.status).toBe("blocked");
+    expect(result.recoveryCode).toBe("evidence.input_missing");
+    expect(result.issues.every((item) => item.code === "evidence.input_missing")).toBe(true);
+  });
+
   test("passes a complete field-readiness run and writes a manifest", async () => {
     const root = await tempRepo("boulder-field-evidence-");
     const evidencePath = await writeCompleteFieldRun(root);

@@ -1,6 +1,8 @@
 import { lstat, realpath } from "node:fs/promises";
 import { join } from "node:path";
 import { readText, writeGeneratedText } from "./fs";
+import { EVIDENCE_RECOVERY_CODES, type EvidenceRecoveryCode } from "./recovery-codes";
+import { evaluateReleaseCheck } from "./release-check";
 
 export type FieldEvidenceStatus = "pass" | "fail";
 
@@ -18,8 +20,55 @@ export type FieldEvidenceResult = {
   readonly checks: readonly FieldEvidenceCheck[];
 };
 
+export type EvidenceArea = "release" | "package" | "docs";
+export type EvidenceState = "pass" | "fail";
+export type EvidenceInspectItem = { readonly id: string; readonly area: EvidenceArea; readonly state: EvidenceState; readonly evidence: string };
+export type EvidenceInspectReport = { readonly schemaVersion: "boulder.evidence.inspect.v1"; readonly status: EvidenceState; readonly evidence: readonly EvidenceInspectItem[] };
+export type EvidenceDiffIssue = { readonly code: EvidenceRecoveryCode; readonly message: string; readonly path: string };
+export type EvidenceDiffChange = { readonly id: string; readonly fromState: EvidenceState | "missing"; readonly toState: EvidenceState | "missing" };
+export type EvidenceDiffReport = { readonly schemaVersion: "boulder.evidence.diff.v1"; readonly status: "ready" | "blocked"; readonly recoveryCode?: EvidenceRecoveryCode; readonly changedEvidenceIds: readonly string[]; readonly changes: readonly EvidenceDiffChange[]; readonly issues: readonly EvidenceDiffIssue[] };
+
 const DECISION_OUTCOMES = ["merge", "reject", "defer", "request-changes"];
 const REQUIRED_METRICS = ["time-to-first-readiness-delta", "readiness delta count", "public evidence link count"];
+
+export async function inspectEvidence(root: string): Promise<EvidenceInspectReport> {
+  const release = await evaluateReleaseCheck(root);
+  const evidence = [
+    ...release.checks.map((check): EvidenceInspectItem => ({
+      id: `release.${check.id}`,
+      area: "release",
+      state: check.status,
+      evidence: check.evidence
+    })),
+    await fixtureEvidence(root, "package.inventory", "package", "fixtures/package-inventory/packaged-files.v0.json", isPackageInventory),
+    await fixtureEvidence(root, "docs.registry", "docs", "fixtures/docs/doc-registry.v0.json", Array.isArray)
+  ];
+  return {
+    schemaVersion: "boulder.evidence.inspect.v1",
+    status: evidence.every((item) => item.state === "pass") ? "pass" : "fail",
+    evidence
+  };
+}
+
+export async function diffEvidence(from: string, to: string): Promise<EvidenceDiffReport> {
+  const issues = [...await inputIssues(from), ...await inputIssues(to)];
+  if (issues.length > 0) return inputMissingReport(issues);
+
+  const fromItems = keyById((await inspectEvidence(from)).evidence);
+  const toItems = keyById((await inspectEvidence(to)).evidence);
+  const ids = Array.from(new Set([...fromItems.keys(), ...toItems.keys()])).sort();
+  const changes = ids.flatMap((id): EvidenceDiffChange[] => {
+    const before = fromItems.get(id);
+    const after = toItems.get(id);
+    return evidenceChanged(before, after) ? [{
+      id,
+      fromState: before?.state ?? "missing",
+      toState: after?.state ?? "missing"
+    }] : [];
+  });
+
+  return { schemaVersion: "boulder.evidence.diff.v1", status: "ready", changedEvidenceIds: changes.map((change) => change.id), changes, issues: [] };
+}
 
 export async function evaluateFieldEvidence(root: string, runId: string, evidencePath: string): Promise<FieldEvidenceResult> {
   const base = await normalizeEvidencePath(root, runId, evidencePath);
@@ -160,6 +209,48 @@ async function metricsCheck(root: string, base: string): Promise<FieldEvidenceCh
   const hasMetrics = metrics.every((item) => typeof item === "string") && REQUIRED_METRICS.every((item) => metrics.includes(item));
   const ok = isRecord(parsed) && parsed["generatedFromEvidence"] === true && hasMetrics;
   return { id: "generated-metrics", status: ok ? "pass" : "fail", evidence: ok ? relative : `${relative} missing generated evidence metrics` };
+}
+
+async function fixtureEvidence(
+  root: string,
+  id: string,
+  area: EvidenceArea,
+  relativePath: string,
+  valid: (value: unknown) => boolean
+): Promise<EvidenceInspectItem> {
+  const content = await readText(join(root, relativePath));
+  const parsed = parseJson(content);
+  const ok = content !== null && valid(parsed);
+  return {
+    id,
+    area,
+    state: ok ? "pass" : "fail",
+    evidence: ok ? relativePath : `missing or invalid ${relativePath}`
+  };
+}
+
+async function inputIssues(path: string): Promise<readonly EvidenceDiffIssue[]> {
+  try {
+    return (await lstat(path)).isDirectory() ? [] : [{ code: EVIDENCE_RECOVERY_CODES.inputMissing, message: "evidence input path must be a directory", path }];
+  } catch {
+    return [{ code: EVIDENCE_RECOVERY_CODES.inputMissing, message: "evidence input path is missing", path }];
+  }
+}
+
+function inputMissingReport(issues: readonly EvidenceDiffIssue[]): EvidenceDiffReport {
+  return { schemaVersion: "boulder.evidence.diff.v1", status: "blocked", recoveryCode: EVIDENCE_RECOVERY_CODES.inputMissing, changedEvidenceIds: [], changes: [], issues };
+}
+
+function keyById(items: readonly EvidenceInspectItem[]): ReadonlyMap<string, EvidenceInspectItem> {
+  return new Map(items.map((item) => [item.id, item]));
+}
+
+function evidenceChanged(before: EvidenceInspectItem | undefined, after: EvidenceInspectItem | undefined): boolean {
+  return before?.state !== after?.state || before?.evidence !== after?.evidence;
+}
+
+function isPackageInventory(value: unknown): boolean {
+  return isRecord(value) && value["schemaVersion"] === "packaged-files.v0" && Array.isArray(value["classes"]);
 }
 
 function parseJson(content: string | null): unknown {

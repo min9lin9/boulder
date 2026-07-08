@@ -1,47 +1,8 @@
-Published install smoke evidence
-
-Observed result on 2026-07-07.
-
-Published registry verification:
-
-```bash
-npm view boulder-oss-cli@0.1.16 name version --json
-npm dist-tag ls boulder-oss-cli
 bunx boulder-oss-cli@0.1.16 --version
+Published help smoke:
 bunx boulder-oss-cli --help
-bunx boulder-oss-cli@0.1.16 --help
-```
-
-Registry output:
-
-```text
-{
-  "name": "boulder-oss-cli",
-  "version": "0.1.16"
-}
-
-latest: 0.1.16
-```
-
-Install smoke output:
-
-```text
-Result: success
-exit: 0
-0.1.16
-```
-
-Published version: 0.1.16
-
-Help smoke asserted the published CLI includes:
-
-```text
 Usage:
-boulder init [--cwd path] [--force]
-boulder bootstrap interview [--cwd path] [--task text] [--json]
-boulder capability import --from source --dry-run|--write [--kind skill|adapter|agent-catalog] [--id id] [--cwd path] [--json]
-boulder routine capture --task text --dry-run|--write [--cwd path] [--json]
-boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
-```
-
-Conclusion: `bunx boulder-oss-cli@0.1.16` installs and executes the published package.
+Published version: 0.1.16
+Result: success
+Generated at: 2026-07-07
+exit: 0

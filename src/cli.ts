@@ -1,29 +1,24 @@
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { bootstrapInterviewToMarkdown, buildBootstrapInterview } from "./bootstrap-interview";
 import { runCapabilityCommand } from "./capability-command";
-import { evaluateCapabilityDoctor } from "./capability-doctor";
-import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
+import { formatLines, prettyJson, printHelp } from "./cli-format";
+import { runOperationalCommand } from "./cli-ops-command";
 import { optionValue, parseOptions, valueAfter } from "./cli-options";
 import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
-import { recordFieldEvidence } from "./field-evidence";
 import { runHandoffCommand } from "./handoff-command";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
 import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
 import { runProfileCommand } from "./profile-command";
-import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
-import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
-import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
-import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
-import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
 import { runRoutineCommand } from "./routine-command";
+import { runRunsCommand } from "./runs-command";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
-import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-readiness";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
+import { buildPrimaryWorkflowMap } from "./workflow-map";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
 const VERSION = "0.1.16";
@@ -45,6 +40,7 @@ async function runMain(args: string[]): Promise<void> {
   const parsed = parseArgv(args);
   const command = parsed.command;
   const options = parseOptions(args);
+  const startedAt = new Date().toISOString();
   if (command === "version" || args.includes("--version")) { console.log(VERSION); return; }
   if (command === "help" || args.includes("--help") || args.includes("-h")) { printHelp(); return; }
   if (command === "init") {
@@ -80,7 +76,20 @@ async function runMain(args: string[]): Promise<void> {
     await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
+  if (command === "workflow" && parsed.commandArgs[1] === "map") {
+    if (!options.json) {
+      console.error("ERROR workflow.json_required: Use workflow map --json.");
+      process.exitCode = 1;
+      return;
+    }
+    console.log(prettyJson(buildPrimaryWorkflowMap()));
+    return;
+  }
   if (await runRoutineCommand(parsed.commandArgs, options)) {
+    return;
+  }
+  if (command === "runs") {
+    await runRunsCommand(parsed.commandArgs, args, options.cwd, options.json);
     return;
   }
   if (command === "bootstrap" && args.includes("interview")) {
@@ -154,96 +163,7 @@ async function runMain(args: string[]): Promise<void> {
     console.log(markdown);
     return;
   }
-  if (command === "release-plan") {
-    const plan = await evaluateReleasePlan(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(plan));
-      return;
-    }
-    const markdown = releasePlanToMarkdown(plan);
-    await writeGeneratedText(options.cwd, "docs/RELEASE_PLAN.md", markdown, true);
-    console.log(markdown);
-    return;
-  }
-  if (command === "release-check") {
-    const report = await evaluateReleaseCheck(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(report));
-      if (report.status === "blocked") process.exitCode = 1;
-      return;
-    }
-    console.log(releaseCheckToMarkdown(report));
-    if (report.status === "blocked") process.exitCode = 1;
-    return;
-  }
-  if (command === "replay-check") {
-    const report = await evaluateReplayCheck(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(report));
-      if (report.status === "blocked") process.exitCode = 1;
-      return;
-    }
-    console.log(replayCheckToMarkdown(report));
-    if (report.status === "blocked") process.exitCode = 1;
-    return;
-  }
-  if (command === "replay-run") {
-    const plan = await buildReplayRunPlan(options.cwd, options.dryRun);
-    if (options.json) {
-      console.log(prettyJson(plan));
-      if (plan.status === "blocked") process.exitCode = 1;
-      return;
-    }
-    console.log(replayRunPlanToMarkdown(plan));
-    if (plan.status === "blocked") process.exitCode = 1;
-    return;
-  }
-  if (command === "product-readiness") {
-    const readiness = await evaluateProductReadiness(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(readiness));
-      if (readiness.status === "blocked") process.exitCode = 1;
-      return;
-    }
-    const markdown = productReadinessToMarkdown(readiness);
-    await writeGeneratedText(options.cwd, "docs/PRODUCT_READINESS.md", markdown, true);
-    console.log(markdown);
-    if (readiness.status === "blocked") process.exitCode = 1;
-    return;
-  }
-  if (command === "service-readiness") {
-    const readiness = await evaluateServiceReadiness(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(readiness));
-      if (readiness.status === "blocked") process.exitCode = 1;
-      return;
-    }
-    const markdown = serviceReadinessToMarkdown(readiness);
-    await writeGeneratedText(options.cwd, "docs/SERVICE_READINESS.md", markdown, true);
-    console.log(markdown);
-    if (readiness.status === "blocked") process.exitCode = 1;
-    return;
-  }
-  if (command === "doctor") {
-    const report = await evaluateCapabilityDoctor(options.cwd);
-    if (options.json) {
-      console.log(prettyJson(report));
-      if (report.status === "fail") process.exitCode = 1;
-      return;
-    }
-    console.log(formatDoctorReport(report));
-    if (report.status === "fail") process.exitCode = 1;
-    return;
-  }
-  if (command === "record" && args.includes("field-readiness")) {
-    const result = await recordFieldEvidence(options.cwd, options.runId, options.evidence);
-    if (options.json) {
-      console.log(prettyJson(result));
-      if (result.status === "fail") process.exitCode = 1;
-      return;
-    }
-    console.log(formatFieldEvidenceResult(result));
-    if (result.status === "fail") process.exitCode = 1;
+  if (await runOperationalCommand(command, parsed.commandArgs, args, options, startedAt)) {
     return;
   }
   if (command === "export") {
@@ -275,5 +195,5 @@ function parseArgv(args: readonly string[]): { readonly command: string; readonl
   };
 }
 
-const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence"]);
-const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run"]);
+const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence", "--from", "--to", "--older-than", "--keep"]);
+const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run", "--record-run", "--latest"]);

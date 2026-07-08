@@ -1,0 +1,30 @@
+{
+  "version": "0.1.16",
+  "status": "ready",
+  "checks": [
+    {
+      "id": "github-actions-evidence",
+      "status": "pass",
+      "evidence": "https://github.com/min9lin9/boulder/actions/runs/28885567998"
+    },
+    {
+      "id": "install-smoke-evidence",
+      "status": "pass",
+      "evidence": "bunx boulder-oss-cli@0.1.16 --version"
+    },
+    {
+      "id": "pack-dry-run-evidence",
+      "status": "pass",
+      "evidence": "187 files"
+    },
+    {
+      "id": "release-evidence-manifest",
+      "status": "pass",
+      "evidence": "6671bcaceb4b35180a5756d6a340798ccdf3c206"
+    }
+  ],
+  "manualSteps": [
+    "Create the GitHub release with verification notes.",
+    "Publishing remains manual; npm publish is not automated by Boulder."
+  ]
+}

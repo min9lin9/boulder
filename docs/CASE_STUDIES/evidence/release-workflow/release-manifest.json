@@ -5,7 +5,7 @@
   "cliVersion": "0.1.16",
   "tag": "v0.1.16",
   "tagCommit": "df3538c7ed0dd7f1b50d4644c6e47204ede45ea7",
-  "releaseCommit": "df3538c7ed0dd7f1b50d4644c6e47204ede45ea7",
+  "releaseCommit": "6671bcaceb4b35180a5756d6a340798ccdf3c206",
   "publishedVersion": "0.1.16",
   "installSmoke": {
     "command": "bunx boulder-oss-cli@0.1.16 --version",
@@ -16,7 +16,7 @@
     "runUrl": "https://github.com/min9lin9/boulder/actions/runs/28885567998"
   },
   "packDryRun": {
-    "fileCount": 169,
+    "fileCount": 187,
     "packageVersion": "0.1.16"
   },
   "limitations": []
