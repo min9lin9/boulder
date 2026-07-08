@@ -1,0 +1,43 @@
+# Wave 1 package baseline refresh
+started: 2026-07-08T07:36:04Z
+worktree: /home/burt/Documents/Boulder-9-3-plus
+head before refresh: 809c611b2dbb7f399927ecdba6d8f068f1ef8dc4
+branch: codex/boulder-9-3-plus
+status before refresh: clean
+
+Reason:
+`bun test test/readiness-baseline-fixtures.test.ts` failed only on `pack-dry-run.txt`.
+Wave 1 added four packaged files:
+- fixtures/docs/doc-registry.v0.json
+- fixtures/package-inventory/packaged-files.v0.json
+- src/recovery-codes.ts
+- src/release-evidence.ts
+
+Baseline update:
+- Total files: 170 -> 174
+- Unpacked size: 0.64MB -> 0.68MB
+
+Verification:
+
+`bun pm pack --dry-run --ignore-scripts`
+exit: 0
+summary:
+Total files: 174
+Unpacked size: 0.68MB
+
+`bun test test/readiness-baseline-fixtures.test.ts`
+exit: 0
+summary:
+2 pass
+0 fail
+8 expect() calls
+
+`bun test test/release-evidence-bundle.test.ts test/package-inventory-contract.test.ts test/docs-registry.test.ts`
+exit: 0
+summary:
+14 pass
+0 fail
+45 expect() calls
+
+`bunx tsc --noEmit`
+exit: 0
