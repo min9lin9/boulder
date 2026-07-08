@@ -199,7 +199,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun bin/boulder.ts release-check --json`, binary observable: exit 0 without external npm trusted-publisher evidence, evidence `.omo/evidence/boulder-9-3-plus-verified/task-10-release-check-ready.json`; failure: `bun test test/release-metadata.test.ts --test-name-pattern "blocks missing repository url"`, binary observable: exit 0 and assertion proves release-check fails with `package.metadata_missing`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-10-metadata-failure.json`.
   Commit: Y | `docs(release): add provenance hardening checklist`.
 
-- [ ] 11. Add final verification scripts and plan compliance test.
+- [x] 11. Add final verification scripts and plan compliance test.
   What to do / Must NOT do: Add `test/plan-compliance.test.ts`, `script/qa/boulder-9-3-plus-manual-qa.sh`, and `script/qa/boulder-9-3-plus-scope-fidelity.sh`. These assets are final-gate infrastructure only; they must not duplicate implementation logic or hide failing commands.
   Parallelization: Wave 5 | Blocked by: 2, 3, 4, 5, 6, 7, 8, 9, 10 | Blocks: F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/plans/boulder-9-3-plus-verified.md`; all task evidence paths under `.omo/evidence/boulder-9-3-plus-verified/`; `test/readiness-reports.test.ts`; `test/source-cleanliness.test.ts`; `test/cli-e2e.test.ts`
