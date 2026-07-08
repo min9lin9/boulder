@@ -3,13 +3,13 @@
   "runs": [
     {
       "schemaVersion": "boulder.run-event.v1",
-      "runId": "3561d6fa-fbca-4bf2-b949-ec0a63cfd866",
+      "runId": "7dac5b3a-a992-4ff1-9aee-c94562824910",
       "eventName": "release-check",
       "command": "release-check --json",
-      "cwdHash": "41f2fed7759fe83f5af8a11af676dc8477e52ee7cc4aaab5cb6c63c490dc6116",
+      "cwdHash": "a341eea919e8ca9f1953589de88dbe50a0b52543b39d321d5376716431ba3589",
       "packageVersion": "0.1.16",
-      "startedAt": "2026-07-08T10:42:13.762Z",
-      "completedAt": "2026-07-08T10:42:13.784Z",
+      "startedAt": "2026-07-08T10:43:56.218Z",
+      "completedAt": "2026-07-08T10:43:56.244Z",
       "severity": "error",
       "status": "blocked",
       "checkIds": [
