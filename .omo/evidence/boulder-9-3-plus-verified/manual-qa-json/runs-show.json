@@ -1,14 +1,14 @@
 {
   "schemaVersion": "boulder.run-event.v1",
-  "runId": "7dac5b3a-a992-4ff1-9aee-c94562824910",
+  "runId": "b5bad667-2d3b-4a6f-84bf-915030f94005",
   "eventName": "release-check",
   "command": "release-check --json",
-  "cwdHash": "a341eea919e8ca9f1953589de88dbe50a0b52543b39d321d5376716431ba3589",
+  "cwdHash": "240e83016d66ba92073bc69c82a50d278061d44e1be8c716dae02075dfc533c5",
   "packageVersion": "0.1.16",
-  "startedAt": "2026-07-08T10:43:56.218Z",
-  "completedAt": "2026-07-08T10:43:56.244Z",
-  "severity": "error",
-  "status": "blocked",
+  "startedAt": "2026-07-08T11:43:03.196Z",
+  "completedAt": "2026-07-08T11:43:03.218Z",
+  "severity": "info",
+  "status": "ready",
   "checkIds": [
     "package-metadata",
     "release-workflow-doc",
@@ -22,10 +22,6 @@
     "release-evidence-manifest",
     "pack-dry-run-evidence"
   ],
-  "recoveryHintIds": [
-    "release.install_smoke_version",
-    "release.published_version",
-    "release.evidence_manifest"
-  ],
+  "recoveryHintIds": [],
   "artifactPaths": []
 }

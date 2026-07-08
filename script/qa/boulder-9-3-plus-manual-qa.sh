@@ -185,11 +185,11 @@ assertDiffMissing(diffMissing);
 assertReady(release, "root release-check");
 assertReady(product, "root product-readiness");
 assertReady(service, "root service-readiness");
-assertReleaseBlocked(runRootRelease, "run-root", ["git-tag-local"]);
+assertReady(runRootRelease, "run-root release-check");
 assertRefreshExpected(cleanRefresh, "clean archive");
-assertReleaseBlocked(cleanRelease, "clean archive", ["git-tag-local"]);
-assertProductBlocked(cleanProduct, "clean archive");
-assertServicePilotReady(cleanService, "clean archive");
+assertReady(cleanRelease, "clean archive release-check");
+assertReady(cleanProduct, "clean archive product-readiness");
+assertReady(cleanService, "clean archive service-readiness");
 ' "$JSON_EVIDENCE_DIR/release-refresh.json" "$JSON_EVIDENCE_DIR/evidence-inspect.json" "$JSON_EVIDENCE_DIR/evidence-diff-missing.json" "$JSON_EVIDENCE_DIR/release-check.json" "$JSON_EVIDENCE_DIR/product-readiness.json" "$JSON_EVIDENCE_DIR/service-readiness.json" "$JSON_EVIDENCE_DIR/run-root-release-check.json" "$JSON_EVIDENCE_DIR/clean-release-refresh.json" "$JSON_EVIDENCE_DIR/clean-release-check.json" "$JSON_EVIDENCE_DIR/clean-product-readiness.json" "$JSON_EVIDENCE_DIR/clean-service-readiness.json"
 
 echo "manual qa complete"

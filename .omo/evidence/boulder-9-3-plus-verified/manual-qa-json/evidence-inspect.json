@@ -1,6 +1,6 @@
 {
   "schemaVersion": "boulder.evidence.inspect.v1",
-  "status": "fail",
+  "status": "pass",
   "evidence": [
     {
       "id": "release.package-metadata",
@@ -35,14 +35,14 @@
     {
       "id": "release.install-smoke-version",
       "area": "release",
-      "state": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16"
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
     },
     {
       "id": "release.published-version-evidence",
       "area": "release",
-      "state": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16"
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
     },
     {
       "id": "release.github-actions-evidence",
@@ -59,8 +59,8 @@
     {
       "id": "release.release-evidence-manifest",
       "area": "release",
-      "state": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16"
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"
     },
     {
       "id": "release.pack-dry-run-evidence",

@@ -1,5 +1,5 @@
 {
-  "status": "pilot-ready",
+  "status": "ready",
   "checks": [
     {
       "id": "service-loop",
@@ -48,11 +48,11 @@
     },
     {
       "id": "product-readiness",
-      "status": "fail",
-      "evidence": "product-readiness blocked"
+      "status": "pass",
+      "evidence": "product-readiness ready"
     }
   ],
   "nextSteps": [
-    "Service pilot is ready; product-readiness must pass before claiming public service-ready."
+    "Service workflow is ready; continue separating adoption claims from local evidence."
   ]
 }

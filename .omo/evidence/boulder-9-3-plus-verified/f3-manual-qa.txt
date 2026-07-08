@@ -1,46 +1,69 @@
 root:/home/burt/Documents/Boulder-9-3-plus
-clean:/tmp/tmp.2sHfjX3tQe/clean
+clean:/tmp/tmp.WsnICWEjt5/clean
 command:release-refresh bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release evidence refresh --dry-run --json --cwd /home/burt/Documents/Boulder-9-3-plus
-release-refresh exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-refresh.json
+release-refresh exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-refresh.json
 bun test v1.3.14 (0d9b296a)
+
+test/package-inventory-contract.test.ts:
+(pass) package inventory contract > classifies every packed file exactly once [12.57ms]
+(pass) package inventory contract > rejects unclassified packed files [0.13ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.23ms]
+
+ 3 pass
+ 0 fail
+ 6 expect() calls
+Ran 3 tests across 1 file. [27.00ms]
 bun test v1.3.14 (0d9b296a)
+
+test/docs-registry.test.ts:
+(pass) documentation registry > covers packaged docs and local-only exclusions [2.52ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.08ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.12ms]
+(pass) documentation registry > rejects packaged docs with missing source path metadata [3.47ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.28ms]
+(pass) documentation registry > rejects packaged local-only docs [0.03ms]
+
+ 6 pass
+ 0 fail
+ 11 expect() calls
+Ran 6 tests across 1 file. [19.00ms]
 command:evidence-inspect bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts evidence inspect --cwd /home/burt/Documents/Boulder-9-3-plus --json
 evidence-inspect exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-inspect.json
-command:evidence-diff-missing bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts evidence diff --from /tmp/tmp.2sHfjX3tQe/missing-a --to /tmp/tmp.2sHfjX3tQe/missing-b --json
+command:evidence-diff-missing bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts evidence diff --from /tmp/tmp.WsnICWEjt5/missing-a --to /tmp/tmp.WsnICWEjt5/missing-b --json
 evidence-diff-missing exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-diff-missing.json
 command:workflow-map bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts workflow map --json
 workflow-map path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/workflow-map.json
 command:release-check bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release-check --cwd /home/burt/Documents/Boulder-9-3-plus --json
-release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-check.json
+release-check exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-check.json
 command:product-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts product-readiness --cwd /home/burt/Documents/Boulder-9-3-plus --json
-product-readiness exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/product-readiness.json
+product-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/product-readiness.json
 command:service-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts service-readiness --cwd /home/burt/Documents/Boulder-9-3-plus --json
 service-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/service-readiness.json
-command:run-root-release-check bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release-check --cwd /tmp/tmp.2sHfjX3tQe/run-root --json --record-run
-run-root-release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/run-root-release-check.json
-command:runs-list bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs list --cwd /tmp/tmp.2sHfjX3tQe/run-root --json
+command:run-root-release-check bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release-check --cwd /tmp/tmp.WsnICWEjt5/run-root --json --record-run
+run-root-release-check exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/run-root-release-check.json
+command:runs-list bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs list --cwd /tmp/tmp.WsnICWEjt5/run-root --json
 runs-list path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-list.json
-command:runs-show bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs show --latest --cwd /tmp/tmp.2sHfjX3tQe/run-root --json
+command:runs-show bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs show --latest --cwd /tmp/tmp.WsnICWEjt5/run-root --json
 runs-show path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-show.json
-command:runs-prune bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs prune --older-than 30d --keep 200 --cwd /tmp/tmp.2sHfjX3tQe/run-root --json
+command:runs-prune bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts runs prune --older-than 30d --keep 200 --cwd /tmp/tmp.WsnICWEjt5/run-root --json
 runs-prune path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-prune.json
-command:clean-release-check bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release-check --cwd /tmp/tmp.2sHfjX3tQe/clean --json
-clean-release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-release-check.json
-command:clean-product-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts product-readiness --cwd /tmp/tmp.2sHfjX3tQe/clean --json
-clean-product-readiness exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-product-readiness.json
-command:clean-service-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts service-readiness --cwd /tmp/tmp.2sHfjX3tQe/clean --json
+command:clean-release-check bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release-check --cwd /tmp/tmp.WsnICWEjt5/clean --json
+clean-release-check exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-release-check.json
+command:clean-product-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts product-readiness --cwd /tmp/tmp.WsnICWEjt5/clean --json
+clean-product-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-product-readiness.json
+command:clean-service-readiness bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts service-readiness --cwd /tmp/tmp.WsnICWEjt5/clean --json
 clean-service-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-service-readiness.json
-command:clean-release-refresh bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release evidence refresh --dry-run --json --cwd /tmp/tmp.2sHfjX3tQe/clean
-clean-release-refresh exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-release-refresh.json
-assert:root release-refresh release.version_mismatch
-assert:evidence-inspect failed ids install-smoke-version,published-version-evidence,release-evidence-manifest
+command:clean-release-refresh bun /home/burt/Documents/Boulder-9-3-plus/bin/boulder.ts release evidence refresh --dry-run --json --cwd /tmp/tmp.WsnICWEjt5/clean
+clean-release-refresh exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-release-refresh.json
+assert:root release-refresh ready
+assert:evidence-inspect pass
 assert:evidence-diff missing issue codes evidence.input_missing,evidence.input_missing
-assert:root release-check install-smoke-version,published-version-evidence,release-evidence-manifest
-assert:root product-readiness public-release-check
-assert:root service-readiness product-readiness
-assert:run-root release-check install-smoke-version,published-version-evidence,release-evidence-manifest
-assert:clean archive release-refresh release.version_mismatch
-assert:clean archive release-check install-smoke-version,published-version-evidence,release-evidence-manifest
-assert:clean archive product-readiness public-release-check
-assert:clean archive service-readiness product-readiness
+assert:root release-check ready
+assert:root product-readiness ready
+assert:root service-readiness ready
+assert:run-root release-check ready
+assert:clean archive release-refresh ready
+assert:clean archive release-check ready
+assert:clean archive product-readiness ready
+assert:clean archive service-readiness ready
 manual qa complete
