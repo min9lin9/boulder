@@ -22,7 +22,9 @@ const PLAN_TARGETS = [
 const RELEASE_EXPECTATION = {
   packageJsonVersion: packageJson.version,
   cliVersion: packageJson.version,
-  tag: `v${packageJson.version}`
+  tag: `v${packageJson.version}`,
+  releaseCommit: releaseManifest.releaseCommit,
+  packDryRunFileCount: releaseManifest.packDryRun.fileCount
 } as const;
 
 describe("ReleaseEvidenceBundleV1", () => {
@@ -77,5 +79,44 @@ describe("ReleaseEvidenceBundleV1", () => {
     expect(codes).toContain(RELEASE_RECOVERY_CODES.versionMismatch);
     expect(codes).toContain(RELEASE_RECOVERY_CODES.tagMismatch);
     expect(codes).toContain(RELEASE_RECOVERY_CODES.packVersionMismatch);
+  });
+
+  test("mismatch rejects CI release commit drift with a stable recovery code", () => {
+    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      return;
+    }
+
+    const mismatched = {
+      ...parsed.value,
+      releaseCommit: "0000000000000000000000000000000000000000"
+    };
+
+    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+
+    expect(codes).toContain(RELEASE_RECOVERY_CODES.releaseCommitMismatch);
+  });
+
+  test("mismatch rejects pack dry-run file count drift with a stable recovery code", () => {
+    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      return;
+    }
+
+    const mismatched = {
+      ...parsed.value,
+      packDryRun: {
+        ...parsed.value.packDryRun,
+        fileCount: parsed.value.packDryRun.fileCount + 1
+      }
+    };
+
+    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+
+    expect(codes).toContain(RELEASE_RECOVERY_CODES.packFileCountMismatch);
   });
 });

@@ -40,6 +40,8 @@ export type ReleaseEvidenceExpectation = {
   readonly packageJsonVersion: string;
   readonly cliVersion: string;
   readonly tag: string;
+  readonly releaseCommit: string;
+  readonly packDryRunFileCount: number;
 };
 
 export type ReleaseEvidenceIssue = {
@@ -89,6 +91,12 @@ export function checkReleaseEvidenceBundle(
   }
   if (value.packDryRun.packageVersion !== expected.packageJsonVersion) {
     issues.push(issue(RELEASE_RECOVERY_CODES.packVersionMismatch, "pack dry-run packageVersion must match package.json"));
+  }
+  if (value.releaseCommit !== expected.releaseCommit) {
+    issues.push(issue(RELEASE_RECOVERY_CODES.releaseCommitMismatch, "releaseCommit must match CI evidence commit"));
+  }
+  if (value.packDryRun.fileCount !== expected.packDryRunFileCount) {
+    issues.push(issue(RELEASE_RECOVERY_CODES.packFileCountMismatch, "pack dry-run fileCount must match pack evidence"));
   }
 
   return { status: issues.length === 0 ? "pass" : "fail", issues };
