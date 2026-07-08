@@ -59,6 +59,11 @@ describe("source cleanliness", () => {
       expect(source).not.toContain("/home/");
       expect(source).not.toMatch(/(^|\s)\/private\//);
       expect(source).not.toContain("Documents/Codex");
+      expect(source).not.toMatch(/sk-proj-[A-Za-z0-9_-]{20,}/);
+      expect(source).not.toMatch(/sk-[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/ghp_[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/npm_[A-Za-z0-9]{20,}/);
+      expect(source).not.toMatch(/Bearer [A-Za-z0-9._-]{20,}/);
     }
   });
 
