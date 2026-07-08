@@ -1,4 +1,7 @@
-scope fidelity repo: /home/burt/Documents/Boulder-9-3-plus
+command:git archive HEAD -> temp clean archive; run F4 there
+tmp:/tmp/tmp.ecjX71fXzQ
+command:bash script/qa/boulder-9-3-plus-scope-fidelity.sh (fresh archive)
+scope fidelity repo: /tmp/tmp.ecjX71fXzQ
 expected transcript artifact: .omo/evidence/boulder-9-3-plus-verified/f4-scope-fidelity.txt
 assert:public-files README.md package.json skills/boulder/SKILL.md skills/boulder-bootstrap-designer/SKILL.md docs/RELEASE_WORKFLOW.md docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json fixtures/docs/doc-registry.v0.json fixtures/package-inventory/packaged-files.v0.json src/release-evidence.ts src/run-events.ts test/docs-registry.test.ts test/package-inventory-contract.test.ts test/run-events-redaction.test.ts test/source-cleanliness.test.ts
 checking public artifact: README.md
@@ -37,40 +40,39 @@ checking public artifact: test/source-cleanliness.test.ts
 bun test v1.3.14 (0d9b296a)
 
 test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [19.68ms]
-(pass) run event redaction > redacts relative protected paths from commands and artifacts [2.45ms]
-(pass) run event redaction > fails closed when runs directory is a symlink [1.40ms]
-(pass) run event redaction > prune ignores malicious run ids when deleting event files [1.78ms]
-(pass) run event redaction > list ignores symlinked run event files [0.99ms]
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [8.33ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.04ms]
+(pass) run event redaction > prune ignores malicious run ids when deleting event files [3.38ms]
+(pass) run event redaction > list ignores symlinked run event files [3.47ms]
 
- 5 pass
+ 4 pass
  0 fail
- 18 expect() calls
-Ran 5 tests across 1 file. [68.00ms]
+ 16 expect() calls
+Ran 4 tests across 1 file. [53.00ms]
 + bun test test/source-cleanliness.test.ts test/docs-registry.test.ts test/package-inventory-contract.test.ts
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [4.84ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.10ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.08ms]
-(pass) documentation registry > rejects packaged docs with missing source path metadata [6.85ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.80ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [4.57ms]
+(pass) documentation registry > rejects translated docs without dir metadata [1.41ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.32ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [2.61ms]
 (pass) documentation registry > rejects packaged local-only docs [0.04ms]
 
 test/source-cleanliness.test.ts:
-(pass) source cleanliness > command modules use shared pretty JSON rendering [0.37ms]
-(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [12.51ms]
-(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [14.22ms]
-(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [1.12ms]
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.34ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.31ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [5.57ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.20ms]
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [25.01ms]
-(pass) package inventory contract > rejects unclassified packed files [0.18ms]
+(pass) package inventory contract > classifies every packed file exactly once [34.70ms]
+(pass) package inventory contract > rejects unclassified packed files [0.63ms]
 (pass) package inventory contract > reports fixture and pack drift separately [0.11ms]
 
- 13 pass
+ 12 pass
  0 fail
- 376 expect() calls
-Ran 13 tests across 3 files. [106.00ms]
+ 375 expect() calls
+Ran 12 tests across 3 files. [97.00ms]
 scope fidelity complete
+cleanup:removed fresh archive temp dir

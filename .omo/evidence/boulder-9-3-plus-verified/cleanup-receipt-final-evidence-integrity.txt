@@ -1,0 +1,5 @@
+cleanup:removed .debug-journal.md
+cleanup:removed /tmp/boulder-f3-pre.txt /tmp/boulder-f4-pre.txt if present
+cleanup:removed .debug-journal.md from git info exclude
+command:test ! -e .debug-journal.md
+command:test ! -e /tmp/boulder-f3-pre.txt && test ! -e /tmp/boulder-f4-pre.txt

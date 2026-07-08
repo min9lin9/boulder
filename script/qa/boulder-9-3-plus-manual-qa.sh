@@ -11,6 +11,7 @@ run_json_allow_blocked() {
   local label="$1"
   shift
   local output="$JSON_EVIDENCE_DIR/${label}.json"
+  echo "command:$label $*"
   set +e
   "$@" >"$output"
   local exit_code=$?
@@ -23,6 +24,7 @@ run_json_strict() {
   local label="$1"
   shift
   local output="$JSON_EVIDENCE_DIR/${label}.json"
+  echo "command:$label $*"
   "$@" >"$output"
   bun -e 'const fs=require("fs"); JSON.parse(fs.readFileSync(process.argv[1], "utf8"));' "$output"
   echo "$label path:$output"
@@ -42,10 +44,10 @@ git -C "$ROOT" archive HEAD | tar -x -C "$RUN_ROOT"
 echo "root:$ROOT"
 echo "clean:$CLEAN_ROOT"
 
-run_json_strict release-refresh bun "$ROOT/bin/boulder.ts" release evidence refresh --dry-run --json --cwd "$ROOT"
+run_json_allow_blocked release-refresh bun "$ROOT/bin/boulder.ts" release evidence refresh --dry-run --json --cwd "$ROOT"
 bun test "$ROOT/test/package-inventory-contract.test.ts"
 bun test "$ROOT/test/docs-registry.test.ts"
-run_json_strict evidence-inspect bun "$ROOT/bin/boulder.ts" evidence inspect --cwd "$ROOT" --json
+run_json_allow_blocked evidence-inspect bun "$ROOT/bin/boulder.ts" evidence inspect --cwd "$ROOT" --json
 run_json_allow_blocked evidence-diff-missing bun "$ROOT/bin/boulder.ts" evidence diff --from "$TMP_ROOT/missing-a" --to "$TMP_ROOT/missing-b" --json
 run_json_strict workflow-map bun "$ROOT/bin/boulder.ts" workflow map --json
 run_json_allow_blocked release-check bun "$ROOT/bin/boulder.ts" release-check --cwd "$ROOT" --json
@@ -59,23 +61,142 @@ run_json_strict runs-prune bun "$ROOT/bin/boulder.ts" runs prune --older-than 30
 run_json_allow_blocked clean-release-check bun "$ROOT/bin/boulder.ts" release-check --cwd "$CLEAN_ROOT" --json
 run_json_allow_blocked clean-product-readiness bun "$ROOT/bin/boulder.ts" product-readiness --cwd "$CLEAN_ROOT" --json
 run_json_allow_blocked clean-service-readiness bun "$ROOT/bin/boulder.ts" service-readiness --cwd "$CLEAN_ROOT" --json
+run_json_allow_blocked clean-release-refresh bun "$ROOT/bin/boulder.ts" release evidence refresh --dry-run --json --cwd "$CLEAN_ROOT"
 
 bun -e '
 const fs = require("fs");
-const report = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-if (report.status !== "blocked") process.exit(0);
-const allowed = new Set([
+const paths = {
+  refresh: process.argv[1],
+  inspect: process.argv[2],
+  diffMissing: process.argv[3],
+  release: process.argv[4],
+  product: process.argv[5],
+  service: process.argv[6],
+  runRootRelease: process.argv[7],
+  cleanRefresh: process.argv[8],
+  cleanRelease: process.argv[9],
+  cleanProduct: process.argv[10],
+  cleanService: process.argv[11]
+};
+const read = (path) => JSON.parse(fs.readFileSync(path, "utf8"));
+const refresh = read(paths.refresh);
+const inspect = read(paths.inspect);
+const diffMissing = read(paths.diffMissing);
+const release = read(paths.release);
+const product = read(paths.product);
+const service = read(paths.service);
+const runRootRelease = read(paths.runRootRelease);
+const cleanRefresh = read(paths.cleanRefresh);
+const cleanRelease = read(paths.cleanRelease);
+const cleanProduct = read(paths.cleanProduct);
+const cleanService = read(paths.cleanService);
+const expectedReleaseFailures = [
+  "install-smoke-version",
+  "published-version-evidence",
+  "release-evidence-manifest"
+];
+const allowedReleaseFailures = new Set([
   "install-smoke-version",
   "published-version-evidence",
   "git-tag-local",
   "release-evidence-manifest"
 ]);
-const failing = (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
-const unexpected = failing.filter((id) => !allowed.has(id));
-if (unexpected.length) {
-  console.error(`unexpected root release-check blockers: ${unexpected.join(", ")}`);
-  process.exit(1);
+function assertBlocked(report, label) {
+  if (report.status !== "blocked") {
+    console.error(`${label} must remain blocked without current external release evidence`);
+    process.exit(1);
+  }
 }
-' "$JSON_EVIDENCE_DIR/release-check.json"
+function failingIds(report) {
+  return (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
+}
+function failedEvidenceIds(report) {
+  return (report.evidence || []).filter((item) => item.state === "fail").map((item) => item.id.replace(/^release\./, ""));
+}
+function assertSameIds(actual, expected, label) {
+  const sortedActual = [...actual].sort();
+  const sortedExpected = [...expected].sort();
+  if (JSON.stringify(sortedActual) !== JSON.stringify(sortedExpected)) {
+    console.error(`${label} mismatch expected:${sortedExpected.join(", ")} actual:${sortedActual.join(", ")}`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} ${expected.join(",")}`);
+}
+function assertReleaseBlocked(report, label) {
+  assertBlocked(report, label);
+  const failing = failingIds(report);
+  const missing = expectedReleaseFailures.filter((id) => !failing.includes(id));
+  const unexpected = failing.filter((id) => !allowedReleaseFailures.has(id));
+  if (missing.length || unexpected.length) {
+    console.error(`${label} release-check blockers mismatch missing:${missing.join(", ")} unexpected:${unexpected.join(", ")}`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} release-check ${expectedReleaseFailures.join(",")}`);
+}
+function assertProductBlocked(report, label) {
+  assertBlocked(report, label);
+  const publicRelease = (report.checks || []).find((check) => check.id === "public-release-check");
+  if (!publicRelease || publicRelease.status !== "fail") {
+    console.error(`${label} product-readiness must fail public-release-check`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} product-readiness public-release-check`);
+}
+function assertServicePilotReady(report, label) {
+  if (report.status !== "pilot-ready") {
+    console.error(`${label} service-readiness must remain pilot-ready`);
+    process.exit(1);
+  }
+  const productReadiness = (report.checks || []).find((check) => check.id === "product-readiness");
+  if (!productReadiness || productReadiness.status !== "fail") {
+    console.error(`${label} service-readiness must fail product-readiness`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} service-readiness product-readiness`);
+}
+function assertRefreshExpected(report, label) {
+  if (report.status === "ready") {
+    if ((report.issues || []).length) {
+      console.error(`${label} release refresh ready output must not include issues`);
+      process.exit(1);
+    }
+    console.log(`assert:${label} release-refresh ready`);
+    return;
+  }
+  assertBlocked(report, label);
+  const codes = (report.issues || []).map((issue) => issue.code);
+  if (!codes.includes("release.version_mismatch")) {
+    console.error(`${label} release refresh must block on release.version_mismatch`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} release-refresh release.version_mismatch`);
+}
+function assertInspectFail(report) {
+  if (report.status !== "fail") {
+    console.error("evidence-inspect must report status fail until release evidence is current");
+    process.exit(1);
+  }
+  assertSameIds(failedEvidenceIds(report), expectedReleaseFailures, "evidence-inspect failed ids");
+}
+function assertDiffMissing(report) {
+  if (report.status !== "blocked" || report.recoveryCode !== "evidence.input_missing") {
+    console.error("evidence-diff-missing must block with evidence.input_missing");
+    process.exit(1);
+  }
+  const codes = (report.issues || []).map((issue) => issue.code);
+  assertSameIds(codes, ["evidence.input_missing", "evidence.input_missing"], "evidence-diff missing issue codes");
+}
+assertRefreshExpected(refresh, "root");
+assertInspectFail(inspect);
+assertDiffMissing(diffMissing);
+assertReleaseBlocked(release, "root");
+assertProductBlocked(product, "root");
+assertServicePilotReady(service, "root");
+assertReleaseBlocked(runRootRelease, "run-root");
+assertRefreshExpected(cleanRefresh, "clean archive");
+assertReleaseBlocked(cleanRelease, "clean archive");
+assertProductBlocked(cleanProduct, "clean archive");
+assertServicePilotReady(cleanService, "clean archive");
+' "$JSON_EVIDENCE_DIR/release-refresh.json" "$JSON_EVIDENCE_DIR/evidence-inspect.json" "$JSON_EVIDENCE_DIR/evidence-diff-missing.json" "$JSON_EVIDENCE_DIR/release-check.json" "$JSON_EVIDENCE_DIR/product-readiness.json" "$JSON_EVIDENCE_DIR/service-readiness.json" "$JSON_EVIDENCE_DIR/run-root-release-check.json" "$JSON_EVIDENCE_DIR/clean-release-refresh.json" "$JSON_EVIDENCE_DIR/clean-release-check.json" "$JSON_EVIDENCE_DIR/clean-product-readiness.json" "$JSON_EVIDENCE_DIR/clean-service-readiness.json"
 
 echo "manual qa complete"

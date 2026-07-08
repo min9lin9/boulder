@@ -1,0 +1,2 @@
+command:bunx tsc --noEmit
+tsc exit:0

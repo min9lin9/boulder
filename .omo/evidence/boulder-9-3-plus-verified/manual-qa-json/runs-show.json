@@ -1,12 +1,12 @@
 {
   "schemaVersion": "boulder.run-event.v1",
-  "runId": "b36f6dbc-3d42-4a82-90fd-cb76e2443171",
+  "runId": "27bb7a3b-2b9a-4079-a6e5-f5c975de5ff5",
   "eventName": "release-check",
   "command": "release-check --json",
-  "cwdHash": "69ca0e26905ec4882b1f53e3770c4f675de6ccf984a86ee5c9b43ae192307a5a",
+  "cwdHash": "2efce36b1f274b11bcb76c085c3c728a334a0994c0cb7adcc1fc92f0ad752978",
   "packageVersion": "0.1.16",
-  "startedAt": "2026-07-08T10:09:53.571Z",
-  "completedAt": "2026-07-08T10:09:53.591Z",
+  "startedAt": "2026-07-08T10:38:54.826Z",
+  "completedAt": "2026-07-08T10:38:54.861Z",
   "severity": "error",
   "status": "blocked",
   "checkIds": [

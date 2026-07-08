@@ -3,46 +3,51 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
-EVIDENCE_DIR="$ROOT/.omo/evidence/boulder-9-3-plus-verified"
-REQUIRED_EVIDENCE=(
-  task-1-baseline.txt
-  task-1-blocked-fixture.txt
-  task-2-bundle-tests.txt
-  task-2-mismatch.txt
-  task-3-package-contract.txt
-  task-3-unclassified-file.txt
-  task-4-doc-registry.txt
-  task-4-i18n-failure.txt
-  task-5-refresh-dry-run.json
-  task-5-refresh-failure.txt
-  task-6-registry-tests.txt
-  task-6-duplicate-id.txt
-  task-7-inspect.json
-  task-7-diff-failure.json
-  task-8-runs-list.json
-  task-8-redaction.txt
-  task-8-prune.json
-  task-9-workflow-map.json
-  task-9-workflow-failure.txt
-  task-10-release-check-ready.json
-  task-10-metadata-failure.json
+SCAN_SURFACES=(README.md docs src test fixtures skills package.json)
+PUBLIC_FILES=(
+  README.md
+  package.json
+  skills/boulder/SKILL.md
+  skills/boulder-bootstrap-designer/SKILL.md
+  docs/RELEASE_WORKFLOW.md
+  docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
+  docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json
+  fixtures/docs/doc-registry.v0.json
+  fixtures/package-inventory/packaged-files.v0.json
+  src/release-evidence.ts
+  src/run-events.ts
+  test/docs-registry.test.ts
+  test/package-inventory-contract.test.ts
+  test/run-events-redaction.test.ts
+  test/source-cleanliness.test.ts
 )
 
-for evidence in "${REQUIRED_EVIDENCE[@]}"; do
-  test -s "$EVIDENCE_DIR/$evidence"
+run() {
+  printf '+'
+  printf ' %q' "$@"
+  printf '\n'
+  "$@" 2>&1
+}
+
+echo "scope fidelity repo: $ROOT"
+echo "expected transcript artifact: .omo/evidence/boulder-9-3-plus-verified/f4-scope-fidelity.txt"
+echo "assert:public-files ${PUBLIC_FILES[*]}"
+for file in "${PUBLIC_FILES[@]}"; do
+  echo "checking public artifact: $file"
+  run test -s "$file"
 done
 
-if rg -n "trusted publisher (is )?verified|npm account (is )?verified|guarantees? (a )?9\\.3|guarantees? (the )?score" README.md docs src test package.json; then
+if run rg -n "trusted publisher (is )?verified|npm account (is )?verified|guarantees? (a )?9\\.3|guarantees? (the )?score" "${SCAN_SURFACES[@]}"; then
   echo "forbidden external-state or guaranteed-score claim found" >&2
   exit 1
 fi
 
-if rg -n "sk-proj-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|npm_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,}" README.md docs src test package.json; then
+if run rg -n "sk-proj-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|npm_[A-Za-z0-9]{20,}|Bearer [A-Za-z0-9._-]{20,}" "${SCAN_SURFACES[@]}"; then
   echo "secret-like token found in repository content" >&2
   exit 1
 fi
 
-bun test test/run-events-redaction.test.ts
-bun test test/source-cleanliness.test.ts test/docs-registry.test.ts test/package-inventory-contract.test.ts
+run bun test test/run-events-redaction.test.ts
+run bun test test/source-cleanliness.test.ts test/docs-registry.test.ts test/package-inventory-contract.test.ts
 
 echo "scope fidelity complete"
