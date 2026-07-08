@@ -65,7 +65,24 @@ describe("package inventory contract", () => {
       message = error instanceof Error ? error.message : String(error);
     }
 
-    expect(message).toBe("Unclassified packed files: tmp/stray.txt");
+    expect(message).toBe("Packed files missing from fixture: tmp/stray.txt");
+  });
+
+  test("reports fixture and pack drift separately", () => {
+    const inventory: Inventory = {
+      schemaVersion: "packaged-files.v0",
+      totalUniqueFiles: 2,
+      classes: [{ className: "runtime", count: 2, files: ["src/known.ts", "src/future.ts"] }]
+    };
+    let message = "";
+
+    try {
+      assertClassified(["src/known.ts", "tmp/stray.txt"], inventory);
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+
+    expect(message).toBe("Packed files missing from fixture: tmp/stray.txt\nFixture files missing from pack: src/future.ts");
   });
 });
 
@@ -100,12 +117,15 @@ function assertClassified(paths: readonly string[], inventory: Inventory): {
     }
   }
 
-  const unclassified = paths.filter((file) => !classified.has(file));
-  if (unclassified.length > 0) throw new Error(`Unclassified packed files: ${unclassified.join(", ")}`);
-
   const packed = new Set(paths);
+  const unclassified = paths.filter((file) => !classified.has(file));
   const stale = Array.from(classified.keys()).filter((file) => !packed.has(file)).sort();
-  if (stale.length > 0) throw new Error(`Fixture lists files not in package: ${stale.join(", ")}`);
+  const drift = [
+    unclassified.length > 0 ? `Packed files missing from fixture: ${unclassified.join(", ")}` : "",
+    stale.length > 0 ? `Fixture files missing from pack: ${stale.join(", ")}` : ""
+  ].filter((message) => message.length > 0);
+  if (drift.length > 0) throw new Error(drift.join("\n"));
+
   if (paths.length !== inventory.totalUniqueFiles) {
     throw new Error(`Total unique file mismatch: expected ${inventory.totalUniqueFiles}, found ${paths.length}`);
   }

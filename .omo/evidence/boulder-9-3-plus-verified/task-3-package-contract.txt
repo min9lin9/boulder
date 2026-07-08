@@ -151,9 +151,9 @@ packed 7.61KB src/product-readiness.ts
 packed 4.82KB src/profile-command.ts
 packed 7.59KB src/profile-store.ts
 packed 5.61KB src/quickstart.ts
-packed 396B src/recovery-codes.ts
+packed 0.53KB src/recovery-codes.ts
 packed 11.1KB src/release-check.ts
-packed 9.60KB src/release-evidence.ts
+packed 6.31KB src/release-evidence.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
 packed 3.80KB src/replay-run.ts
@@ -185,12 +185,37 @@ $ bun test test/package-inventory-contract.test.ts
 bun test v1.3.14 (0d9b296a)
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [19.92ms]
-(pass) package inventory contract > rejects unclassified packed files [0.96ms]
+(pass) package inventory contract > classifies every packed file exactly once [16.21ms]
+(pass) package inventory contract > rejects unclassified packed files [0.17ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.11ms]
 
- 2 pass
+ 3 pass
  0 fail
- 4 expect() calls
-Ran 2 tests across 1 file. [48.00ms]
+ 5 expect() calls
+Ran 3 tests across 1 file. [53.00ms]
+
+$ bun test test/package-inventory-contract.test.ts --test-name-pattern "rejects unclassified packed files"
+bun test v1.3.14 (0d9b296a)
+
+test/package-inventory-contract.test.ts:
+(pass) package inventory contract > rejects unclassified packed files [0.53ms]
+
+ 1 pass
+ 2 filtered out
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [26.00ms]
+
+$ bun test test/package-inventory-contract.test.ts --test-name-pattern "reports fixture and pack drift separately"
+bun test v1.3.14 (0d9b296a)
+
+test/package-inventory-contract.test.ts:
+(pass) package inventory contract > reports fixture and pack drift separately [0.54ms]
+
+ 1 pass
+ 2 filtered out
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [29.00ms]
 
 $ bunx tsc --noEmit
