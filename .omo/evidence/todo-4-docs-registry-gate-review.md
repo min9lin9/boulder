@@ -1,5 +1,14 @@
 # Todo 4 Docs Registry Gate Review
 
+recommendation: SUPERSEDED
+
+SUPERSEDED_BY:
+- `.omo/evidence/boulder-9-3-plus-verified/task-4-support-review.txt`
+- commit `fbc4dbc` (`test(docs): cover registry metadata failures`)
+- pending final Wave 1 verifier after support-review coverage is rechecked
+
+Historical result below is retained for audit context only.
+
 recommendation: REJECT
 
 originalIntent: Verify Todo 4 completion for the documentation registry contract in `/home/burt/Documents/Boulder-9-3-plus`, covering commit `d569cdefba57e0b3de9e00e26eccc8bead06b167` and current worktree.

@@ -7,11 +7,16 @@ Scope reviewed:
 - package.json#files
 
 Manual QA/review matrix:
+- Programming criteria: no `any`, `as any`, `as unknown`, `@ts-ignore`, `@ts-expect-error`, or non-null assertion escape hatches were found in the reviewed TypeScript test file.
 - Packaged docs coverage: `bun test test/docs-registry.test.ts` compares all packaged `docs/**` entries from package inventory with registry entries where `packaging` is `packaged`.
 - Local-only exclusions: same test compares `local-only` registry entries with `package.json#files` negated doc patterns and keeps packaged local-only rejection coverage.
 - Translation metadata: negative tests reject translated docs missing `dir`, `source`, or `version`.
 - Generated metadata: negative test rejects generated docs missing `generatedBy` or `source`.
+- Scope fidelity: changes stay in docs registry fixture/test/evidence paths and do not edit source code, release evidence targets, or out-of-scope product docs.
+- Slop/overfit check: the registry contract checks structured metadata and package inventory alignment instead of accepting a single static docs listing.
+- Deferred scope: large docs and package inventory fixtures remain deferred by scope; this task verifies classification and metadata rather than reducing documentation surface area.
 
 Result:
 - No fixture edit was needed; failures were missing test coverage, not bad registry data.
 - Requested verification passed: full docs registry test, filtered translated-dir test, and `bunx tsc --noEmit`.
+- Prior stale Todo 4 REJECT findings for missing translation source/version and generated metadata negative tests are superseded by the later registry metadata fix.

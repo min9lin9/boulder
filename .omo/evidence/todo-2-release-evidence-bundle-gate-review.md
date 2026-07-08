@@ -1,3 +1,12 @@
+recommendation: SUPERSEDED
+
+SUPERSEDED_BY:
+- `.omo/evidence/boulder-9-3-plus-verified/task-2-support-review.txt`
+- commit `14e7ea2` (`fix(release): validate release evidence drift fields`)
+- pending final Wave 1 verifier after current-evidence acceptance is rechecked
+
+Historical result below is retained for audit context only.
+
 recommendation: REJECT
 
 blockers:
