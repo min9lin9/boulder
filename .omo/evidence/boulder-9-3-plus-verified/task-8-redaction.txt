@@ -1,9 +1,0 @@
-bun test v1.3.14 (0d9b296a)
-
-test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [5.47ms]
-
- 1 pass
- 0 fail
- 11 expect() calls
-Ran 1 test across 1 file. [34.00ms]

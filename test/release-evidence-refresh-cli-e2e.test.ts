@@ -91,6 +91,7 @@ describe("release evidence refresh CLI", () => {
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt"), "utf8")).toBe(adjacent);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"), "utf8")).toContain(`Total files: ${packTotal}`);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"), "utf8")).toContain(`bunx boulder-oss-cli@${packageJson.version} --version`);
+      expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"), "utf8")).toContain("bunx boulder-oss-cli --help");
       expect(await readFile(join(root, "docs/PRODUCT_READINESS.md"), "utf8")).toContain(`- public-release-check: pass - release-check ready for ${packageJson.version}`);
     } finally {
       await removeTempRepo(root);

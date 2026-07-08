@@ -16,6 +16,7 @@ run_json_allow_blocked() {
   "$@" >"$output"
   local exit_code=$?
   set -e
+  printf '%s\n' "$exit_code" >"$output.exit"
   bun -e 'const fs=require("fs"); JSON.parse(fs.readFileSync(process.argv[1], "utf8"));' "$output"
   echo "$label exit:$exit_code path:$output"
 }
@@ -26,6 +27,7 @@ run_json_strict() {
   local output="$JSON_EVIDENCE_DIR/${label}.json"
   echo "command:$label $*"
   "$@" >"$output"
+  printf '0\n' >"$output.exit"
   bun -e 'const fs=require("fs"); JSON.parse(fs.readFileSync(process.argv[1], "utf8"));' "$output"
   echo "$label path:$output"
 }
@@ -79,6 +81,7 @@ const paths = {
   cleanService: process.argv[11]
 };
 const read = (path) => JSON.parse(fs.readFileSync(path, "utf8"));
+const exitCode = (path) => Number(fs.readFileSync(`${path}.exit`, "utf8").trim());
 const refresh = read(paths.refresh);
 const inspect = read(paths.inspect);
 const diffMissing = read(paths.diffMissing);
@@ -90,6 +93,7 @@ const cleanRefresh = read(paths.cleanRefresh);
 const cleanRelease = read(paths.cleanRelease);
 const cleanProduct = read(paths.cleanProduct);
 const cleanService = read(paths.cleanService);
+const exits = Object.fromEntries(Object.entries(paths).map(([key, path]) => [key, exitCode(path)]));
 function assertBlocked(report, label) {
   if (report.status !== "blocked") {
     console.error(`${label} must remain blocked without current external release evidence`);
@@ -102,6 +106,13 @@ function assertReady(report, label) {
     process.exit(1);
   }
   console.log(`assert:${label} ready`);
+}
+function assertExit(key, expected, label) {
+  if (exits[key] !== expected) {
+    console.error(`${label} exit mismatch expected:${expected} actual:${exits[key]}`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} exit ${expected}`);
 }
 function failingIds(report) {
   return (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
@@ -180,16 +191,27 @@ function assertDiffMissing(report) {
   assertSameIds(codes, ["evidence.input_missing", "evidence.input_missing"], "evidence-diff missing issue codes");
 }
 assertRefreshExpected(refresh, "root");
+assertExit("refresh", 0, "root release-refresh");
 assertInspectPass(inspect);
+assertExit("inspect", 0, "evidence-inspect");
 assertDiffMissing(diffMissing);
+assertExit("diffMissing", 1, "evidence-diff missing");
 assertReady(release, "root release-check");
+assertExit("release", 0, "root release-check");
 assertReady(product, "root product-readiness");
+assertExit("product", 0, "root product-readiness");
 assertReady(service, "root service-readiness");
+assertExit("service", 0, "root service-readiness");
 assertReady(runRootRelease, "run-root release-check");
+assertExit("runRootRelease", 0, "run-root release-check");
 assertRefreshExpected(cleanRefresh, "clean archive");
+assertExit("cleanRefresh", 0, "clean archive release-refresh");
 assertReady(cleanRelease, "clean archive release-check");
+assertExit("cleanRelease", 0, "clean archive release-check");
 assertReady(cleanProduct, "clean archive product-readiness");
+assertExit("cleanProduct", 0, "clean archive product-readiness");
 assertReady(cleanService, "clean archive service-readiness");
+assertExit("cleanService", 0, "clean archive service-readiness");
 ' "$JSON_EVIDENCE_DIR/release-refresh.json" "$JSON_EVIDENCE_DIR/evidence-inspect.json" "$JSON_EVIDENCE_DIR/evidence-diff-missing.json" "$JSON_EVIDENCE_DIR/release-check.json" "$JSON_EVIDENCE_DIR/product-readiness.json" "$JSON_EVIDENCE_DIR/service-readiness.json" "$JSON_EVIDENCE_DIR/run-root-release-check.json" "$JSON_EVIDENCE_DIR/clean-release-refresh.json" "$JSON_EVIDENCE_DIR/clean-release-check.json" "$JSON_EVIDENCE_DIR/clean-product-readiness.json" "$JSON_EVIDENCE_DIR/clean-service-readiness.json"
 
 echo "manual qa complete"

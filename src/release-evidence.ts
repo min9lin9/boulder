@@ -113,16 +113,14 @@ async function refreshBundle(root: string, bundle: ReleaseEvidenceBundleV1, pack
   return refreshVersionFields(
     bundle,
     packageInfo,
-    await currentGitCommit(root, ["rev-list", "-n", "1", `v${packageInfo.version}`]),
-    await currentGitCommit(root, ["rev-parse", "HEAD"])
+    await currentGitCommit(root, ["rev-list", "-n", "1", `v${packageInfo.version}`])
   );
 }
 
 function refreshVersionFields(
   bundle: ReleaseEvidenceBundleV1,
   packageInfo: PackageInfo,
-  tagCommit: string,
-  releaseCommit: string
+  tagCommit: string
 ): ReleaseEvidenceBundleV1 {
   return {
     ...bundle,
@@ -131,7 +129,6 @@ function refreshVersionFields(
     cliVersion: packageInfo.version,
     tag: `v${packageInfo.version}`,
     tagCommit: tagCommit || bundle.tagCommit,
-    releaseCommit: releaseCommit || bundle.releaseCommit,
     packDryRun: { ...bundle.packDryRun, packageVersion: packageInfo.version }
   };
 }

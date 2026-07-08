@@ -1,1 +1,0 @@
-product_readiness_cli_status=1

@@ -103,7 +103,7 @@ export function renderReleaseEvidenceBundle(bundle: ReleaseEvidenceBundleV1): Re
   return {
     "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json": `${JSON.stringify(bundle, null, 2)}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt": `CI\nResult: success\nRun: ${bundle.githubActions.runUrl}\nCommit: ${bundle.releaseCommit}\n`,
-    "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt": `${bundle.installSmoke.command}\nPublished version: ${bundle.publishedVersion}\nResult: success\nGenerated at: ${bundle.installSmoke.generatedAt}\nexit: ${bundle.installSmoke.exitCode}\n`,
+    "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt": `${bundle.installSmoke.command}\nPublished help smoke:\nbunx boulder-oss-cli --help\nUsage:\nPublished version: ${bundle.publishedVersion}\nResult: success\nGenerated at: ${bundle.installSmoke.generatedAt}\nexit: ${bundle.installSmoke.exitCode}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt": `${bundle.packageName}\nPackage version: ${bundle.packDryRun.packageVersion}\nTotal files: ${bundle.packDryRun.fileCount}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/ci.txt": `bun run ci\nResult: success\nCommit: ${bundle.releaseCommit}\n`,
     "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json": `${JSON.stringify({

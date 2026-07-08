@@ -68,7 +68,7 @@ async function expectCommitFields(errors: string[], root: string, version: strin
   if (releaseCommit) {
     const currentCommit = await gitStdout(root, "git rev-parse HEAD");
     const documentedCommit = await documentedGithubActionsCommit(root);
-    if ((currentCommit || documentedCommit) && releaseCommit !== currentCommit && releaseCommit !== documentedCommit) {
+    if ((currentCommit || documentedCommit) && !commitMatches(releaseCommit, currentCommit) && !commitMatches(releaseCommit, documentedCommit)) {
       errors.push("releaseCommit must match HEAD or the documented GitHub Actions commit");
     }
   }
@@ -78,10 +78,17 @@ async function documentedGithubActionsCommit(root: string): Promise<string> {
   try {
     const content = await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"), "utf8");
     const match = /^Commit:\s*([0-9a-f]{7,40})$/im.exec(content);
-    return match ? await gitStdout(root, `git rev-parse ${shellQuote(match[1])}`) : "";
+    if (!match?.[1]) return "";
+    return await gitStdout(root, `git rev-parse ${shellQuote(match[1])}`) || match[1].toLowerCase();
   } catch {
     return "";
   }
+}
+
+function commitMatches(actual: string, expected: string): boolean {
+  const left = actual.trim().toLowerCase();
+  const right = expected.trim().toLowerCase();
+  return !!left && !!right && (left === right || left.startsWith(right) || right.startsWith(left));
 }
 
 async function gitStdout(root: string, command: string): Promise<string> {
