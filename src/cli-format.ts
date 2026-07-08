@@ -41,6 +41,7 @@ export function printHelp(): void {
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
     "  boulder release-plan [--cwd path] [--json]",
+    "  boulder release evidence refresh --dry-run|--write [--cwd path] [--json]",
     "  boulder release-check [--cwd path] [--json]",
     "  boulder replay-check [--cwd path] [--json]",
     "  boulder replay-run [--cwd path] --dry-run [--json]",

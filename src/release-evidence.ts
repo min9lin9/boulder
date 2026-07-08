@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+import { writeGeneratedText } from "./fs";
 import { RELEASE_RECOVERY_CODES, type ReleaseRecoveryCode } from "./recovery-codes";
 
 export const RELEASE_EVIDENCE_TARGETS = [
@@ -59,6 +62,20 @@ export type ReleaseEvidenceParseResult = {
 
 export type ReleaseEvidenceValidation = {
   readonly status: "pass" | "fail";
+  readonly issues: readonly ReleaseEvidenceIssue[];
+};
+
+export type ReleaseEvidenceRefreshTarget = {
+  readonly path: ReleaseEvidenceTarget;
+  readonly changed: boolean;
+  readonly beforeBytes: number;
+  readonly afterBytes: number;
+  readonly content: string;
+};
+
+export type ReleaseEvidenceRefreshPlan = {
+  readonly status: "ready" | "blocked";
+  readonly targets: readonly ReleaseEvidenceRefreshTarget[];
   readonly issues: readonly ReleaseEvidenceIssue[];
 };
 
@@ -127,6 +144,51 @@ export function renderReleaseEvidenceBundle(bundle: ReleaseEvidenceBundleV1): Re
   };
 }
 
+export async function planReleaseEvidenceRefresh(root: string): Promise<ReleaseEvidenceRefreshPlan> {
+  const parsed = await loadBundle(root);
+  if (!parsed.ok) return { status: "blocked", targets: [], issues: parsed.issues };
+
+  const packageInfo = await loadPackageInfo(root);
+  if (!packageInfo) {
+    return { status: "blocked", targets: [], issues: [issue(RELEASE_RECOVERY_CODES.malformedInput, "package.json must contain name and version")] };
+  }
+
+  const bundle = refreshVersionFields(parsed.value, packageInfo);
+  const packDryRunFileCount = await currentPackDryRunFileCount(root) ?? bundle.packDryRun.fileCount;
+  const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(bundle), {
+    packageJsonVersion: packageInfo.version,
+    cliVersion: packageInfo.version,
+    tag: `v${packageInfo.version}`,
+    releaseCommit: bundle.releaseCommit,
+    packDryRunFileCount
+  });
+  if (validation.status === "fail") {
+    return { status: "blocked", targets: [], issues: validation.issues };
+  }
+
+  const rendered = renderReleaseEvidenceBundle(bundle);
+  const targets = await Promise.all(RELEASE_EVIDENCE_TARGETS.map(async (path) => {
+    const current = await readExisting(root, path);
+    const content = path === "docs/PRODUCT_READINESS.md" ? mergeProductReadinessLine(current, rendered[path]) : rendered[path];
+    return {
+      path,
+      changed: current !== content,
+      beforeBytes: current.length,
+      afterBytes: content.length,
+      content
+    } satisfies ReleaseEvidenceRefreshTarget;
+  }));
+
+  return { status: "ready", targets, issues: [] };
+}
+
+export async function writeReleaseEvidenceRefresh(root: string, plan: ReleaseEvidenceRefreshPlan): Promise<void> {
+  if (plan.status === "blocked") return;
+  for (const target of plan.targets) {
+    await writeGeneratedText(root, target.path, target.content, true);
+  }
+}
+
 function isBundle(input: Record<string, unknown>): input is ReleaseEvidenceBundleV1 {
   return input.schemaVersion === 1 &&
     typeof input.packageName === "string" &&
@@ -170,4 +232,71 @@ function issue(code: ReleaseRecoveryCode, message: string): ReleaseEvidenceIssue
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+async function loadBundle(root: string): Promise<ReleaseEvidenceParseResult> {
+  try {
+    return parseReleaseEvidenceBundle(JSON.parse(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"), "utf8")));
+  } catch (error) {
+    if (!(error instanceof Error)) throw error;
+    return fail(RELEASE_RECOVERY_CODES.malformedInput, "release evidence manifest must be readable JSON");
+  }
+}
+
+async function loadPackageInfo(root: string): Promise<{ readonly name: string; readonly version: string } | null> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+    if (isRecord(parsed) && typeof parsed.name === "string" && typeof parsed.version === "string") {
+      return { name: parsed.name, version: parsed.version };
+    }
+  } catch (error) {
+    if (!(error instanceof Error)) throw error;
+    return null;
+  }
+  return null;
+}
+
+function refreshVersionFields(bundle: ReleaseEvidenceBundleV1, packageInfo: { readonly name: string; readonly version: string }): ReleaseEvidenceBundleV1 {
+  return {
+    ...bundle,
+    packageName: packageInfo.name,
+    packageJsonVersion: packageInfo.version,
+    cliVersion: packageInfo.version,
+    tag: `v${packageInfo.version}`,
+    publishedVersion: packageInfo.version,
+    installSmoke: {
+      ...bundle.installSmoke,
+      command: `bunx ${packageInfo.name}@${packageInfo.version} --version`
+    },
+    packDryRun: {
+      ...bundle.packDryRun,
+      packageVersion: packageInfo.version
+    }
+  };
+}
+
+async function currentPackDryRunFileCount(root: string): Promise<number | null> {
+  const content = await readExisting(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt");
+  const match = /^Total files:\s*(\d+)$/im.exec(content);
+  return match ? Number(match[1]) : null;
+}
+
+async function readExisting(root: string, path: ReleaseEvidenceTarget): Promise<string> {
+  try {
+    return await readFile(join(root, path), "utf8");
+  } catch (error) {
+    if (!(error instanceof Error)) throw error;
+    return "";
+  }
+}
+
+function mergeProductReadinessLine(current: string, renderedLine: string): string {
+  const line = renderedLine.trimEnd();
+  const lines = current.split("\n");
+  const index = lines.findIndex((item) => item.startsWith("- public-release-check:"));
+  if (index >= 0) {
+    lines[index] = line;
+    return lines.join("\n");
+  }
+  return current.endsWith("\n") || current.length === 0 ? `${current}${line}\n` : `${current}\n${line}\n`;
 }

@@ -15,6 +15,7 @@ import { runProfileCommand } from "./profile-command";
 import { evaluateProductReadiness, productReadinessToMarkdown } from "./product-readiness";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { evaluateReleaseCheck, releaseCheckToMarkdown } from "./release-check";
+import { planReleaseEvidenceRefresh, writeReleaseEvidenceRefresh, type ReleaseEvidenceRefreshPlan } from "./release-evidence";
 import { evaluateReleasePlan, releasePlanToMarkdown } from "./release-plan";
 import { evaluateReplayCheck, replayCheckToMarkdown } from "./replay-check";
 import { buildReplayRunPlan, replayRunPlanToMarkdown } from "./replay-run";
@@ -165,6 +166,28 @@ async function runMain(args: string[]): Promise<void> {
     console.log(markdown);
     return;
   }
+  if (command === "release" && parsed.commandArgs[1] === "evidence" && parsed.commandArgs[2] === "refresh") {
+    const wantsDryRun = args.includes("--dry-run");
+    const wantsWrite = args.includes("--write");
+    if (wantsDryRun === wantsWrite) {
+      console.error("ERROR release.mode_required: Use exactly one of --dry-run or --write.");
+      process.exitCode = 1;
+      return;
+    }
+
+    const plan = await planReleaseEvidenceRefresh(options.cwd);
+    if (wantsWrite && plan.status === "ready") {
+      await writeReleaseEvidenceRefresh(options.cwd, plan);
+    }
+    if (options.json) {
+      console.log(prettyJson(refreshPlanForJson(plan, wantsWrite ? "write" : "dry-run")));
+      if (plan.status === "blocked") process.exitCode = 1;
+      return;
+    }
+    console.log(refreshPlanToMarkdown(plan, wantsWrite ? "write" : "dry-run"));
+    if (plan.status === "blocked") process.exitCode = 1;
+    return;
+  }
   if (command === "release-check") {
     const report = await evaluateReleaseCheck(options.cwd);
     if (options.json) {
@@ -283,3 +306,36 @@ function parseArgv(args: readonly string[]): { readonly command: string; readonl
 
 const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence"]);
 const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run"]);
+
+function refreshPlanForJson(plan: ReleaseEvidenceRefreshPlan, mode: "dry-run" | "write"): {
+  readonly mode: "dry-run" | "write";
+  readonly status: ReleaseEvidenceRefreshPlan["status"];
+  readonly targets: readonly {
+    readonly path: string;
+    readonly changed: boolean;
+    readonly beforeBytes: number;
+    readonly afterBytes: number;
+  }[];
+  readonly issues: ReleaseEvidenceRefreshPlan["issues"];
+} {
+  return {
+    mode,
+    status: plan.status,
+    targets: plan.targets.map((target) => ({
+      path: target.path,
+      changed: target.changed,
+      beforeBytes: target.beforeBytes,
+      afterBytes: target.afterBytes
+    })),
+    issues: plan.issues
+  };
+}
+
+function refreshPlanToMarkdown(plan: ReleaseEvidenceRefreshPlan, mode: "dry-run" | "write"): string {
+  return [
+    `Boulder release evidence refresh ${mode}`,
+    `- status: ${plan.status}`,
+    ...plan.targets.map((target) => `- ${target.changed ? "update" : "unchanged"}: ${target.path} (${target.beforeBytes} -> ${target.afterBytes} bytes)`),
+    ...plan.issues.map((issue) => `- issue: ${issue.code} - ${issue.message}`)
+  ].join("\n");
+}

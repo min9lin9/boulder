@@ -1,0 +1,49 @@
+{
+  "mode": "dry-run",
+  "status": "ready",
+  "targets": [
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
+      "changed": true,
+      "beforeBytes": 627,
+      "afterBytes": 627
+    },
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt",
+      "changed": true,
+      "beforeBytes": 1278,
+      "afterBytes": 134
+    },
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
+      "changed": true,
+      "beforeBytes": 3406,
+      "afterBytes": 113
+    },
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
+      "changed": true,
+      "beforeBytes": 5271,
+      "afterBytes": 57
+    },
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/ci.txt",
+      "changed": true,
+      "beforeBytes": 2395,
+      "afterBytes": 76
+    },
+    {
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/release-plan.json",
+      "changed": true,
+      "beforeBytes": 1915,
+      "afterBytes": 754
+    },
+    {
+      "path": "docs/PRODUCT_READINESS.md",
+      "changed": true,
+      "beforeBytes": 1763,
+      "afterBytes": 1763
+    }
+  ],
+  "issues": []
+}

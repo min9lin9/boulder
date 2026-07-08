@@ -1,0 +1,10 @@
+bun test v1.3.14 (0d9b296a)
+
+test/release-evidence-refresh-cli-e2e.test.ts:
+(pass) release evidence refresh CLI > blocks mismatched bundle without writes [113.16ms]
+
+ 1 pass
+ 2 filtered out
+ 0 fail
+ 4 expect() calls
+Ran 1 test across 1 file. [215.00ms]
