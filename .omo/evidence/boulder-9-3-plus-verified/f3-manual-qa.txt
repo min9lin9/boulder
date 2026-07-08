@@ -1,30 +1,30 @@
 root:/home/burt/Documents/Boulder-9-3-plus
-clean:/tmp/tmp.Dj9DqgsK0P/clean
+clean:/tmp/tmp.577wy2dwTT/clean
 release-refresh path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-refresh.json
 bun test v1.3.14 (0d9b296a)
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [24.78ms]
-(pass) package inventory contract > rejects unclassified packed files [0.99ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.13ms]
+(pass) package inventory contract > classifies every packed file exactly once [18.52ms]
+(pass) package inventory contract > rejects unclassified packed files [1.99ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.12ms]
 
  3 pass
  0 fail
  6 expect() calls
-Ran 3 tests across 1 file. [54.00ms]
+Ran 3 tests across 1 file. [38.00ms]
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [3.33ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.48ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.33ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.29ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [4.11ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.89ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.36ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.35ms]
 (pass) documentation registry > rejects packaged local-only docs [0.03ms]
 
  5 pass
  0 fail
  10 expect() calls
-Ran 5 tests across 1 file. [19.00ms]
+Ran 5 tests across 1 file. [21.00ms]
 evidence-inspect path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-inspect.json
 evidence-diff-missing exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-diff-missing.json
 workflow-map path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/workflow-map.json

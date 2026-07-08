@@ -1,37 +1,37 @@
 bun test v1.3.14 (0d9b296a)
 
 test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [8.42ms]
-(pass) run event redaction > fails closed when runs directory is a symlink [1.69ms]
-(pass) run event redaction > prune ignores malicious run ids when deleting event files [3.01ms]
-(pass) run event redaction > list ignores symlinked run event files [1.28ms]
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [5.54ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.16ms]
+(pass) run event redaction > prune ignores malicious run ids when deleting event files [2.00ms]
+(pass) run event redaction > list ignores symlinked run event files [4.11ms]
 
  4 pass
  0 fail
  16 expect() calls
-Ran 4 tests across 1 file. [39.00ms]
+Ran 4 tests across 1 file. [35.00ms]
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [4.53ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.87ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.39ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.33ms]
-(pass) documentation registry > rejects packaged local-only docs [0.05ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [2.71ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.49ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.41ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.30ms]
+(pass) documentation registry > rejects packaged local-only docs [0.03ms]
 
 test/source-cleanliness.test.ts:
-(pass) source cleanliness > command modules use shared pretty JSON rendering [0.45ms]
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.37ms]
 (pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.33ms]
-(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [13.42ms]
-(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.22ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [10.11ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.17ms]
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [14.43ms]
-(pass) package inventory contract > rejects unclassified packed files [1.46ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.11ms]
+(pass) package inventory contract > classifies every packed file exactly once [15.68ms]
+(pass) package inventory contract > rejects unclassified packed files [1.28ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.14ms]
 
  12 pass
  0 fail
  375 expect() calls
-Ran 12 tests across 3 files. [59.00ms]
+Ran 12 tests across 3 files. [51.00ms]
 scope fidelity complete

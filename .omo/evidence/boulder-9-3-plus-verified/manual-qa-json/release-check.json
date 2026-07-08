@@ -45,7 +45,7 @@
     {
       "id": "git-tag-local",
       "status": "pass",
-      "evidence": "local tag v0.1.16"
+      "evidence": "release tag evidence available for v0.1.16"
     },
     {
       "id": "release-evidence-manifest",

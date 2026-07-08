@@ -155,10 +155,10 @@ packed 7.59KB src/profile-store.ts
 packed 5.61KB src/quickstart.ts
 packed 11.12KB src/readiness-registry.ts
 packed 0.73KB src/recovery-codes.ts
-packed 9.19KB src/release-check.ts
+packed 9.58KB src/release-check.ts
 packed 7.65KB src/release-evidence-bundle.ts
 packed 7.65KB src/release-evidence.ts
-packed 5.62KB src/release-manifest-check.ts
+packed 5.66KB src/release-manifest-check.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
 packed 3.80KB src/replay-run.ts
