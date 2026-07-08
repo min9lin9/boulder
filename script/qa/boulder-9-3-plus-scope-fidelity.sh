@@ -3,9 +3,15 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
-SCAN_SURFACES=(README.md docs src test fixtures skills package.json)
+SCAN_SURFACES=(README.md CHANGELOG.md CONTRIBUTING.md ROADMAP.md SECURITY.md boulder.yaml LICENSE docs src test fixtures skills package.json)
 PUBLIC_FILES=(
   README.md
+  CHANGELOG.md
+  CONTRIBUTING.md
+  ROADMAP.md
+  SECURITY.md
+  boulder.yaml
+  LICENSE
   package.json
   skills/boulder/SKILL.md
   skills/boulder-bootstrap-designer/SKILL.md

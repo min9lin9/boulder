@@ -56,14 +56,14 @@ describe("run event redaction", () => {
 
       const result = await recordRunEvent(root, {
         eventName: "release-check",
-        command: "release-check --include .env.local --log nested/.env.local",
+        command: "release-check --include .env.local --include=.env.local --log nested/.env.local",
         startedAt: "2026-07-08T00:00:00.000Z",
         completedAt: "2026-07-08T00:00:01.000Z",
         severity: "error",
         status: "blocked",
         checkIds: [],
         recoveryHintIds: [],
-        artifactPaths: [".env.local", "nested/.env.local"]
+        artifactPaths: [".env.local", "nested/.env.local", "--artifact=.env.local"]
       });
 
       const stored = await readFile(result.path, "utf8");

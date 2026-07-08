@@ -43,6 +43,12 @@ describe("source cleanliness", () => {
       ...(await filesUnder("skills/boulder-bootstrap-designer")),
       ...(await filesUnder("docs")),
       "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "ROADMAP.md",
+      "SECURITY.md",
+      "boulder.yaml",
+      "LICENSE",
     ];
 
     for (const file of files) {

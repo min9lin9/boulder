@@ -14,7 +14,7 @@ Scope: current Boulder worktree, npm registry metadata, GitHub workflow status v
 | SSL/HTTPS | 부분 있음 | Low | CLI 자체에는 TLS 표면이 없다. 다만 capability source URL은 GitHub HTTPS만 허용한다. 공개 docs/site를 만들면 별도 HTTPS 검증이 필요하다. |
 | 로그인/권한 | 해당 없음/부분 있음 | Low-Medium | 사용자 로그인은 없다. 대신 external handoff는 approval code와 review receipt로 보호된다. |
 | 보안 취약점 | 부분 있음 | Medium-High | raw workspace 차단은 강하지만 `verify` shell 실행, generated write hardening, handoff approval secret 수명/위치, capability source immutability, dependency scanning, workflow SHA pinning 갭이 있다. |
-| SEO/GEO/AEO | 있음 | Medium | package metadata와 FAQ/use-case answer 구조가 부족하다. 웹 landing 자산은 없다. |
+| SEO/GEO/AEO | 부분 있음 | Medium | package metadata는 보강됨. 남은 갭은 FAQ/use-case answer 구조와 별도 웹 landing 자산이다. |
 | 모바일 반응형 | 해당 없음 | Low | CLI/Markdown 제품이라 모바일 UI 표면이 없다. 웹 landing을 만들 때만 반응형 기준이 필요하다. |
 | 메모리 누수 | 큰 문제 없음/부분 있음 | Low-Medium | daemon은 없지만 `exec` output buffering과 대형 JSON/doc read는 큰 repo에서 memory spike가 가능하다. |
 | 병목/성능 | 부분 있음 | Medium | `product-readiness` 재귀 스캔, capability inventory fallback walk, release-check git shell calls가 큰 repo/cache에서 병목이 될 수 있다. |
@@ -262,7 +262,7 @@ Medium.
 
 ### 확인 근거
 
-- npm metadata fields `repository`, `homepage`, `bugs`가 없음: `package.json:2-51`.
+- npm metadata fields `repository`, `homepage`, `bugs`는 현재 `package.json`에 있음.
 - `.html`, `.css`, `robots.txt`, `sitemap.xml`, favicon/OG image asset이 없음.
 - FAQ/use-case answer index가 명확하지 않음.
 - README는 제품 목적과 명령을 설명하지만, 검색/AI answer용 질문형 entry가 부족하다.
@@ -280,7 +280,7 @@ nl -ba package.json | sed -n '1,80p'
 
 승인 후 최소 변경부터 적용한다.
 
-- `package.json` metadata 보강.
+- npm metadata는 현재 유지하고, README/FAQ answer 구조를 보강한다.
 - README 상단에 “What is Boulder?”, “Who is it for?”, “How do I verify it?” 같은 짧은 answer blocks 추가.
 - `docs/FAQ.md` 또는 README FAQ를 추가하고 핵심 질문 8-10개를 evidence link와 함께 정리.
 - 별도 public website를 만들 때만 sitemap/robots/OG/JSON-LD를 추가한다.
@@ -540,7 +540,7 @@ rg -n "locale|i18n|translation|한국어|Korean|\\.ko\\.md" README.md docs/*.md 
 | Priority | 승인 대상 | 이유 | 예상 변경 |
 | --- | --- | --- | --- |
 | P0 | release evidence/product-readiness parity | 현재 worktree 기준 readiness status의 직접 근거 | install-smoke, release-manifest, PRODUCT_READINESS |
-| P1 | package metadata | npm marketplace 신뢰/탐색성 | package.json |
+| P1 | package metadata 유지 검증 | npm marketplace 신뢰/탐색성 회귀 방지 | package.json, release metadata tests |
 | P1 | write-path hardening | generic generated writes/capability manifests를 handoff 수준으로 보호 | src/fs.ts, src/capability-source.ts, tests |
 | P1 | security evidence gap 문서화 | verify command trust boundary와 scanner 미설정 명확화 | SECURITY, TRUST_SUPPORT_SECURITY, VERIFICATION_GATES |
 | P1 | verify trust boundary | untrusted repo에서 manifest command 실행 위험 축소 | src/verify.ts, CLI docs, tests |
@@ -590,7 +590,7 @@ git revert <commit>
 ## 이번 감사에서 수정하지 않은 것
 
 - runtime code 수정 없음.
-- package metadata 수정 없음.
+- package metadata는 이번 remediation에서 이미 보강됨.
 - release evidence 갱신 없음.
 - docs i18n/FAQ 생성 없음.
 - security scanner config 추가 없음.

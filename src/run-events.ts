@@ -128,7 +128,7 @@ function redactProtectedPath(root: string, pattern: string, value: string): stri
   const escaped = escapeRegExp(absolute);
   const relative = relativeProtectedPathPattern(prefix, clean.endsWith("*"));
   const absoluteMatch = clean.endsWith("*") ? new RegExp(`${escaped}[^\\s"']*`, "g") : new RegExp(escaped, "g");
-  const relativeMatch = new RegExp(`(^|[\\s"'])(${relative})`, "g");
+  const relativeMatch = new RegExp(`(^|[\\s"'=:])(${relative})`, "g");
   return value
     .replace(absoluteMatch, "[REDACTED_PROTECTED_PATH]")
     .replace(relativeMatch, "$1[REDACTED_PROTECTED_PATH]");
