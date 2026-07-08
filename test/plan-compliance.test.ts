@@ -15,11 +15,18 @@ const REQUIRED_GUARDRAILS = [
   "9.3+ is documented as a review target"
 ] as const;
 
+const REQUIRED_CURRENT_BLOCKED_CONTEXT = [
+  "v0.1.16 is a code version",
+  "publish/tag/install smoke evidence is required before fully ready",
+  "current release/product gates may be blocked if the clean target ref is blocked"
+] as const;
+
 describe("9.3+ plan compliance", () => {
   test("completed plan guardrails and final QA assets are present", async () => {
     expect(await validatePlanCompliance([MANUAL_QA_SCRIPT, SCOPE_FIDELITY_SCRIPT])).toEqual({
       qaAssetCount: 2,
-      guardrailCount: REQUIRED_GUARDRAILS.length
+      guardrailCount: REQUIRED_GUARDRAILS.length,
+      blockedContextCount: REQUIRED_CURRENT_BLOCKED_CONTEXT.length
     });
   });
 
@@ -28,7 +35,7 @@ describe("9.3+ plan compliance", () => {
   });
 });
 
-async function validatePlanCompliance(qaAssets: readonly string[]): Promise<{ qaAssetCount: number; guardrailCount: number }> {
+async function validatePlanCompliance(qaAssets: readonly string[]): Promise<{ qaAssetCount: number; guardrailCount: number; blockedContextCount: number }> {
   const plan = await readFile(PLAN_PATH, "utf8");
   for (const todo of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
     if (!plan.includes(`- [x] ${todo}.`)) throw new Error(`todo ${todo} is not complete`);
@@ -39,10 +46,13 @@ async function validatePlanCompliance(qaAssets: readonly string[]): Promise<{ qa
   for (const guardrail of REQUIRED_GUARDRAILS) {
     if (!plan.includes(guardrail)) throw new Error(`missing guardrail: ${guardrail}`);
   }
+  for (const context of REQUIRED_CURRENT_BLOCKED_CONTEXT) {
+    if (!plan.includes(context)) throw new Error(`missing current blocked context: ${context}`);
+  }
   for (const asset of qaAssets) {
     await expectQaAsset(asset);
   }
-  return { qaAssetCount: qaAssets.length, guardrailCount: REQUIRED_GUARDRAILS.length };
+  return { qaAssetCount: qaAssets.length, guardrailCount: REQUIRED_GUARDRAILS.length, blockedContextCount: REQUIRED_CURRENT_BLOCKED_CONTEXT.length };
 }
 
 async function expectQaAsset(path: string): Promise<void> {

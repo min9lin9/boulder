@@ -1,41 +1,41 @@
 root:/home/burt/Documents/Boulder-9-3-plus
-clean:/tmp/tmp.3XNLWGWNSd/clean
-release-refresh path:/tmp/tmp.3XNLWGWNSd/release-refresh.json
+clean:/tmp/tmp.aXWQREulKX/clean
+release-refresh path:/tmp/tmp.aXWQREulKX/release-refresh.json
 bun test v1.3.14 (0d9b296a)
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [15.57ms]
-(pass) package inventory contract > rejects unclassified packed files [0.13ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.09ms]
+(pass) package inventory contract > classifies every packed file exactly once [16.03ms]
+(pass) package inventory contract > rejects unclassified packed files [0.17ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.15ms]
 
  3 pass
  0 fail
  6 expect() calls
-Ran 3 tests across 1 file. [33.00ms]
+Ran 3 tests across 1 file. [35.00ms]
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [3.01ms]
-(pass) documentation registry > rejects translated docs without dir metadata [1.84ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [1.55ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.39ms]
-(pass) documentation registry > rejects packaged local-only docs [0.04ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [3.40ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.58ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.42ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.34ms]
+(pass) documentation registry > rejects packaged local-only docs [0.05ms]
 
  5 pass
  0 fail
  10 expect() calls
-Ran 5 tests across 1 file. [39.00ms]
-evidence-inspect path:/tmp/tmp.3XNLWGWNSd/evidence-inspect.json
-evidence-diff-missing exit:1 path:/tmp/tmp.3XNLWGWNSd/evidence-diff-missing.json
-workflow-map path:/tmp/tmp.3XNLWGWNSd/workflow-map.json
-release-check exit:1 path:/tmp/tmp.3XNLWGWNSd/release-check.json
-product-readiness exit:1 path:/tmp/tmp.3XNLWGWNSd/product-readiness.json
-service-readiness exit:0 path:/tmp/tmp.3XNLWGWNSd/service-readiness.json
-run-root-release-check exit:1 path:/tmp/tmp.3XNLWGWNSd/run-root-release-check.json
-runs-list path:/tmp/tmp.3XNLWGWNSd/runs-list.json
-runs-show path:/tmp/tmp.3XNLWGWNSd/runs-show.json
-runs-prune path:/tmp/tmp.3XNLWGWNSd/runs-prune.json
-clean-release-check exit:1 path:/tmp/tmp.3XNLWGWNSd/clean-release-check.json
-clean-product-readiness exit:1 path:/tmp/tmp.3XNLWGWNSd/clean-product-readiness.json
-clean-service-readiness exit:0 path:/tmp/tmp.3XNLWGWNSd/clean-service-readiness.json
+Ran 5 tests across 1 file. [22.00ms]
+evidence-inspect path:/tmp/tmp.aXWQREulKX/evidence-inspect.json
+evidence-diff-missing exit:1 path:/tmp/tmp.aXWQREulKX/evidence-diff-missing.json
+workflow-map path:/tmp/tmp.aXWQREulKX/workflow-map.json
+release-check exit:1 path:/tmp/tmp.aXWQREulKX/release-check.json
+product-readiness exit:1 path:/tmp/tmp.aXWQREulKX/product-readiness.json
+service-readiness exit:0 path:/tmp/tmp.aXWQREulKX/service-readiness.json
+run-root-release-check exit:1 path:/tmp/tmp.aXWQREulKX/run-root-release-check.json
+runs-list path:/tmp/tmp.aXWQREulKX/runs-list.json
+runs-show path:/tmp/tmp.aXWQREulKX/runs-show.json
+runs-prune path:/tmp/tmp.aXWQREulKX/runs-prune.json
+clean-release-check exit:1 path:/tmp/tmp.aXWQREulKX/clean-release-check.json
+clean-product-readiness exit:1 path:/tmp/tmp.aXWQREulKX/clean-product-readiness.json
+clean-service-readiness exit:0 path:/tmp/tmp.aXWQREulKX/clean-service-readiness.json
 manual qa complete

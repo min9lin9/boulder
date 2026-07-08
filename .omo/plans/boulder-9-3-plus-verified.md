@@ -8,6 +8,8 @@
 
 **What it will NOT do:** hosted app, 모바일, 로그인, 웹사이트, SEO/GEO/AEO를 만들지 않습니다. npm 계정 2FA나 trusted publisher 설정을 repo-only로 검증했다고 주장하지 않습니다. raw workspace file body나 secret을 run log에 남기지 않습니다.
 
+**Current release-state boundary:** v0.1.16 is a code version. publish/tag/install smoke evidence is required before fully ready, so root release/product gates may honestly remain blocked until external release evidence is supplied.
+
 **Effort:** XL
 **Risk:** High - release evidence, package contract, readiness architecture, local state, docs registry를 가로지르는 구조 변경입니다.
 **Decisions to sanity-check:** repo-verifiable npm metadata/provenance checklist는 active scope이고, npm account/trusted-publisher configuration과 post-publish provenance evidence는 deferred external scope입니다. run logs는 full observability가 아니라 local structured events로 둡니다. 9.3+는 보장 점수가 아니라 review target입니다.

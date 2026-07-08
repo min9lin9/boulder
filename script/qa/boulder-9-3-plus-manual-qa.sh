@@ -57,4 +57,22 @@ run_json_allow_blocked clean-release-check bun "$ROOT/bin/boulder.ts" release-ch
 run_json_allow_blocked clean-product-readiness bun "$ROOT/bin/boulder.ts" product-readiness --cwd "$CLEAN_ROOT" --json
 run_json_allow_blocked clean-service-readiness bun "$ROOT/bin/boulder.ts" service-readiness --cwd "$CLEAN_ROOT" --json
 
+bun -e '
+const fs = require("fs");
+const report = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+if (report.status !== "blocked") process.exit(0);
+const allowed = new Set([
+  "install-smoke-version",
+  "published-version-evidence",
+  "git-tag-local",
+  "release-evidence-manifest"
+]);
+const failing = (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
+const unexpected = failing.filter((id) => !allowed.has(id));
+if (unexpected.length) {
+  console.error(`unexpected root release-check blockers: ${unexpected.join(", ")}`);
+  process.exit(1);
+}
+' "$TMP_ROOT/release-check.json"
+
 echo "manual qa complete"
