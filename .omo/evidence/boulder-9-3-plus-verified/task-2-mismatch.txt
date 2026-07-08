@@ -1,0 +1,13 @@
+Script started on 2026-07-08 06:50:40+00:00 [COMMAND="bun test test/release-evidence-bundle.test.ts --test-name-pattern mismatch" <not executed on terminal>]
+bun test v1.3.14 (0d9b296a)
+
+test/release-evidence-bundle.test.ts:
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [0.45ms]
+
+ 1 pass
+ 2 filtered out
+ 0 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [17.00ms]
+
+Script done on 2026-07-08 06:50:40+00:00 [COMMAND_EXIT_CODE="0"]
