@@ -50,7 +50,7 @@
     {
       "id": "release-evidence-manifest",
       "status": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16"
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16"
     },
     {
       "id": "pack-dry-run-evidence",

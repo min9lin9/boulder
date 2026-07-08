@@ -8,12 +8,12 @@
     {
       "code": "evidence.input_missing",
       "message": "evidence input path is missing",
-      "path": "/tmp/tmp.577wy2dwTT/missing-a"
+      "path": "/tmp/tmp.a5d12i2lcm/missing-a"
     },
     {
       "code": "evidence.input_missing",
       "message": "evidence input path is missing",
-      "path": "/tmp/tmp.577wy2dwTT/missing-b"
+      "path": "/tmp/tmp.a5d12i2lcm/missing-b"
     }
   ]
 }

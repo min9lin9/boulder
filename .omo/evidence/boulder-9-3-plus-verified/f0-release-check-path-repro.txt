@@ -1,0 +1,6 @@
+tmp_path:/tmp/tmp.JaLszKga4y/release-check.json
+tmp_release_check:absent
+durable_path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json-repro/release-check.json
+durable_release_check:present_nonempty
+durable_json:parsed
+cleanup:tmp_root_removed

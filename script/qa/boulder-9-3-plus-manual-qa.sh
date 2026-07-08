@@ -76,6 +76,6 @@ if (unexpected.length) {
   console.error(`unexpected root release-check blockers: ${unexpected.join(", ")}`);
   process.exit(1);
 }
-' "$TMP_ROOT/release-check.json"
+' "$JSON_EVIDENCE_DIR/release-check.json"
 
 echo "manual qa complete"
