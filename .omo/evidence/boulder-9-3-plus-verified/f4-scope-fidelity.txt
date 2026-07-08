@@ -49,40 +49,40 @@ checking public artifact: test/source-cleanliness.test.ts
 bun test v1.3.14 (0d9b296a)
 
 test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [6.97ms]
-(pass) run event redaction > redacts relative protected paths from commands and artifacts [1.95ms]
-(pass) run event redaction > fails closed when runs directory is a symlink [0.99ms]
-(pass) run event redaction > prune ignores malicious run ids when deleting event files [1.20ms]
-(pass) run event redaction > list ignores symlinked run event files [0.95ms]
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [8.68ms]
+(pass) run event redaction > redacts relative protected paths from commands and artifacts [4.80ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.51ms]
+(pass) run event redaction > prune ignores malicious run ids when deleting event files [3.61ms]
+(pass) run event redaction > list ignores symlinked run event files [0.94ms]
 
  5 pass
  0 fail
  18 expect() calls
-Ran 5 tests across 1 file. [53.00ms]
+Ran 5 tests across 1 file. [56.00ms]
 + bun test test/source-cleanliness.test.ts test/docs-registry.test.ts test/package-inventory-contract.test.ts
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [4.09ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [3.31ms]
 (pass) documentation registry > rejects translated docs without dir metadata [0.10ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.09ms]
-(pass) documentation registry > rejects packaged docs with missing source path metadata [4.55ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [1.01ms]
-(pass) documentation registry > rejects packaged local-only docs [0.15ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.21ms]
+(pass) documentation registry > rejects packaged docs with missing source path metadata [6.46ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.46ms]
+(pass) documentation registry > rejects packaged local-only docs [0.04ms]
 
 test/source-cleanliness.test.ts:
-(pass) source cleanliness > command modules use shared pretty JSON rendering [1.60ms]
-(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [4.42ms]
-(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [15.67ms]
-(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.21ms]
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.27ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.29ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [18.19ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.22ms]
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [41.75ms]
-(pass) package inventory contract > rejects unclassified packed files [1.25ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.25ms]
+(pass) package inventory contract > classifies every packed file exactly once [33.98ms]
+(pass) package inventory contract > rejects unclassified packed files [0.84ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.10ms]
 
  13 pass
  0 fail
- 400 expect() calls
-Ran 13 tests across 3 files. [134.00ms]
+ 496 expect() calls
+Ran 13 tests across 3 files. [90.00ms]
 scope fidelity complete

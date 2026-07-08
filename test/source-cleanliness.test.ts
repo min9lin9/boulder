@@ -42,6 +42,7 @@ describe("source cleanliness", () => {
       ...(await filesUnder("skills/boulder")),
       ...(await filesUnder("skills/boulder-bootstrap-designer")),
       ...(await filesUnder("docs")),
+      ...(await filesUnder("fixtures")),
       "README.md",
       "CHANGELOG.md",
       "CONTRIBUTING.md",
