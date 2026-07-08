@@ -92,7 +92,7 @@ export const PRIMARY_WORKFLOW_MAP = {
     {
       id: "handoff-review",
       lane: "handoff",
-      command: "boulder handoff review --adapter gajae-code",
+      command: "boulder handoff review --packet .boulder/handoffs/gajae-code.json",
       purpose: "Review the packet before any external send.",
       required: false,
       dependsOn: ["handoff-packet"]

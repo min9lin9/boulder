@@ -102,4 +102,35 @@ describe("run event redaction", () => {
       await removeTempRepo(root);
     }
   });
+
+  test("list ignores symlinked run event files", async () => {
+    const root = await tempRepo();
+    const outside = await tempRepo();
+
+    try {
+      await write(root, "package.json", JSON.stringify({ name: "fixture", version: "9.9.9" }, null, 2));
+      await mkdir(join(root, ".boulder", "runs"), { recursive: true });
+      await writeFile(join(outside, "outside.json"), JSON.stringify({
+        schemaVersion: "boulder.run-event.v1",
+        runId: "11111111-1111-4111-8111-111111111111",
+        eventName: "release-check",
+        command: "sk-proj-outsideSecret",
+        cwdHash: "hash",
+        packageVersion: "9.9.9",
+        startedAt: "2026-01-01T00:00:00.000Z",
+        completedAt: "2026-01-01T00:00:00.000Z",
+        severity: "error",
+        status: "blocked",
+        checkIds: [],
+        recoveryHintIds: [],
+        artifactPaths: []
+      }, null, 2), "utf8");
+      await symlink(join(outside, "outside.json"), join(root, ".boulder", "runs", "2026-01-01T00-00-00-000Z-release-check-11111111-1111-4111-8111-111111111111.json"));
+
+      expect(await listRunEvents(root)).toEqual([]);
+    } finally {
+      await removeTempRepo(root);
+      await removeTempRepo(outside);
+    }
+  });
 });

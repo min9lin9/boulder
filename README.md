@@ -79,7 +79,7 @@ bunx boulder-oss-cli@latest profile resolve --json
 bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 bunx boulder-oss-cli@latest doctor
 bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include <path> --json
-bunx boulder-oss-cli@latest handoff review --adapter gajae-code
+bunx boulder-oss-cli@latest handoff review --packet .boulder/handoffs/gajae-code.json
 bunx boulder-oss-cli@latest release-check --json
 bunx boulder-oss-cli@latest product-readiness --json
 bunx boulder-oss-cli@latest service-readiness --json
@@ -92,7 +92,7 @@ For higher-friction work:
 ```bash
 bunx boulder-oss-cli@latest pipeline --friction high
 bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include src/cli.ts
-bunx boulder-oss-cli@latest handoff review --adapter gajae-code
+bunx boulder-oss-cli@latest handoff review --packet .boulder/handoffs/gajae-code.json
 bunx boulder-oss-cli@latest handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 ```
 
@@ -172,7 +172,7 @@ boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
 boulder handoff packet --adapter gajae-code --include src/cli.ts
-boulder handoff review --adapter gajae-code
+boulder handoff review --packet .boulder/handoffs/gajae-code.json
 boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run
 boulder replay-check
 boulder replay-run --dry-run

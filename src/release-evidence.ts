@@ -160,7 +160,10 @@ export async function planReleaseEvidenceRefresh(root: string): Promise<ReleaseE
     await currentGitCommit(root, ["rev-list", "-n", "1", `v${packageInfo.version}`]),
     await currentGitCommit(root, ["rev-parse", "HEAD"])
   );
-  const packDryRunFileCount = await currentPackDryRunFileCount(root) ?? bundle.packDryRun.fileCount;
+  const packDryRunFileCount = await currentPackDryRunFileCount(root);
+  if (packDryRunFileCount === null) {
+    return { status: "blocked", targets: [], issues: [issue(RELEASE_RECOVERY_CODES.packFileCountMismatch, "live pack dry-run total must be available before refreshing release evidence")] };
+  }
   const bundleWithPackCount: ReleaseEvidenceBundleV1 = {
     ...bundle,
     packDryRun: {
@@ -308,11 +311,7 @@ function shellQuote(value: string): string {
 }
 
 async function currentPackDryRunFileCount(root: string): Promise<number | null> {
-  const live = await currentPackDryRunTotal(root);
-  if (live !== null) return live;
-  const content = await readExisting(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt");
-  const match = /^Total files:\s*(\d+)$/im.exec(content);
-  return match ? Number(match[1]) : null;
+  return await currentPackDryRunTotal(root);
 }
 
 async function currentPackDryRunTotal(root: string): Promise<number | null> {

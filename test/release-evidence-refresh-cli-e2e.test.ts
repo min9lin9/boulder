@@ -65,6 +65,22 @@ describe("release evidence refresh CLI", () => {
       await removeTempRepo(root);
     }
   });
+
+  test("blocks refresh when package metadata is malformed", async () => {
+    const root = await tempRepo();
+
+    try {
+      await writeRefreshFixture(root, JSON.stringify(releaseManifest, null, 2));
+      await write(root, "package.json", "{not json}\n");
+
+      const result = await runBoulder(["release", "evidence", "refresh", "--dry-run", "--json", "--cwd", root]);
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout).toContain("release.malformed_input");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
 });
 
 async function writeRefreshFixture(root: string, manifest: string): Promise<void> {

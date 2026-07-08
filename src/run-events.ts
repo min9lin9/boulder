@@ -186,6 +186,8 @@ function redactProtectedPath(root: string, pattern: string, value: string): stri
 
 async function readRunEvent(path: string): Promise<RunEventRecord | null> {
   try {
+    const info = await lstat(path);
+    if (!info.isFile() || info.isSymbolicLink() || info.nlink > 1) return null;
     const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
     return isRunEventRecord(parsed) ? parsed : null;
   } catch (error) {

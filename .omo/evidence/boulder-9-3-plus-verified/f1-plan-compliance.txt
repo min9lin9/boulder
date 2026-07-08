@@ -1,10 +1,10 @@
 bun test v1.3.14 (0d9b296a)
 
 test/plan-compliance.test.ts:
-(pass) 9.3+ plan compliance > completed plan guardrails and final QA assets are present [1.18ms]
-(pass) 9.3+ plan compliance > fails when required QA asset is missing [0.45ms]
+(pass) 9.3+ plan compliance > completed plan guardrails and final QA assets are present [1.20ms]
+(pass) 9.3+ plan compliance > fails when required QA asset is missing [0.57ms]
 
  2 pass
  0 fail
  2 expect() calls
-Ran 2 tests across 1 file. [33.00ms]
+Ran 2 tests across 1 file. [38.00ms]

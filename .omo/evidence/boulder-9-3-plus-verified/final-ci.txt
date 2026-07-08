@@ -52,321 +52,323 @@ Package:
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [3.21ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.44ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.32ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.32ms]
-(pass) documentation registry > rejects packaged local-only docs [0.03ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [4.17ms]
+(pass) documentation registry > rejects translated docs without dir metadata [1.89ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.52ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [1.22ms]
+(pass) documentation registry > rejects packaged local-only docs [0.04ms]
 
 test/field-evidence.test.ts:
-(pass) field evidence > inspects release package and docs evidence states [19.09ms]
-(pass) field evidence > diff reports changed evidence ids between roots [9.65ms]
-(pass) field evidence > diff fails with evidence input recovery code when a path is missing [0.44ms]
-(pass) field evidence > passes a complete field-readiness run and writes a manifest [3.92ms]
-(pass) field evidence > fails when the maintainer decision outcome is unsupported [2.22ms]
-(pass) field evidence > fails when JSON evidence is malformed [1.77ms]
+(pass) field evidence > inspects release package and docs evidence states [26.54ms]
+(pass) field evidence > diff reports changed evidence ids between roots [9.64ms]
+(pass) field evidence > diff fails with evidence input recovery code when a path is missing [0.36ms]
+(pass) field evidence > passes a complete field-readiness run and writes a manifest [5.03ms]
+(pass) field evidence > fails when the maintainer decision outcome is unsupported [4.77ms]
+(pass) field evidence > fails when JSON evidence is malformed [1.85ms]
 (pass) field evidence > fails closed for evidence paths outside field-readiness [0.26ms]
-(pass) field evidence > does not overwrite a valid manifest when evidence path is unsafe [0.49ms]
-(pass) field evidence > does not write a manifest when run id is unsafe [0.31ms]
-(pass) field evidence > does not write through a symlinked field evidence directory [0.68ms]
-(pass) field evidence > does not write through a symlinked field-readiness parent directory [1.25ms]
+(pass) field evidence > does not overwrite a valid manifest when evidence path is unsafe [0.64ms]
+(pass) field evidence > does not write a manifest when run id is unsafe [0.33ms]
+(pass) field evidence > does not write through a symlinked field evidence directory [0.80ms]
+(pass) field evidence > does not write through a symlinked field-readiness parent directory [1.73ms]
 
 test/capability-doctor-failures.test.ts:
-(pass) capability doctor failure reporting > fails closed when capability inventory entries are malformed [3.37ms]
-(pass) capability doctor failure reporting > fails closed when capability inventory JSON or top-level shape is malformed [2.58ms]
-(pass) capability doctor failure reporting > warns with direct Bun upgrade guidance before live GJC execution [1.43ms]
+(pass) capability doctor failure reporting > fails closed when capability inventory entries are malformed [2.80ms]
+(pass) capability doctor failure reporting > fails closed when capability inventory JSON or top-level shape is malformed [2.82ms]
+(pass) capability doctor failure reporting > warns with direct Bun upgrade guidance before live GJC execution [1.41ms]
 
 test/pipeline.test.ts:
-(pass) pipeline planning surface > builds a low friction pipeline plan [0.40ms]
-(pass) pipeline planning surface > builds a medium friction pipeline plan [0.11ms]
-(pass) pipeline planning surface > adds command adapter candidates for GJC and LazyCodex handoff [0.10ms]
-(pass) pipeline planning surface > builds a high friction pipeline plan [0.09ms]
-(pass) pipeline planning surface > fails closed for forbidden side effects [0.08ms]
-(pass) pipeline planning surface > default manifest routes planning and execution executors by profile [0.43ms]
+(pass) pipeline planning surface > builds a low friction pipeline plan [0.66ms]
+(pass) pipeline planning surface > builds a medium friction pipeline plan [0.27ms]
+(pass) pipeline planning surface > adds command adapter candidates for GJC and LazyCodex handoff [0.25ms]
+(pass) pipeline planning surface > builds a high friction pipeline plan [0.14ms]
+(pass) pipeline planning surface > fails closed for forbidden side effects [0.19ms]
+(pass) pipeline planning surface > default manifest routes planning and execution executors by profile [0.72ms]
 
 test/handoff-cli-e2e.test.ts:
-(pass) boulder handoff CLI e2e > creates and reviews tenant-safe handoff packets without external send [43.83ms]
-(pass) boulder handoff CLI e2e > blocks external handoff send by default [105.15ms]
-(pass) boulder handoff CLI e2e > prints safe include paths in packet JSON without file bodies [44.69ms]
-(pass) boulder handoff CLI e2e > requires a packet before approved external send [57.40ms]
-(pass) boulder handoff CLI e2e > rejects forged approved packets [54.01ms]
-(pass) boulder handoff CLI e2e > rejects explicit packets outside the Boulder handoff directory [40.57ms]
-(pass) boulder handoff CLI e2e > requires review before approved external send [193.64ms]
-(pass) boulder handoff CLI e2e > renders approved handoff send dry-run without external execution [150.91ms]
-(pass) boulder handoff CLI e2e > returns bounded protected path errors [40.03ms]
-(pass) boulder handoff CLI e2e > rejects adapter path traversal [114.21ms]
-(pass) boulder handoff CLI e2e > rejects forged packet adapter traversal [99.34ms]
+(pass) boulder handoff CLI e2e > creates and reviews tenant-safe handoff packets without external send [49.37ms]
+(pass) boulder handoff CLI e2e > blocks external handoff send by default [99.07ms]
+(pass) boulder handoff CLI e2e > prints safe include paths in packet JSON without file bodies [46.85ms]
+(pass) boulder handoff CLI e2e > requires a packet before approved external send [47.57ms]
+(pass) boulder handoff CLI e2e > rejects forged approved packets [50.94ms]
+(pass) boulder handoff CLI e2e > rejects explicit packets outside the Boulder handoff directory [47.60ms]
+(pass) boulder handoff CLI e2e > requires review before approved external send [216.64ms]
+(pass) boulder handoff CLI e2e > renders approved handoff send dry-run without external execution [144.43ms]
+(pass) boulder handoff CLI e2e > returns bounded protected path errors [43.48ms]
+(pass) boulder handoff CLI e2e > rejects adapter path traversal [131.87ms]
+(pass) boulder handoff CLI e2e > rejects forged packet adapter traversal [101.70ms]
 
 test/readiness-baseline-fixtures.test.ts:
-(pass) readiness v0 baseline fixtures > match current release and readiness gate outputs [106.03ms]
-(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [16.03ms]
+(pass) readiness v0 baseline fixtures > match current release and readiness gate outputs [123.38ms]
+(pass) readiness v0 baseline fixtures > blocks mismatched release manifest fixture [18.94ms]
 
 test/source-cleanliness.test.ts:
-(pass) source cleanliness > command modules use shared pretty JSON rendering [0.83ms]
-(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.49ms]
-(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [1.65ms]
-(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.15ms]
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.34ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.32ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [1.39ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.20ms]
 
 test/release-evidence-refresh-cli-e2e.test.ts:
-(pass) release evidence refresh CLI > reports every renderer target in dry-run JSON [69.52ms]
-(pass) release evidence refresh CLI > blocks mismatched bundle without writes [49.44ms]
-(pass) release evidence refresh CLI > write updates approved targets and leaves adjacent files alone [184.69ms]
+(pass) release evidence refresh CLI > reports every renderer target in dry-run JSON [63.68ms]
+(pass) release evidence refresh CLI > blocks mismatched bundle without writes [49.58ms]
+(pass) release evidence refresh CLI > write updates approved targets and leaves adjacent files alone [207.59ms]
+(pass) release evidence refresh CLI > blocks refresh when package metadata is malformed [87.43ms]
 
 test/profile-cli-e2e.test.ts:
-(pass) boulder profile CLI e2e > resolves workflow profiles without applying task suggestions [85.68ms]
-(pass) boulder profile CLI e2e > lists, shows, and saves workflow profiles [281.93ms]
-(pass) boulder profile CLI e2e > saves active profile snapshots without transient drift metadata [174.72ms]
-(pass) boulder profile CLI e2e > rejects missing explicit workflow profile [59.78ms]
-(pass) boulder profile CLI e2e > rejects profile save path traversal [39.83ms]
-(pass) boulder profile CLI e2e > rejects profile use path traversal as an invalid profile name [42.96ms]
-(pass) boulder profile CLI e2e > rejects saved profile names that collide with built-ins [38.24ms]
-(pass) boulder profile CLI e2e > rejects malformed project profiles without stack traces [99.16ms]
-(pass) boulder profile CLI e2e > rejects project profiles with invalid lane and purpose literals [59.10ms]
-(pass) boulder profile CLI e2e > uses active research profile for quickstart and pipeline routing [185.82ms]
+(pass) boulder profile CLI e2e > resolves workflow profiles without applying task suggestions [84.86ms]
+(pass) boulder profile CLI e2e > lists, shows, and saves workflow profiles [299.00ms]
+(pass) boulder profile CLI e2e > saves active profile snapshots without transient drift metadata [193.97ms]
+(pass) boulder profile CLI e2e > rejects missing explicit workflow profile [64.04ms]
+(pass) boulder profile CLI e2e > rejects profile save path traversal [46.54ms]
+(pass) boulder profile CLI e2e > rejects profile use path traversal as an invalid profile name [47.12ms]
+(pass) boulder profile CLI e2e > rejects saved profile names that collide with built-ins [43.21ms]
+(pass) boulder profile CLI e2e > rejects malformed project profiles without stack traces [91.85ms]
+(pass) boulder profile CLI e2e > rejects project profiles with invalid lane and purpose literals [53.55ms]
+(pass) boulder profile CLI e2e > uses active research profile for quickstart and pipeline routing [214.11ms]
 
 test/release-metadata.test.ts:
-(pass) release package metadata > blocks missing repository url [60.09ms]
+(pass) release package metadata > blocks missing repository url [51.06ms]
 
 test/handoff-packet.test.ts:
-(pass) tenant-safe handoff packets > generates a sanitized GJC packet without raw workspace content [2.50ms]
-(pass) tenant-safe handoff packets > rejects protected path includes before packet generation [3.80ms]
-(pass) tenant-safe handoff packets > records safe include paths as summary metadata only [1.36ms]
-(pass) tenant-safe handoff packets > rejects absolute include paths before packet generation [0.33ms]
-(pass) tenant-safe handoff packets > rejects repo-escaping include paths before packet generation [0.29ms]
-(pass) tenant-safe handoff packets > blocks external send by default [1.26ms]
-(pass) tenant-safe handoff packets > rejects raw workspace references even with approval [2.21ms]
-(pass) tenant-safe handoff packets > rejects shape-valid packets that contain raw workspace references [0.78ms]
-(pass) tenant-safe handoff packets > rejects root file handles and protected file names in packet text [0.69ms]
-(pass) tenant-safe handoff packets > rejects raw reference casing and separator variants [0.85ms]
-(pass) tenant-safe handoff packets > rejects non-mac absolute workspace path references [0.79ms]
-(pass) tenant-safe handoff packets > rejects traversal workspace path references in forged packets [0.71ms]
-(pass) tenant-safe handoff packets > rejects raw references hidden in excluded content [0.66ms]
-(pass) tenant-safe handoff packets > rejects forged destination adapter names [0.72ms]
+(pass) tenant-safe handoff packets > generates a sanitized GJC packet without raw workspace content [6.20ms]
+(pass) tenant-safe handoff packets > rejects protected path includes before packet generation [1.03ms]
+(pass) tenant-safe handoff packets > records safe include paths as summary metadata only [1.55ms]
+(pass) tenant-safe handoff packets > rejects absolute include paths before packet generation [0.59ms]
+(pass) tenant-safe handoff packets > rejects repo-escaping include paths before packet generation [0.31ms]
+(pass) tenant-safe handoff packets > blocks external send by default [1.33ms]
+(pass) tenant-safe handoff packets > rejects raw workspace references even with approval [1.56ms]
+(pass) tenant-safe handoff packets > rejects shape-valid packets that contain raw workspace references [1.56ms]
+(pass) tenant-safe handoff packets > rejects root file handles and protected file names in packet text [1.35ms]
+(pass) tenant-safe handoff packets > rejects raw reference casing and separator variants [0.88ms]
+(pass) tenant-safe handoff packets > rejects non-mac absolute workspace path references [0.96ms]
+(pass) tenant-safe handoff packets > rejects traversal workspace path references in forged packets [2.43ms]
+(pass) tenant-safe handoff packets > rejects raw references hidden in excluded content [1.71ms]
+(pass) tenant-safe handoff packets > rejects forged destination adapter names [1.22ms]
 
 test/readiness-reports.test.ts:
-(pass) harness quality scorecard > scores the root Boulder harness as ready [2.61ms]
-(pass) harness quality scorecard > penalizes unsafe external provider policy [0.16ms]
-(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [1.07ms]
-(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [5.31ms]
-(pass) benchmark and release reports > reports root release evidence as blocked until 0.1.16 is published and tagged [14.00ms]
-(pass) benchmark and release reports > reports release evidence as ready after publish and tag in a release fixture [42.81ms]
-(pass) benchmark and release reports > reports blocker-first release next commands without publish automation [3.46ms]
-(pass) benchmark and release reports > blocks malformed structured release evidence manifests [39.87ms]
-(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [6.57ms]
-(pass) quickstart and replay reports > checks public replay fixtures and official docs references [0.85ms]
-(pass) quickstart and replay reports > blocks stale replay docs and replay ref mismatches [1.10ms]
-(pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [0.71ms]
-(pass) product readiness and examples > reports root product readiness evidence gates [36.61ms]
-(pass) product readiness and examples > blocks when GJC planning evidence is missing [9.90ms]
-(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [0.64ms]
-(pass) readiness wording hygiene > service strategy separates local readiness from external field backing [0.20ms]
-(pass) repeat-use evidence hygiene > ships a metric log template with the required field contract [0.18ms]
-(pass) repeat-use evidence hygiene > keeps public evidence free of local paths and npm identity traces [19.98ms]
+(pass) harness quality scorecard > scores the root Boulder harness as ready [2.65ms]
+(pass) harness quality scorecard > penalizes unsafe external provider policy [0.20ms]
+(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [1.05ms]
+(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [0.82ms]
+(pass) benchmark and release reports > reports root release evidence as blocked until 0.1.16 is published and tagged [15.67ms]
+(pass) benchmark and release reports > reports release evidence as ready after publish and tag in a release fixture [48.30ms]
+(pass) benchmark and release reports > reports blocker-first release next commands without publish automation [3.51ms]
+(pass) benchmark and release reports > blocks malformed structured release evidence manifests [55.77ms]
+(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [9.60ms]
+(pass) quickstart and replay reports > checks public replay fixtures and official docs references [4.43ms]
+(pass) quickstart and replay reports > blocks stale replay docs and replay ref mismatches [2.23ms]
+(pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [0.97ms]
+(pass) product readiness and examples > reports root product readiness evidence gates [33.45ms]
+(pass) product readiness and examples > blocks when GJC planning evidence is missing [7.25ms]
+(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [0.52ms]
+(pass) readiness wording hygiene > service strategy separates local readiness from external field backing [0.17ms]
+(pass) repeat-use evidence hygiene > ships a metric log template with the required field contract [0.16ms]
+(pass) repeat-use evidence hygiene > keeps public evidence free of local paths and npm identity traces [12.03ms]
 
 test/retro-cli-e2e.test.ts:
-(pass) boulder retro CLI e2e > reports weekly dry-run candidates from two routines [47.80ms]
-(pass) boulder retro CLI e2e > reports empty when no routine artifacts exist [46.08ms]
-(pass) boulder retro CLI e2e > lists malformed routine files as warnings and keeps valid candidates [45.84ms]
-(pass) boulder retro CLI e2e > blocks traversal-like routine fixture names without reading outside routines [41.88ms]
-(pass) boulder retro CLI e2e > blocks symlink escape routine fixtures without reading target content [44.66ms]
-(pass) boulder retro CLI e2e > requires dry-run and never creates a retrospective write path [84.72ms]
+(pass) boulder retro CLI e2e > reports weekly dry-run candidates from two routines [52.78ms]
+(pass) boulder retro CLI e2e > reports empty when no routine artifacts exist [50.88ms]
+(pass) boulder retro CLI e2e > lists malformed routine files as warnings and keeps valid candidates [76.86ms]
+(pass) boulder retro CLI e2e > blocks traversal-like routine fixture names without reading outside routines [56.38ms]
+(pass) boulder retro CLI e2e > blocks symlink escape routine fixtures without reading target content [49.85ms]
+(pass) boulder retro CLI e2e > requires dry-run and never creates a retrospective write path [97.11ms]
 
 test/workflow-profiles.test.ts:
-(pass) workflow profile resolution > loads programming-default as the built-in resolved profile [0.59ms]
-(pass) workflow profile resolution > suggests bootstrap profiles without applying them [0.86ms]
-(pass) workflow profile resolution > migrates legacy boulder yaml executors into a resolved profile [1.16ms]
-(pass) workflow profile resolution > reports missing current profile as drift and falls back to built-in [1.50ms]
-(pass) workflow profile resolution > reports manifest drift when current profile differs from legacy executors [1.57ms]
-(pass) workflow profile resolution > maps task classes to suggestions without changing active profile [0.24ms]
-(pass) workflow profile resolution > keeps resolved profile fixtures for the built-in profiles [0.49ms]
-(pass) workflow profile resolution > keeps bootstrap profile taxonomy synchronized across docs and skills [0.68ms]
+(pass) workflow profile resolution > loads programming-default as the built-in resolved profile [1.63ms]
+(pass) workflow profile resolution > suggests bootstrap profiles without applying them [1.59ms]
+(pass) workflow profile resolution > migrates legacy boulder yaml executors into a resolved profile [1.25ms]
+(pass) workflow profile resolution > reports missing current profile as drift and falls back to built-in [1.10ms]
+(pass) workflow profile resolution > reports manifest drift when current profile differs from legacy executors [0.98ms]
+(pass) workflow profile resolution > maps task classes to suggestions without changing active profile [0.54ms]
+(pass) workflow profile resolution > keeps resolved profile fixtures for the built-in profiles [0.46ms]
+(pass) workflow profile resolution > keeps bootstrap profile taxonomy synchronized across docs and skills [0.72ms]
 
 test/run-events-cli-e2e.test.ts:
-(pass) runs CLI > records lists shows and prunes run events as JSON [190.06ms]
+(pass) runs CLI > records lists shows and prunes run events as JSON [247.36ms]
 
 test/profile-state-safety-e2e.test.ts:
-(pass) boulder profile state safety e2e > rejects symlinked profile state files [92.34ms]
-(pass) boulder profile state safety e2e > does not read symlinked current profile state [94.36ms]
-(pass) boulder profile state safety e2e > does not read hard-linked current profile state [45.81ms]
-(pass) boulder profile state safety e2e > does not read symlinked project profile JSON [93.64ms]
-(pass) boulder profile state safety e2e > does not read hard-linked project profile JSON [46.69ms]
-(pass) boulder profile state safety e2e > rejects hard-linked profile state files [104.54ms]
+(pass) boulder profile state safety e2e > rejects symlinked profile state files [107.65ms]
+(pass) boulder profile state safety e2e > does not read symlinked current profile state [96.29ms]
+(pass) boulder profile state safety e2e > does not read hard-linked current profile state [44.63ms]
+(pass) boulder profile state safety e2e > does not read symlinked project profile JSON [96.16ms]
+(pass) boulder profile state safety e2e > does not read hard-linked project profile JSON [49.97ms]
+(pass) boulder profile state safety e2e > rejects hard-linked profile state files [103.13ms]
 
 test/capability-doctor.test.ts:
-(pass) capability doctor > routes installed skills and MCP tools to workflow lanes [2.25ms]
-(pass) capability doctor > passes when configured adapters are present in inventory [1.28ms]
-(pass) capability doctor > recognizes the GJC Hermes coordinator MCP bridge as the planning adapter [1.12ms]
-(pass) capability doctor > passes when Bun supports live GJC execution [0.93ms]
-(pass) capability doctor > uses the active resolved profile instead of legacy manifest executors [1.94ms]
-(pass) capability doctor > does not report GJC runtime warnings for local-only active profiles [1.17ms]
-(pass) capability doctor > does not treat adjacent Codex plugins as the canonical codex adapter [1.05ms]
-(pass) capability doctor > reports profile drift alongside active profile [2.08ms]
-(pass) capability doctor > discovers local Codex skills and MCP inventory when fixture is missing [5.51ms]
+(pass) capability doctor > routes installed skills and MCP tools to workflow lanes [2.08ms]
+(pass) capability doctor > passes when configured adapters are present in inventory [0.88ms]
+(pass) capability doctor > recognizes the GJC Hermes coordinator MCP bridge as the planning adapter [0.76ms]
+(pass) capability doctor > passes when Bun supports live GJC execution [0.82ms]
+(pass) capability doctor > uses the active resolved profile instead of legacy manifest executors [1.04ms]
+(pass) capability doctor > does not report GJC runtime warnings for local-only active profiles [1.35ms]
+(pass) capability doctor > does not treat adjacent Codex plugins as the canonical codex adapter [1.01ms]
+(pass) capability doctor > reports profile drift alongside active profile [3.01ms]
+(pass) capability doctor > discovers local Codex skills and MCP inventory when fixture is missing [3.76ms]
 
 test/routine-cli-e2e.test.ts:
-(pass) boulder routine CLI e2e > preserves unknown-command help behavior [49.28ms]
-(pass) boulder routine CLI e2e > prints deterministic capture plan without writing on dry-run [46.85ms]
-(pass) boulder routine CLI e2e > writes and updates the same normalized routine [97.59ms]
-(pass) boulder routine CLI e2e > rejects capture when dry-run and write are both present [47.31ms]
-(pass) boulder routine CLI e2e > rejects routine commands that are not exactly capture [54.45ms]
-(pass) boulder routine CLI e2e > canonicalizes stale stored routine metadata on repeat capture [52.09ms]
-(pass) boulder routine CLI e2e > replaces non slug stored routine id on repeat capture [48.53ms]
-(pass) boulder routine CLI e2e > normalizes shell metacharacters into a slug-only id [63.13ms]
-(pass) boulder routine CLI e2e > rejects empty and path-like routine tasks [200.16ms]
-(pass) boulder routine CLI e2e > does not write through a symlinked routines directory [45.90ms]
+(pass) boulder routine CLI e2e > preserves unknown-command help behavior [49.67ms]
+(pass) boulder routine CLI e2e > prints deterministic capture plan without writing on dry-run [49.72ms]
+(pass) boulder routine CLI e2e > writes and updates the same normalized routine [95.86ms]
+(pass) boulder routine CLI e2e > rejects capture when dry-run and write are both present [66.05ms]
+(pass) boulder routine CLI e2e > rejects routine commands that are not exactly capture [51.36ms]
+(pass) boulder routine CLI e2e > canonicalizes stale stored routine metadata on repeat capture [45.18ms]
+(pass) boulder routine CLI e2e > replaces non slug stored routine id on repeat capture [50.28ms]
+(pass) boulder routine CLI e2e > normalizes shell metacharacters into a slug-only id [50.42ms]
+(pass) boulder routine CLI e2e > rejects empty and path-like routine tasks [173.17ms]
+(pass) boulder routine CLI e2e > does not write through a symlinked routines directory [46.00ms]
 
 test/product-readiness.test.ts:
-(pass) tight product readiness > rates a public evidence fixture as ready [81.65ms]
-(pass) tight product readiness > blocks when published install smoke evidence is missing [56.81ms]
-(pass) tight product readiness > blocks when release tag or published install evidence does not match package version [54.39ms]
-(pass) tight product readiness > blocks duplicate copy artifacts in the release tree [57.45ms]
-(pass) tight product readiness > ignores broken local codegraph symlinks during release tree scan [52.22ms]
+(pass) tight product readiness > rates a public evidence fixture as ready [52.75ms]
+(pass) tight product readiness > blocks when published install smoke evidence is missing [47.74ms]
+(pass) tight product readiness > blocks when release tag or published install evidence does not match package version [44.05ms]
+(pass) tight product readiness > blocks duplicate copy artifacts in the release tree [48.06ms]
+(pass) tight product readiness > ignores broken local codegraph symlinks during release tree scan [48.00ms]
 
 test/handoff-safety-e2e.test.ts:
-(pass) boulder handoff safety e2e > rejects stale review receipts after packet regeneration [227.55ms]
-(pass) boulder handoff safety e2e > rejects forged and digest-only review receipts [173.47ms]
-(pass) boulder handoff safety e2e > rejects signed forged receipts with missing or signature approval codes [182.68ms]
-(pass) boulder handoff safety e2e > rejects symlink packet targets, handoff directories, review secrets, and nested packet dirs [269.05ms]
-(pass) boulder handoff safety e2e > rejects hard-linked packet targets, review receipts, and review secrets [240.81ms]
+(pass) boulder handoff safety e2e > rejects stale review receipts after packet regeneration [197.70ms]
+(pass) boulder handoff safety e2e > rejects forged and digest-only review receipts [147.54ms]
+(pass) boulder handoff safety e2e > rejects signed forged receipts with missing or signature approval codes [158.20ms]
+(pass) boulder handoff safety e2e > rejects symlink packet targets, handoff directories, review secrets, and nested packet dirs [242.84ms]
+(pass) boulder handoff safety e2e > rejects hard-linked packet targets, review receipts, and review secrets [255.27ms]
 
 test/service-readiness.test.ts:
-(pass) service readiness > rates a service evidence fixture as pilot-ready when product readiness is still blocked [15.04ms]
-(pass) service readiness > blocks when repeat-run gate evidence is missing [12.24ms]
-(pass) service readiness > blocks when official documentation evidence is missing for public OSS replay [16.05ms]
-(pass) service readiness > blocks when replay docs are stale or ref-mismatched [14.83ms]
-(pass) service readiness > blocks when field evidence is not complete [15.69ms]
-(pass) service readiness > blocks when the recorded field evidence manifest is stale or failing [13.33ms]
-(pass) service readiness > blocks when field evidence exists but no manifest was recorded [12.69ms]
-(pass) service readiness > blocks when any recorded field evidence run becomes invalid [19.95ms]
-(pass) service readiness > blocks when onboarding uses stale pre-publish terms [13.89ms]
-(pass) service readiness > blocks when onboarding mixes current and stale publish terms [13.78ms]
+(pass) service readiness > rates a service evidence fixture as pilot-ready when product readiness is still blocked [17.42ms]
+(pass) service readiness > blocks when repeat-run gate evidence is missing [13.96ms]
+(pass) service readiness > blocks when official documentation evidence is missing for public OSS replay [13.23ms]
+(pass) service readiness > blocks when replay docs are stale or ref-mismatched [13.88ms]
+(pass) service readiness > blocks when field evidence is not complete [14.86ms]
+(pass) service readiness > blocks when the recorded field evidence manifest is stale or failing [13.65ms]
+(pass) service readiness > blocks when field evidence exists but no manifest was recorded [16.55ms]
+(pass) service readiness > blocks when any recorded field evidence run becomes invalid [19.19ms]
+(pass) service readiness > blocks when onboarding uses stale pre-publish terms [13.47ms]
+(pass) service readiness > blocks when onboarding mixes current and stale publish terms [17.90ms]
 
 test/capability-cli-e2e.test.ts:
-(pass) boulder capability import > previews a known adapter source without writing [48.90ms]
-(pass) boulder capability import > previews the agency-agents subagent catalog without writing [45.95ms]
-(pass) boulder capability import > writes source manifests for known and explicit adapter sources [109.93ms]
-(pass) boulder capability import > reports read-only capability lifecycle status [47.98ms]
-(pass) boulder capability import > does not treat substring inventory matches as installed capabilities [55.53ms]
-(pass) boulder capability import > fails closed for invalid import modes and sources [237.26ms]
+(pass) boulder capability import > previews a known adapter source without writing [46.86ms]
+(pass) boulder capability import > previews the agency-agents subagent catalog without writing [52.43ms]
+(pass) boulder capability import > writes source manifests for known and explicit adapter sources [89.63ms]
+(pass) boulder capability import > reports read-only capability lifecycle status [66.46ms]
+(pass) boulder capability import > does not treat substring inventory matches as installed capabilities [48.92ms]
+(pass) boulder capability import > fails closed for invalid import modes and sources [233.83ms]
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [7.60ms]
-(pass) package inventory contract > rejects unclassified packed files [0.12ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.08ms]
+(pass) package inventory contract > classifies every packed file exactly once [7.88ms]
+(pass) package inventory contract > rejects unclassified packed files [0.10ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.10ms]
 
 test/release-evidence-bundle.test.ts:
-(pass) ReleaseEvidenceBundleV1 > validates and renders a ready v0.1.16 bundle for the release evidence targets [0.42ms]
-(pass) ReleaseEvidenceBundleV1 > reports current checked release evidence as version drift until refresh [0.08ms]
-(pass) ReleaseEvidenceBundleV1 > rejects malformed input with a stable recovery code [0.05ms]
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [0.14ms]
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects CI release commit drift with a stable recovery code [0.05ms]
+(pass) ReleaseEvidenceBundleV1 > validates and renders a ready v0.1.16 bundle for the release evidence targets [0.41ms]
+(pass) ReleaseEvidenceBundleV1 > reports current checked release evidence as version drift until refresh [0.07ms]
+(pass) ReleaseEvidenceBundleV1 > rejects malformed input with a stable recovery code [0.04ms]
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [0.09ms]
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects CI release commit drift with a stable recovery code [0.04ms]
 (pass) ReleaseEvidenceBundleV1 > mismatch rejects pack dry-run file count drift with a stable recovery code [0.05ms]
 
 test/cli-pipeline-e2e.test.ts:
-(pass) boulder pipeline CLI e2e > renders high friction pipeline human output [44.95ms]
-(pass) boulder pipeline CLI e2e > renders high friction pipeline json output [44.18ms]
-(pass) boulder pipeline CLI e2e > renders pipeline executor routes from the manifest [47.97ms]
-(pass) boulder pipeline CLI e2e > renders selected active profile in human pipeline output [135.73ms]
-(pass) boulder pipeline CLI e2e > preserves packet-only legacy executor mode in pipeline output [42.38ms]
-(pass) boulder pipeline CLI e2e > exports pipeline executor routes from the manifest [52.89ms]
-(pass) boulder pipeline CLI e2e > exports active workflow profile routes [150.43ms]
-(pass) boulder pipeline CLI e2e > rejects invalid pipeline friction [45.34ms]
+(pass) boulder pipeline CLI e2e > renders high friction pipeline human output [49.07ms]
+(pass) boulder pipeline CLI e2e > renders high friction pipeline json output [48.09ms]
+(pass) boulder pipeline CLI e2e > renders pipeline executor routes from the manifest [65.80ms]
+(pass) boulder pipeline CLI e2e > renders selected active profile in human pipeline output [145.76ms]
+(pass) boulder pipeline CLI e2e > preserves packet-only legacy executor mode in pipeline output [51.18ms]
+(pass) boulder pipeline CLI e2e > exports pipeline executor routes from the manifest [52.15ms]
+(pass) boulder pipeline CLI e2e > exports active workflow profile routes [147.82ms]
+(pass) boulder pipeline CLI e2e > rejects invalid pipeline friction [44.86ms]
 
 test/cli-e2e.test.ts:
-(pass) boulder CLI e2e cleanup safety > prints the package version [47.38ms]
-(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [7.99ms]
-(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [187.64ms]
-(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [398.00ms]
-(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [143.23ms]
-(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [275.08ms]
-(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [62.35ms]
-(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [49.73ms]
-(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [48.05ms]
-(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [95.61ms]
-(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [148.41ms]
-(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [62.27ms]
-(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [46.93ms]
-(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [45.61ms]
+(pass) boulder CLI e2e cleanup safety > prints the package version [45.24ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [6.55ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [189.98ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [422.17ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [161.44ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [289.18ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [60.25ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [41.53ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [45.65ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [95.12ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [162.90ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [56.60ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [51.18ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [51.49ms]
 
 test/capability-source.test.ts:
-(pass) capability source manifests > canonicalizes known GitHub adapter source URLs [0.57ms]
-(pass) capability source manifests > recognizes known GitHub adapters regardless of owner casing [0.07ms]
-(pass) capability source manifests > recognizes agency-agents as a subagent catalog source [0.04ms]
-(pass) capability source manifests > defaults unknown GitHub and ClawHub sources to skill manifests [0.11ms]
-(pass) capability source manifests > requires an explicit capability id for unknown adapter source URLs [0.05ms]
-(pass) capability source manifests > loads explicit adapter manifests only when capability id matches the source repo [2.20ms]
+(pass) capability source manifests > canonicalizes known GitHub adapter source URLs [0.45ms]
+(pass) capability source manifests > recognizes known GitHub adapters regardless of owner casing [0.09ms]
+(pass) capability source manifests > recognizes agency-agents as a subagent catalog source [0.06ms]
+(pass) capability source manifests > defaults unknown GitHub and ClawHub sources to skill manifests [0.10ms]
+(pass) capability source manifests > requires an explicit capability id for unknown adapter source URLs [0.04ms]
+(pass) capability source manifests > loads explicit adapter manifests only when capability id matches the source repo [1.86ms]
 (pass) capability source manifests > rejects unsafe and ambiguous source forms [0.21ms]
-(pass) capability source manifests > writes manifests idempotently and rejects conflicting duplicates [1.17ms]
-(pass) capability source manifests > rejects unsafe manifest paths [0.61ms]
-(pass) capability source manifests > rejects existing manifest hardlinks before writing [0.96ms]
-(pass) capability source manifests > ignores unsafe manifest load paths [0.57ms]
+(pass) capability source manifests > writes manifests idempotently and rejects conflicting duplicates [1.22ms]
+(pass) capability source manifests > rejects unsafe manifest paths [0.59ms]
+(pass) capability source manifests > rejects existing manifest hardlinks before writing [0.95ms]
+(pass) capability source manifests > ignores unsafe manifest load paths [0.54ms]
 (pass) capability source manifests > ignores hard-linked manifest files when loading [0.81ms]
-(pass) capability source manifests > loads valid source manifests and reports malformed ones [1.68ms]
-(pass) capability source manifests > does not echo unsafe malformed manifest filenames [0.92ms]
+(pass) capability source manifests > loads valid source manifests and reports malformed ones [0.99ms]
+(pass) capability source manifests > does not echo unsafe malformed manifest filenames [0.63ms]
 
 test/skill-proposal-cli-e2e.test.ts:
-(pass) boulder skill proposal CLI e2e > prints a review-only proposal without writing on dry-run [47.80ms]
-(pass) boulder skill proposal CLI e2e > writes a proposal under .boulder only [71.74ms]
-(pass) boulder skill proposal CLI e2e > reports a stable missing routine error [42.51ms]
-(pass) boulder skill proposal CLI e2e > rejects invalid routine ids and mode conflicts without writing [217.76ms]
-(pass) boulder skill proposal CLI e2e > does not write through a symlinked proposal directory [57.04ms]
+(pass) boulder skill proposal CLI e2e > prints a review-only proposal without writing on dry-run [43.64ms]
+(pass) boulder skill proposal CLI e2e > writes a proposal under .boulder only [47.82ms]
+(pass) boulder skill proposal CLI e2e > reports a stable missing routine error [44.55ms]
+(pass) boulder skill proposal CLI e2e > rejects invalid routine ids and mode conflicts without writing [212.95ms]
+(pass) boulder skill proposal CLI e2e > does not write through a symlinked proposal directory [49.62ms]
 
 test/bootstrap-interview-cli-e2e.test.ts:
-(pass) boulder bootstrap interview CLI e2e > renders scored guidance with profile-scoped subagent imports [44.71ms]
-(pass) boulder bootstrap interview CLI e2e > scores task variants without applying profiles [178.52ms]
-(pass) boulder bootstrap interview CLI e2e > normalizes hostile task text and avoids substring false positives [43.33ms]
+(pass) boulder bootstrap interview CLI e2e > renders scored guidance with profile-scoped subagent imports [42.10ms]
+(pass) boulder bootstrap interview CLI e2e > scores task variants without applying profiles [167.63ms]
+(pass) boulder bootstrap interview CLI e2e > normalizes hostile task text and avoids substring false positives [40.43ms]
 
 test/capability-source-forgery.test.ts:
-(pass) capability source forgery rejection > rejects manifests that do not match canonical parser output [1.85ms]
-(pass) capability source forgery rejection > rejects arbitrary sources presented as known adapters [1.03ms]
+(pass) capability source forgery rejection > rejects manifests that do not match canonical parser output [1.34ms]
+(pass) capability source forgery rejection > rejects arbitrary sources presented as known adapters [0.69ms]
 
 test/readiness-registry.test.ts:
-(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.13ms]
-(pass) readiness registry > orders checks deterministically for every readiness report [88.62ms]
-(pass) readiness registry > preserves baseline readiness JSON output [91.63ms]
-(pass) readiness registry > rejects duplicate check ids [0.25ms]
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.16ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [90.91ms]
+(pass) readiness registry > preserves baseline readiness JSON output [86.51ms]
+(pass) readiness registry > rejects duplicate check ids [0.24ms]
 
 test/capability-doctor-source-candidates.test.ts:
-(pass) capability doctor source candidates > keeps source candidates visible when capability inventory is missing [1.82ms]
-(pass) capability doctor source candidates > reports source candidates separately from installed capabilities [1.59ms]
+(pass) capability doctor source candidates > keeps source candidates visible when capability inventory is missing [2.41ms]
+(pass) capability doctor source candidates > reports source candidates separately from installed capabilities [1.49ms]
 
 test/plan-compliance.test.ts:
-(pass) 9.3+ plan compliance > completed plan guardrails and final QA assets are present [0.67ms]
-(pass) 9.3+ plan compliance > fails when required QA asset is missing [0.46ms]
+(pass) 9.3+ plan compliance > completed plan guardrails and final QA assets are present [0.75ms]
+(pass) 9.3+ plan compliance > fails when required QA asset is missing [0.39ms]
 
 test/manifest-yaml.test.ts:
-(pass) manifest yaml parser > keeps scalar and list parsing inside the requested section [0.12ms]
-(pass) manifest yaml parser > keeps nested groups inside their parent boundary [0.11ms]
-(pass) manifest yaml parser > parses booleans without accepting arbitrary text [0.07ms]
+(pass) manifest yaml parser > keeps scalar and list parsing inside the requested section [0.46ms]
+(pass) manifest yaml parser > keeps nested groups inside their parent boundary [0.12ms]
+(pass) manifest yaml parser > parses booleans without accepting arbitrary text [0.03ms]
 
 test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [5.62ms]
-(pass) run event redaction > fails closed when runs directory is a symlink [1.10ms]
-(pass) run event redaction > prune ignores malicious run ids when deleting event files [1.28ms]
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [4.78ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.18ms]
+(pass) run event redaction > prune ignores malicious run ids when deleting event files [2.91ms]
+(pass) run event redaction > list ignores symlinked run event files [1.52ms]
 
 test/workflow-map.test.ts:
-(pass) primary workflow map > renders the primary workflow map json fixture [40.78ms]
-(pass) primary workflow map > rejects primary workflow without release-check [0.38ms]
-(pass) primary workflow map > keeps secondary loops below the main help route [41.86ms]
+(pass) primary workflow map > renders the primary workflow map json fixture [41.81ms]
+(pass) primary workflow map > rejects primary workflow without release-check [0.32ms]
+(pass) primary workflow map > keeps secondary loops below the main help route [44.09ms]
 
 test/cli.test.ts:
-(pass) boulder M1 surface > init creates harness files [4.55ms]
-(pass) boulder M1 surface > inspect returns a repo brief shape [4.06ms]
-(pass) boulder M1 surface > init writes inferred package verification commands [3.91ms]
-(pass) boulder M1 surface > verify supports dry run [4.24ms]
-(pass) boulder M1 surface > manifest validation catches unsafe external provider policy [0.13ms]
-(pass) boulder M1 surface > manifest validation accepts supported executor modes [0.09ms]
+(pass) boulder M1 surface > init creates harness files [4.37ms]
+(pass) boulder M1 surface > inspect returns a repo brief shape [7.50ms]
+(pass) boulder M1 surface > init writes inferred package verification commands [4.83ms]
+(pass) boulder M1 surface > verify supports dry run [4.57ms]
+(pass) boulder M1 surface > manifest validation catches unsafe external provider policy [0.12ms]
+(pass) boulder M1 surface > manifest validation accepts supported executor modes [0.16ms]
 (pass) boulder M1 surface > manifest validation requires the har-maker operator stack [0.11ms]
-(pass) boulder M1 surface > verify rejects invalid manifests [4.28ms]
-(pass) boulder M1 surface > export writes Codex notes [6.19ms]
-(pass) provider policy fixtures > codex-only fixture validates as expected [0.43ms]
-(pass) provider policy fixtures > external-approved fixture validates as expected [0.27ms]
-(pass) provider policy fixtures > external-without-approval fixture validates as expected [0.25ms]
+(pass) boulder M1 surface > verify rejects invalid manifests [3.76ms]
+(pass) boulder M1 surface > export writes Codex notes [10.93ms]
+(pass) provider policy fixtures > codex-only fixture validates as expected [0.46ms]
+(pass) provider policy fixtures > external-approved fixture validates as expected [0.36ms]
+(pass) provider policy fixtures > external-without-approval fixture validates as expected [0.43ms]
 
- 238 pass
+ 240 pass
  0 fail
- 1398 expect() calls
-Ran 238 tests across 37 files. [9.86s]
+ 1401 expect() calls
+Ran 240 tests across 37 files. [10.16s]
 $ bun build bin/boulder.ts --outdir /tmp/boulder-build --target bun
 Bundled 57 modules in 11ms
 
@@ -379,7 +381,7 @@ packed 1.44KB package.json
 packed 6.30KB CHANGELOG.md
 packed 1.28KB CONTRIBUTING.md
 packed 1.1KB LICENSE
-packed 10.78KB README.md
+packed 10.84KB README.md
 packed 1.66KB ROADMAP.md
 packed 0.80KB SECURITY.md
 packed 476B bin/boulder.js
@@ -487,7 +489,7 @@ packed 0.91KB fixtures/replay/kimi-agent-swarm-skill/official-docs.json
 packed 0.78KB fixtures/replay/kimi-agent-swarm-skill/replay.json
 packed 1.48KB fixtures/service-readiness/gates.json
 packed 0.57KB fixtures/service-readiness/metric-log-template.json
-packed 4.32KB fixtures/workflow-map/primary-workflow.v0.json
+packed 4.35KB fixtures/workflow-map/primary-workflow.v0.json
 packed 4.71KB skills/boulder-bootstrap-designer/SKILL.md
 packed 278B skills/boulder-bootstrap-designer/agents/openai.yaml
 packed 4.16KB skills/boulder/SKILL.md
@@ -529,14 +531,14 @@ packed 5.61KB src/quickstart.ts
 packed 11.12KB src/readiness-registry.ts
 packed 0.73KB src/recovery-codes.ts
 packed 14.0KB src/release-check.ts
-packed 13.69KB src/release-evidence.ts
+packed 13.64KB src/release-evidence.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
 packed 3.80KB src/replay-run.ts
 packed 4.61KB src/routine-command.ts
 packed 5.17KB src/routine-retro.ts
 packed 7.26KB src/routine.ts
-packed 12.86KB src/run-events.ts
+packed 12.97KB src/run-events.ts
 packed 7.1KB src/scorecard.ts
 packed 2.62KB src/service-field-evidence.ts
 packed 5.48KB src/service-gates.ts
@@ -548,7 +550,7 @@ packed 4.54KB src/templates/init.ts
 packed 3.77KB src/types.ts
 packed 5.24KB src/validation.ts
 packed 2.71KB src/verify.ts
-packed 5.56KB src/workflow-map.ts
+packed 5.58KB src/workflow-map.ts
 packed 6.27KB src/workflow-profile-builtins.ts
 packed 9.23KB src/workflow-profiles.ts
 packed 1.43KB src/workflow-stack.ts
