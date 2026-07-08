@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { benchmarkReportToMarkdown, evaluateBenchmarkFixtures, loadBenchmarkFixtures } from "./benchmark";
 import { bootstrapInterviewToMarkdown, buildBootstrapInterview } from "./bootstrap-interview";
 import { runCapabilityCommand } from "./capability-command";
@@ -6,7 +7,7 @@ import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson,
 import { parseOptions } from "./cli-options";
 import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
-import { recordFieldEvidence } from "./field-evidence";
+import { diffEvidence, inspectEvidence, recordFieldEvidence } from "./field-evidence";
 import { runHandoffCommand } from "./handoff-command";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
@@ -199,6 +200,18 @@ async function runMain(args: string[]): Promise<void> {
     if (report.status === "blocked") process.exitCode = 1;
     return;
   }
+  if (command === "evidence" && parsed.commandArgs[1] === "inspect") {
+    console.log(prettyJson(await inspectEvidence(options.cwd)));
+    return;
+  }
+  if (command === "evidence" && parsed.commandArgs[1] === "diff") {
+    const from = optionValue(args, "--from");
+    const to = optionValue(args, "--to");
+    const report = await diffEvidence(from ? resolve(from) : "", to ? resolve(to) : "");
+    console.log(prettyJson(report));
+    if (report.status === "blocked") process.exitCode = 1;
+    return;
+  }
   if (command === "replay-check") {
     const report = await evaluateReplayCheck(options.cwd);
     if (options.json) {
@@ -304,7 +317,7 @@ function parseArgv(args: readonly string[]): { readonly command: string; readonl
   };
 }
 
-const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence"]);
+const GLOBAL_VALUE_FLAGS = new Set(["--cwd", "--friction", "--run-id", "--evidence", "--from", "--to"]);
 const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--force", "--dry-run"]);
 
 function refreshPlanForJson(plan: ReleaseEvidenceRefreshPlan, mode: "dry-run" | "write"): {

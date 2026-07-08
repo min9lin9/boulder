@@ -9,3 +9,9 @@ export const RELEASE_RECOVERY_CODES = {
 } as const;
 
 export type ReleaseRecoveryCode = typeof RELEASE_RECOVERY_CODES[keyof typeof RELEASE_RECOVERY_CODES];
+
+export const EVIDENCE_RECOVERY_CODES = {
+  inputMissing: "evidence.input_missing"
+} as const;
+
+export type EvidenceRecoveryCode = typeof EVIDENCE_RECOVERY_CODES[keyof typeof EVIDENCE_RECOVERY_CODES];
