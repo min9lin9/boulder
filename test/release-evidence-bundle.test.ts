@@ -4,6 +4,8 @@ import packageJson from "../package.json" with { type: "json" };
 import { RELEASE_RECOVERY_CODES } from "../src/recovery-codes";
 import {
   RELEASE_EVIDENCE_TARGETS,
+  type ReleaseEvidenceBundleV1,
+  type ReleaseEvidenceExpectation,
   checkReleaseEvidenceBundle,
   parseReleaseEvidenceBundle,
   renderReleaseEvidenceBundle
@@ -19,42 +21,74 @@ const PLAN_TARGETS = [
   "docs/PRODUCT_READINESS.md"
 ] as const;
 
-const RELEASE_EXPECTATION = {
+const READY_RELEASE_BUNDLE = {
+  ...releaseManifest,
+  schemaVersion: 1,
   packageJsonVersion: packageJson.version,
   cliVersion: packageJson.version,
   tag: `v${packageJson.version}`,
-  releaseCommit: releaseManifest.releaseCommit,
-  packDryRunFileCount: releaseManifest.packDryRun.fileCount
-} as const;
+  publishedVersion: packageJson.version,
+  installSmoke: {
+    ...releaseManifest.installSmoke,
+    command: `bunx boulder-oss-cli@${packageJson.version} --version`
+  },
+  packDryRun: {
+    ...releaseManifest.packDryRun,
+    packageVersion: packageJson.version
+  }
+} satisfies ReleaseEvidenceBundleV1;
+
+const READY_RELEASE_EXPECTATION = {
+  packageJsonVersion: packageJson.version,
+  cliVersion: packageJson.version,
+  tag: `v${packageJson.version}`,
+  releaseCommit: READY_RELEASE_BUNDLE.releaseCommit,
+  packDryRunFileCount: READY_RELEASE_BUNDLE.packDryRun.fileCount
+} satisfies ReleaseEvidenceExpectation;
 
 describe("ReleaseEvidenceBundleV1", () => {
-  test("parses existing release manifest and renders only plan targets", () => {
-    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+  test("validates and renders a ready v0.1.16 bundle for the release evidence targets", () => {
+    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
       return;
     }
 
+    const validation = checkReleaseEvidenceBundle(parsed, READY_RELEASE_EXPECTATION);
     const rendered = renderReleaseEvidenceBundle(parsed.value);
 
+    expect(validation.status).toBe("pass");
+    expect(validation.issues).toEqual([]);
     expect(RELEASE_EVIDENCE_TARGETS).toEqual(PLAN_TARGETS);
     expect(Object.keys(rendered).sort()).toEqual([...PLAN_TARGETS].sort());
-    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"]).toContain('"packageJsonVersion": "0.1.15"');
+    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"]).toContain(`"packageJsonVersion": "${packageJson.version}"`);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"]).toContain(releaseManifest.githubActions.runUrl);
-    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(releaseManifest.installSmoke.command);
+    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(READY_RELEASE_BUNDLE.installSmoke.command);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"]).toContain("Total files: 146");
   });
 
+  test("reports current checked release evidence as version drift until refresh", () => {
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), READY_RELEASE_EXPECTATION);
+
+    expect(validation.status).toBe("fail");
+    expect(validation.issues.map((issue) => issue.code)).toEqual([
+      RELEASE_RECOVERY_CODES.packageJsonVersionMismatch,
+      RELEASE_RECOVERY_CODES.versionMismatch,
+      RELEASE_RECOVERY_CODES.tagMismatch,
+      RELEASE_RECOVERY_CODES.packVersionMismatch
+    ]);
+  });
+
   test("rejects malformed input with a stable recovery code", () => {
-    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle({ schemaVersion: 1 }), RELEASE_EXPECTATION);
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle({ schemaVersion: 1 }), READY_RELEASE_EXPECTATION);
 
     expect(validation.status).toBe("fail");
     expect(validation.issues.map((issue) => issue.code)).toEqual([RELEASE_RECOVERY_CODES.malformedInput]);
   });
 
   test("mismatch rejects package, CLI, tag, and pack versions with stable recovery codes", () => {
-    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
@@ -73,7 +107,7 @@ describe("ReleaseEvidenceBundleV1", () => {
       }
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.packageJsonVersionMismatch);
     expect(codes).toContain(RELEASE_RECOVERY_CODES.versionMismatch);
@@ -82,7 +116,7 @@ describe("ReleaseEvidenceBundleV1", () => {
   });
 
   test("mismatch rejects CI release commit drift with a stable recovery code", () => {
-    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
@@ -94,13 +128,13 @@ describe("ReleaseEvidenceBundleV1", () => {
       releaseCommit: "0000000000000000000000000000000000000000"
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.releaseCommitMismatch);
   });
 
   test("mismatch rejects pack dry-run file count drift with a stable recovery code", () => {
-    const parsed = parseReleaseEvidenceBundle(releaseManifest);
+    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
@@ -115,7 +149,7 @@ describe("ReleaseEvidenceBundleV1", () => {
       }
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.packFileCountMismatch);
   });

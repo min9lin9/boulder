@@ -1,43 +1,13 @@
-Red check before verifier fix:
-
 $ bun test test/release-evidence-bundle.test.ts --test-name-pattern mismatch
 bun test v1.3.14 (0d9b296a)
 
 test/release-evidence-bundle.test.ts:
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [0.49ms]
-error: expect(received).toContain(expected)
-
-Expected to contain: undefined
-Received: [ "release.package_json_version_mismatch", "release.version_mismatch", "release.tag_mismatch",
-  "release.pack_version_mismatch"
-]
-(fail) ReleaseEvidenceBundleV1 > mismatch rejects CI release commit drift with a stable recovery code [0.20ms]
-error: expect(received).toContain(expected)
-
-Expected to contain: undefined
-Received: [ "release.package_json_version_mismatch", "release.version_mismatch", "release.tag_mismatch",
-  "release.pack_version_mismatch"
-]
-(fail) ReleaseEvidenceBundleV1 > mismatch rejects pack dry-run file count drift with a stable recovery code [0.17ms]
-
- 1 pass
- 2 filtered out
- 2 fail
- 9 expect() calls
-Ran 3 tests across 1 file. [13.00ms]
-
-Green check after verifier fix:
-
-$ bun test test/release-evidence-bundle.test.ts --test-name-pattern mismatch
-bun test v1.3.14 (0d9b296a)
-
-test/release-evidence-bundle.test.ts:
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [0.44ms]
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects CI release commit drift with a stable recovery code [0.07ms]
-(pass) ReleaseEvidenceBundleV1 > mismatch rejects pack dry-run file count drift with a stable recovery code [0.06ms]
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects package, CLI, tag, and pack versions with stable recovery codes [1.18ms]
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects CI release commit drift with a stable recovery code [0.18ms]
+(pass) ReleaseEvidenceBundleV1 > mismatch rejects pack dry-run file count drift with a stable recovery code [0.12ms]
 
  3 pass
- 2 filtered out
+ 3 filtered out
  0 fail
  9 expect() calls
-Ran 3 tests across 1 file. [17.00ms]
+Ran 3 tests across 1 file. [24.00ms]
