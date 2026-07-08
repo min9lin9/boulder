@@ -28,11 +28,33 @@ bunx --no-cache boulder-oss-cli --help
 
 ## Required Alignment
 
+- `package.json` has repo-verifiable npm page metadata:
+  - `name`
+  - `version`
+  - `license`
+  - `repository.url`
+  - `homepage`
+  - `bugs.url`
+- `repository.url`, `homepage`, and `bugs.url` point at the same GitHub repository.
+- Root `README.md` is current because npm renders it on the package page.
 - npm version and `package.json` version match.
 - Git tag points at the commit containing the release evidence.
 - GitHub Release body links to `CHANGELOG.md`, install smoke, and CI evidence.
 - `boulder product-readiness --json` returns `ready` in a clean release tree.
 - `boulder service-readiness --json` returns `ready` in a clean release tree.
+
+## Deferred External Provenance Hardening
+
+`release-check` verifies repository files only. It must not block on npm account or package settings unless a maintainer supplies external evidence and asks Boulder to evaluate it.
+
+Keep these as post-repo checklist items:
+
+- npm account 2FA is required for publishing and package settings.
+- npm token policy avoids long-lived publish tokens; prefer trusted publishing once configured.
+- npm trusted publisher is configured on the npm package for the intended GitHub repository and workflow.
+- Trusted publishing runs on a supported GitHub-hosted runner with the required Node and npm versions.
+- Post-publish provenance is visible from npm package provenance views.
+- Optional consumer checks are captured when used: `npm audit signatures`, registry signature verification, `npm sbom`, and any GitHub artifact attestation for non-npm release artifacts.
 
 ## Current Release Note
 

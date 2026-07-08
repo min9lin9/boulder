@@ -34,6 +34,7 @@ export class ReadinessRegistryError extends Error {
 }
 
 export const READINESS_REGISTRY = buildReadinessRegistry([
+  releaseEntry("package-metadata", "metadata", 5, "manifest", "packageMetadataCheck", "file", ["package.json"], "package.metadata_missing"),
   releaseContent("release-workflow-doc", 10, "release.workflow_doc", "docs/RELEASE_WORKFLOW.md"),
   releaseContent("ci-bun-engine", 20, "release.ci_bun_engine", ".github/workflows/ci.yml"),
   releaseContent("changelog-version", 30, "release.changelog_version", "CHANGELOG.md"),

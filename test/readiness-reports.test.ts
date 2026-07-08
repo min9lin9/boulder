@@ -87,7 +87,7 @@ describe("benchmark and release reports", () => {
 
   test("reports release evidence as ready after publish and tag in a release fixture", async () => {
     const root = await tempRepo();
-    await write(root, "package.json", JSON.stringify({ name: "boulder-oss-cli", version: "1.2.3" }));
+    await write(root, "package.json", JSON.stringify(releasePackageJson("1.2.3")));
     await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
     await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
     await write(root, "CHANGELOG.md", "## 1.2.3\n");
@@ -149,7 +149,7 @@ describe("benchmark and release reports", () => {
 
   test("blocks malformed structured release evidence manifests", async () => {
     const root = await tempRepo();
-    await write(root, "package.json", JSON.stringify({ name: "fixture", version: "1.2.3" }));
+    await write(root, "package.json", JSON.stringify(releasePackageJson("1.2.3")));
     await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
     await write(root, ".github/workflows/ci.yml", 'bun-version: "1.3.14"\n');
     await write(root, "CHANGELOG.md", "## 1.2.3\n");
@@ -401,4 +401,20 @@ async function recursiveFiles(root: string): Promise<readonly string[]> {
     else files.push(path);
   }
   return files;
+}
+
+function releasePackageJson(version: string): Record<string, unknown> {
+  return {
+    name: "boulder-oss-cli",
+    version,
+    license: "MIT",
+    repository: {
+      type: "git",
+      url: "git+https://github.com/min9lin9/boulder.git"
+    },
+    homepage: "https://github.com/min9lin9/boulder#readme",
+    bugs: {
+      url: "https://github.com/min9lin9/boulder/issues"
+    }
+  };
 }

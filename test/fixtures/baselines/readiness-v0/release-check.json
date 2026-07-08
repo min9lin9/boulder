@@ -3,6 +3,11 @@
   "status": "blocked",
   "checks": [
     {
+      "id": "package-metadata",
+      "status": "pass",
+      "evidence": "package.json repo-verifiable metadata"
+    },
+    {
       "id": "release-workflow-doc",
       "status": "pass",
       "evidence": "docs/RELEASE_WORKFLOW.md"

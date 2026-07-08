@@ -4,7 +4,7 @@ Status: draft rubric for local application-readiness
 
 Official source: https://developers.openai.com/community/codex-for-oss accessed 2026-06-11.
 
-This scorecard measures Boulder as an evidence-backed Codex OSS maintainer workflow kit. A 9.5+ result is local application-readiness for the Codex for OSS program, not an assurance of OpenAI acceptance.
+This scorecard measures Boulder as an evidence-backed Codex OSS maintainer workflow kit. A 9.3+ result is a review target, not a guaranteed score or acceptance outcome. A 9.5+ result is local application-readiness for the Codex for OSS program, not an assurance of OpenAI acceptance.
 
 Boulder framing:
 

@@ -20,6 +20,7 @@ export type ReleaseCheckReport = {
 export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckReport> {
   const version = await packageVersion(root);
   const checks = [
+    await packageMetadataCheck(root),
     await contentCheck(root, "release-workflow-doc", "docs/RELEASE_WORKFLOW.md", ["npm publish", "GitHub Release", "tag"]),
     await contentCheck(root, "ci-bun-engine", ".github/workflows/ci.yml", ['bun-version: "1.3.14"']),
     await contentCheck(root, "changelog-version", "CHANGELOG.md", [`## ${version}`]),
@@ -106,8 +107,38 @@ function nextCommandsFor(status: ReleaseCheckReport["status"], checks: readonly 
   if (failing.has("pack-dry-run-evidence")) {
     commands.push("Refresh docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt with package dry-run evidence.");
   }
+  if (failing.has("package-metadata")) {
+    commands.push("Add repo-verifiable package metadata in package.json: name, version, license, repository.url, homepage, and bugs.url.");
+  }
 
   return commands;
+}
+
+async function packageMetadataCheck(root: string): Promise<ReleaseEvidenceCheck> {
+  try {
+    const parsed: unknown = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+    if (!isRecord(parsed)) {
+      return metadataFailure(["package.json object"]);
+    }
+
+    const missing = [
+      ...requiredStringFields(parsed, ["name", "version", "license"]),
+      ...requiredNestedStringFields(parsed, "repository", ["url"]),
+      ...requiredNestedStringFields(parsed, "bugs", ["url"]),
+      ...requiredStringFields(parsed, ["homepage"])
+    ];
+    const repositoryUrl = nestedStringField(parsed, "repository", "url");
+    const homepage = stringField(parsed, "homepage");
+    const bugsUrl = nestedStringField(parsed, "bugs", "url");
+    const compatibility = compatiblePackageUrls(repositoryUrl, homepage, bugsUrl);
+    if (!compatibility) {
+      missing.push("repository/homepage/bugs GitHub URL compatibility");
+    }
+
+    return missing.length ? metadataFailure(missing) : { id: "package-metadata", status: "pass", evidence: "package.json repo-verifiable metadata" };
+  } catch {
+    return metadataFailure(["package.json"]);
+  }
 }
 
 async function packageVersion(root: string): Promise<string> {
@@ -274,6 +305,46 @@ function expectObjectField(errors: string[], record: Record<string, unknown>, ke
     return;
   }
   validate(value);
+}
+
+function metadataFailure(missing: readonly string[]): ReleaseEvidenceCheck {
+  return {
+    id: "package-metadata",
+    status: "fail",
+    evidence: `package.json missing repo-verifiable metadata: ${missing.join(", ")}`
+  };
+}
+
+function requiredStringFields(record: Record<string, unknown>, fields: readonly string[]): string[] {
+  return fields.filter((field) => !stringField(record, field));
+}
+
+function requiredNestedStringFields(record: Record<string, unknown>, parent: string, fields: readonly string[]): string[] {
+  const value = record[parent];
+  if (!isRecord(value)) {
+    return fields.map((field) => `${parent}.${field}`);
+  }
+  return fields.filter((field) => !stringField(value, field)).map((field) => `${parent}.${field}`);
+}
+
+function compatiblePackageUrls(repositoryUrl: string, homepage: string, bugsUrl: string): boolean {
+  const slug = githubSlug(repositoryUrl);
+  return !!slug && githubSlug(homepage) === slug && githubSlug(bugsUrl) === slug;
+}
+
+function githubSlug(value: string): string {
+  const match = /github\.com[:/]([^/#?]+\/[^/#?.]+)(?:\.git)?/i.exec(value);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function stringField(record: Record<string, unknown>, key: string): string {
+  const value = record[key];
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function nestedStringField(record: Record<string, unknown>, parent: string, key: string): string {
+  const value = record[parent];
+  return isRecord(value) ? stringField(value, key) : "";
 }
 
 async function execStdout(command: string, cwd: string): Promise<string> {
