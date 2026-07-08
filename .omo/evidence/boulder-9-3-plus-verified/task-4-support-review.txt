@@ -1,0 +1,17 @@
+Task 4 support review matrix
+
+Scope reviewed:
+- test/docs-registry.test.ts
+- fixtures/docs/doc-registry.v0.json
+- fixtures/package-inventory/packaged-files.v0.json
+- package.json#files
+
+Manual QA/review matrix:
+- Packaged docs coverage: `bun test test/docs-registry.test.ts` compares all packaged `docs/**` entries from package inventory with registry entries where `packaging` is `packaged`.
+- Local-only exclusions: same test compares `local-only` registry entries with `package.json#files` negated doc patterns and keeps packaged local-only rejection coverage.
+- Translation metadata: negative tests reject translated docs missing `dir`, `source`, or `version`.
+- Generated metadata: negative test rejects generated docs missing `generatedBy` or `source`.
+
+Result:
+- No fixture edit was needed; failures were missing test coverage, not bad registry data.
+- Requested verification passed: full docs registry test, filtered translated-dir test, and `bunx tsc --noEmit`.

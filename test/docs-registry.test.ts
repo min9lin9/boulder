@@ -48,6 +48,24 @@ describe("documentation registry", () => {
     expect(registryErrors([withoutDir(translation)])).toContain("dir");
   });
 
+  test("rejects translated docs without source or version metadata", async () => {
+    const registry = parseRegistry(await readFile(registryPath, "utf8"));
+    const translation = registry.find((entry) => entry.kind === "translation");
+
+    if (translation === undefined) throw new Error("Fixture must include at least one translated doc.");
+    expect(registryErrors([withoutSource(translation)])).toContain("source");
+    expect(registryErrors([withoutVersion(translation)])).toContain("version");
+  });
+
+  test("rejects generated docs without generator or source metadata", async () => {
+    const registry = parseRegistry(await readFile(registryPath, "utf8"));
+    const generated = registry.find((entry) => entry.kind === "generated");
+
+    if (generated === undefined) throw new Error("Fixture must include at least one generated doc.");
+    expect(registryErrors([withoutGeneratedBy(generated)])).toContain("generatedBy");
+    expect(registryErrors([withoutSource(generated)])).toContain("source");
+  });
+
   test("rejects packaged local-only docs", () => {
     const entry: DocRegistryEntry = {
       path: "docs/*SESSION_SUMMARY*.md",
@@ -102,6 +120,46 @@ function withoutDir(entry: DocRegistryEntry): DocRegistryEntry {
     source: entry.source,
     version: entry.version,
     generatedBy: entry.generatedBy,
+    packaging: entry.packaging,
+    translatable: entry.translatable
+  };
+}
+
+function withoutSource(entry: DocRegistryEntry): DocRegistryEntry {
+  return {
+    path: entry.path,
+    kind: entry.kind,
+    locale: entry.locale,
+    dir: entry.dir,
+    version: entry.version,
+    generatedBy: entry.generatedBy,
+    packaging: entry.packaging,
+    translatable: entry.translatable
+  };
+}
+
+function withoutVersion(entry: DocRegistryEntry): DocRegistryEntry {
+  return {
+    path: entry.path,
+    kind: entry.kind,
+    locale: entry.locale,
+    dir: entry.dir,
+    source: entry.source,
+    generatedBy: entry.generatedBy,
+    packaging: entry.packaging,
+    translatable: entry.translatable
+  };
+}
+
+function withoutGeneratedBy(entry: DocRegistryEntry): DocRegistryEntry {
+  return {
+    path: entry.path,
+    kind: entry.kind,
+    locale: entry.locale,
+    dir: entry.dir,
+    source: entry.source,
+    version: entry.version,
+    generatedBy: "",
     packaging: entry.packaging,
     translatable: entry.translatable
   };

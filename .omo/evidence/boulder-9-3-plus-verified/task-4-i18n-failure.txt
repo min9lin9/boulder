@@ -2,10 +2,10 @@ $ bun test test/docs-registry.test.ts --test-name-pattern "rejects translated do
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > rejects translated docs without dir metadata [8.63ms]
+(pass) documentation registry > rejects translated docs without dir metadata [5.83ms]
 
  1 pass
- 2 filtered out
+ 4 filtered out
  0 fail
  2 expect() calls
-Ran 1 test across 1 file. [55.00ms]
+Ran 1 test across 1 file. [26.00ms]

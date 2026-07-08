@@ -1,15 +1,18 @@
 $ bun test test/docs-registry.test.ts
 
-test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [9.03ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.60ms]
-(pass) documentation registry > rejects packaged local-only docs [0.04ms]
-
- 3 pass
- 0 fail
- 6 expect() calls
-Ran 3 tests across 1 file. [62.00ms]
 bun test v1.3.14 (0d9b296a)
+
+test/docs-registry.test.ts:
+(pass) documentation registry > covers packaged docs and local-only exclusions [6.23ms]
+(pass) documentation registry > rejects translated docs without dir metadata [1.61ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.35ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.52ms]
+(pass) documentation registry > rejects packaged local-only docs [0.03ms]
+
+ 5 pass
+ 0 fail
+ 10 expect() calls
+Ran 5 tests across 1 file. [28.00ms]
 
 $ bunx tsc --noEmit
 # exit 0, no output
