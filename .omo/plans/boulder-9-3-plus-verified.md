@@ -175,7 +175,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun bin/boulder.ts evidence inspect --cwd . --json`, binary observable: exit 0 and JSON includes evidence state ids, evidence `.omo/evidence/boulder-9-3-plus-verified/task-7-inspect.json`; failure: `bun bin/boulder.ts evidence diff --from missing --to missing --json`, binary observable: exit 1 and JSON includes recovery code `evidence.input_missing`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-7-diff-failure.json`.
   Commit: Y | `feat(evidence): add inspect diff and recovery codes`.
 
-- [ ] 8. Add structured local run events under `.boulder/runs`.
+- [x] 8. Add structured local run events under `.boulder/runs`.
   What to do / Must NOT do: Record local structured run events for exact commands: `release-check`, `product-readiness`, `service-readiness`, `release-plan`, `release evidence refresh`, `evidence inspect`, and `evidence diff`. Event fields: `schemaVersion`, `eventName`, `command`, `cwdHash`, `packageVersion`, `startedAt`, `completedAt`, `severity`, `status`, `checkIds`, `recoveryHintIds`, `artifactPaths`. Add `boulder runs list/show/prune --json`. Retention policy: `runs prune --older-than 30d --keep 200 --json`. Do not log raw workspace bodies, secrets, or protected file content.
   Parallelization: Wave 3 | Blocked by: 5, 6, 7 | Blocks: F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-librarian-ops-docs.md`; `src/routine.ts`; `src/handoff-paths.ts`; `src/profile-store.ts`; `src/field-evidence.ts`; `test/profile-state-safety-e2e.test.ts`
@@ -183,7 +183,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun bin/boulder.ts release-check --json --record-run && bun bin/boulder.ts runs list --json && bun bin/boulder.ts runs show --latest --json`, binary observable: exits 0 and JSON includes `eventName`, `status`, `checkIds`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-8-runs-list.json`; failure: `bun test test/run-events-redaction.test.ts`, binary observable: secret-like tokens and raw file bodies are absent from generated run JSON, evidence `.omo/evidence/boulder-9-3-plus-verified/task-8-redaction.txt`; cleanup: `bun bin/boulder.ts runs prune --older-than 30d --keep 200 --json`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-8-prune.json`.
   Commit: Y | `feat(runs): add local structured run events`.
 
-- [ ] 9. Add primary workflow map and help/README hierarchy.
+- [x] 9. Add primary workflow map and help/README hierarchy.
   What to do / Must NOT do: Add `boulder workflow map --json` using schema `fixtures/workflow-map/primary-workflow.v0.json` and update help/README/docs so the main route is first-run -> profile -> capability -> handoff -> readiness. Do not bury core route under secondary routine/retro/proposal features.
   Parallelization: Wave 4 | Blocked by: 1 | Blocks: F1-F4
   References (executor has NO interview context - be exhaustive): `README.md`; `src/cli-format.ts`; `src/quickstart.ts`; `docs/CASE_STUDIES/README.md`; `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/SYNTHESIS.md`
