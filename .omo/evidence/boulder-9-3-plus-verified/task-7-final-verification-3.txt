@@ -1,0 +1,89 @@
+# Task 7 final verification rerun 3
+timestamp: 2026-07-08T08:15:45Z
+worktree: /home/burt/Documents/Boulder-9-3-plus
+
+$ git status --short --branch
+## codex/boulder-9-3-plus
+ M src/product-readiness.ts
+ M src/release-check.ts
+ M src/service-readiness.ts
+?? src/readiness-registry.ts
+?? test/readiness-registry.test.ts
+exit:0
+
+$ git rev-parse --short HEAD
+e56bd62
+exit:0
+
+$ git show --format=%B --no-patch HEAD
+feat(evidence): add inspect diff and recovery codes
+
+Plan: .omo/plans/boulder-9-3-plus-verified.md
+
+exit:0
+
+$ git show --name-only --format= HEAD
+.omo/evidence/boulder-9-3-plus-verified/task-7-diff-failure.json
+.omo/evidence/boulder-9-3-plus-verified/task-7-inspect.json
+src/cli.ts
+src/field-evidence.ts
+src/recovery-codes.ts
+test/field-evidence.test.ts
+exit:0
+
+$ bun test test/field-evidence.test.ts test/cli-e2e.test.ts
+bun test v1.3.14 (0d9b296a)
+
+test/field-evidence.test.ts:
+(pass) field evidence > inspects release package and docs evidence states [28.79ms]
+(pass) field evidence > diff reports changed evidence ids between roots [11.85ms]
+(pass) field evidence > diff fails with evidence input recovery code when a path is missing [0.63ms]
+(pass) field evidence > passes a complete field-readiness run and writes a manifest [7.26ms]
+(pass) field evidence > fails when the maintainer decision outcome is unsupported [1.63ms]
+(pass) field evidence > fails when JSON evidence is malformed [1.51ms]
+(pass) field evidence > fails closed for evidence paths outside field-readiness [0.20ms]
+(pass) field evidence > does not overwrite a valid manifest when evidence path is unsafe [0.49ms]
+(pass) field evidence > does not write a manifest when run id is unsafe [0.30ms]
+(pass) field evidence > does not write through a symlinked field evidence directory [0.63ms]
+(pass) field evidence > does not write through a symlinked field-readiness parent directory [1.41ms]
+
+test/cli-e2e.test.ts:
+(pass) boulder CLI e2e cleanup safety > prints the package version [48.76ms]
+(pass) boulder CLI e2e cleanup safety > keeps duplicate copy artifacts out of package dry run [10.63ms]
+(pass) boulder CLI e2e cleanup safety > preserves full init-to-export happy path [206.59ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe generated root and docs write targets [495.91ms]
+(pass) boulder CLI e2e cleanup safety > renders first-run quickstart and onboard surfaces [166.52ms]
+(pass) boulder CLI e2e cleanup safety > supports global options before root and subcommands [295.96ms]
+(pass) boulder CLI e2e cleanup safety > renders release-check blockers without publishing [58.48ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-check fixture evidence [46.75ms]
+(pass) boulder CLI e2e cleanup safety > renders replay-run dry-run plan [59.73ms]
+(pass) boulder CLI e2e cleanup safety > rejects unsafe provider policy through validate command [106.43ms]
+(pass) boulder CLI e2e cleanup safety > preserves root release-plan and initialized export surface [157.67ms]
+(pass) boulder CLI e2e cleanup safety > renders capability doctor json for installed Codex tools [49.87ms]
+(pass) boulder CLI e2e cleanup safety > renders active profile in human capability doctor output [40.05ms]
+(pass) boulder CLI e2e cleanup safety > records field-readiness evidence through the CLI [49.19ms]
+
+ 25 pass
+ 0 fail
+ 115 expect() calls
+Ran 25 tests across 2 files. [1.88s]
+exit:0
+
+$ bunx tsc --noEmit
+exit:0
+
+$ bun bin/boulder.ts evidence inspect --cwd . --json > .omo/evidence/boulder-9-3-plus-verified/task-7-inspect.json
+exit:0
+
+$ bun -e inspect JSON assertions
+{"schemaVersion":"boulder.evidence.inspect.v1","status":"fail","evidenceCount":12,"requiredIdsPresent":true}
+exit:0
+
+$ bun bin/boulder.ts evidence diff --from missing --to missing --json > .omo/evidence/boulder-9-3-plus-verified/task-7-diff-failure.json
+exit:1
+
+$ bun -e diff JSON assertions
+{"schemaVersion":"boulder.evidence.diff.v1","status":"blocked","recoveryCode":"evidence.input_missing","issueCount":2}
+exit:0
+
+VERDICT: PASS task 7 commands, commit, and artifacts verified in current worktree.

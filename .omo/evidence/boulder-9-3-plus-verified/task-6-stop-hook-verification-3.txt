@@ -1,0 +1,358 @@
+# Todo 6 stop-hook verification 3
+timestamp: 2026-07-08T08:20:57Z
+cwd: /home/burt/Documents/Boulder-9-3-plus
+head: 316aecdf701e41c45f7b00e71438bb45a3dce196
+
+$ bun test test/readiness-registry.test.ts test/readiness-reports.test.ts test/product-readiness.test.ts test/service-readiness.test.ts
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-reports.test.ts:
+(pass) harness quality scorecard > scores the root Boulder harness as ready [2.98ms]
+(pass) harness quality scorecard > penalizes unsafe external provider policy [0.23ms]
+(pass) benchmark and release reports > loads root benchmark fixtures and avoids leaderboard claims [1.15ms]
+(pass) benchmark and release reports > rates the root release plan as ready and keeps publish manual [1.96ms]
+(pass) benchmark and release reports > reports root release evidence as blocked until 0.1.16 is published and tagged [42.70ms]
+(pass) benchmark and release reports > reports release evidence as ready after publish and tag in a release fixture [49.49ms]
+(pass) benchmark and release reports > reports blocker-first release next commands without publish automation [7.97ms]
+(pass) benchmark and release reports > blocks malformed structured release evidence manifests [37.66ms]
+(pass) quickstart and replay reports > summarizes the next first-run commands for a repository [9.47ms]
+(pass) quickstart and replay reports > checks public replay fixtures and official docs references [2.84ms]
+(pass) quickstart and replay reports > blocks stale replay docs and replay ref mismatches [1.21ms]
+(pass) quickstart and replay reports > builds a dry-run command plan from replay fixtures [0.76ms]
+(pass) product readiness and examples > reports root product readiness evidence gates [39.50ms]
+(pass) product readiness and examples > blocks when GJC planning evidence is missing [25.18ms]
+(pass) product readiness and examples > checked-in example harnesses include Boulder outputs [3.34ms]
+(pass) readiness wording hygiene > service strategy separates local readiness from external field backing [0.19ms]
+(pass) repeat-use evidence hygiene > ships a metric log template with the required field contract [0.19ms]
+(pass) repeat-use evidence hygiene > keeps public evidence free of local paths and npm identity traces [12.73ms]
+
+test/product-readiness.test.ts:
+(pass) tight product readiness > rates a public evidence fixture as ready [51.20ms]
+(pass) tight product readiness > blocks when published install smoke evidence is missing [48.87ms]
+(pass) tight product readiness > blocks when release tag or published install evidence does not match package version [52.52ms]
+(pass) tight product readiness > blocks duplicate copy artifacts in the release tree [54.71ms]
+(pass) tight product readiness > ignores broken local codegraph symlinks during release tree scan [64.79ms]
+
+test/service-readiness.test.ts:
+(pass) service readiness > rates a service evidence fixture as pilot-ready when product readiness is still blocked [20.36ms]
+(pass) service readiness > blocks when repeat-run gate evidence is missing [14.27ms]
+(pass) service readiness > blocks when official documentation evidence is missing for public OSS replay [15.86ms]
+(pass) service readiness > blocks when replay docs are stale or ref-mismatched [12.71ms]
+(pass) service readiness > blocks when field evidence is not complete [12.37ms]
+(pass) service readiness > blocks when the recorded field evidence manifest is stale or failing [13.57ms]
+(pass) service readiness > blocks when field evidence exists but no manifest was recorded [12.91ms]
+(pass) service readiness > blocks when any recorded field evidence run becomes invalid [17.32ms]
+(pass) service readiness > blocks when onboarding uses stale pre-publish terms [17.67ms]
+(pass) service readiness > blocks when onboarding mixes current and stale publish terms [17.87ms]
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > contains recovery hint ids and formatter metadata for every check [0.13ms]
+(pass) readiness registry > orders checks deterministically for every readiness report [97.63ms]
+(pass) readiness registry > preserves baseline readiness JSON output [81.77ms]
+(pass) readiness registry > rejects duplicate check ids [0.37ms]
+
+ 37 pass
+ 0 fail
+ 361 expect() calls
+Ran 37 tests across 4 files. [889.00ms]
+exit:0
+
+$ bun test test/readiness-registry.test.ts --test-name-pattern "rejects duplicate check ids"
+bun test v1.3.14 (0d9b296a)
+
+test/readiness-registry.test.ts:
+(pass) readiness registry > rejects duplicate check ids [0.17ms]
+
+ 1 pass
+ 3 filtered out
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [31.00ms]
+exit:0
+
+$ bunx tsc --noEmit
+exit:0
+
+$ bun bin/boulder.ts release-check --json
+{
+  "version": "0.1.16",
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "release-workflow-doc",
+      "status": "pass",
+      "evidence": "docs/RELEASE_WORKFLOW.md"
+    },
+    {
+      "id": "ci-bun-engine",
+      "status": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "changelog-version",
+      "status": "pass",
+      "evidence": "CHANGELOG.md"
+    },
+    {
+      "id": "install-smoke-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "install-smoke-version",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16"
+    },
+    {
+      "id": "published-version-evidence",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16"
+    },
+    {
+      "id": "github-actions-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "git-tag-local",
+      "status": "pass",
+      "evidence": "local tag v0.1.16"
+    },
+    {
+      "id": "release-evidence-manifest",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16"
+    },
+    {
+      "id": "pack-dry-run-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"
+    }
+  ],
+  "nextCommands": [
+    "Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.",
+    "Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16."
+  ]
+}
+exit:1
+
+$ bun bin/boulder.ts product-readiness --json
+{
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "clean-release-tree",
+      "status": "pass",
+      "evidence": "no duplicate copy artifacts found"
+    },
+    {
+      "id": "codex-oss-application-packet",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md"
+    },
+    {
+      "id": "public-case-study-index",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/README.md"
+    },
+    {
+      "id": "public-case-studies",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/pr-review.md, docs/CASE_STUDIES/release-workflow.md, docs/CASE_STUDIES/core-implementation.md"
+    },
+    {
+      "id": "gjc-plan-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md"
+    },
+    {
+      "id": "lazycodex-implementation-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/core-implementation/lazycodex-implementation-summary.md"
+    },
+    {
+      "id": "boulder-verify-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/pr-review/BOULDER_EXPORT.md, docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md, docs/CASE_STUDIES/evidence/release-workflow/ci.txt"
+    },
+    {
+      "id": "public-ci-workflow",
+      "status": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "public-ci-run-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "published-install-smoke",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "public-release-check",
+      "status": "fail",
+      "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16"
+    },
+    {
+      "id": "limitations-explicit",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md"
+    },
+    {
+      "id": "trust-support-security-posture",
+      "status": "pass",
+      "evidence": "docs/TRUST_SUPPORT_SECURITY.md"
+    },
+    {
+      "id": "public-support-templates",
+      "status": "pass",
+      "evidence": ".github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, SECURITY.md"
+    },
+    {
+      "id": "gjc-lazycodex-handoff-fixtures",
+      "status": "pass",
+      "evidence": "fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json"
+    },
+    {
+      "id": "final-audit",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_FINAL_AUDIT.md"
+    }
+  ],
+  "nextSteps": [
+    "Fill every failed public product evidence path before claiming 9.5+ readiness."
+  ]
+}
+exit:1
+
+$ bun bin/boulder.ts service-readiness --json
+{
+  "status": "pilot-ready",
+  "checks": [
+    {
+      "id": "service-loop",
+      "status": "pass",
+      "evidence": "docs/SERVICE_LOOP.md"
+    },
+    {
+      "id": "onboarding",
+      "status": "pass",
+      "evidence": "docs/ONBOARDING.md"
+    },
+    {
+      "id": "official-docs-coverage",
+      "status": "pass",
+      "evidence": "fixtures/replay/gajae-code/official-docs.json, fixtures/replay/awesome-codex-subagents/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
+    },
+    {
+      "id": "external-replay",
+      "status": "pass",
+      "evidence": "fixtures/replay/gajae-code/replay.json, fixtures/replay/awesome-codex-subagents/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json"
+    },
+    {
+      "id": "handoff-validation",
+      "status": "pass",
+      "evidence": "fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json"
+    },
+    {
+      "id": "service-acceptance-gates",
+      "status": "pass",
+      "evidence": "fixtures/service-readiness/gates.json"
+    },
+    {
+      "id": "field-evidence",
+      "status": "pass",
+      "evidence": "evidence/field-readiness/oss-run-1"
+    },
+    {
+      "id": "operating-metrics",
+      "status": "pass",
+      "evidence": "docs/OPERATING_METRICS.md"
+    },
+    {
+      "id": "support-routes",
+      "status": "pass",
+      "evidence": ".github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, docs/TRUST_SUPPORT_SECURITY.md"
+    },
+    {
+      "id": "product-readiness",
+      "status": "fail",
+      "evidence": "product-readiness blocked"
+    }
+  ],
+  "nextSteps": [
+    "Service pilot is ready; product-readiness must pass before claiming public service-ready."
+  ]
+}
+exit:0
+
+$ bun bin/boulder.ts --help
+boulder
+
+A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
+
+Usage:
+  boulder init [--cwd path] [--force]
+  boulder quickstart [--cwd path] [--json]
+  boulder onboard [--cwd path] [--json]
+  boulder bootstrap interview [--cwd path] [--task text] [--json]
+  boulder inspect [--cwd path] [--json]
+  boulder profile list [--cwd path] [--json]
+  boulder profile resolve [--cwd path] [--profile name] [--task kind] [--json]
+  boulder profile show [name] [--cwd path] [--json]
+  boulder profile save <name> [--cwd path] [--profile source] [--json]
+  boulder profile use <name> [--cwd path] [--json]
+  boulder capability import --from source --dry-run|--write [--kind skill|adapter|agent-catalog] [--id id] [--cwd path] [--json]
+  boulder capability status [--cwd path] [--json]
+  boulder routine capture --task text --dry-run|--write [--cwd path] [--json]
+  boulder retro weekly --dry-run [--cwd path] [--json]
+  boulder skill propose --from-routine id --dry-run|--write [--cwd path] [--json]
+  boulder handoff packet [--cwd path] [--adapter name] [--include path] [--json]
+  boulder handoff review [--cwd path] [--packet path] [--json]
+  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]
+  boulder validate [--cwd path]
+  boulder verify [--cwd path] [--dry-run]
+  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]
+  boulder scorecard [--cwd path] [--json]
+  boulder benchmark [--cwd path] [--json]
+  boulder release-plan [--cwd path] [--json]
+  boulder release evidence refresh --dry-run|--write [--cwd path] [--json]
+  boulder release-check [--cwd path] [--json]
+  boulder replay-check [--cwd path] [--json]
+  boulder replay-run [--cwd path] --dry-run [--json]
+  boulder product-readiness [--cwd path] [--json]
+  boulder service-readiness [--cwd path] [--json]
+  boulder doctor [--cwd path] [--json]
+  boulder record field-readiness --run-id id --evidence path [--cwd path] [--json]
+  boulder export [--cwd path] [--force]
+
+Package:
+  bunx boulder-oss-cli <command>
+
+exit:0
+
+$ git show --name-only --format=fuller HEAD -- src/readiness-registry.ts src/release-check.ts src/product-readiness.ts src/service-readiness.ts test/readiness-registry.test.ts
+commit 316aecdf701e41c45f7b00e71438bb45a3dce196
+Author:     Burt <burt@Burtui-noteubug.local>
+AuthorDate: Wed Jul 8 08:17:30 2026 +0000
+Commit:     Burt <burt@Burtui-noteubug.local>
+CommitDate: Wed Jul 8 08:17:30 2026 +0000
+
+    refactor(readiness): introduce registry
+    
+    Plan: .omo/plans/boulder-9-3-plus-verified.md
+
+src/product-readiness.ts
+src/readiness-registry.ts
+src/release-check.ts
+src/service-readiness.ts
+test/readiness-registry.test.ts
+
+$ git status --short --untracked-files=all
+
+$ wc -c evidence file
+14585 .omo/evidence/boulder-9-3-plus-verified/task-6-stop-hook-verification-3.txt
+
+JUDGMENT: PASS - directly re-ran Todo 6 tests, duplicate-id rejection, typecheck, CLI smoke, commit scope, and git status in this third hook run.

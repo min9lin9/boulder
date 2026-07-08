@@ -159,7 +159,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun bin/boulder.ts release evidence refresh --dry-run --json`, binary observable: exit 0 and JSON lists all seven target files, evidence `.omo/evidence/boulder-9-3-plus-verified/task-5-refresh-dry-run.json`; failure: `bun test test/release-evidence-refresh-cli-e2e.test.ts --test-name-pattern "blocks mismatched bundle without writes"`, binary observable: exit 0 and assertion proves CLI exits nonzero with recovery code and no writes, evidence `.omo/evidence/boulder-9-3-plus-verified/task-5-refresh-failure.txt`.
   Commit: Y | `feat(release): add evidence refresh command`.
 
-- [ ] 6. Add shared readiness registry and migrate existing gates with parity tests.
+- [x] 6. Add shared readiness registry and migrate existing gates with parity tests.
   What to do / Must NOT do: Introduce registry entries with id, category, severity, validator, evidence, recovery hint id, and formatter metadata. Migrate release/product/service readiness underneath while preserving JSON and markdown output.
   Parallelization: Wave 2 | Blocked by: 2, 3, 5 | Blocks: 8, F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-explorer-architecture.md`; `src/release-check.ts`; `src/product-readiness.ts`; `src/service-readiness.ts`; `test/readiness-reports.test.ts`; `test/product-readiness.test.ts`; `test/service-readiness.test.ts`
@@ -167,7 +167,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun test test/readiness-registry.test.ts test/readiness-reports.test.ts test/product-readiness.test.ts test/service-readiness.test.ts`, binary observable: exit 0, evidence `.omo/evidence/boulder-9-3-plus-verified/task-6-registry-tests.txt`; failure: `bun test test/readiness-registry.test.ts --test-name-pattern "rejects duplicate check ids"`, binary observable: exit 0 and assertion proves duplicate registry fixture is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-6-duplicate-id.txt`.
   Commit: Y | `refactor(readiness): introduce registry`.
 
-- [ ] 7. Add evidence lifecycle inspect/diff and recovery code taxonomy.
+- [x] 7. Add evidence lifecycle inspect/diff and recovery code taxonomy.
   What to do / Must NOT do: Extend the recovery code taxonomy and add subcommand-local parsing for `boulder evidence inspect [--cwd <path>] --json` and `boulder evidence diff --from <path> --to <path> --json`. Do not make prose next steps the only machine-facing output.
   Parallelization: Wave 2 | Blocked by: 4 | Blocks: 8, F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-librarian-ops-docs.md`; `src/field-evidence.ts`; `src/release-check.ts`; `src/product-readiness.ts`; `src/cli.ts`
