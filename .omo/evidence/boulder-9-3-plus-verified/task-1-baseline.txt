@@ -1,17 +1,13 @@
 # Task 1 baseline QA
-started: 2026-07-08T06:14:25Z
-cwd: /home/burt/Documents/Boulder-9-3-plus
-head: 62dfdf40590ac86400d900e346a6fc3963fe228a
+started: 2026-07-08T06:25:19Z
+source: clean temp clone of current HEAD after commit cd3c49a
+main worktree: /home/burt/Documents/Boulder-9-3-plus
+temp clone: /tmp/boulder-task1-clean-EhtMdk/repo
+cwd: /tmp/boulder-task1-clean-EhtMdk/repo
+head: cd3c49a4ea34b1a2f37b53cddc9465ecc57a7a27
 branch: codex/boulder-9-3-plus
-dirty files before commit:
- M test/cli-e2e.test.ts
- M test/readiness-reports.test.ts
-?? test/fixtures/baselines/readiness-v0/pack-dry-run.txt
-?? test/fixtures/baselines/readiness-v0/product-readiness.json
-?? test/fixtures/baselines/readiness-v0/release-check.json
-?? test/fixtures/baselines/readiness-v0/release-plan.json
-?? test/fixtures/baselines/readiness-v0/service-readiness.json
-?? test/readiness-baseline-fixtures.test.ts
+status before capture:
+clean
 
 $ bun bin/boulder.ts release-check --json
 {
@@ -488,4 +484,4 @@ Total files: 170
 Unpacked size: 0.64MB
 exit:0
 
-completed: 2026-07-08T06:14:25Z
+cleanup: removed temp clone root /tmp/boulder-task1-clean-EhtMdk
