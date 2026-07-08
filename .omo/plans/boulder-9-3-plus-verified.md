@@ -127,7 +127,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bash -lc 'for cmd in "bun bin/boulder.ts release-check --json" "bun bin/boulder.ts product-readiness --json" "bun bin/boulder.ts service-readiness --json" "bun bin/boulder.ts release-plan --json" "bun pm pack --dry-run --ignore-scripts"; do echo "$ $cmd"; bash -lc "$cmd"; echo "exit:$?"; done'`, binary observable: every command runs to completion, exit codes and JSON statuses are recorded, and the captured statuses match committed baselines; current release/product gates may be blocked if the clean target ref is blocked. Evidence `.omo/evidence/boulder-9-3-plus-verified/task-1-baseline.txt`; failure: `bun test test/readiness-baseline-fixtures.test.ts --test-name-pattern "blocks mismatched release manifest fixture"`, binary observable: exit 0 and assertion proves mismatched fixture/status drift is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-1-blocked-fixture.txt`.
   Commit: Y | `test(readiness): capture current gate baselines`.
 
-- [ ] 2. Implement recovery code seed and `ReleaseEvidenceBundle` model/renderers.
+- [x] 2. Implement recovery code seed and `ReleaseEvidenceBundle` model/renderers.
   What to do / Must NOT do: Add `src/recovery-codes.ts` with initial release/package evidence recovery codes, then add `src/release-evidence.ts` with `ReleaseEvidenceBundleV1` and renderers for the exact target set listed in Scope. Do not remove existing command behavior yet.
   Parallelization: Wave 1 | Blocked by: 1 | Blocks: 5, 6, F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-explorer-architecture.md`; `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-2-release-metadata-parity.md`; `src/release-check.ts`; `src/release-plan.ts`; `docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json`
@@ -135,7 +135,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun test test/release-evidence-bundle.test.ts`, binary observable: exit 0, ready fixture validates and checked evidence drift reports stable codes, evidence `.omo/evidence/boulder-9-3-plus-verified/task-2-bundle-tests.txt`; failure: `bun test test/release-evidence-bundle.test.ts --test-name-pattern mismatch`, binary observable: mismatch fixtures assert recovery codes including `release.version_mismatch`, `release.release_commit_mismatch`, and `release.pack_file_count_mismatch`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-2-mismatch.txt`.
   Commit: Y | `feat(release): add release evidence bundle model`.
 
-- [ ] 3. Implement package inventory contract fixture.
+- [x] 3. Implement package inventory contract fixture.
   What to do / Must NOT do: Create `fixtures/package-inventory/packaged-files.v0.json` and a parser/contract test that classifies every packed file exactly once using only approved classes: `runtime`, `public-doc`, `case-study-evidence`, `fixture`, `skill`, `config`, `license`, `metadata`. Do not rely only on regex absence checks.
   Parallelization: Wave 1 | Blocked by: 1 | Blocks: 6, F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-explorer-test-package.md`; `package.json`; `test/source-cleanliness.test.ts`; `test/cli-e2e.test.ts`; `docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt`
@@ -143,7 +143,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun test test/package-inventory-contract.test.ts`, binary observable: exit 0, evidence `.omo/evidence/boulder-9-3-plus-verified/task-3-package-contract.txt`; failure: `bun test test/package-inventory-contract.test.ts --test-name-pattern "rejects unclassified packed files"`, binary observable: exit 0 and assertion proves the invalid manifest is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-3-unclassified-file.txt`.
   Commit: Y | `test(package): add inventory contract`.
 
-- [ ] 4. Implement documentation registry and i18n metadata contract.
+- [x] 4. Implement documentation registry and i18n metadata contract.
   What to do / Must NOT do: Add `fixtures/docs/doc-registry.v0.json` covering all packaged docs plus known local-only exclusions. Each entry includes `path`, `kind`, `locale`, `dir`, `source`, `version`, `generatedBy`, `packaging`, and `translatable`. Do not force every local OMO/session artifact into package docs.
   Parallelization: Wave 1 | Blocked by: 1 | Blocks: 7, F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-librarian-ops-docs.md`; `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-web-official-standards.md`; `test/source-cleanliness.test.ts`; `docs/`
