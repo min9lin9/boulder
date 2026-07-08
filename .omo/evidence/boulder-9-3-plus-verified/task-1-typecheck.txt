@@ -1,0 +1,8 @@
+# Task 1 typecheck evidence
+
+cwd: /home/burt/Documents/Boulder-9-3-plus
+command: bunx tsc --noEmit
+
+```text
+EXIT_CODE=0
+```
