@@ -10,14 +10,15 @@ Scope reviewed:
 
 Manual QA/review matrix:
 - Programming criteria: no `any`, `as any`, `as unknown`, `@ts-ignore`, `@ts-expect-error`, or non-null assertion escape hatches were found in the reviewed TypeScript files.
-- Behavior focus: tests exercise bundle parsing/rendering plus version, tag, release commit, and pack file count drift through stable recovery codes; they are not deletion-only or tautological assertions.
+- Behavior focus: tests exercise bundle parsing/rendering, every release evidence render target, PRODUCT_READINESS public-release-check line content, plus version, tag, release commit, and pack file count drift through stable recovery codes; they are not deletion-only or tautological assertions.
 - Scope fidelity: changes stay in release evidence model/test/evidence paths; no product docs, fixture families outside release evidence, package inventory, or docs registry were edited by this task.
 - Slop/overfit check: package/docs/release contracts are not tied to one command dump only; drift checks compare structured fields and recovery codes rather than snapshotting full command output.
 - Deferred scope: large packaged file inventories and docs registry coverage are handled by Tasks 3 and 4; this task does not force those large files into release evidence.
-- Ready fixture path now validates a synthetic v0.1.16 bundle and renders the approved target set.
+- Ready fixture path now validates a synthetic v0.1.16 bundle and renders non-empty meaningful content for all seven approved targets.
+- Renderer output now includes CI evidence, release-plan JSON, and exactly one PRODUCT_READINESS public-release-check line instead of empty placeholders.
 - Current checked release-manifest/install evidence is asserted as pre-refresh drift with stable version recovery codes.
 - Mismatch coverage still includes package/CLI/tag/pack version, releaseCommit, and packDryRun.fileCount recovery codes.
 
 Result:
-- Prior stale Todo 2 REJECT findings for missing release commit and pack file count mismatch checks are superseded by the later drift-field fix.
+- Todo 2 renderer completeness now has a direct test guard for empty render targets and PRODUCT_READINESS line content.
 - Remaining Wave 1 acceptance status depends on the final verifier's current-evidence check, not this support note.

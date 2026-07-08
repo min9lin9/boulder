@@ -62,10 +62,14 @@ describe("ReleaseEvidenceBundleV1", () => {
     expect(validation.issues).toEqual([]);
     expect(RELEASE_EVIDENCE_TARGETS).toEqual(PLAN_TARGETS);
     expect(Object.keys(rendered).sort()).toEqual([...PLAN_TARGETS].sort());
+    for (const target of RELEASE_EVIDENCE_TARGETS) {
+      expect(rendered[target].trim().length).toBeGreaterThan(0);
+    }
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"]).toContain(`"packageJsonVersion": "${packageJson.version}"`);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"]).toContain(releaseManifest.githubActions.runUrl);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(READY_RELEASE_BUNDLE.installSmoke.command);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"]).toContain("Total files: 146");
+    expect(rendered["docs/PRODUCT_READINESS.md"]).toBe(`- public-release-check: pass - release-check ready for ${packageJson.version}\n`);
   });
 
   test("reports current checked release evidence as version drift until refresh", () => {
