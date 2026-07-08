@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { exec } from "node:child_process";
 import { join } from "node:path";
 import { writeGeneratedText } from "./fs";
 import { RELEASE_RECOVERY_CODES, type ReleaseRecoveryCode } from "./recovery-codes";
@@ -153,7 +154,12 @@ export async function planReleaseEvidenceRefresh(root: string): Promise<ReleaseE
     return { status: "blocked", targets: [], issues: [issue(RELEASE_RECOVERY_CODES.malformedInput, "package.json must contain name and version")] };
   }
 
-  const bundle = refreshVersionFields(parsed.value, packageInfo);
+  const bundle = refreshVersionFields(
+    parsed.value,
+    packageInfo,
+    await currentGitCommit(root, ["rev-list", "-n", "1", `v${packageInfo.version}`]),
+    await currentGitCommit(root, ["rev-parse", "HEAD"])
+  );
   const packDryRunFileCount = await currentPackDryRunFileCount(root) ?? bundle.packDryRun.fileCount;
   const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(bundle), {
     packageJsonVersion: packageInfo.version,
@@ -256,13 +262,20 @@ async function loadPackageInfo(root: string): Promise<{ readonly name: string; r
   return null;
 }
 
-function refreshVersionFields(bundle: ReleaseEvidenceBundleV1, packageInfo: { readonly name: string; readonly version: string }): ReleaseEvidenceBundleV1 {
+function refreshVersionFields(
+  bundle: ReleaseEvidenceBundleV1,
+  packageInfo: { readonly name: string; readonly version: string },
+  tagCommit: string,
+  releaseCommit: string
+): ReleaseEvidenceBundleV1 {
   return {
     ...bundle,
     packageName: packageInfo.name,
     packageJsonVersion: packageInfo.version,
     cliVersion: packageInfo.version,
     tag: `v${packageInfo.version}`,
+    tagCommit: tagCommit || bundle.tagCommit,
+    releaseCommit: releaseCommit || bundle.releaseCommit,
     publishedVersion: packageInfo.version,
     installSmoke: {
       ...bundle.installSmoke,
@@ -273,6 +286,18 @@ function refreshVersionFields(bundle: ReleaseEvidenceBundleV1, packageInfo: { re
       packageVersion: packageInfo.version
     }
   };
+}
+
+async function currentGitCommit(root: string, args: readonly string[]): Promise<string> {
+  return await new Promise<string>((resolve) => {
+    exec(`git ${args.map(shellQuote).join(" ")}`, { cwd: root }, (error, stdout) => {
+      resolve(error ? "" : stdout.trim());
+    });
+  });
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
 async function currentPackDryRunFileCount(root: string): Promise<number | null> {

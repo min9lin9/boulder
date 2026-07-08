@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { listRunEvents, recordRunEvent } from "../src/run-events";
@@ -43,6 +43,33 @@ describe("run event redaction", () => {
       expect(events[0]?.packageVersion).toBe("9.9.9");
     } finally {
       await removeTempRepo(root);
+    }
+  });
+
+  test("fails closed when runs directory is a symlink", async () => {
+    const root = await tempRepo();
+    const outside = await tempRepo();
+
+    try {
+      await write(root, "package.json", JSON.stringify({ name: "fixture", version: "9.9.9" }, null, 2));
+      await mkdir(join(root, ".boulder"), { recursive: true });
+      await symlink(outside, join(root, ".boulder", "runs"));
+
+      await expect(recordRunEvent(root, {
+        eventName: "release-check",
+        command: "release-check",
+        startedAt: "2026-07-08T00:00:00.000Z",
+        completedAt: "2026-07-08T00:00:01.000Z",
+        severity: "error",
+        status: "blocked",
+        checkIds: [],
+        recoveryHintIds: [],
+        artifactPaths: []
+      })).rejects.toThrow("Run event path changed");
+      expect(await listRunEvents(root)).toEqual([]);
+    } finally {
+      await removeTempRepo(root);
+      await removeTempRepo(outside);
     }
   });
 });

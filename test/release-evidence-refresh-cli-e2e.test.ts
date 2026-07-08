@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { exec } from "node:child_process";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import releaseManifest from "../docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json" with { type: "json" };
@@ -53,9 +54,11 @@ describe("release evidence refresh CLI", () => {
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt", adjacent);
 
       const result = await runBoulder(["release", "evidence", "refresh", "--write", "--json", "--cwd", root]);
+      const releaseCheck = await runBoulder(["release-check", "--json", "--cwd", root]);
 
       expect(result.exitCode).toBe(0);
       expect(result.stderr).toBe("");
+      if (releaseCheck.exitCode !== 0) throw new Error(releaseCheck.stdout);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt"), "utf8")).toBe(adjacent);
       expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"), "utf8")).toContain(`bunx boulder-oss-cli@${packageJson.version} --version`);
       expect(await readFile(join(root, "docs/PRODUCT_READINESS.md"), "utf8")).toContain(`- public-release-check: pass - release-check ready for ${packageJson.version}`);
@@ -66,7 +69,17 @@ describe("release evidence refresh CLI", () => {
 });
 
 async function writeRefreshFixture(root: string, manifest: string): Promise<void> {
-  await write(root, "package.json", JSON.stringify({ name: packageJson.name, version: packageJson.version }, null, 2));
+  await write(root, "package.json", JSON.stringify({
+    name: packageJson.name,
+    version: packageJson.version,
+    license: "MIT",
+    repository: { type: "git", url: "git+https://github.com/min9lin9/boulder.git" },
+    homepage: "https://github.com/min9lin9/boulder#readme",
+    bugs: { url: "https://github.com/min9lin9/boulder/issues" }
+  }, null, 2));
+  await write(root, "CHANGELOG.md", `# Changelog\n\n## ${packageJson.version}\n\n- Fixture release.\n`);
+  await write(root, "docs/RELEASE_WORKFLOW.md", "npm publish\nGitHub Release\ntag\n");
+  await write(root, ".github/workflows/ci.yml", "name: CI\non: [push]\njobs:\n  smoke:\n    steps:\n      - uses: oven-sh/setup-bun@v2\n        with:\n          bun-version: \"1.3.14\"\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json", manifest);
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt", "Package version: 0.1.15\nTotal files: 146\n");
   await write(root, "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt", "CI\nCommit: 806330e\n");
@@ -80,6 +93,22 @@ async function writeRefreshFixture(root: string, manifest: string): Promise<void
     "- limitations-explicit: pass - docs/CODEX_OSS_APPLICATION_PACKET.md",
     ""
   ].join("\n"));
+  await git(root, ["init"]);
+  await git(root, ["config", "user.email", "fixture@example.com"]);
+  await git(root, ["config", "user.name", "Fixture"]);
+  await git(root, ["add", "."]);
+  await git(root, ["commit", "-m", "fixture"]);
+  await git(root, ["tag", `v${packageJson.version}`]);
+}
+
+async function git(cwd: string, args: readonly string[]): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    exec(`git ${args.map(shellQuote).join(" ")}`, { cwd }, (error) => error ? reject(error) : resolve());
+  });
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
 function refreshTargetPaths(source: string): string[] {

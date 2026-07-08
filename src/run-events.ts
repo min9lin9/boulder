@@ -1,4 +1,6 @@
-import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { lstat, mkdir, open, readdir, readFile, rename, rm, unlink, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { join, resolve } from "node:path";
 
 export type RunEventName =
@@ -57,9 +59,16 @@ export type RunEventsPruneResult = {
   readonly kept: number;
 };
 
+export class UnsafeRunEventPathError extends Error {
+  constructor() {
+    super("Run event path changed during safe file access.");
+    this.name = "UnsafeRunEventPathError";
+  }
+}
+
 export async function recordRunEvent(root: string, input: RecordRunEventInput): Promise<RecordRunEventResult> {
   const runsPath = runsDir(root);
-  await mkdir(runsPath, { recursive: true });
+  await ensureRunsDirSafe(root);
   const packageVersion = await readPackageVersion(root);
   const protectedPatterns = await readProtectedPatterns(root);
   const event = sanitizeEvent(root, protectedPatterns, {
@@ -78,12 +87,13 @@ export async function recordRunEvent(root: string, input: RecordRunEventInput): 
     artifactPaths: input.artifactPaths
   });
   const path = join(runsPath, `${event.completedAt.replace(/[:.]/g, "-")}-${event.eventName.replace(/\s+/g, "-")}-${event.runId}.json`);
-  await writeFile(path, `${JSON.stringify(event, null, 2)}\n`, "utf8");
+  await safeReplaceText(path, `${JSON.stringify(event, null, 2)}\n`);
   return { event, path };
 }
 
 export async function listRunEvents(root: string): Promise<readonly RunEventRecord[]> {
   const runsPath = runsDir(root);
+  if (!await runsDirIsSafe(root, false)) return [];
   let names: readonly string[];
   try {
     names = await readdir(runsPath);
@@ -110,6 +120,7 @@ export async function showRunEvent(root: string, runId: string): Promise<RunEven
 
 export async function pruneRunEvents(root: string, olderThanDays: number, keep: number): Promise<RunEventsPruneResult> {
   const runsPath = runsDir(root);
+  if (!await runsDirIsSafe(root, false)) return { schemaVersion: "boulder.runs.prune.v1", pruned: 0, kept: 0 };
   const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
   const events = await listRunEvents(root);
   let pruned = 0;
@@ -172,6 +183,62 @@ async function readRunEvent(path: string): Promise<RunEventRecord | null> {
     if (error instanceof SyntaxError || hasErrorCode(error, "ENOENT")) return null;
     throw error;
   }
+}
+
+async function ensureRunsDirSafe(root: string): Promise<void> {
+  await mkdir(join(root, ".boulder"), { recursive: true });
+  if (await protectedLink(join(root, ".boulder"))) throw new UnsafeRunEventPathError();
+  await mkdir(runsDir(root), { recursive: true });
+  if (!await runsDirIsSafe(root, true)) throw new UnsafeRunEventPathError();
+}
+
+async function runsDirIsSafe(root: string, requirePresent: boolean): Promise<boolean> {
+  const boulder = join(root, ".boulder");
+  const runs = runsDir(root);
+  if (await protectedLink(boulder)) return false;
+  try {
+    const info = await lstat(runs);
+    return info.isDirectory() && !info.isSymbolicLink() && info.nlink >= 1;
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return !requirePresent;
+    throw error;
+  }
+}
+
+async function protectedLink(path: string): Promise<boolean> {
+  try {
+    const info = await lstat(path);
+    return info.isSymbolicLink() || (info.isFile() && info.nlink > 1);
+  } catch (error) {
+    if (hasErrorCode(error, "ENOENT")) return false;
+    throw error;
+  }
+}
+
+async function safeReplaceText(path: string, content: string): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  const temporary = `${path}.${crypto.randomUUID()}.tmp`;
+  let handle: Awaited<ReturnType<typeof open>> | null = null;
+  try {
+    handle = await open(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
+    await handle.writeFile(content, "utf8");
+    await handle.close();
+    handle = null;
+    await rename(temporary, path);
+  } catch (error) {
+    try {
+      await unlink(temporary);
+    } catch (cleanupError) {
+      if (!hasErrorCode(cleanupError, "ENOENT")) throw cleanupError;
+    }
+    throw error;
+  } finally {
+    await handle?.close();
+  }
+}
+
+function noFollowFlag(): number {
+  return typeof constants.O_NOFOLLOW === "number" ? constants.O_NOFOLLOW : 0;
 }
 
 async function readPackageVersion(root: string): Promise<string> {

@@ -27,6 +27,7 @@ type InventoryClass = {
 type Inventory = {
   readonly schemaVersion: "packaged-files.v0";
   readonly totalUniqueFiles: number;
+  readonly totalPackedFiles?: number;
   readonly classes: readonly InventoryClass[];
 };
 
@@ -35,10 +36,11 @@ describe("package inventory contract", () => {
     const inventory = parseInventory(await readFile(fixturePath, "utf8"));
     const result = await runCommand("bun pm pack --dry-run --ignore-scripts", root);
     const output = `${result.stdout}\n${result.stderr}`;
-    const summary = assertClassified(parsePackedFiles(output), inventory);
+    const summary = assertClassified(parsePackDryRun(output), inventory);
 
     expect(result.exitCode).toBe(0);
     expect(summary.totalUniqueFiles).toBe(177);
+    expect(summary.totalPackedFiles).toBe(178);
     expect(summary.counts).toEqual({
       runtime: 61,
       "public-doc": 64,
@@ -55,12 +57,13 @@ describe("package inventory contract", () => {
     const inventory: Inventory = {
       schemaVersion: "packaged-files.v0",
       totalUniqueFiles: 1,
+      totalPackedFiles: 2,
       classes: [{ className: "runtime", count: 1, files: ["src/known.ts"] }]
     };
     let message = "";
 
     try {
-      assertClassified(["src/known.ts", "tmp/stray.txt"], inventory);
+      assertClassified({ files: ["src/known.ts", "tmp/stray.txt"], reportedTotal: 2 }, inventory);
     } catch (error) {
       message = error instanceof Error ? error.message : String(error);
     }
@@ -72,12 +75,13 @@ describe("package inventory contract", () => {
     const inventory: Inventory = {
       schemaVersion: "packaged-files.v0",
       totalUniqueFiles: 2,
+      totalPackedFiles: 2,
       classes: [{ className: "runtime", count: 2, files: ["src/known.ts", "src/future.ts"] }]
     };
     let message = "";
 
     try {
-      assertClassified(["src/known.ts", "tmp/stray.txt"], inventory);
+      assertClassified({ files: ["src/known.ts", "tmp/stray.txt"], reportedTotal: 2 }, inventory);
     } catch (error) {
       message = error instanceof Error ? error.message : String(error);
     }
@@ -86,20 +90,24 @@ describe("package inventory contract", () => {
   });
 });
 
-function parsePackedFiles(output: string): readonly string[] {
+function parsePackDryRun(output: string): { readonly files: readonly string[]; readonly reportedTotal: number } {
   const paths = new Set<string>();
+  let reportedTotal = 0;
 
   for (const line of output.split("\n")) {
     const match = /^packed\s+\S+\s+(.+)$/.exec(line);
     if (match?.[1]) paths.add(match[1]);
+    const total = /^Total files:\s*(\d+)$/.exec(line);
+    if (total?.[1]) reportedTotal = Number(total[1]);
   }
 
-  return Array.from(paths).sort();
+  return { files: Array.from(paths).sort(), reportedTotal };
 }
 
-function assertClassified(paths: readonly string[], inventory: Inventory): {
+function assertClassified(pack: { readonly files: readonly string[]; readonly reportedTotal: number }, inventory: Inventory): {
   readonly counts: Record<PackageClass, number>;
   readonly totalUniqueFiles: number;
+  readonly totalPackedFiles: number;
 } {
   const classified = new Map<string, PackageClass>();
   const counts = emptyCounts();
@@ -117,8 +125,8 @@ function assertClassified(paths: readonly string[], inventory: Inventory): {
     }
   }
 
-  const packed = new Set(paths);
-  const unclassified = paths.filter((file) => !classified.has(file));
+  const packed = new Set(pack.files);
+  const unclassified = pack.files.filter((file) => !classified.has(file));
   const stale = Array.from(classified.keys()).filter((file) => !packed.has(file)).sort();
   const drift = [
     unclassified.length > 0 ? `Packed files missing from fixture: ${unclassified.join(", ")}` : "",
@@ -126,11 +134,14 @@ function assertClassified(paths: readonly string[], inventory: Inventory): {
   ].filter((message) => message.length > 0);
   if (drift.length > 0) throw new Error(drift.join("\n"));
 
-  if (paths.length !== inventory.totalUniqueFiles) {
-    throw new Error(`Total unique file mismatch: expected ${inventory.totalUniqueFiles}, found ${paths.length}`);
+  if (pack.files.length !== inventory.totalUniqueFiles) {
+    throw new Error(`Total unique file mismatch: expected ${inventory.totalUniqueFiles}, found ${pack.files.length}`);
+  }
+  if (inventory.totalPackedFiles !== undefined && pack.reportedTotal !== inventory.totalPackedFiles) {
+    throw new Error(`Total packed file mismatch: expected ${inventory.totalPackedFiles}, found ${pack.reportedTotal}`);
   }
 
-  return { counts, totalUniqueFiles: paths.length };
+  return { counts, totalUniqueFiles: pack.files.length, totalPackedFiles: pack.reportedTotal };
 }
 
 function parseInventory(source: string): Inventory {
@@ -138,11 +149,13 @@ function parseInventory(source: string): Inventory {
   if (!isRecord(payload)) throw new Error("Inventory fixture must be a JSON object.");
   if (payload["schemaVersion"] !== "packaged-files.v0") throw new Error("Inventory fixture schemaVersion mismatch.");
   if (typeof payload["totalUniqueFiles"] !== "number") throw new Error("Inventory fixture totalUniqueFiles must be a number.");
+  if (payload["totalPackedFiles"] !== undefined && typeof payload["totalPackedFiles"] !== "number") throw new Error("Inventory fixture totalPackedFiles must be a number.");
   if (!Array.isArray(payload["classes"])) throw new Error("Inventory fixture classes must be an array.");
 
   return {
     schemaVersion: "packaged-files.v0",
     totalUniqueFiles: payload["totalUniqueFiles"],
+    totalPackedFiles: payload["totalPackedFiles"],
     classes: payload["classes"].map(parseInventoryClass)
   };
 }

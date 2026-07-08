@@ -1,34 +1,35 @@
 bun test v1.3.14 (0d9b296a)
 
 test/run-events-redaction.test.ts:
-(pass) run event redaction > redacts secrets protected paths and raw file bodies [4.28ms]
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [7.22ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.49ms]
 
- 1 pass
+ 2 pass
  0 fail
- 11 expect() calls
-Ran 1 test across 1 file. [21.00ms]
+ 13 expect() calls
+Ran 2 tests across 1 file. [31.00ms]
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [9.01ms]
-(pass) documentation registry > rejects translated docs without dir metadata [2.62ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [2.86ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [1.54ms]
-(pass) documentation registry > rejects packaged local-only docs [0.05ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [3.36ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.58ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.38ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.31ms]
+(pass) documentation registry > rejects packaged local-only docs [0.03ms]
 
 test/source-cleanliness.test.ts:
-(pass) source cleanliness > command modules use shared pretty JSON rendering [3.54ms]
-(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [2.28ms]
-(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [3.22ms]
-(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.23ms]
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.47ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.43ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [1.83ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.18ms]
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [16.68ms]
-(pass) package inventory contract > rejects unclassified packed files [1.15ms]
+(pass) package inventory contract > classifies every packed file exactly once [14.13ms]
+(pass) package inventory contract > rejects unclassified packed files [1.07ms]
 (pass) package inventory contract > reports fixture and pack drift separately [0.14ms]
 
  12 pass
  0 fail
- 58 expect() calls
-Ran 12 tests across 3 files. [65.00ms]
+ 59 expect() calls
+Ran 12 tests across 3 files. [46.00ms]
 scope fidelity complete
