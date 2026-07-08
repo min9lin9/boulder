@@ -126,9 +126,9 @@ packed 11.00KB src/capability-doctor.ts
 packed 7.1KB src/capability-inventory.ts
 packed 3.29KB src/capability-source-schema.ts
 packed 9.87KB src/capability-source.ts
-packed 4.76KB src/cli-format.ts
+packed 4.84KB src/cli-format.ts
 packed 1.0KB src/cli-options.ts
-packed 10.68KB src/cli.ts
+packed 12.85KB src/cli.ts
 packed 1.50KB src/executor-adapters.ts
 packed 1.59KB src/executors.ts
 packed 1.25KB src/export.ts
@@ -152,7 +152,7 @@ packed 7.59KB src/profile-store.ts
 packed 5.61KB src/quickstart.ts
 packed 0.53KB src/recovery-codes.ts
 packed 11.1KB src/release-check.ts
-packed 7.32KB src/release-evidence.ts
+packed 12.20KB src/release-evidence.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
 packed 3.80KB src/replay-run.ts

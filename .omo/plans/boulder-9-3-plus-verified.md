@@ -151,7 +151,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun test test/docs-registry.test.ts`, binary observable: exit 0, evidence `.omo/evidence/boulder-9-3-plus-verified/task-4-doc-registry.txt`; failure: `bun test test/docs-registry.test.ts --test-name-pattern "rejects translated docs without dir metadata"`, binary observable: exit 0 and assertion proves invalid registry is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-4-i18n-failure.txt`.
   Commit: Y | `test(docs): add documentation registry contract`.
 
-- [ ] 5. Add `boulder release evidence refresh --dry-run|--write`.
+- [x] 5. Add `boulder release evidence refresh --dry-run|--write`.
   What to do / Must NOT do: Wire subcommand-local parsing for `boulder release evidence refresh --dry-run|--write [--json]`. `--dry-run` prints planned diffs; `--write` updates only the exact renderer target set listed in Scope. Do not publish, tag, push, or call npm registry writes. Do not add `--write` as a global option.
   Parallelization: Wave 2 | Blocked by: 2 | Blocks: 6, 8, F1-F4
   References (executor has NO interview context - be exhaustive): `src/cli.ts`; `src/cli-format.ts`; `src/release-check.ts`; `src/release-plan.ts`; `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/SYNTHESIS.md`
