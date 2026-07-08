@@ -1,6 +1,6 @@
 # Marketplace, Security, and i18n Readiness Audit
 
-Status: proposal-only audit
+Status: historical proposal-only audit with current residual-risk notes
 Date: 2026-07-07
 Scope: current Boulder worktree, npm registry metadata, GitHub workflow status visible through `gh`
 
@@ -10,7 +10,7 @@ Scope: current Boulder worktree, npm registry metadata, GitHub workflow status v
 
 | Area | 문제 여부 | 위험도 | 결론 |
 | --- | --- | --- | --- |
-| Public marketplace 등록 | 있음 | High | npm latest는 `0.1.16`이지만 현재 worktree의 README/release evidence/product-readiness가 `0.1.15`에 머물러 공개 제출 신뢰를 해친다. |
+| Public marketplace 등록 | 부분 해결됨 | Medium | npm latest와 README는 `0.1.16` 기준이다. 현재 residual risk는 release evidence/product-readiness를 같은 경계에서 다시 기록해야 한다는 점이다. |
 | SSL/HTTPS | 부분 있음 | Low | CLI 자체에는 TLS 표면이 없다. 다만 capability source URL은 GitHub HTTPS만 허용한다. 공개 docs/site를 만들면 별도 HTTPS 검증이 필요하다. |
 | 로그인/권한 | 해당 없음/부분 있음 | Low-Medium | 사용자 로그인은 없다. 대신 external handoff는 approval code와 review receipt로 보호된다. |
 | 보안 취약점 | 부분 있음 | Medium-High | raw workspace 차단은 강하지만 `verify` shell 실행, generated write hardening, handoff approval secret 수명/위치, capability source immutability, dependency scanning, workflow SHA pinning 갭이 있다. |
@@ -25,10 +25,9 @@ Scope: current Boulder worktree, npm registry metadata, GitHub workflow status v
 
 - `package.json` version은 `0.1.16`: `package.json:3`.
 - npm registry는 `boulder-oss-cli@latest = 0.1.16`: `npm view boulder-oss-cli version dist-tags --json`.
-- README는 아직 `0.1.15`를 published package와 설치 예시로 표시: `README.md:7`, `README.md:24-49`.
-- release evidence는 현재 worktree에서 `0.1.15` 값이 남아 있음: `docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json:4-20`, `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`.
-- `bun bin/boulder.ts release-check --json`은 `0.1.16` install smoke/version manifest 불일치로 blocked.
-- `bun bin/boulder.ts product-readiness --json`은 public-release-check 실패로 blocked.
+- README는 `0.1.16` published package와 `@latest` 설치 예시를 사용한다.
+- release evidence와 product-readiness 산출물은 같은 `0.1.16` 경계에서 재검증되어야 한다.
+- `bun bin/boulder.ts release-check --json`과 `bun bin/boulder.ts product-readiness --json` 결과가 현재 공개 제출 상태의 source of truth다.
 - GitHub Actions의 latest main CI/Security run은 성공: `gh run list --repo min9lin9/boulder --workflow CI --limit 5`, `gh run list --repo min9lin9/boulder --workflow Security --limit 5`.
 - handoff packet은 raw workspace content 제외와 approval required를 강제: `src/handoff-packet.ts:84-91`, `src/handoff-packet.ts:133-145`, `src/handoff-packet.ts:154-185`.
 - handoff review receipt는 HMAC + packet digest + approval digest를 사용: `src/handoff-paths.ts:47-62`, `src/handoff-paths.ts:107-123`.
@@ -48,23 +47,22 @@ Scope: current Boulder worktree, npm registry metadata, GitHub workflow status v
 
 ### 위험도
 
-High.
+Medium. stale README/version claim은 해결되었고, 남은 위험은 release evidence/product-readiness 산출물 갱신 전까지 current ready를 주장하면 안 된다는 점이다.
 
 ### 확인 근거
 
 - `package.json:3`은 `0.1.16`.
 - npm registry는 latest `0.1.16`.
-- `README.md:7`은 `Current published package: boulder-oss-cli@0.1.15`.
-- `README.md:24-49` 설치/사용 예시는 `0.1.15`.
-- `docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json`은 `packageJsonVersion`, `cliVersion`, `tag`, `publishedVersion`, `packDryRun.packageVersion`이 `0.1.15`.
-- `release-check`와 `product-readiness`는 현재 worktree에서 blocked.
-- `package.json:2-51`에는 `repository`, `homepage`, `bugs`, `funding` 메타필드가 없다.
+- `README.md`는 current published package를 `0.1.16`으로 표시하고 CLI 예시는 `@latest`를 사용한다.
+- `package.json:3`은 `0.1.16`.
+- release evidence와 product-readiness는 현재 명령 산출물로 다시 확인해야 한다.
+- `package.json`에는 `repository`, `homepage`, `bugs` 메타필드가 있다.
 
 ### 재현 방법
 
 ```bash
 npm view boulder-oss-cli version dist-tags --json
-rg -n "0\.1\.15|0\.1\.16|Current published package|bunx boulder-oss-cli" README.md package.json docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json docs/PRODUCT_READINESS.md
+rg -n "0\.1\.16|Current published package|bunx boulder-oss-cli" README.md package.json docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json docs/PRODUCT_READINESS.md
 bun bin/boulder.ts release-check --json
 bun bin/boulder.ts product-readiness --json
 nl -ba package.json | sed -n '1,80p'
@@ -74,21 +72,19 @@ nl -ba package.json | sed -n '1,80p'
 
 승인 후 별도 브랜치에서 다음만 고친다.
 
-- README published/current install examples를 `0.1.16` 또는 `@latest` 정책으로 통일한다.
-- `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt`와 `release-manifest.json`을 `0.1.16` evidence로 갱신한다.
-- `docs/PRODUCT_READINESS.md`를 재생성하거나 수동 갱신하지 말고 `bun bin/boulder.ts product-readiness` 산출물로 맞춘다.
-- `package.json`에 `repository`, `homepage`, `bugs`를 추가한다.
+- release evidence와 product-readiness 산출물을 `0.1.16` evidence로 갱신한다.
+- `docs/PRODUCT_READINESS.md`를 수동 green 상태로 바꾸지 말고 `bun bin/boulder.ts product-readiness` 산출물로 맞춘다.
 
 ### 백업/롤백
 
-- 백업: `git switch -c codex/marketplace-readiness-fix` 후 작업 전 `git diff -- README.md package.json docs/CASE_STUDIES/evidence/release-workflow docs/PRODUCT_READINESS.md > .omo/evidence/marketplace-readiness-preimage.diff`.
+- 백업: 작업 전 현재 branch와 diff를 로컬 evidence workspace에 저장한다.
 - 롤백: `git restore README.md package.json docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json docs/PRODUCT_READINESS.md`.
 
 ### 체크리스트
 
 - [ ] `npm view boulder-oss-cli version dist-tags --json` latest가 문서와 일치한다.
-- [ ] `bun bin/boulder.ts release-check --json` status가 ready다.
-- [ ] `bun bin/boulder.ts product-readiness --json` status가 ready다.
+- [ ] `bun bin/boulder.ts release-check --json` status가 현재 release evidence와 일치한다.
+- [ ] `bun bin/boulder.ts product-readiness --json` status가 현재 공개 제출 상태와 일치한다.
 - [ ] README 첫 화면, 설치 예시, release evidence, package metadata가 같은 버전을 가리킨다.
 - [ ] package metadata에 repository/homepage/bugs가 표시된다.
 
@@ -429,7 +425,7 @@ rg -n "discoverCapabilityInventory|findSkillFiles|readdir\\(" src/capability-inv
 
 ### 백업/롤백
 
-- 성능 변경 전 baseline transcript 저장: `.omo/evidence/perf-baseline/*.txt`.
+- 성능 변경 전 baseline transcript를 로컬 evidence workspace에 저장한다.
 - 롤백: `git restore src/product-readiness.ts src/release-check.ts src/service-readiness.ts src/replay-check.ts`.
 
 ### 체크리스트
@@ -543,7 +539,7 @@ rg -n "locale|i18n|translation|한국어|Korean|\\.ko\\.md" README.md docs/*.md 
 
 | Priority | 승인 대상 | 이유 | 예상 변경 |
 | --- | --- | --- | --- |
-| P0 | release evidence/README version parity | 현재 worktree 기준 readiness blocked의 직접 원인 | README, install-smoke, release-manifest, PRODUCT_READINESS |
+| P0 | release evidence/product-readiness parity | 현재 worktree 기준 readiness status의 직접 근거 | install-smoke, release-manifest, PRODUCT_READINESS |
 | P1 | package metadata | npm marketplace 신뢰/탐색성 | package.json |
 | P1 | write-path hardening | generic generated writes/capability manifests를 handoff 수준으로 보호 | src/fs.ts, src/capability-source.ts, tests |
 | P1 | security evidence gap 문서화 | verify command trust boundary와 scanner 미설정 명확화 | SECURITY, TRUST_SUPPORT_SECURITY, VERIFICATION_GATES |
@@ -560,8 +556,8 @@ rg -n "locale|i18n|translation|한국어|Korean|\\.ko\\.md" README.md docs/*.md 
 ```bash
 git status --short --branch
 git diff --stat
-mkdir -p .omo/evidence/marketplace-security-i18n
-git diff > .omo/evidence/marketplace-security-i18n/pre-approval-worktree.diff
+git status --short --branch
+git diff --stat
 ```
 
 2. 승인 항목별 브랜치/커밋 분리:

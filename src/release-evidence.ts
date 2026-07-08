@@ -66,6 +66,10 @@ export async function planReleaseEvidenceRefresh(root: string): Promise<ReleaseE
   }
 
   const bundleWithPackCount = withPackFileCount(bundle, packDryRunFileCount);
+  if (!hasCurrentExternalReleaseEvidence(bundleWithPackCount, packageInfo.version)) {
+    return blocked(RELEASE_RECOVERY_CODES.versionMismatch, `external release evidence must already prove ${packageInfo.version}`);
+  }
+
   const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(bundleWithPackCount), {
     packageJsonVersion: packageInfo.version,
     cliVersion: packageInfo.version,
@@ -128,14 +132,18 @@ function refreshVersionFields(
     tag: `v${packageInfo.version}`,
     tagCommit: tagCommit || bundle.tagCommit,
     releaseCommit: releaseCommit || bundle.releaseCommit,
-    publishedVersion: packageInfo.version,
-    installSmoke: { ...bundle.installSmoke, command: `bunx ${packageInfo.name}@${packageInfo.version} --version` },
     packDryRun: { ...bundle.packDryRun, packageVersion: packageInfo.version }
   };
 }
 
 function withPackFileCount(bundle: ReleaseEvidenceBundleV1, fileCount: number): ReleaseEvidenceBundleV1 {
   return { ...bundle, packDryRun: { ...bundle.packDryRun, fileCount } };
+}
+
+function hasCurrentExternalReleaseEvidence(bundle: ReleaseEvidenceBundleV1, version: string): boolean {
+  return bundle.publishedVersion === version &&
+    bundle.installSmoke.exitCode === 0 &&
+    bundle.installSmoke.command.includes(`@${version}`);
 }
 
 async function buildRefreshTargets(root: string, bundle: ReleaseEvidenceBundleV1): Promise<readonly ReleaseEvidenceRefreshTarget[]> {

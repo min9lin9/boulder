@@ -47,7 +47,7 @@ packed 1.10KB docs/CASE_STUDIES/issue-pr-ci-cycle.md
 packed 2.0KB docs/CASE_STUDIES/pr-review.md
 packed 1.93KB docs/CASE_STUDIES/release-workflow.md
 packed 3.90KB docs/CODEX_OSS_APPLICATION_PACKET.md
-packed 6.10KB docs/CODEX_OSS_FINAL_AUDIT.md
+packed 6.17KB docs/CODEX_OSS_FINAL_AUDIT.md
 packed 8.28KB docs/CODEX_OSS_SCORECARD.md
 packed 0.77KB docs/CODEX_WORKFLOW_NOTES.md
 packed 1.23KB docs/COMMUNITY.md
@@ -60,7 +60,7 @@ packed 5.92KB docs/GJC_LAZYCODEX_HANDOFF.md
 packed 0.67KB docs/HANDOFF_VALIDATION.md
 packed 0.81KB docs/HARNESS_QUALITY_SCORECARD.md
 packed 0.68KB docs/MAINTAINER_WORKFLOWS.md
-packed 29.16KB docs/MARKETPLACE_SECURITY_I18N_AUDIT.ko.md
+packed 28.69KB docs/MARKETPLACE_SECURITY_I18N_AUDIT.ko.md
 packed 2.65KB docs/ONBOARDING.md
 packed 4.82KB docs/OPEN_SOURCE_USAGE_DECISION.md
 packed 2.95KB docs/OPERATING_METRICS.md
@@ -157,7 +157,7 @@ packed 11.12KB src/readiness-registry.ts
 packed 0.73KB src/recovery-codes.ts
 packed 9.58KB src/release-check.ts
 packed 7.65KB src/release-evidence-bundle.ts
-packed 7.65KB src/release-evidence.ts
+packed 7.97KB src/release-evidence.ts
 packed 5.80KB src/release-manifest-check.ts
 packed 5.87KB src/release-plan.ts
 packed 7.99KB src/replay-check.ts
@@ -166,7 +166,7 @@ packed 4.61KB src/routine-command.ts
 packed 5.17KB src/routine-retro.ts
 packed 7.26KB src/routine.ts
 packed 3.17KB src/run-event-shape.ts
-packed 10.32KB src/run-events.ts
+packed 10.80KB src/run-events.ts
 packed 1.99KB src/runs-command.ts
 packed 7.1KB src/scorecard.ts
 packed 2.62KB src/service-field-evidence.ts

@@ -40,21 +40,25 @@ describe("documentation registry", () => {
   });
 
   test("rejects translated docs without dir metadata", async () => {
-    const registry = parseRegistry(await readFile(registryPath, "utf8"));
-    const translation = registry.find((entry) => entry.kind === "translation");
+    const translation = translatedDoc();
 
-    if (translation === undefined) throw new Error("Fixture must include at least one translated doc.");
-    expect(registryErrors(registry)).not.toContain("dir");
     expect(registryErrors([withoutDir(translation)])).toContain("dir");
   });
 
   test("rejects translated docs without source or version metadata", async () => {
-    const registry = parseRegistry(await readFile(registryPath, "utf8"));
-    const translation = registry.find((entry) => entry.kind === "translation");
+    const translation = translatedDoc();
 
-    if (translation === undefined) throw new Error("Fixture must include at least one translated doc.");
     expect(registryErrors([withoutSource(translation)])).toContain("source");
     expect(registryErrors([withoutVersion(translation)])).toContain("version");
+  });
+
+  test("rejects packaged docs with missing source path metadata", async () => {
+    const registry = parseRegistry(await readFile(registryPath, "utf8"));
+    const sourceBacked = registry.find((entry) => entry.packaging === "packaged" && sourcePath(entry.source));
+
+    if (sourceBacked === undefined) throw new Error("Fixture must include at least one packaged doc source path.");
+    expect(await registrySourceErrors(registry)).toEqual([]);
+    expect(await registrySourceErrors([{ ...sourceBacked, source: "docs/DOES_NOT_EXIST.md" }])).toContain("source");
   });
 
   test("rejects generated docs without generator or source metadata", async () => {
@@ -112,57 +116,43 @@ function registryErrors(entries: readonly DocRegistryEntry[]): readonly string[]
   });
 }
 
+async function registrySourceErrors(entries: readonly DocRegistryEntry[]): Promise<readonly string[]> {
+  const errors: string[] = [];
+  for (const entry of entries) {
+    if (entry.packaging !== "packaged") continue;
+    if (entry.kind !== "canonical" && entry.kind !== "translation" && entry.kind !== "generated") continue;
+    if (!sourcePath(entry.source)) continue;
+    try {
+      await readFile(join(root, entry.source), "utf8");
+    } catch (error) {
+      if (hasErrorCode(error, "ENOENT")) {
+        errors.push("source");
+        continue;
+      }
+      throw error;
+    }
+  }
+  return errors;
+}
+
+function translatedDoc(): DocRegistryEntry {
+  return { path: "docs/EXAMPLE.ko.md", kind: "translation", locale: "ko", dir: "ltr", source: "docs/EXAMPLE.md", version: "0.1.16", generatedBy: null, packaging: "packaged", translatable: true };
+}
+
 function withoutDir(entry: DocRegistryEntry): DocRegistryEntry {
-  return {
-    path: entry.path,
-    kind: entry.kind,
-    locale: entry.locale,
-    source: entry.source,
-    version: entry.version,
-    generatedBy: entry.generatedBy,
-    packaging: entry.packaging,
-    translatable: entry.translatable
-  };
+  return { path: entry.path, kind: entry.kind, locale: entry.locale, source: entry.source, version: entry.version, generatedBy: entry.generatedBy, packaging: entry.packaging, translatable: entry.translatable };
 }
 
 function withoutSource(entry: DocRegistryEntry): DocRegistryEntry {
-  return {
-    path: entry.path,
-    kind: entry.kind,
-    locale: entry.locale,
-    dir: entry.dir,
-    version: entry.version,
-    generatedBy: entry.generatedBy,
-    packaging: entry.packaging,
-    translatable: entry.translatable
-  };
+  return { path: entry.path, kind: entry.kind, locale: entry.locale, dir: entry.dir, version: entry.version, generatedBy: entry.generatedBy, packaging: entry.packaging, translatable: entry.translatable };
 }
 
 function withoutVersion(entry: DocRegistryEntry): DocRegistryEntry {
-  return {
-    path: entry.path,
-    kind: entry.kind,
-    locale: entry.locale,
-    dir: entry.dir,
-    source: entry.source,
-    generatedBy: entry.generatedBy,
-    packaging: entry.packaging,
-    translatable: entry.translatable
-  };
+  return { path: entry.path, kind: entry.kind, locale: entry.locale, dir: entry.dir, source: entry.source, generatedBy: entry.generatedBy, packaging: entry.packaging, translatable: entry.translatable };
 }
 
 function withoutGeneratedBy(entry: DocRegistryEntry): DocRegistryEntry {
-  return {
-    path: entry.path,
-    kind: entry.kind,
-    locale: entry.locale,
-    dir: entry.dir,
-    source: entry.source,
-    version: entry.version,
-    generatedBy: "",
-    packaging: entry.packaging,
-    translatable: entry.translatable
-  };
+  return { path: entry.path, kind: entry.kind, locale: entry.locale, dir: entry.dir, source: entry.source, version: entry.version, generatedBy: "", packaging: entry.packaging, translatable: entry.translatable };
 }
 
 async function readPackagedDocs(): Promise<readonly string[]> {
@@ -267,4 +257,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isStringArray(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function sourcePath(source: string | undefined): source is string {
+  return source !== undefined && !source.includes("#");
+}
+
+function hasErrorCode(error: unknown, code: string): boolean {
+  return error instanceof Error &&
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === code;
 }

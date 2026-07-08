@@ -46,6 +46,34 @@ describe("run event redaction", () => {
     }
   });
 
+  test("redacts relative protected paths from commands and artifacts", async () => {
+    const root = await tempRepo();
+
+    try {
+      await write(root, "package.json", JSON.stringify({ name: "fixture", version: "9.9.9" }, null, 2));
+      await write(root, "boulder.yaml", "protectedPaths:\n  - .env*\n");
+      await write(root, ".env.local", "SECRET=redacted\n");
+
+      const result = await recordRunEvent(root, {
+        eventName: "release-check",
+        command: "release-check --include .env.local --log nested/.env.local",
+        startedAt: "2026-07-08T00:00:00.000Z",
+        completedAt: "2026-07-08T00:00:01.000Z",
+        severity: "error",
+        status: "blocked",
+        checkIds: [],
+        recoveryHintIds: [],
+        artifactPaths: [".env.local", "nested/.env.local"]
+      });
+
+      const stored = await readFile(result.path, "utf8");
+      expect(stored).not.toContain(".env.local");
+      expect(stored).toContain("[REDACTED_PROTECTED_PATH]");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("fails closed when runs directory is a symlink", async () => {
     const root = await tempRepo();
     const outside = await tempRepo();

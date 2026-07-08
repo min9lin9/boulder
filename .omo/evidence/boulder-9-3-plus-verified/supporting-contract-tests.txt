@@ -1,0 +1,30 @@
+bun test v1.3.14 (0d9b296a)
+
+test/docs-registry.test.ts:
+(pass) documentation registry > covers packaged docs and local-only exclusions [4.13ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.50ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.35ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.31ms]
+(pass) documentation registry > rejects packaged local-only docs [0.04ms]
+
+test/source-cleanliness.test.ts:
+(pass) source cleanliness > command modules use shared pretty JSON rendering [0.32ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [0.28ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [7.69ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.22ms]
+
+test/package-inventory-contract.test.ts:
+(pass) package inventory contract > classifies every packed file exactly once [30.90ms]
+(pass) package inventory contract > rejects unclassified packed files [0.13ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.08ms]
+
+test/run-events-redaction.test.ts:
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [4.89ms]
+(pass) run event redaction > fails closed when runs directory is a symlink [1.27ms]
+(pass) run event redaction > prune ignores malicious run ids when deleting event files [1.29ms]
+(pass) run event redaction > list ignores symlinked run event files [1.36ms]
+
+ 16 pass
+ 0 fail
+ 391 expect() calls
+Ran 16 tests across 4 files. [104.00ms]

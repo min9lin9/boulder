@@ -126,8 +126,18 @@ function redactProtectedPath(root: string, pattern: string, value: string): stri
   const prefix = clean.endsWith("*") ? clean.slice(0, -1) : clean;
   const absolute = resolve(root, prefix);
   const escaped = escapeRegExp(absolute);
-  const match = clean.endsWith("*") ? new RegExp(`${escaped}[^\\s"']*`, "g") : new RegExp(escaped, "g");
-  return value.replace(match, "[REDACTED_PROTECTED_PATH]");
+  const relative = relativeProtectedPathPattern(prefix, clean.endsWith("*"));
+  const absoluteMatch = clean.endsWith("*") ? new RegExp(`${escaped}[^\\s"']*`, "g") : new RegExp(escaped, "g");
+  const relativeMatch = new RegExp(`(^|[\\s"'])(${relative})`, "g");
+  return value
+    .replace(absoluteMatch, "[REDACTED_PROTECTED_PATH]")
+    .replace(relativeMatch, "$1[REDACTED_PROTECTED_PATH]");
+}
+
+function relativeProtectedPathPattern(prefix: string, wildcard: boolean): string {
+  const escaped = escapeRegExp(prefix);
+  const segment = prefix.includes("/") ? escaped : `(?:[^\\s"']*/)*${escaped}`;
+  return wildcard ? `${segment}[^\\s"']*` : segment;
 }
 
 async function readRunEvent(path: string): Promise<RunEventRecord | null> {

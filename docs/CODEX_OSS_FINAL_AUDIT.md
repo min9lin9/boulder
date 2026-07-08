@@ -1,6 +1,6 @@
 # Codex OSS Final Audit
 
-Status: local 9.5+ readiness audit
+Status: historical local 9.5+ readiness audit; current 0.1.16 public product gate is blocked pending refreshed release evidence
 
 Official source: https://developers.openai.com/community/codex-for-oss accessed 2026-06-11.
 
@@ -8,13 +8,13 @@ This audit decides whether Boulder has enough public evidence to submit as a Cod
 
 ## Go Decision
 
-Decision: GO for submission preparation with public npm install smoke and GitHub Actions evidence available.
+Decision: HISTORICAL GO for submission preparation. Do not treat this document as current product-readiness evidence.
 
 Local readiness: 9.56 / 10.
 
 Weighted score: 95.65 / 100.
 
-Public product readiness: ready for the packaged CLI workflow. `boulder-oss-cli@0.1.15` is published, `v0.1.15` is tagged and released on GitHub, and the install smoke evidence records `Published version: 0.1.15`.
+Public product readiness: not claimed ready for the current `0.1.16` boundary. `boulder product-readiness --json` remains the source of truth and must pass with refreshed release evidence before this audit can be used as a current green artifact.
 
 ## Final Local Readiness
 
@@ -24,26 +24,26 @@ Public product readiness: ready for the packaged CLI workflow. `boulder-oss-cli@
 | Public OSS credibility | 15 | 9.5 | `README.md`, `LICENSE`, `docs/APPLICATION_EVIDENCE.md`, `docs/TRUST_SUPPORT_SECURITY.md`, and package name `boulder-oss-cli`. |
 | Repeatable workflow proof | 20 | 9.5 | `docs/CASE_STUDIES/pr-review.md`, `docs/CASE_STUDIES/release-workflow.md`, and `docs/CASE_STUDIES/core-implementation.md`. |
 | Codex-specific value | 15 | 9.6 | `docs/GJC_LAZYCODEX_HANDOFF.md`, `docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md`, and `docs/CASE_STUDIES/evidence/core-implementation/lazycodex-implementation-summary.md`. |
-| Product readiness | 10 | 9.6 | `docs/PRODUCT_READINESS.md`, `src/product-readiness.ts`, `docs/RELEASE_PLAN.md`, and `.omo/ulw-loop/evidence/codex-oss-9-5/`. Public-ready release evidence is aligned for `boulder-oss-cli@0.1.15` and `v0.1.15`. |
+| Product readiness | 10 | historical 9.6 | `docs/PRODUCT_READINESS.md`, `src/product-readiness.ts`, and `docs/RELEASE_PLAN.md`. Current `0.1.16` product-readiness is blocked until release evidence and install smoke records are refreshed. |
 | Safety and boundaries | 10 | 9.7 | `docs/TRUST_SUPPORT_SECURITY.md`, `docs/PROVIDER_POLICY.md`, `SECURITY.md`, and no hosted service or provider-launch claim. |
 | Narrative quality | 10 | 9.5 | `docs/CODEX_OSS_APPLICATION_PACKET.md` is claim-to-evidence mapped and keeps limitations visible. |
 
 ## Hard Gate Review
 
-No hard blocker remains for local candidate application-readiness:
+Historical hard-gate notes:
 
-- CLI version and `package.json` version are `0.1.15`.
+- CLI version and `package.json` version are now `0.1.16`.
 - Package dry run excludes duplicate `* 2.*` artifacts by package manifest policy.
 - Public GitHub Actions evidence is fixed in `docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt`.
-- Published install smoke evidence is fixed in `docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt` and records a successful `bunx boulder-oss-cli --help` run.
+- Published install smoke evidence must match the current `0.1.16` boundary before current readiness is claimed.
 - M9 export/release evidence is present through generated export docs and release-plan evidence.
-- Product-readiness passes in a clean release tree with public install smoke evidence present.
+- Product-readiness is blocked for the current boundary until public install smoke evidence is refreshed.
 - Three case studies exist and include commands, artifacts, operator conclusions, and limitations.
 - Public trust/support/security posture is documented.
 - Core Boulder commands remain local and do not require credential access.
 - Boulder makes no provider launch, hosted service, benchmark leadership, acceptance, runtime scale, or external adoption claim.
 
-Public release completion is recorded for `boulder-oss-cli@0.1.15`, Git tag `v0.1.15`, and GitHub Release `v0.1.15`.
+Public release completion is not asserted here for `0.1.16`.
 
 Public service workflow is ready for the packaged local CLI evidence gate. Independent external maintainer adoption is not yet claimed.
 
@@ -53,12 +53,13 @@ Public service workflow is ready for the packaged local CLI evidence gate. Indep
 
 Current public blockers:
 
-- None for the packaged CLI readiness gate in a clean release tree.
+- Refresh release evidence and install smoke records for `0.1.16`.
+- Rerun `boulder product-readiness --json` and record the resulting status from that command.
 
 Already evidenced:
 
 - GitHub Actions CI success run is recorded.
-- Published baseline and candidate install smoke evidence succeeds for `boulder-oss-cli`, with `0.1.15` candidate tarball smoke recorded.
+- Published baseline and candidate install smoke evidence must be refreshed for the current `0.1.16` package boundary.
 - GitHub Issue Forms provide public bug, feature, AI contribution, and documentation support routes.
 - Public case studies, GJC planning evidence, LazyCodex handoff evidence, and trust/security posture are present.
 

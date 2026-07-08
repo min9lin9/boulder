@@ -8,13 +8,20 @@ import { RELEASE_EVIDENCE_TARGETS } from "../src/release-evidence";
 import { removeTempRepo, runBoulder, runCommand, tempRepo, write } from "./helpers/cli";
 
 describe("release evidence refresh CLI", () => {
-  test("reports every renderer target in dry-run JSON", async () => {
-    const result = await runBoulder(["release", "evidence", "refresh", "--dry-run", "--json"]);
+  test("reports every renderer target in dry-run JSON with current external proof", async () => {
+    const root = await tempRepo();
 
-    expect(result.exitCode).toBe(0);
-    expect(result.stderr).toBe("");
+    try {
+      await writeRefreshFixture(root, JSON.stringify(currentExternalProofBundle(), null, 2));
 
-    expect(refreshTargetPaths(result.stdout).sort()).toEqual([...RELEASE_EVIDENCE_TARGETS].sort());
+      const result = await runBoulder(["release", "evidence", "refresh", "--dry-run", "--json", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(refreshTargetPaths(result.stdout).sort()).toEqual([...RELEASE_EVIDENCE_TARGETS].sort());
+    } finally {
+      await removeTempRepo(root);
+    }
   });
 
   test("blocks mismatched bundle without writes", async () => {
@@ -42,12 +49,36 @@ describe("release evidence refresh CLI", () => {
     }
   });
 
-  test("write updates approved targets and leaves adjacent files alone", async () => {
+  test("write keeps stale external proof blocked and leaves adjacent files alone", async () => {
     const root = await tempRepo();
     const adjacent = "adjacent evidence\n";
 
     try {
       await writeRefreshFixture(root, JSON.stringify(releaseManifest, null, 2));
+      await write(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt", adjacent);
+
+      const result = await runBoulder(["release", "evidence", "refresh", "--write", "--json", "--cwd", root]);
+      const releaseCheck = await runBoulder(["release-check", "--json", "--cwd", root]);
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toContain("release.version_mismatch");
+      expect(releaseCheck.exitCode).toBe(1);
+      expect(releaseCheck.stdout).toContain("\"status\": \"blocked\"");
+      expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt"), "utf8")).toBe(adjacent);
+      expect(await readFile(join(root, "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"), "utf8")).toBe("old install smoke\n");
+      expect(await readFile(join(root, "docs/PRODUCT_READINESS.md"), "utf8")).toContain("- public-release-check: pass - release-check ready for 0.1.15");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("write updates approved targets with current external proof", async () => {
+    const root = await tempRepo();
+    const adjacent = "adjacent evidence\n";
+
+    try {
+      await writeRefreshFixture(root, JSON.stringify(currentExternalProofBundle(), null, 2));
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt", adjacent);
       const packTotal = await currentPackTotal(root);
 
@@ -153,6 +184,17 @@ function refreshTargetPaths(source: string): string[] {
     if (!isRecord(target) || typeof target.path !== "string") return [];
     return [target.path];
   });
+}
+
+function currentExternalProofBundle(): typeof releaseManifest {
+  return {
+    ...releaseManifest,
+    publishedVersion: packageJson.version,
+    installSmoke: {
+      ...releaseManifest.installSmoke,
+      command: `bunx ${packageJson.name}@${packageJson.version} --version`
+    }
+  };
 }
 
 async function currentPackTotal(root: string): Promise<number> {
