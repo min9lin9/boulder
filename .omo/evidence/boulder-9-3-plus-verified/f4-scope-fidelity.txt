@@ -1,0 +1,34 @@
+bun test v1.3.14 (0d9b296a)
+
+test/run-events-redaction.test.ts:
+(pass) run event redaction > redacts secrets protected paths and raw file bodies [4.28ms]
+
+ 1 pass
+ 0 fail
+ 11 expect() calls
+Ran 1 test across 1 file. [21.00ms]
+bun test v1.3.14 (0d9b296a)
+
+test/docs-registry.test.ts:
+(pass) documentation registry > covers packaged docs and local-only exclusions [9.01ms]
+(pass) documentation registry > rejects translated docs without dir metadata [2.62ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [2.86ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [1.54ms]
+(pass) documentation registry > rejects packaged local-only docs [0.05ms]
+
+test/source-cleanliness.test.ts:
+(pass) source cleanliness > command modules use shared pretty JSON rendering [3.54ms]
+(pass) source cleanliness > bootstrap designer skill is packaged with profile guidance [2.28ms]
+(pass) source cleanliness > packaged skills and release docs do not contain local-only paths [3.22ms]
+(pass) source cleanliness > package surface includes the public boulder skill and excludes local planning notes [0.23ms]
+
+test/package-inventory-contract.test.ts:
+(pass) package inventory contract > classifies every packed file exactly once [16.68ms]
+(pass) package inventory contract > rejects unclassified packed files [1.15ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.14ms]
+
+ 12 pass
+ 0 fail
+ 58 expect() calls
+Ran 12 tests across 3 files. [65.00ms]
+scope fidelity complete

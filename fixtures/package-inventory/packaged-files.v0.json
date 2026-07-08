@@ -1,10 +1,10 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 173,
+  "totalUniqueFiles": 177,
   "classes": [
     {
       "class": "runtime",
-      "count": 58,
+      "count": 61,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -40,6 +40,7 @@
         "src/profile-command.ts",
         "src/profile-store.ts",
         "src/quickstart.ts",
+        "src/readiness-registry.ts",
         "src/recovery-codes.ts",
         "src/release-check.ts",
         "src/release-evidence.ts",
@@ -49,6 +50,7 @@
         "src/routine-command.ts",
         "src/routine-retro.ts",
         "src/routine.ts",
+        "src/run-events.ts",
         "src/scorecard.ts",
         "src/service-field-evidence.ts",
         "src/service-gates.ts",
@@ -60,6 +62,7 @@
         "src/types.ts",
         "src/validation.ts",
         "src/verify.ts",
+        "src/workflow-map.ts",
         "src/workflow-profile-builtins.ts",
         "src/workflow-profiles.ts",
         "src/workflow-stack.ts",
@@ -163,7 +166,7 @@
     },
     {
       "class": "fixture",
-      "count": 23,
+      "count": 24,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
@@ -187,7 +190,8 @@
         "fixtures/replay/kimi-agent-swarm-skill/official-docs.json",
         "fixtures/replay/kimi-agent-swarm-skill/replay.json",
         "fixtures/service-readiness/gates.json",
-        "fixtures/service-readiness/metric-log-template.json"
+        "fixtures/service-readiness/metric-log-template.json",
+        "fixtures/workflow-map/primary-workflow.v0.json"
       ]
     },
     {

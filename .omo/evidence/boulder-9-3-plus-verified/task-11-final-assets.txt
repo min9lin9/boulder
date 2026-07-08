@@ -1,0 +1,11 @@
+$ test -x scripts and bun test test/plan-compliance.test.ts
+bun test v1.3.14 (0d9b296a)
+
+test/plan-compliance.test.ts:
+(pass) 9.3+ plan compliance > required task evidence and guardrails are present [1.56ms]
+(pass) 9.3+ plan compliance > fails when required evidence is missing [0.33ms]
+
+ 2 pass
+ 0 fail
+ 2 expect() calls
+Ran 2 tests across 1 file. [28.00ms]
