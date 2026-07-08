@@ -22,10 +22,14 @@ Prefer the local `boulder` skill when it is installed. For CLI use after trustin
 
 ```bash
 bunx boulder-oss-cli@0.1.15 init
-bunx boulder-oss-cli@0.1.15 routine capture --task "release note draft" --write
+bunx boulder-oss-cli@0.1.15 workflow map --json
 bunx boulder-oss-cli@0.1.15 quickstart
 bunx boulder-oss-cli@0.1.15 inspect
+bunx boulder-oss-cli@0.1.15 profile resolve
+bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 bunx boulder-oss-cli@0.1.15 doctor
+bunx boulder-oss-cli@0.1.15 handoff packet --adapter gajae-code --include <path> --json
+bunx boulder-oss-cli@0.1.15 release-check --json
 ```
 
 `doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
@@ -33,6 +37,7 @@ bunx boulder-oss-cli@0.1.15 doctor
 Then close the weekly learning loop (repo-local only):
 
 ```bash
+bunx boulder-oss-cli@0.1.15 routine capture --task "release note draft" --write
 bunx boulder-oss-cli@0.1.15 retro weekly --dry-run
 bunx boulder-oss-cli@0.1.15 skill propose --from-routine release-note-draft --dry-run
 ```
@@ -66,11 +71,18 @@ Local development: `bun install`, `bun run boulder -- --help`, then `bun run ci`
 ```bash
 cd path/to/your/repo
 bunx boulder-oss-cli@latest init
-bunx boulder-oss-cli@latest bootstrap interview --task "release npm package safely"
+bunx boulder-oss-cli@latest workflow map --json
 bunx boulder-oss-cli@latest quickstart
 bunx boulder-oss-cli@latest onboard
+bunx boulder-oss-cli@latest inspect --json
+bunx boulder-oss-cli@latest profile resolve --json
 bunx boulder-oss-cli@latest capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
 bunx boulder-oss-cli@latest doctor
+bunx boulder-oss-cli@latest handoff packet --adapter gajae-code --include <path> --json
+bunx boulder-oss-cli@latest handoff review --adapter gajae-code
+bunx boulder-oss-cli@latest release-check --json
+bunx boulder-oss-cli@latest product-readiness --json
+bunx boulder-oss-cli@latest service-readiness --json
 ```
 
 `quickstart` tells you the next repo-specific commands. `doctor` tells you whether GJC, LazyCodex, local skills, MCPs, plugins, and Bun are available or only configured as preferences.
@@ -148,11 +160,9 @@ See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.m
 
 ```bash
 boulder init
+boulder workflow map --json
 boulder bootstrap interview --task "release npm package safely"
 boulder quickstart
-boulder routine capture --task "<text>"
-boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
 boulder onboard
 boulder inspect
 boulder profile resolve
@@ -169,6 +179,9 @@ boulder replay-run --dry-run
 boulder release-check
 boulder product-readiness
 boulder service-readiness
+boulder routine capture --task "<text>"
+boulder retro weekly --dry-run
+boulder skill propose --from-routine <routine-id>
 boulder export
 ```
 

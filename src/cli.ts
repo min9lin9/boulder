@@ -26,6 +26,7 @@ import { evaluateServiceReadiness, serviceReadinessToMarkdown } from "./service-
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
+import { buildPrimaryWorkflowMap } from "./workflow-map";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 
 const VERSION = "0.1.16";
@@ -80,6 +81,15 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "capability") {
     await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
+    return;
+  }
+  if (command === "workflow" && parsed.commandArgs[1] === "map") {
+    if (!options.json) {
+      console.error("ERROR workflow.json_required: Use workflow map --json.");
+      process.exitCode = 1;
+      return;
+    }
+    console.log(prettyJson(buildPrimaryWorkflowMap()));
     return;
   }
   if (await runRoutineCommand(parsed.commandArgs, options)) {
