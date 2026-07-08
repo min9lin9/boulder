@@ -1,0 +1,88 @@
+{
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "clean-release-tree",
+      "status": "pass",
+      "evidence": "no duplicate copy artifacts found"
+    },
+    {
+      "id": "codex-oss-application-packet",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md"
+    },
+    {
+      "id": "public-case-study-index",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/README.md"
+    },
+    {
+      "id": "public-case-studies",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/pr-review.md, docs/CASE_STUDIES/release-workflow.md, docs/CASE_STUDIES/core-implementation.md"
+    },
+    {
+      "id": "gjc-plan-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/core-implementation/gjc-plan.md"
+    },
+    {
+      "id": "lazycodex-implementation-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/core-implementation/lazycodex-implementation-summary.md"
+    },
+    {
+      "id": "boulder-verify-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/pr-review/BOULDER_EXPORT.md, docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md, docs/CASE_STUDIES/evidence/release-workflow/ci.txt"
+    },
+    {
+      "id": "public-ci-workflow",
+      "status": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "public-ci-run-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "published-install-smoke",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "public-release-check",
+      "status": "fail",
+      "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16"
+    },
+    {
+      "id": "limitations-explicit",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_APPLICATION_PACKET.md"
+    },
+    {
+      "id": "trust-support-security-posture",
+      "status": "pass",
+      "evidence": "docs/TRUST_SUPPORT_SECURITY.md"
+    },
+    {
+      "id": "public-support-templates",
+      "status": "pass",
+      "evidence": ".github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, SECURITY.md"
+    },
+    {
+      "id": "gjc-lazycodex-handoff-fixtures",
+      "status": "pass",
+      "evidence": "fixtures/handoffs/low.json, fixtures/handoffs/medium.json, fixtures/handoffs/high.json"
+    },
+    {
+      "id": "final-audit",
+      "status": "pass",
+      "evidence": "docs/CODEX_OSS_FINAL_AUDIT.md"
+    }
+  ],
+  "nextSteps": [
+    "Fill every failed public product evidence path before claiming 9.5+ readiness."
+  ]
+}

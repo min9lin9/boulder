@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import releaseManifest from "../docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json" with { type: "json" };
+import packageInventory from "../fixtures/package-inventory/packaged-files.v0.json" with { type: "json" };
 import packageJson from "../package.json" with { type: "json" };
 import { RELEASE_RECOVERY_CODES } from "../src/recovery-codes";
 import {
@@ -34,6 +35,7 @@ const READY_RELEASE_BUNDLE = {
   },
   packDryRun: {
     ...releaseManifest.packDryRun,
+    fileCount: packageInventory.totalPackedFiles,
     packageVersion: packageJson.version
   }
 } satisfies ReleaseEvidenceBundleV1;
@@ -68,7 +70,7 @@ describe("ReleaseEvidenceBundleV1", () => {
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"]).toContain(`"packageJsonVersion": "${packageJson.version}"`);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"]).toContain(releaseManifest.githubActions.runUrl);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(READY_RELEASE_BUNDLE.installSmoke.command);
-    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"]).toContain("Total files: 146");
+    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"]).toContain(`Total files: ${packageInventory.totalPackedFiles}`);
     expect(rendered["docs/PRODUCT_READINESS.md"]).toBe(`- public-release-check: pass - release-check ready for ${packageJson.version}\n`);
   });
 
@@ -80,7 +82,8 @@ describe("ReleaseEvidenceBundleV1", () => {
       RELEASE_RECOVERY_CODES.packageJsonVersionMismatch,
       RELEASE_RECOVERY_CODES.versionMismatch,
       RELEASE_RECOVERY_CODES.tagMismatch,
-      RELEASE_RECOVERY_CODES.packVersionMismatch
+      RELEASE_RECOVERY_CODES.packVersionMismatch,
+      RELEASE_RECOVERY_CODES.packFileCountMismatch
     ]);
   });
 

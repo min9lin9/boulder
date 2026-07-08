@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "boulder.evidence.diff.v1",
+  "status": "blocked",
+  "recoveryCode": "evidence.input_missing",
+  "changedEvidenceIds": [],
+  "changes": [],
+  "issues": [
+    {
+      "code": "evidence.input_missing",
+      "message": "evidence input path is missing",
+      "path": "/tmp/tmp.Dj9DqgsK0P/missing-a"
+    },
+    {
+      "code": "evidence.input_missing",
+      "message": "evidence input path is missing",
+      "path": "/tmp/tmp.Dj9DqgsK0P/missing-b"
+    }
+  ]
+}

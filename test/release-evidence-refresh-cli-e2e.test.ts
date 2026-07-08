@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
@@ -81,6 +81,26 @@ describe("release evidence refresh CLI", () => {
       await removeTempRepo(root);
     }
   });
+
+  test("blocks refresh when live pack dry-run exits nonzero even if output looks valid", async () => {
+    const root = await tempRepo();
+    const bin = join(root, "fake-bin");
+
+    try {
+      await writeRefreshFixture(root, JSON.stringify(releaseManifest, null, 2));
+      await mkdir(bin, { recursive: true });
+      await writeFile(join(bin, "bun"), "#!/usr/bin/env bash\nprintf 'Total files: 999\\n'\nexit 1\n", "utf8");
+      await runCommand(`chmod 755 ${shellQuote(join(bin, "bun"))}`, root);
+      const realBun = (await runCommand("command -v bun", root)).stdout.trim();
+
+      const result = await runCommandWithPath(`${shellQuote(realBun)} ${shellQuote(join(import.meta.dir, "..", "bin", "boulder.ts"))} release evidence refresh --dry-run --json --cwd ${shellQuote(root)}`, root, `${bin}:${process.env.PATH ?? ""}`);
+
+      expect(result.exitCode).toBe(1);
+      expect(result.stdout).toContain("release.pack_file_count_mismatch");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
 });
 
 async function writeRefreshFixture(root: string, manifest: string): Promise<void> {
@@ -140,6 +160,20 @@ async function currentPackTotal(root: string): Promise<number> {
   const match = /^Total files:\s*(\d+)$/im.exec(`${result.stdout}\n${result.stderr}`);
   if (!match?.[1]) throw new Error("pack dry-run did not report total files");
   return Number(match[1]);
+}
+
+async function runCommandWithPath(command: string, cwd: string, path: string): Promise<{ readonly exitCode: number; readonly stdout: string; readonly stderr: string }> {
+  return await new Promise((resolve) => {
+    exec(`PATH=${shellQuote(path)} ${command}`, { cwd }, (error, stdout, stderr) => {
+      resolve({ exitCode: exitCodeFrom(error), stdout, stderr });
+    });
+  });
+}
+
+function exitCodeFrom(error: Error | null): number {
+  if (!error) return 0;
+  if ("code" in error && typeof error.code === "number") return error.code;
+  return 1;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

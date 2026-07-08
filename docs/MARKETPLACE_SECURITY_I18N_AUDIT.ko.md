@@ -2,7 +2,7 @@
 
 Status: proposal-only audit
 Date: 2026-07-07
-Scope: current `/home/burt/Documents/Boulder` worktree, npm registry metadata, GitHub workflow status visible through `gh`
+Scope: current Boulder worktree, npm registry metadata, GitHub workflow status visible through `gh`
 
 이 문서는 수정 전 제안서다. 아래 항목은 승인 없이 구현하지 않는다. Boulder는 현재 hosted web app이 아니라 Bun TypeScript CLI이므로 SSL/HTTPS, 로그인, 모바일 반응형 일부 항목은 제품 런타임 이슈가 아니라 공개 배포/문서/마켓플레이스 검증 항목으로 판정한다.
 

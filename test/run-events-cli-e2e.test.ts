@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readinessEntriesForReport } from "../src/readiness-registry";
 import { removeTempRepo, runBoulder, tempRepo, write } from "./helpers/cli";
 
 describe("runs CLI", () => {
@@ -31,6 +32,7 @@ describe("runs CLI", () => {
       expect(readString(event, "status")).toBe("blocked");
       expect(readArray(event, "checkIds")).toContain("install-smoke-version");
       expect(readArray(event, "recoveryHintIds")).toContain("release.install_smoke_version");
+      expect(readStringArray(event, "recoveryHintIds").sort()).toEqual(expectedFailedRecoveryHints(report).sort());
 
       const pruned = await runBoulder(["runs", "prune", "--older-than", "30d", "--keep", "200", "--cwd", root, "--json"]);
       expect(pruned.exitCode).toBe(0);
@@ -46,6 +48,16 @@ function parseJson(source: string): Record<string, unknown> {
   const parsed: unknown = JSON.parse(source);
   if (isRecord(parsed)) return parsed;
   throw new Error("expected JSON object");
+}
+
+function expectedFailedRecoveryHints(report: Record<string, unknown>): string[] {
+  const failed = new Set(readArray(report, "checks")
+    .map(readRecord)
+    .filter((check) => readString(check, "status") === "fail")
+    .map((check) => readString(check, "id")));
+  return readinessEntriesForReport("release-check")
+    .filter((entry) => failed.has(entry.id))
+    .map((entry) => entry.recoveryHintId);
 }
 
 function readRecord(value: unknown): Record<string, unknown> {
@@ -69,6 +81,13 @@ function readArray(record: Record<string, unknown>, key: string): readonly unkno
   const value = record[key];
   if (Array.isArray(value)) return value;
   throw new Error(`expected array field ${key}`);
+}
+
+function readStringArray(record: Record<string, unknown>, key: string): string[] {
+  return readArray(record, key).map((item) => {
+    if (typeof item === "string") return item;
+    throw new Error(`expected string array field ${key}`);
+  });
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

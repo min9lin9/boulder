@@ -1,0 +1,66 @@
+{
+  "version": "0.1.16",
+  "status": "blocked",
+  "checks": [
+    {
+      "id": "package-metadata",
+      "status": "pass",
+      "evidence": "package.json repo-verifiable metadata"
+    },
+    {
+      "id": "release-workflow-doc",
+      "status": "pass",
+      "evidence": "docs/RELEASE_WORKFLOW.md"
+    },
+    {
+      "id": "ci-bun-engine",
+      "status": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "changelog-version",
+      "status": "pass",
+      "evidence": "CHANGELOG.md"
+    },
+    {
+      "id": "install-smoke-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "install-smoke-version",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16"
+    },
+    {
+      "id": "published-version-evidence",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16"
+    },
+    {
+      "id": "github-actions-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "git-tag-local",
+      "status": "fail",
+      "evidence": "unable to inspect local git tags"
+    },
+    {
+      "id": "release-evidence-manifest",
+      "status": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; releaseCommit must match HEAD or the documented GitHub Actions commit"
+    },
+    {
+      "id": "pack-dry-run-evidence",
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"
+    }
+  ],
+  "nextCommands": [
+    "Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.",
+    "Record local tag evidence for v0.1.16 after the release commit is ready.",
+    "Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16."
+  ]
+}

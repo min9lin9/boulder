@@ -3,13 +3,14 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 EVIDENCE_DIR="$ROOT/.omo/evidence/boulder-9-3-plus-verified"
+JSON_EVIDENCE_DIR="$EVIDENCE_DIR/manual-qa-json"
 TMP_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
 run_json_allow_blocked() {
   local label="$1"
   shift
-  local output="$TMP_ROOT/${label}.json"
+  local output="$JSON_EVIDENCE_DIR/${label}.json"
   set +e
   "$@" >"$output"
   local exit_code=$?
@@ -21,13 +22,15 @@ run_json_allow_blocked() {
 run_json_strict() {
   local label="$1"
   shift
-  local output="$TMP_ROOT/${label}.json"
+  local output="$JSON_EVIDENCE_DIR/${label}.json"
   "$@" >"$output"
   bun -e 'const fs=require("fs"); JSON.parse(fs.readFileSync(process.argv[1], "utf8"));' "$output"
   echo "$label path:$output"
 }
 
 mkdir -p "$EVIDENCE_DIR"
+rm -rf "$JSON_EVIDENCE_DIR"
+mkdir -p "$JSON_EVIDENCE_DIR"
 git -C "$ROOT" archive HEAD | tar -x -C "$TMP_ROOT"
 CLEAN_ROOT="$TMP_ROOT/clean"
 mkdir "$CLEAN_ROOT"

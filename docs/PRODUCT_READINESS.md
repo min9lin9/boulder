@@ -1,6 +1,6 @@
 # Product Readiness
 
-Status: ready
+Status: blocked
 
 ## Checks
 
@@ -14,7 +14,7 @@ Status: ready
 - public-ci-workflow: pass - .github/workflows/ci.yml
 - public-ci-run-evidence: pass - docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
 - published-install-smoke: pass - docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
-- public-release-check: pass - release-check ready for 0.1.15
+- public-release-check: fail - release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16
 - limitations-explicit: pass - docs/CODEX_OSS_APPLICATION_PACKET.md
 - trust-support-security-posture: pass - docs/TRUST_SUPPORT_SECURITY.md
 - public-support-templates: pass - .github/ISSUE_TEMPLATE/bug_report.yml, .github/ISSUE_TEMPLATE/feature_request.yml, .github/ISSUE_TEMPLATE/ai_contribution.yml, .github/ISSUE_TEMPLATE/documentation.yml, SECURITY.md
@@ -23,4 +23,4 @@ Status: ready
 
 ## Next Steps
 
-- Public product gate is ready; keep OpenAI acceptance and adoption outside Boulder claims.
+- Fill every failed public product evidence path before claiming 9.5+ readiness.

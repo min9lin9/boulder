@@ -39,10 +39,10 @@ describe("package inventory contract", () => {
     const summary = assertClassified(parsePackDryRun(output), inventory);
 
     expect(result.exitCode).toBe(0);
-    expect(summary.totalUniqueFiles).toBe(177);
-    expect(summary.totalPackedFiles).toBe(178);
+    expect(summary.totalUniqueFiles).toBe(183);
+    expect(summary.totalPackedFiles).toBe(184);
     expect(summary.counts).toEqual({
-      runtime: 61,
+      runtime: 67,
       "public-doc": 64,
       "case-study-evidence": 19,
       fixture: 24,

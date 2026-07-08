@@ -1,41 +1,41 @@
 root:/home/burt/Documents/Boulder-9-3-plus
-clean:/tmp/tmp.3VI5B17gV6/clean
-release-refresh path:/tmp/tmp.3VI5B17gV6/release-refresh.json
+clean:/tmp/tmp.Dj9DqgsK0P/clean
+release-refresh path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-refresh.json
 bun test v1.3.14 (0d9b296a)
 
 test/package-inventory-contract.test.ts:
-(pass) package inventory contract > classifies every packed file exactly once [17.16ms]
-(pass) package inventory contract > rejects unclassified packed files [0.12ms]
-(pass) package inventory contract > reports fixture and pack drift separately [0.22ms]
+(pass) package inventory contract > classifies every packed file exactly once [24.78ms]
+(pass) package inventory contract > rejects unclassified packed files [0.99ms]
+(pass) package inventory contract > reports fixture and pack drift separately [0.13ms]
 
  3 pass
  0 fail
  6 expect() calls
-Ran 3 tests across 1 file. [34.00ms]
+Ran 3 tests across 1 file. [54.00ms]
 bun test v1.3.14 (0d9b296a)
 
 test/docs-registry.test.ts:
-(pass) documentation registry > covers packaged docs and local-only exclusions [3.43ms]
-(pass) documentation registry > rejects translated docs without dir metadata [0.95ms]
-(pass) documentation registry > rejects translated docs without source or version metadata [0.42ms]
-(pass) documentation registry > rejects generated docs without generator or source metadata [0.30ms]
+(pass) documentation registry > covers packaged docs and local-only exclusions [3.33ms]
+(pass) documentation registry > rejects translated docs without dir metadata [0.48ms]
+(pass) documentation registry > rejects translated docs without source or version metadata [0.33ms]
+(pass) documentation registry > rejects generated docs without generator or source metadata [0.29ms]
 (pass) documentation registry > rejects packaged local-only docs [0.03ms]
 
  5 pass
  0 fail
  10 expect() calls
-Ran 5 tests across 1 file. [22.00ms]
-evidence-inspect path:/tmp/tmp.3VI5B17gV6/evidence-inspect.json
-evidence-diff-missing exit:1 path:/tmp/tmp.3VI5B17gV6/evidence-diff-missing.json
-workflow-map path:/tmp/tmp.3VI5B17gV6/workflow-map.json
-release-check exit:1 path:/tmp/tmp.3VI5B17gV6/release-check.json
-product-readiness exit:1 path:/tmp/tmp.3VI5B17gV6/product-readiness.json
-service-readiness exit:0 path:/tmp/tmp.3VI5B17gV6/service-readiness.json
-run-root-release-check exit:1 path:/tmp/tmp.3VI5B17gV6/run-root-release-check.json
-runs-list path:/tmp/tmp.3VI5B17gV6/runs-list.json
-runs-show path:/tmp/tmp.3VI5B17gV6/runs-show.json
-runs-prune path:/tmp/tmp.3VI5B17gV6/runs-prune.json
-clean-release-check exit:1 path:/tmp/tmp.3VI5B17gV6/clean-release-check.json
-clean-product-readiness exit:1 path:/tmp/tmp.3VI5B17gV6/clean-product-readiness.json
-clean-service-readiness exit:0 path:/tmp/tmp.3VI5B17gV6/clean-service-readiness.json
+Ran 5 tests across 1 file. [19.00ms]
+evidence-inspect path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-inspect.json
+evidence-diff-missing exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/evidence-diff-missing.json
+workflow-map path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/workflow-map.json
+release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/release-check.json
+product-readiness exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/product-readiness.json
+service-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/service-readiness.json
+run-root-release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/run-root-release-check.json
+runs-list path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-list.json
+runs-show path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-show.json
+runs-prune path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/runs-prune.json
+clean-release-check exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-release-check.json
+clean-product-readiness exit:1 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-product-readiness.json
+clean-service-readiness exit:0 path:/home/burt/Documents/Boulder-9-3-plus/.omo/evidence/boulder-9-3-plus-verified/manual-qa-json/clean-service-readiness.json
 manual qa complete

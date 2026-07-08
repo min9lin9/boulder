@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "boulder.evidence.inspect.v1",
+  "status": "fail",
+  "evidence": [
+    {
+      "id": "release.package-metadata",
+      "area": "release",
+      "state": "pass",
+      "evidence": "package.json repo-verifiable metadata"
+    },
+    {
+      "id": "release.release-workflow-doc",
+      "area": "release",
+      "state": "pass",
+      "evidence": "docs/RELEASE_WORKFLOW.md"
+    },
+    {
+      "id": "release.ci-bun-engine",
+      "area": "release",
+      "state": "pass",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "id": "release.changelog-version",
+      "area": "release",
+      "state": "pass",
+      "evidence": "CHANGELOG.md"
+    },
+    {
+      "id": "release.install-smoke-evidence",
+      "area": "release",
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
+    },
+    {
+      "id": "release.install-smoke-version",
+      "area": "release",
+      "state": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.16"
+    },
+    {
+      "id": "release.published-version-evidence",
+      "area": "release",
+      "state": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.16"
+    },
+    {
+      "id": "release.github-actions-evidence",
+      "area": "release",
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"
+    },
+    {
+      "id": "release.git-tag-local",
+      "area": "release",
+      "state": "pass",
+      "evidence": "local tag v0.1.16"
+    },
+    {
+      "id": "release.release-evidence-manifest",
+      "area": "release",
+      "state": "fail",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.16; cliVersion must be 0.1.16; tag must be v0.1.16; publishedVersion must be 0.1.16; packageVersion must be 0.1.16; tagCommit must match local tag v0.1.16"
+    },
+    {
+      "id": "release.pack-dry-run-evidence",
+      "area": "release",
+      "state": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"
+    },
+    {
+      "id": "package.inventory",
+      "area": "package",
+      "state": "pass",
+      "evidence": "fixtures/package-inventory/packaged-files.v0.json"
+    },
+    {
+      "id": "docs.registry",
+      "area": "docs",
+      "state": "pass",
+      "evidence": "fixtures/docs/doc-registry.v0.json"
+    }
+  ]
+}

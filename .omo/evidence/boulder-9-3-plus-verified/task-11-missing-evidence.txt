@@ -1,10 +1,1 @@
-bun test v1.3.14 (0d9b296a)
-
-test/plan-compliance.test.ts:
-(pass) 9.3+ plan compliance > fails when required evidence is missing [1.11ms]
-
- 1 pass
- 1 filtered out
- 0 fail
- 1 expect() calls
-Ran 1 test across 1 file. [24.00ms]
+missing evidence exit:1

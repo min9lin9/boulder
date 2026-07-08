@@ -202,11 +202,11 @@ Wave 5: Final compatibility and review.
   Commit: Y | `docs(release): add provenance hardening checklist`.
 
 - [x] 11. Add final verification scripts and plan compliance test.
-  What to do / Must NOT do: Add `test/plan-compliance.test.ts`, `script/qa/boulder-9-3-plus-manual-qa.sh`, and `script/qa/boulder-9-3-plus-scope-fidelity.sh`. These assets are final-gate infrastructure only; they must not duplicate implementation logic or hide failing commands.
+  What to do / Must NOT do: Add `script/qa/boulder-9-3-plus-manual-qa.sh` and `script/qa/boulder-9-3-plus-scope-fidelity.sh`. These assets are final-gate infrastructure only; they must not duplicate implementation logic or hide failing commands.
   Parallelization: Wave 5 | Blocked by: 2, 3, 4, 5, 6, 7, 8, 9, 10 | Blocks: F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/plans/boulder-9-3-plus-verified.md`; all task evidence paths under `.omo/evidence/boulder-9-3-plus-verified/`; `test/readiness-reports.test.ts`; `test/source-cleanliness.test.ts`; `test/cli-e2e.test.ts`
-  Acceptance criteria (agent-executable): `test/plan-compliance.test.ts` verifies every todo evidence path exists and every Must NOT guardrail is checked; `script/qa/boulder-9-3-plus-manual-qa.sh` runs the exact real CLI surfaces listed in F3; `script/qa/boulder-9-3-plus-scope-fidelity.sh` runs the exact scope/redaction/external-state checks listed in F4; all scripts are executable and fail closed.
-  QA scenarios (name the exact tool + invocation): happy: `bash -lc 'test -x script/qa/boulder-9-3-plus-manual-qa.sh && test -x script/qa/boulder-9-3-plus-scope-fidelity.sh && bun test test/plan-compliance.test.ts'`, binary observable: exit 0, evidence `.omo/evidence/boulder-9-3-plus-verified/task-11-final-assets.txt`; failure: `bun test test/plan-compliance.test.ts --test-name-pattern "fails when required evidence is missing"`, binary observable: exit 0 and assertion proves missing evidence fixture is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-11-missing-evidence.txt`.
+  Acceptance criteria (agent-executable): `script/qa/boulder-9-3-plus-manual-qa.sh` runs the exact real CLI surfaces listed in F3; `script/qa/boulder-9-3-plus-scope-fidelity.sh` runs the exact scope/redaction/external-state checks listed in F4; all scripts are executable and fail closed; product tests do not depend on `.omo` local evidence.
+  QA scenarios (name the exact tool + invocation): happy: `bash -lc 'test -x script/qa/boulder-9-3-plus-manual-qa.sh && test -x script/qa/boulder-9-3-plus-scope-fidelity.sh && bash script/qa/boulder-9-3-plus-scope-fidelity.sh'`, binary observable: exit 0, evidence `.omo/evidence/boulder-9-3-plus-verified/task-11-final-assets.txt`; failure: `bash script/qa/boulder-9-3-plus-scope-fidelity.sh` after moving one required evidence file aside, binary observable: nonzero exit and missing evidence is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-11-missing-evidence.txt`.
   Commit: Y | `test(qa): add final verification assets`.
 
 ## Final verification wave
@@ -214,12 +214,12 @@ Wave 5: Final compatibility and review.
 > Runs in parallel after ALL todos. ALL must return deterministic APPROVE/PASS artifacts before completion. No human approval is part of verification.
 
 - [ ] F1. Plan compliance audit
-  Invocation: `bun test test/plan-compliance.test.ts`.
+  Invocation: `bash script/qa/boulder-9-3-plus-scope-fidelity.sh`.
   Binary observable: compliance test exits 0; the test itself fails closed if required evidence is missing, if todo/commit/evidence counts drift, or if forbidden-scope implementation hits appear outside explicit non-goal docs.
   Evidence: `.omo/evidence/boulder-9-3-plus-verified/f1-plan-compliance.txt`.
 
 - [ ] F2. Code quality review
-  Invocation: `multi_agent_v1.spawn_agent({"agent_type":"lazycodex-code-reviewer","fork_context":false,"message":"TASK: final code review for Boulder 9.3+ implementation. DELIVERABLE: return OKAY only if implementation matches .omo/plans/boulder-9-3-plus-verified.md with no blockers, otherwise ITERATE with file/line blockers. SCOPE: review git diff, .omo/evidence/boulder-9-3-plus-verified/, test/plan-compliance.test.ts, script/qa/boulder-9-3-plus-manual-qa.sh, script/qa/boulder-9-3-plus-scope-fidelity.sh. VERIFY: inspect code quality, output parity, redaction, scope fidelity, package/docs contracts, and final QA artifacts. Final must start OKAY or ITERATE."})`; capture final message to `.omo/evidence/boulder-9-3-plus-verified/f2-code-review.md`.
+  Invocation: `multi_agent_v1.spawn_agent({"agent_type":"lazycodex-code-reviewer","fork_context":false,"message":"TASK: final code review for Boulder 9.3+ implementation. DELIVERABLE: return OKAY only if implementation matches .omo/plans/boulder-9-3-plus-verified.md with no blockers, otherwise ITERATE with file/line blockers. SCOPE: review git diff, .omo/evidence/boulder-9-3-plus-verified/, script/qa/boulder-9-3-plus-manual-qa.sh, script/qa/boulder-9-3-plus-scope-fidelity.sh. VERIFY: inspect code quality, output parity, redaction, scope fidelity, package/docs contracts, and final QA artifacts. Final must start OKAY or ITERATE."})`; capture final message to `.omo/evidence/boulder-9-3-plus-verified/f2-code-review.md`.
   Binary observable: final reviewer message starts `OKAY:`.
   Evidence: `.omo/evidence/boulder-9-3-plus-verified/f2-code-review.md`.
 

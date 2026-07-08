@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "boulder.workflow-map.v1",
+  "id": "primary-workflow",
+  "route": [
+    "first-run",
+    "profile",
+    "capability",
+    "handoff",
+    "readiness"
+  ],
+  "steps": [
+    {
+      "id": "init",
+      "lane": "first-run",
+      "command": "boulder init --cwd .",
+      "purpose": "Create the local Boulder harness files.",
+      "required": true,
+      "dependsOn": []
+    },
+    {
+      "id": "quickstart",
+      "lane": "first-run",
+      "command": "boulder quickstart --cwd .",
+      "purpose": "Read the current checks and next commands.",
+      "required": true,
+      "dependsOn": [
+        "init"
+      ]
+    },
+    {
+      "id": "inspect",
+      "lane": "first-run",
+      "command": "boulder inspect --cwd . --json",
+      "purpose": "Capture repository shape before planning.",
+      "required": false,
+      "dependsOn": [
+        "quickstart"
+      ]
+    },
+    {
+      "id": "profile-resolve",
+      "lane": "profile",
+      "command": "boulder profile resolve --cwd . --json",
+      "purpose": "Confirm the active profile and executor policy.",
+      "required": true,
+      "dependsOn": [
+        "quickstart"
+      ]
+    },
+    {
+      "id": "profile-use",
+      "lane": "profile",
+      "command": "boulder profile use programming-default --cwd .",
+      "purpose": "Change the active profile only when the resolved default is not right for the work.",
+      "required": false,
+      "dependsOn": [
+        "profile-resolve"
+      ]
+    },
+    {
+      "id": "capability-import",
+      "lane": "capability",
+      "command": "boulder capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run",
+      "purpose": "Preview capability source candidates before recording them.",
+      "required": true,
+      "dependsOn": [
+        "profile-resolve"
+      ]
+    },
+    {
+      "id": "doctor",
+      "lane": "capability",
+      "command": "boulder doctor --cwd . --json",
+      "purpose": "Report configured, candidate, and locally available capabilities without installing tools.",
+      "required": false,
+      "dependsOn": [
+        "capability-import"
+      ]
+    },
+    {
+      "id": "handoff-packet",
+      "lane": "handoff",
+      "command": "boulder handoff packet --adapter gajae-code --include <path> --json",
+      "purpose": "Build a sanitized handoff packet.",
+      "required": true,
+      "dependsOn": [
+        "doctor"
+      ]
+    },
+    {
+      "id": "handoff-review",
+      "lane": "handoff",
+      "command": "boulder handoff review --packet .boulder/handoffs/gajae-code.json",
+      "purpose": "Review the packet before any external send.",
+      "required": false,
+      "dependsOn": [
+        "handoff-packet"
+      ]
+    },
+    {
+      "id": "release-check",
+      "lane": "readiness",
+      "command": "boulder release-check --cwd . --json",
+      "purpose": "Check release evidence before publishing.",
+      "required": true,
+      "dependsOn": [
+        "handoff-review"
+      ]
+    },
+    {
+      "id": "product-readiness",
+      "lane": "readiness",
+      "command": "boulder product-readiness --cwd . --json",
+      "purpose": "Check public product evidence.",
+      "required": false,
+      "dependsOn": [
+        "release-check"
+      ]
+    },
+    {
+      "id": "service-readiness",
+      "lane": "readiness",
+      "command": "boulder service-readiness --cwd . --json",
+      "purpose": "Check repeatable service evidence.",
+      "required": false,
+      "dependsOn": [
+        "product-readiness"
+      ]
+    }
+  ],
+  "secondaryCommands": [
+    {
+      "id": "routine-capture",
+      "lane": "first-run",
+      "command": "boulder routine capture --task \"<text>\" --dry-run",
+      "purpose": "Capture recurring work after the main route is understood.",
+      "required": false,
+      "dependsOn": []
+    },
+    {
+      "id": "retro-weekly",
+      "lane": "first-run",
+      "command": "boulder retro weekly --dry-run",
+      "purpose": "Review recurring-work patterns.",
+      "required": false,
+      "dependsOn": [
+        "routine-capture"
+      ]
+    },
+    {
+      "id": "skill-propose",
+      "lane": "first-run",
+      "command": "boulder skill propose --from-routine <routine-id> --dry-run",
+      "purpose": "Draft a local skill proposal for manual review.",
+      "required": false,
+      "dependsOn": [
+        "retro-weekly"
+      ]
+    }
+  ]
+}
