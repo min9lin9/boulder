@@ -1,18 +1,8 @@
-import { mkdir, mkdtemp, readFile, stat, symlink, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { mkdir, readFile, stat, symlink } from "node:fs/promises";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { diffEvidence, evaluateFieldEvidence, inspectEvidence, recordFieldEvidence } from "../src/field-evidence";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-field-evidence-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 async function writeCompleteFieldRun(root: string, runId = "oss-run-1"): Promise<string> {
   const base = `evidence/field-readiness/${runId}`;
@@ -68,7 +58,7 @@ describe("field evidence", () => {
   });
 
   test("passes a complete field-readiness run and writes a manifest", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
     const evidencePath = await writeCompleteFieldRun(root);
 
     const result = await recordFieldEvidence(root, "oss-run-1", evidencePath);
@@ -81,7 +71,7 @@ describe("field evidence", () => {
   });
 
   test("fails when the maintainer decision outcome is unsupported", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
     const evidencePath = await writeCompleteFieldRun(root);
     await write(root, `${evidencePath}/decision-log.json`, "{\"outcome\":\"ship-it-anyway\"}\n");
 
@@ -92,7 +82,7 @@ describe("field evidence", () => {
   });
 
   test("fails when JSON evidence is malformed", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
     const evidencePath = await writeCompleteFieldRun(root);
     await write(root, `${evidencePath}/first-readiness.json`, "not json\n");
 
@@ -103,7 +93,7 @@ describe("field evidence", () => {
   });
 
   test("fails closed for evidence paths outside field-readiness", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
 
     const result = await evaluateFieldEvidence(root, "oss-run-1", "../outside");
 
@@ -113,7 +103,7 @@ describe("field evidence", () => {
   });
 
   test("does not overwrite a valid manifest when evidence path is unsafe", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
     await write(root, "evidence/field-readiness/oss-run-1/manifest.json", "{\"status\":\"pass\"}\n");
 
     const result = await recordFieldEvidence(root, "oss-run-1", "../outside");
@@ -123,7 +113,7 @@ describe("field evidence", () => {
   });
 
   test("does not write a manifest when run id is unsafe", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
 
     const result = await recordFieldEvidence(root, "../escape", "../escape");
 
@@ -132,8 +122,8 @@ describe("field evidence", () => {
   });
 
   test("does not write through a symlinked field evidence directory", async () => {
-    const root = await tempRepo();
-    const external = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
+    const external = await tempRepo("boulder-field-evidence-");
     await mkdir(join(root, "evidence/field-readiness"), { recursive: true });
     await symlink(external, join(root, "evidence/field-readiness/oss-run-1"));
 
@@ -145,8 +135,8 @@ describe("field evidence", () => {
   });
 
   test("does not write through a symlinked field-readiness parent directory", async () => {
-    const root = await tempRepo();
-    const external = await tempRepo();
+    const root = await tempRepo("boulder-field-evidence-");
+    const external = await tempRepo("boulder-field-evidence-");
     await mkdir(join(root, "evidence"), { recursive: true });
     await mkdir(join(external, "oss-run-1"), { recursive: true });
     await symlink(external, join(root, "evidence/field-readiness"));

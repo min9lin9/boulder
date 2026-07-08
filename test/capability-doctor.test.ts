@@ -1,22 +1,11 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { evaluateCapabilityDoctor } from "../src/capability-doctor";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-capability-doctor-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 describe("capability doctor", () => {
   test("routes installed skills and MCP tools to workflow lanes", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [
         { id: "omo:ulw-plan", path: "/Users/burt/.codex/plugins/cache/sisyphuslabs/omo/0.1.0/skills/ulw-plan/SKILL.md", status: "installed" },
@@ -48,7 +37,7 @@ describe("capability doctor", () => {
   });
 
   test("passes when configured adapters are present in inventory", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [
         { id: "gajae-code", status: "installed" },
@@ -67,7 +56,7 @@ describe("capability doctor", () => {
   });
 
   test("recognizes the GJC Hermes coordinator MCP bridge as the planning adapter", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [
         { id: "gjc-delegation", status: "installed" },
@@ -88,7 +77,7 @@ describe("capability doctor", () => {
   });
 
   test("passes when Bun supports live GJC execution", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [
         { id: "omo:ulw-plan", status: "installed" },
@@ -107,7 +96,7 @@ describe("capability doctor", () => {
   });
 
   test("uses the active resolved profile instead of legacy manifest executors", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, ".boulder/current-profile", "research-default\n");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [{ id: "codex", status: "available" }],
@@ -127,7 +116,7 @@ describe("capability doctor", () => {
   });
 
   test("does not report GJC runtime warnings for local-only active profiles", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, ".boulder/current-profile", "research-default\n");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [{ id: "codex", status: "available" }],
@@ -143,7 +132,7 @@ describe("capability doctor", () => {
   });
 
   test("does not treat adjacent Codex plugins as the canonical codex adapter", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, ".boulder/current-profile", "research-default\n");
     await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
       skills: [],
@@ -161,7 +150,7 @@ describe("capability doctor", () => {
   });
 
   test("reports profile drift alongside active profile", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, ".boulder/current-profile", "research-default\n");
     await write(root, "boulder.yaml", [
       "name: fixture",
@@ -208,7 +197,7 @@ describe("capability doctor", () => {
 
 
   test("discovers local Codex skills and MCP inventory when fixture is missing", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-doctor-");
     await write(root, ".codex/skills/boulder/SKILL.md", "---\nname: boulder\n---\n");
     await write(root, ".codex/skills/gajae-code/SKILL.md", "---\nname: gajae-code\n---\n");
     await write(root, ".codex/skills/lazycodex/SKILL.md", "---\nname: lazycodex\n---\n");

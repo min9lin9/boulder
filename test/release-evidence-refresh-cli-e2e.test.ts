@@ -54,7 +54,7 @@ describe("release evidence refresh CLI", () => {
     const adjacent = "adjacent evidence\n";
 
     try {
-      await writeRefreshFixture(root, JSON.stringify(releaseManifest, null, 2));
+      await writeRefreshFixture(root, JSON.stringify(staleExternalProofBundle(), null, 2));
       await write(root, "docs/CASE_STUDIES/evidence/release-workflow/not-a-target.txt", adjacent);
 
       const result = await runBoulder(["release", "evidence", "refresh", "--write", "--json", "--cwd", root]);
@@ -193,6 +193,17 @@ function currentExternalProofBundle(): typeof releaseManifest {
     installSmoke: {
       ...releaseManifest.installSmoke,
       command: `bunx ${packageJson.name}@${packageJson.version} --version`
+    }
+  };
+}
+
+function staleExternalProofBundle(): typeof releaseManifest {
+  return {
+    ...releaseManifest,
+    publishedVersion: "0.1.15",
+    installSmoke: {
+      ...releaseManifest.installSmoke,
+      command: `bunx ${packageJson.name}@0.1.15 --version`
     }
   };
 }

@@ -1,7 +1,6 @@
-import { constants } from "node:fs";
-import { lstat, mkdir, open, readFile, rename, unlink } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
-import { at } from "./fs";
+import { readFile } from "node:fs/promises";
+import { relative, resolve } from "node:path";
+import { at, isMissingPath, protectedWritePathIsSafe, safeReplaceText } from "./fs";
 
 export type EvidenceRef = {
   readonly kind: string;
@@ -100,11 +99,7 @@ function routinePathIsValid(root: string, path: string): boolean {
 }
 
 async function routinePathIsSafe(root: string, path: string): Promise<boolean> {
-  await mkdir(at(root, ".boulder"), { recursive: true });
-  if (await pathIsProtectedLink(at(root, ".boulder"))) return false;
-  await mkdir(at(root, ".boulder", "routines"), { recursive: true });
-  return !await pathIsProtectedLink(at(root, ".boulder", "routines"))
-    && !await pathIsProtectedLink(path);
+  return protectedWritePathIsSafe(root, at(root, ".boulder", "routines"), path);
 }
 
 async function loadRoutine(path: string, root: string): Promise<RoutineArtifact | null> {
@@ -145,7 +140,7 @@ function isSafeEvidenceRef(value: EvidenceRef): boolean {
   return isSafeEvidencePath(value.path);
 }
 
-function isSafeEvidencePath(path: string): boolean {
+export function isSafeEvidencePath(path: string): boolean {
   const normalized = path.replace(/\\/g, "/");
   return normalized.length > 0
     && !/[\u0000-\u001F\u007F]/.test(path)
@@ -159,44 +154,4 @@ function isSafeEvidencePath(path: string): boolean {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-export async function pathIsProtectedLink(path: string): Promise<boolean> {
-  try {
-    const info = await lstat(path);
-    return info.isSymbolicLink() || (info.isFile() && info.nlink > 1);
-  } catch (error) {
-    if (isMissingPath(error)) return false;
-    throw error;
-  }
-}
-
-async function safeReplaceText(path: string, content: string): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
-  const temporary = `${path}.${crypto.randomUUID()}.tmp`;
-  let handle: Awaited<ReturnType<typeof open>> | null = null;
-  try {
-    handle = await open(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
-    await handle.writeFile(content, "utf8");
-    await handle.close();
-    handle = null;
-    await rename(temporary, path);
-  } catch (error) {
-    try {
-      await unlink(temporary);
-    } catch (cleanupError) {
-      if (!isMissingPath(cleanupError)) throw cleanupError;
-    }
-    throw error;
-  } finally {
-    await handle?.close();
-  }
-}
-
-export function noFollowFlag(): number {
-  return typeof constants.O_NOFOLLOW === "number" ? constants.O_NOFOLLOW : 0;
-}
-
-export function isMissingPath(error: unknown): boolean {
-  return error instanceof Error && Reflect.get(error, "code") === "ENOENT";
 }

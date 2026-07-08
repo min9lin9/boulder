@@ -90,28 +90,21 @@ const cleanRefresh = read(paths.cleanRefresh);
 const cleanRelease = read(paths.cleanRelease);
 const cleanProduct = read(paths.cleanProduct);
 const cleanService = read(paths.cleanService);
-const expectedReleaseFailures = [
-  "install-smoke-version",
-  "published-version-evidence",
-  "release-evidence-manifest"
-];
-const allowedReleaseFailures = new Set([
-  "install-smoke-version",
-  "published-version-evidence",
-  "git-tag-local",
-  "release-evidence-manifest"
-]);
 function assertBlocked(report, label) {
   if (report.status !== "blocked") {
     console.error(`${label} must remain blocked without current external release evidence`);
     process.exit(1);
   }
 }
+function assertReady(report, label) {
+  if (report.status !== "ready") {
+    console.error(`${label} must be ready`);
+    process.exit(1);
+  }
+  console.log(`assert:${label} ready`);
+}
 function failingIds(report) {
   return (report.checks || []).filter((check) => check.status === "fail").map((check) => check.id);
-}
-function failedEvidenceIds(report) {
-  return (report.evidence || []).filter((item) => item.state === "fail").map((item) => item.id.replace(/^release\./, ""));
 }
 function assertSameIds(actual, expected, label) {
   const sortedActual = [...actual].sort();
@@ -122,16 +115,16 @@ function assertSameIds(actual, expected, label) {
   }
   console.log(`assert:${label} ${expected.join(",")}`);
 }
-function assertReleaseBlocked(report, label) {
+function assertReleaseBlocked(report, label, expectedFailures) {
   assertBlocked(report, label);
   const failing = failingIds(report);
-  const missing = expectedReleaseFailures.filter((id) => !failing.includes(id));
-  const unexpected = failing.filter((id) => !allowedReleaseFailures.has(id));
+  const missing = expectedFailures.filter((id) => !failing.includes(id));
+  const unexpected = failing.filter((id) => !expectedFailures.includes(id));
   if (missing.length || unexpected.length) {
     console.error(`${label} release-check blockers mismatch missing:${missing.join(", ")} unexpected:${unexpected.join(", ")}`);
     process.exit(1);
   }
-  console.log(`assert:${label} release-check ${expectedReleaseFailures.join(",")}`);
+  console.log(`assert:${label} release-check ${expectedFailures.join(",")}`);
 }
 function assertProductBlocked(report, label) {
   assertBlocked(report, label);
@@ -171,12 +164,12 @@ function assertRefreshExpected(report, label) {
   }
   console.log(`assert:${label} release-refresh release.version_mismatch`);
 }
-function assertInspectFail(report) {
-  if (report.status !== "fail") {
-    console.error("evidence-inspect must report status fail until release evidence is current");
+function assertInspectPass(report) {
+  if (report.status !== "pass") {
+    console.error("evidence-inspect must pass when release evidence is current");
     process.exit(1);
   }
-  assertSameIds(failedEvidenceIds(report), expectedReleaseFailures, "evidence-inspect failed ids");
+  console.log("assert:evidence-inspect pass");
 }
 function assertDiffMissing(report) {
   if (report.status !== "blocked" || report.recoveryCode !== "evidence.input_missing") {
@@ -187,14 +180,14 @@ function assertDiffMissing(report) {
   assertSameIds(codes, ["evidence.input_missing", "evidence.input_missing"], "evidence-diff missing issue codes");
 }
 assertRefreshExpected(refresh, "root");
-assertInspectFail(inspect);
+assertInspectPass(inspect);
 assertDiffMissing(diffMissing);
-assertReleaseBlocked(release, "root");
-assertProductBlocked(product, "root");
-assertServicePilotReady(service, "root");
-assertReleaseBlocked(runRootRelease, "run-root");
+assertReady(release, "root release-check");
+assertReady(product, "root product-readiness");
+assertReady(service, "root service-readiness");
+assertReleaseBlocked(runRootRelease, "run-root", ["git-tag-local"]);
 assertRefreshExpected(cleanRefresh, "clean archive");
-assertReleaseBlocked(cleanRelease, "clean archive");
+assertReleaseBlocked(cleanRelease, "clean archive", ["git-tag-local"]);
 assertProductBlocked(cleanProduct, "clean archive");
 assertServicePilotReady(cleanService, "clean archive");
 ' "$JSON_EVIDENCE_DIR/release-refresh.json" "$JSON_EVIDENCE_DIR/evidence-inspect.json" "$JSON_EVIDENCE_DIR/evidence-diff-missing.json" "$JSON_EVIDENCE_DIR/release-check.json" "$JSON_EVIDENCE_DIR/product-readiness.json" "$JSON_EVIDENCE_DIR/service-readiness.json" "$JSON_EVIDENCE_DIR/run-root-release-check.json" "$JSON_EVIDENCE_DIR/clean-release-refresh.json" "$JSON_EVIDENCE_DIR/clean-release-check.json" "$JSON_EVIDENCE_DIR/clean-product-readiness.json" "$JSON_EVIDENCE_DIR/clean-service-readiness.json"

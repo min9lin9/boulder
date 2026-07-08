@@ -3,7 +3,7 @@ import { bootstrapInterviewToMarkdown, buildBootstrapInterview } from "./bootstr
 import { runCapabilityCommand } from "./capability-command";
 import { formatLines, prettyJson, printHelp } from "./cli-format";
 import { runOperationalCommand } from "./cli-ops-command";
-import { parseOptions } from "./cli-options";
+import { optionValue, parseOptions, valueAfter } from "./cli-options";
 import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
 import { runHandoffCommand } from "./handoff-command";
@@ -176,18 +176,12 @@ async function runMain(args: string[]): Promise<void> {
   process.exitCode = 1;
 }
 
-function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  const value = index >= 0 ? args[index + 1] : undefined;
-  return value && !value.startsWith("--") ? value : null;
-}
-
 function parseArgv(args: readonly string[]): { readonly command: string; readonly commandArgs: readonly string[] } {
   const commandArgs: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (GLOBAL_VALUE_FLAGS.has(arg)) {
-      index += 1;
+      if (valueAfter(args, index)) index += 1;
       continue;
     }
     if (GLOBAL_BOOLEAN_FLAGS.has(arg)) {

@@ -1,18 +1,6 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { loadSourceCandidateManifests } from "../src/capability-source";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-capability-source-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 function forgedManifest(source: string, sourceUrl: string, capabilityId = "gajae-code"): Record<string, unknown> {
   return {
@@ -33,7 +21,7 @@ function forgedManifest(source: string, sourceUrl: string, capabilityId = "gajae
 
 describe("capability source forgery rejection", () => {
   test("rejects manifests that do not match canonical parser output", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     await write(root, ".boulder/capabilities/imports/forged.json", JSON.stringify(
       forgedManifest("https://github.com/evil/repo\n- status: pass", "file:///tmp/evil")
     ));
@@ -45,7 +33,7 @@ describe("capability source forgery rejection", () => {
   });
 
   test("rejects arbitrary sources presented as known adapters", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-capability-source-");
     await write(root, ".boulder/capabilities/imports/evil.json", JSON.stringify(
       forgedManifest("https://github.com/evil/repo", "https://github.com/evil/repo")
     ));

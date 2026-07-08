@@ -89,6 +89,20 @@ describe("boulder profile CLI e2e", () => {
     }
   });
 
+  test("treats missing profile flag values followed by another flag as absent", async () => {
+    const root = await tempRepo();
+    try {
+      const result = await runBoulder(["profile", "resolve", "--cwd", root, "--profile", "--json"]);
+      const payload = JSON.parse(result.stdout);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(payload.id).toBe("programming-default");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("rejects profile save path traversal", async () => {
     const root = await tempRepo();
     try {

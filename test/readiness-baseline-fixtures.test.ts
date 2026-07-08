@@ -24,8 +24,8 @@ describe("readiness v0 baseline fixtures", () => {
       const releaseCheck = JSON.parse(await readFile(releaseCheckPath, "utf8"));
       if (!isRecord(releaseCheck)) throw new Error("release-check baseline must be an object");
       const manifestCheck = findCheck(releaseCheck, "release-evidence-manifest");
-      manifestCheck["status"] = "pass";
-      manifestCheck["evidence"] = "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json";
+      manifestCheck["status"] = "fail";
+      manifestCheck["evidence"] = "stale release manifest fixture";
       await write(releaseCheckPath, `${JSON.stringify(releaseCheck, null, 2)}\n`);
 
       await expect(expectCurrentBaselines(fixtureDir)).rejects.toThrow("release-check.json mismatch");

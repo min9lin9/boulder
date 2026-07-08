@@ -1,7 +1,7 @@
 import { constants } from "node:fs";
 import { lstat, open, readdir } from "node:fs/promises";
-import { at } from "./fs";
-import { isMissingPath, isRoutineArtifact, noFollowFlag, pathIsProtectedLink, type RoutineArtifact } from "./routine";
+import { at, isMissingPath, noFollowFlag, pathIsProtectedLink } from "./fs";
+import { isRoutineArtifact, type RoutineArtifact } from "./routine";
 
 const ROUTINE_FILESYSTEM_ERROR_CODES = ["EACCES", "EPERM", "EISDIR", "ENOTDIR", "ELOOP", "ENAMETOOLONG", "EIO"] as const;
 

@@ -74,17 +74,11 @@ describe("ReleaseEvidenceBundleV1", () => {
     expect(rendered["docs/PRODUCT_READINESS.md"]).toBe(`- public-release-check: pass - release-check ready for ${packageJson.version}\n`);
   });
 
-  test("reports current checked release evidence as version drift until refresh", () => {
+  test("reports current checked release evidence as ready", () => {
     const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), READY_RELEASE_EXPECTATION);
 
-    expect(validation.status).toBe("fail");
-    expect(validation.issues.map((issue) => issue.code)).toEqual([
-      RELEASE_RECOVERY_CODES.packageJsonVersionMismatch,
-      RELEASE_RECOVERY_CODES.versionMismatch,
-      RELEASE_RECOVERY_CODES.tagMismatch,
-      RELEASE_RECOVERY_CODES.packVersionMismatch,
-      RELEASE_RECOVERY_CODES.packFileCountMismatch
-    ]);
+    expect(validation.status).toBe("pass");
+    expect(validation.issues).toEqual([]);
   });
 
   test("rejects malformed input with a stable recovery code", () => {

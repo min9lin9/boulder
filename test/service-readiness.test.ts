@@ -1,19 +1,9 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { mkdir, rm } from "node:fs/promises";
+import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { recordFieldEvidence } from "../src/field-evidence";
 import { evaluateServiceReadiness } from "../src/service-readiness";
-
-async function tempRepo(): Promise<string> {
-  return await mkdtemp(join(tmpdir(), "boulder-service-readiness-"));
-}
-
-async function write(root: string, path: string, content: string): Promise<void> {
-  const target = join(root, path);
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content, "utf8");
-}
+import { tempRepo, write } from "./helpers/cli";
 
 async function writeServiceFixture(root: string): Promise<void> {
   await write(root, "docs/SERVICE_LOOP.md", "install\ninit\ninspect\npipeline\nhandoff\nverify\nexport\nreadiness\nreplay\nsupport\nnot hosted\nprovider launch\n");
@@ -110,7 +100,7 @@ async function writeFieldEvidence(root: string, runId = "oss-run-1"): Promise<vo
 
 describe("service readiness", () => {
   test("rates a service evidence fixture as pilot-ready when product readiness is still blocked", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
 
     const readiness = await evaluateServiceReadiness(root);
@@ -123,7 +113,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when repeat-run gate evidence is missing", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "fixtures/service-readiness/gates.json", JSON.stringify({
       activationGate: {
@@ -140,7 +130,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when official documentation evidence is missing for public OSS replay", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "fixtures/replay/kimi-agent-swarm-skill/official-docs.json", "{}\n");
 
@@ -151,7 +141,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when replay docs are stale or ref-mismatched", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "fixtures/replay/kimi-agent-swarm-skill/official-docs.json", JSON.stringify({
       project: "kimi-agent-swarm-skill",
@@ -176,7 +166,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when field evidence is not complete", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "evidence/field-readiness/oss-run-1/decision-log.json", "{\"outcome\":\"unsupported\"}\n");
 
@@ -187,7 +177,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when the recorded field evidence manifest is stale or failing", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "evidence/field-readiness/oss-run-1/manifest.json", "{\"status\":\"fail\"}\n");
 
@@ -198,7 +188,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when field evidence exists but no manifest was recorded", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await rm(join(root, "evidence/field-readiness/oss-run-1/manifest.json"));
 
@@ -209,7 +199,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when any recorded field evidence run becomes invalid", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await writeFieldEvidence(root, "oss-run-2");
     await recordFieldEvidence(root, "oss-run-2", "evidence/field-readiness/oss-run-2");
@@ -222,7 +212,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when onboarding uses stale pre-publish terms", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "docs/ONBOARDING.md", "bun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\npre-publish\npost-publish\n");
 
@@ -233,7 +223,7 @@ describe("service readiness", () => {
   });
 
   test("blocks when onboarding mixes current and stale publish terms", async () => {
-    const root = await tempRepo();
+    const root = await tempRepo("boulder-service-readiness-");
     await writeServiceFixture(root);
     await write(root, "docs/ONBOARDING.md", "Published Package Path\nLocal Checkout Path\nbun bin/boulder.ts --help\ninit\ninspect\npipeline\nexport\nproduct-readiness\nquickstart\nonboard\ndoctor\nservice-readiness\nconfigured-unverified\ndoes not mutate\npre-publish\n");
 

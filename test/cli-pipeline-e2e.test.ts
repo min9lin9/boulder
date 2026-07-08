@@ -118,9 +118,9 @@ describe("boulder pipeline CLI e2e", () => {
   });
 
   test("rejects invalid pipeline friction", async () => {
-    const result = await runBoulder(["pipeline", "--friction", "impossible"]);
+    const result = await runBoulder(["pipeline", "--friction", "-1"]);
     expect(result.exitCode).toBe(1);
     expect(result.stdout).toBe("");
-    expect(result.stderr.trim()).toBe('ERROR pipeline.friction.invalid: Unsupported friction level "impossible". Expected one of: low, medium, high.');
+    expect(result.stderr.trim()).toBe('ERROR pipeline.friction.invalid: Unsupported friction level "-1". Expected one of: low, medium, high.');
   });
 });

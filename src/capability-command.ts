@@ -1,3 +1,4 @@
+import { optionValue } from "./cli-options";
 import {
   buildSourceCandidateManifest,
   CapabilitySourceError,
@@ -151,12 +152,6 @@ function parseKind(value: string | null): "skill" | "adapter" | "agent-catalog" 
   if (!value) return undefined;
   if (value === "skill" || value === "adapter" || value === "agent-catalog") return value;
   throw new CapabilitySourceError("capability.kind_invalid", "Kind must be skill, adapter, or agent-catalog.");
-}
-
-function optionValue(args: readonly string[], flag: string): string | null {
-  const index = args.findIndex((arg) => arg === flag);
-  const value = index >= 0 ? args[index + 1] : undefined;
-  return value && !value.startsWith("--") ? value : null;
 }
 
 function formatCapabilityImportResult(result: CapabilityImportResult): string {
