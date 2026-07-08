@@ -191,7 +191,7 @@ Wave 5: Final compatibility and review.
   QA scenarios (name the exact tool + invocation): happy: `bun bin/boulder.ts workflow map --json`, binary observable: exit 0 and JSON validates against `fixtures/workflow-map/primary-workflow.v0.json`, evidence `.omo/evidence/boulder-9-3-plus-verified/task-9-workflow-map.json`; failure: `bun test test/workflow-map.test.ts --test-name-pattern "rejects primary workflow without release-check"`, binary observable: exit 0 and assertion proves invalid map fixture is rejected, evidence `.omo/evidence/boulder-9-3-plus-verified/task-9-workflow-failure.txt`.
   Commit: Y | `feat(workflow): add primary workflow map`.
 
-- [ ] 10. Add repo-verifiable npm metadata checklist and deferred external provenance hardening docs.
+- [x] 10. Add repo-verifiable npm metadata checklist and deferred external provenance hardening docs.
   What to do / Must NOT do: Add docs and release-check advisory items for repository URL compatibility, package metadata, package page README/metadata, optional SBOM/signature/provenance verification. Split external npm settings into a deferred checklist section: npm 2FA, token policy, trusted publisher config, GitHub-hosted runner proof, and post-publish provenance view. Do not require external npm state for local readiness unless evidence is supplied.
   Parallelization: Wave 4 | Blocked by: 1 | Blocks: F1-F4
   References (executor has NO interview context - be exhaustive): `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-1-librarian-release-provenance.md`; `.omo/ulw-research/20260708-052436-boulder-9-3-plan-factcheck/wave-2-npm-github-expansion.md`; npm trusted publishing/provenance docs cited in synthesis; `.github/workflows/ci.yml`; `package.json`
