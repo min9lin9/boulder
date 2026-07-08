@@ -186,8 +186,8 @@ describe("boulder CLI e2e cleanup safety", () => {
     expect(payload.status).toBe("blocked");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
-    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
-    expect(payload.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
+    expect(payload.checks.some((item: { id: string; status: string }) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
+    expect(payload.nextCommands).not.toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
   });
 
   test("renders replay-check fixture evidence", async () => {

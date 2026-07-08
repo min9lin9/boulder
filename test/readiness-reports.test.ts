@@ -71,12 +71,12 @@ describe("benchmark and release reports", () => {
     expect(report.checks.some((item) => item.id === "changelog-version" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-version" && item.status === "fail")).toBe(true);
     expect(report.checks.some((item) => item.id === "published-version-evidence" && item.status === "fail")).toBe(true);
-    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "fail")).toBe(true);
+    expect(report.checks.some((item) => item.id === "git-tag-local" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "install-smoke-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "github-actions-evidence" && item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "release-evidence-manifest" && item.status === "fail")).toBe(true);
     expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.16.");
-    expect(report.nextCommands).toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
+    expect(report.nextCommands).not.toContain("Record local tag evidence for v0.1.16 after the release commit is ready.");
     expect(report.nextCommands).toContain("Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.16.");
     expect(markdown).toContain("does not publish");
     expect(markdown).toContain("Status: blocked");
