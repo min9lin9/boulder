@@ -2,6 +2,7 @@ import { exec } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+import { orderReadinessChecks } from "./readiness-registry";
 
 export type ReleaseEvidenceCheck = {
   readonly id: string;
@@ -34,7 +35,7 @@ export async function evaluateReleaseCheck(root: string): Promise<ReleaseCheckRe
   return {
     version,
     status,
-    checks,
+    checks: orderReadinessChecks("release-check", checks),
     nextCommands: nextCommandsFor(status, checks, version)
   };
 }

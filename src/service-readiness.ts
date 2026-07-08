@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { exists } from "./fs";
 import { validateHandoffFile } from "./handoff-validation";
 import { evaluateProductReadiness } from "./product-readiness";
+import { orderReadinessChecks } from "./readiness-registry";
 import { fieldEvidenceCheck } from "./service-field-evidence";
 import { evaluateReplayCheck } from "./replay-check";
 import { evaluateServiceGates } from "./service-gates";
@@ -77,7 +78,7 @@ export async function evaluateServiceReadiness(root: string): Promise<ServiceRea
     : "blocked";
   return {
     status,
-    checks,
+    checks: orderReadinessChecks("service-readiness", checks),
     nextSteps: nextStepsFor(status)
   };
 }
