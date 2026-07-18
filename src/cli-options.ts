@@ -28,5 +28,6 @@ export function parseOptions(args: readonly string[]): CliOptions {
 
 function optionValue(args: readonly string[], flag: string): string | null {
   const index = args.findIndex((arg) => arg === flag);
-  return index >= 0 && args[index + 1] ? args[index + 1] : null;
+  const value = index >= 0 ? args[index + 1] : undefined;
+  return value && !value.startsWith("-") ? value : null;
 }

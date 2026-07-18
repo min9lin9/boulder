@@ -4,8 +4,8 @@ A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex 
 
 Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
 
-Current published package: `boulder-oss-cli@0.1.15`.
-Current release candidate: `v0.1.16`.
+Current published package: `boulder-oss-cli@0.1.16`.
+Current release target: npm CLI package readiness. Boulder is not a hosted OpenAI Apps SDK app, Codex plugin marketplace listing, mobile app, login surface, or website.
 
 ## 3-minute route for non-developers
 
@@ -21,32 +21,32 @@ boulder로 반복작업 캡처하고 루프를 돌려줘.
 Prefer the local `boulder` skill when it is installed. For CLI use after trusting the npm package:
 
 ```bash
-bunx boulder-oss-cli@0.1.15 init
-bunx boulder-oss-cli@0.1.15 routine capture --task "release note draft" --write
-bunx boulder-oss-cli@0.1.15 quickstart
-bunx boulder-oss-cli@0.1.15 inspect
-bunx boulder-oss-cli@0.1.15 doctor
+bunx boulder-oss-cli@0.1.16 init
+bunx boulder-oss-cli@0.1.16 routine capture --task "release note draft" --write
+bunx boulder-oss-cli@0.1.16 quickstart
+bunx boulder-oss-cli@0.1.16 inspect
+bunx boulder-oss-cli@0.1.16 doctor
 ```
 
-`doctor` does not install GJC or LazyCodex. It reports whether they are configured preferences, detected local tools, or safe to use through Codex fallback.
+`doctor` reports whether GJC and LazyCodex are configured preferences, detected local tools, or safe to use through Codex fallback; it does not install them.
 
 Then close the weekly learning loop (repo-local only):
 
 ```bash
-bunx boulder-oss-cli@0.1.15 retro weekly --dry-run
-bunx boulder-oss-cli@0.1.15 skill propose --from-routine release-note-draft --dry-run
+bunx boulder-oss-cli@0.1.16 retro weekly --dry-run
+bunx boulder-oss-cli@0.1.16 skill propose --from-routine release-note-draft --dry-run
 ```
 
 `routine capture`, `retro weekly --dry-run`, and `skill propose --from-routine` are review-first: they keep recurring-work evidence in `.boulder/**`, surface what would change, and do **not** run schedulers, mutate calendars, install/update/apply tools, call external models by default, or archive existing skills.
 
-If GJC, LazyCodex, or a subagent catalog is not installed yet, register canonical GitHub source URLs as project-local candidates first. This keeps Boulder read-only until you explicitly choose what to install or wire up:
+If GJC, LazyCodex, or a subagent catalog is not installed, register canonical GitHub source URLs as project-local candidates before choosing what to install or wire up. Boulder remains read-only until that explicit choice:
 
 ```bash
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/code-yeongyu/lazycodex --write
-bunx boulder-oss-cli@0.1.15 capability import --from https://github.com/msitarzewski/agency-agents --dry-run
-bunx boulder-oss-cli@0.1.15 doctor
+bunx boulder-oss-cli@0.1.16 capability import --from https://github.com/Yeachan-Heo/gajae-code --dry-run
+bunx boulder-oss-cli@0.1.16 capability import --from https://github.com/Yeachan-Heo/gajae-code --write
+bunx boulder-oss-cli@0.1.16 capability import --from https://github.com/code-yeongyu/lazycodex --write
+bunx boulder-oss-cli@0.1.16 capability import --from https://github.com/msitarzewski/agency-agents --dry-run
+bunx boulder-oss-cli@0.1.16 doctor
 ```
 
 `--dry-run` prints the manifest path and capability kind without writing. `--write` creates `.boulder/capabilities/imports/*.json`. `doctor` then shows these as source candidates, not installed tools.
@@ -108,9 +108,9 @@ For a repeated workflow, ask Codex to design the repo-local profile before wirin
 Use $boulder-bootstrap-designer to turn this repeated task into a Boulder workflow profile.
 ```
 
-The designer chooses one of the built-in bootstrap profiles: `programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, or `docs-reviewer`. It returns `boulder profile use`, `capability import`, `quickstart`, and `doctor` commands. It can also use an interview path: ask what repeated work the user does, activate the matching profile, then select a small subagent subset from `https://github.com/msitarzewski/agency-agents`. `GJC`, `LazyCodex`, `agency-agents`, `context-mode`, and `private corpus` repositories are candidate capabilities until `doctor` verifies the local installation or inventory.
+The designer chooses one of the built-in bootstrap profiles—`programming-heavy`, `research-corpus`, `release-safe`, `issue-triage`, or `docs-reviewer`—and returns `boulder profile use`, `capability import`, `quickstart`, and `doctor` commands. Its interview path asks about repeated work, activates the matching profile, then selects a small subagent subset from `https://github.com/msitarzewski/agency-agents`. `GJC`, `LazyCodex`, `agency-agents`, `context-mode`, and `private corpus` repositories remain candidate capabilities until `doctor` verifies the local installation or inventory.
 
-For recurring work outside interviews, use the learning loop docs directly:
+For recurring work outside interviews:
 
 ```bash
 boulder routine capture --task "weekly release note draft"
@@ -144,6 +144,18 @@ Live planning delegation through `gjc_delegate_plan` is suggested only after pac
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
 
+## Explicit boulder-native Preview
+
+`boulder-native-preview` is an opt-in local planning preview; it does not replace `programming-default`. Select it explicitly with `boulder profile use boulder-native-preview`, then use `plan analyze`, `plan show`, and `plan validate` only to inspect local inputs and plan artifacts:
+
+```bash
+boulder plan analyze --task "review the release workflow" --friction focused --json
+boulder plan show --run-id <run-id> --json
+boulder plan validate --input <packet-path> --artifact packet --json
+```
+
+These commands are read-only: they do not install software, contact providers, invoke external agents, mutate product files, or execute a plan. Preview planning approval and execution approval are separate explicit decisions. Any preview event evidence is local-only and remains in `.boulder/`; an external bridge from this preview to Handoff is a follow-up RFC, not a shipped feature. Boulder Handoff v1 remains the existing sanitized packet and review flow.
+
 ## Core Commands
 
 ```bash
@@ -176,7 +188,7 @@ Workflow profiles are the preferred routing surface. `boulder.yaml.executors` re
 
 ## Why Boulder
 
-Codex can help with triage, planning, review, release work, and agent-assisted maintenance. Boulder turns implicit maintainer knowledge into a repeatable harness with explicit evidence gates.
+For triage, planning, review, release work, and agent-assisted maintenance, Boulder turns implicit maintainer knowledge into a repeatable harness with explicit evidence gates.
 
 It is not a swarm runtime, benchmark leaderboard, hosted service, or replacement for local verification.
 

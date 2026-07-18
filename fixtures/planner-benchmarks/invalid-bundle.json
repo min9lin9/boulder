@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "boulder.planner-evidence-bundle.v1",
+  "studyId": "representative-study",
+  "protocolDigest": "not-a-digest",
+  "manifestDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "rubricDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "normalizerDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "normalizedRuns": [],
+  "exclusions": [],
+  "assignmentsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "approvalsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "redactionsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "trustRootFingerprintSetDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "studyRootDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+  "signature": { "algorithm": "Ed25519", "keyId": "operator", "signature": "AA" }
+}

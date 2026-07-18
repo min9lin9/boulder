@@ -230,4 +230,22 @@ describe("capability doctor", () => {
     expect(report.capabilities.some((item) => item.kind === "runtime" && item.id === "bun" && item.status === "1.3.14")).toBe(true);
   });
 
+  test("reports the native planner as an explicit bundled preview without changing availability", async () => {
+    const root = await tempRepo();
+    await write(root, "fixtures/capabilities/codex-installed.json", JSON.stringify({
+      skills: [{ id: "gajae-code", status: "installed" }, { id: "lazycodex", status: "installed" }],
+      mcpServers: [],
+      plugins: [],
+      runtimes: [{ id: "bun", version: "1.3.14" }]
+    }));
+
+    const report = await evaluateCapabilityDoctor(root);
+
+    expect(report.status).toBe("pass");
+    expect(report.nativePlannerPreview.profileId).toBe("boulder-native-preview");
+    expect(report.nativePlannerPreview.availability).toBe("bundled-local-preview");
+    expect(report.nativePlannerPreview.requiresExplicitSelection).toBe(true);
+    expect(report.nativePlannerPreview.recommendation).toContain("not an installation");
+    expect(report.capabilities.some((item) => item.id === "boulder-native")).toBe(false);
+  });
 });

@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
+import { runCommand } from "./helpers/cli";
 
 const root = join(import.meta.dir, "..");
 
@@ -36,11 +37,56 @@ describe("source cleanliness", () => {
     expect(metadata).toContain("default_prompt:");
     expect(packageJson).toContain("\"skills/boulder-bootstrap-designer\"");
   });
+  test("native planner skill is packaged and preserves local approval boundaries", async () => {
+    const skill = await readFile(join(root, "skills/boulder-native-planner/SKILL.md"), "utf8");
+    const metadata = await readFile(join(root, "skills/boulder-native-planner/agents/openai.yaml"), "utf8");
+    const packageJson = await readFile(join(root, "package.json"), "utf8");
+
+    expect(skill).toContain("boulder-native-preview");
+    expect(skill).toContain("boulder plan analyze --task");
+    expect(skill).toContain("boulder plan validate --input");
+    expect(skill).toContain("boulder plan show --run-id");
+    expect(skill).not.toContain("boulder plan review");
+    expect(skill).not.toContain("boulder plan approve");
+    expect(skill).toContain("separate explicit approval");
+    expect(skill).not.toContain("bunx");
+    expect(metadata).toContain("allow_implicit_invocation: false");
+    expect(packageJson).toContain("\"skills/boulder-native-planner\"");
+  });
+  test("preview documentation preserves default routing and Handoff v1 contracts", async () => {
+    const [readme, architecture, doctor, profiles, handoffPacket, handoffShape] = await Promise.all([
+      readFile(join(root, "README.md"), "utf8"),
+      readFile(join(root, "docs/WORKFLOW_ARCHITECTURE.md"), "utf8"),
+      readFile(join(root, "docs/CAPABILITY_DOCTOR.md"), "utf8"),
+      readFile(join(root, "src/workflow-profile-builtins.ts"), "utf8"),
+      readFile(join(root, "src/handoff-packet.ts"), "utf8"),
+      readFile(join(root, "src/handoff-packet-shape.ts"), "utf8")
+    ]);
+
+    expect(readme).toContain("The default active profile is `programming-default`: planning uses `gajae-code` and execution uses `lazycodex`, both in `detect-and-suggest` mode.");
+    expect(profiles).toContain('if (profileId === "programming-default") return programmingDefault(source, drift, task, suggestion);');
+    expect(profiles).toContain('planAdapter: "gajae-code"');
+    expect(profiles).toContain('executeAdapter: "lazycodex"');
+    expect(handoffPacket).toContain('readonly schemaVersion: "boulder.handoff.v1";');
+    expect(handoffPacket).toContain('schemaVersion: "boulder.handoff.v1"');
+    expect(handoffShape).toContain('schemaVersion !== "boulder.handoff.v1"');
+
+    for (const source of [readme, architecture, doctor]) {
+      expect(source).toContain("boulder-native-preview");
+      expect(source).toMatch(/read-only|inspect local/i);
+      expect(source).toMatch(/separate explicit|separate explicit maintainer/i);
+      expect(source).toMatch(/local(?:-only)? (?:to|in|and remains in) `?\.boulder\//i);
+      expect(source).toMatch(/follow-up RFC.*not (?:a )?(?:shipped|implemented)/i);
+      expect(source).not.toMatch(/auto-?install|automatically install|automatic provider|provider integration/i);
+    }
+  });
+
 
   test("packaged skills and release docs do not contain local-only paths", async () => {
     const files = [
       ...(await filesUnder("skills/boulder")),
       ...(await filesUnder("skills/boulder-bootstrap-designer")),
+      ...(await filesUnder("skills/boulder-native-planner")),
       "README.md",
       "docs/BOULDER_CODEX_SKILL_USAGE.ko.md"
     ];
@@ -61,6 +107,14 @@ describe("source cleanliness", () => {
     expect(packageJson).toContain("\"skills/boulder-bootstrap-designer\"");
     expect(packageJson).toContain("\"!docs/*SESSION_SUMMARY*.md\"");
     expect(packageJson).toContain("\"!docs/NEXT_*GAP*PLAN*.md\"");
+  });
+
+  test("package dry run excludes all AGENTS.md files", async () => {
+    const result = await runCommand("bun pm pack --dry-run --ignore-scripts", root);
+    const output = `${result.stdout}${result.stderr}`;
+
+    expect(result.exitCode).toBe(0);
+    expect(output).not.toMatch(/^packed\s+\S+\s+(?:.*\/)?AGENTS\.md\r?$/m);
   });
 });
 

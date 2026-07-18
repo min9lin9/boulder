@@ -4,6 +4,7 @@ import { runCapabilityCommand } from "./capability-command";
 import { evaluateCapabilityDoctor } from "./capability-doctor";
 import { formatDoctorReport, formatFieldEvidenceResult, formatLines, prettyJson, printHelp } from "./cli-format";
 import { parseOptions } from "./cli-options";
+import { runPlanCommand } from "./plan-command";
 import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
 import { recordFieldEvidence } from "./field-evidence";
@@ -70,6 +71,10 @@ async function runMain(args: string[]): Promise<void> {
     const markdown = inspectionToMarkdown(inspection);
     await writeGeneratedText(options.cwd, "docs/REPO_BRIEF.md", markdown, true);
     console.log(markdown);
+    return;
+  }
+  if (command === "plan") {
+    await runPlanCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
   if (command === "profile") {
@@ -267,7 +272,7 @@ function parseArgv(args: readonly string[]): { readonly command: string; readonl
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (GLOBAL_VALUE_FLAGS.has(arg)) {
-      index += 1;
+      if (args[index + 1] && !args[index + 1].startsWith("-")) index += 1;
       continue;
     }
     if (GLOBAL_BOOLEAN_FLAGS.has(arg)) {

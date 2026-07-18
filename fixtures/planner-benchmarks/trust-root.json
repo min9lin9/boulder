@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "boulder.planner-benchmark.trust-root.v1",
+  "rootId": "representative-operator-root",
+  "createdAt": "2026-07-15T00:00:00.000Z",
+  "delegationPolicy": { "protocolThreshold": 1, "allowProtocolDelegation": true, "requireManifestSignerAuthorization": true, "requireBundleSignerAuthorization": true },
+  "keys": [{ "keyId": "operator", "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925", "status": "active" }]
+}

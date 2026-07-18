@@ -1,6 +1,6 @@
 Release CI evidence
 
-Observed result on 2026-06-24 for the 0.1.15 release candidate.
+Observed result on 2026-07-08 for the 0.1.16 release.
 
 Command:
 
@@ -16,7 +16,7 @@ validate, verify, pipeline, scorecard, benchmark, release-plan,
 release-check, replay-check, replay-run, product-readiness,
 service-readiness, doctor, record, and export.
 
-bun test: pass (132 tests)
+bun test: pass (202 tests)
 TypeScript build: pass
 Package dry-run: pass
 ```
@@ -63,12 +63,12 @@ Package:
 Bun package dry-run evidence:
 
 ```text
-boulder-oss-cli-0.1.15.tgz
-Bun total files: 147
-Unpacked size: 0.49MB
+boulder-oss-cli-0.1.16.tgz
+Bun total files: 168
+Unpacked size: 0.63MB
 ```
 
-Conclusion: the release candidate includes the workflow profile and
+Conclusion: the release includes the workflow profile and
 tenant-safe handoff surface. This file records `bun run ci`; npm
 publish dry-run evidence is recorded separately in
 `docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt`.

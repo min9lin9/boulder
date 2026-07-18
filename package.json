@@ -4,6 +4,14 @@
   "description": "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/min9lin9/boulder.git"
+  },
+  "homepage": "https://github.com/min9lin9/boulder#readme",
+  "bugs": {
+    "url": "https://github.com/min9lin9/boulder/issues"
+  },
   "bin": {
     "boulder": "bin/boulder.js",
     "boulder-oss-cli": "bin/boulder.js"
@@ -32,6 +40,7 @@
     "fixtures",
     "skills/boulder",
     "skills/boulder-bootstrap-designer",
+    "skills/boulder-native-planner",
     "README.md",
     "boulder.yaml",
     "LICENSE",
@@ -39,6 +48,7 @@
     "ROADMAP.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
+    "!**/AGENTS.md",
     "!docs/*SESSION_SUMMARY*.md",
     "!docs/NEXT_*GAP*PLAN*.md",
     "!**/* 2.*"

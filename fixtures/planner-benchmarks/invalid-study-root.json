@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "boulder.planner-study-root.v1",
+  "fixtureOnly": true,
+  "fixtureNotice": "Invalid deterministic fixture only; no field-study evidence or operational signature is represented.",
+  "study": {
+    "studyId": "fixture-pr8a-36-run-matrix",
+    "matrix": {
+      "planners": ["gjc", "boulder-native", "lazycodex-ulw-plan"],
+      "taskClasses": ["small-bug", "medium-feature", "high-risk-change"],
+      "repositories": ["small-ts-cli", "medium-multi-module"],
+      "repeats": [1, 2],
+      "requiredRunCount": 35
+    },
+    "fieldStudyStatus": "NOT_PERFORMED"
+  },
+  "protocol": {},
+  "manifest": {},
+  "evidenceBundle": {}
+}

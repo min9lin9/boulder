@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "boulder.plan-analysis.v1",
+  "input": {
+    "normalizedTask": "add a bounded planner contract",
+    "inputDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "dimensions": [
+    { "id": "ambiguity", "level": 2, "weight": 25, "weightedScore": 13, "reasons": ["The owner must choose the contract boundary."] },
+    { "id": "impact", "level": 2, "weight": 20, "weightedScore": 10, "reasons": ["The change spans a single component."] },
+    { "id": "irreversibility", "level": 0, "weight": 20, "weightedScore": 0, "reasons": ["The change is reversible."] },
+    { "id": "externality", "level": 1, "weight": 15, "weightedScore": 4, "reasons": ["Only existing local tools are used."] },
+    { "id": "verification_gap", "level": 3, "weight": 20, "weightedScore": 15, "reasons": ["Integration verification is not specified."] }
+  ],
+  "totalScore": 42,
+  "confidence": "high",
+  "hardOverrides": [],
+  "selectedMode": "focused",
+  "approvalMinimum": ["plan", "execution"],
+  "questionBudget": 3,
+  "plannerRecommendation": "Use the boulder-native planner with focused owner questions.",
+  "canonicalDigest": "sha256:aeb2e593ac3a1eaf85ca0c4e0804f68ef491c925ca12594c4aadba1b00192875",
+  "volatile": {
+    "runId": "plan-analysis-fixture",
+    "createdAt": "2026-07-15T00:00:00.000Z"
+  }
+}

@@ -4,7 +4,7 @@ Status: final planning draft
 
 ## One-Line Definition
 
-Boulder is a workflow manager and evaluator for modular AI-assisted work: GJC is the default planning executor, LazyCodex is the default execution executor, and Boulder owns classification, handoff contracts, verification, decision evidence, and compound orchestration.
+Boulder is a workflow manager and evaluator for modular AI-assisted work. The default `programming-default` profile keeps GJC as the planning preference and LazyCodex as the execution preference; the explicit `boulder-native-preview` profile is a local planning preview. Boulder owns classification, handoff contracts, verification, decision evidence, and compound orchestration.
 
 ## Source Inputs
 
@@ -173,6 +173,11 @@ Design rule:
 | Evaluator | Boulder gates | custom QA, reviewer, CI | verification report |
 | Decision owner | Maintainer | reviewer, project owner | decision log |
 | Compound layer | Boulder | another orchestrator | workflow profile and evidence ledger |
+### Explicit boulder-native Preview
+
+`boulder-native-preview` is opt-in and does not alter `programming-default`. Its `plan analyze`, `plan show`, and `plan validate` commands inspect local inputs and artifacts only: they do not install software, contact providers, invoke external agents, mutate product files, or execute a plan.
+
+Planning approval and execution approval remain separate explicit maintainer decisions. Preview event evidence is local-only in `.boulder/`; it is not provider telemetry or an external delivery record. Boulder Handoff v1 remains the existing sanitized packet and review contract. A bridge that turns preview output into an external Handoff flow is follow-up RFC work and is not implemented.
 
 ## Adapter Contracts
 

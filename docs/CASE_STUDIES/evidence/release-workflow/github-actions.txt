@@ -2,31 +2,18 @@ GitHub Actions evidence
 
 Repository: https://github.com/min9lin9/boulder
 Workflow: CI
-Run: https://github.com/min9lin9/boulder/actions/runs/27739209640
+Run: https://github.com/min9lin9/boulder/actions/runs/28885567998
 Branch: main
 Event: push
 Status: success
-Commit: 806330e
-Release tag: v0.1.15
-Tag proof: `git tag --list v0.1.15` returns the local tag and `git push origin v0.1.15` pushed it to GitHub.
-GitHub Release: https://github.com/min9lin9/boulder/releases/tag/v0.1.15
+Commit: df3538c
+Release tag: v0.1.16
 
 Security workflow:
 
-- Run: https://github.com/min9lin9/boulder/actions/runs/27739209611
+- Run: https://github.com/min9lin9/boulder/actions/runs/28885567994
 - Status: success
 - Job: CodeQL
-
-CI evidence fix:
-
-- Failed run without release tag history: https://github.com/min9lin9/boulder/actions/runs/27739148603
-- Fix commit: `806330e` changes checkout to `fetch-depth: 0` so release-check can see release tags, which point at the published release commit instead of the latest docs/config commit.
-
-Prior baseline CI runs:
-
-- https://github.com/min9lin9/boulder/actions/runs/27699858921
-- https://github.com/min9lin9/boulder/actions/runs/27423715576
-- https://github.com/min9lin9/boulder/actions/runs/27290627860
 
 Command covered by the workflow:
 
@@ -34,4 +21,4 @@ Command covered by the workflow:
 bun run ci
 ```
 
-Recorded as public CI evidence for Boulder release workflow review. Newer commits must keep `.github/workflows/ci.yml` green before claiming product-ready status.
+Recorded as public CI evidence for Boulder release workflow review.

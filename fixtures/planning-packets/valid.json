@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "boulder.planning-packet.v1",
+  "runId": "planning-packet-fixture",
+  "createdAt": "2026-07-15T00:00:00Z",
+  "packetDigest": "sha256:fd45a5b2e2408c974076756cba75a8ce4288399ca0f7f88448770a6c2bc1355f",
+  "producer": {"adapter":"boulder-native","mode":"focused","host":"bun","toolVersion":"0.2.0"},
+  "task": {"rawTaskHash":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","normalizedSummary":"Validate planning packet shapes.","profileId":"boulder-native-preview","analysisRef":"analysis.json"},
+  "objective": "Reject unsafe or untraceable planning packets.",
+  "decisions": [{"id":"D1","statement":"Keep planning local.","source":"maintainer","sourceRefs":["S1"],"confidence":"high"}],
+  "scope": {"allowedPaths":["src/planning-packet.ts","test/planning-packet.test.ts","fixtures/planning-packets/**"],"forbiddenPaths":["src/handoff-packet.ts"],"protectedPaths":[".env*"],"nonGoals":["provider calls"]},
+  "tasks": [{"id":"T1","title":"Validate packet shapes","dependsOn":[],"paths":["src/planning-packet.ts"],"steps":["Validate required fields"],"acceptanceIds":["AC1"],"verificationIds":["V1"],"evidenceIds":["E1"]}],
+  "acceptanceCriteria": [{"id":"AC1","statement":"Unsafe packets are rejected.","verificationIds":["V1"],"evidenceIds":["E1"]}],
+  "verification": [{"id":"V1","kind":"command","command":"bun test test/planning-packet.test.ts","source":"package-script","required":true,"evidencePath":"evidence/tests/planning-packet.txt"}],
+  "risks": [{"id":"R1","severity":"medium","trigger":"Schema drift","mitigation":"Use stable validation","rollback":"Revert the change","approvalGate":"plan"}],
+  "approvalPolicy": {"plan":"required","execution":"required","external":"required-if-used"},
+  "review": {"structural":"pending","semantic":"pending","unresolvedFindings":[]},
+  "sourceRefs": [{"id":"S1","path":"src/workflow-profile-builtins.ts","sha256":"sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","kind":"code","trust":"repo-evidence"}]
+}

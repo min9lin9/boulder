@@ -1,0 +1,496 @@
+{
+  "criticReview": {
+    "schemaVersion": "boulder.critic-review.v1",
+    "reviewType": "structural",
+    "packetDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verdict": "PASS",
+    "findings": [],
+    "coverage": [
+      "scope"
+    ],
+    "reviewer": {
+      "adapter": "fixture",
+      "host": "local",
+      "toolVersion": "v1",
+      "independentFromProducer": true
+    },
+    "createdAt": "2026-07-15T00:00:00.000Z"
+  },
+  "executionPacket": {
+    "schemaVersion": "boulder.execution-packet.v1",
+    "planningPacketDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approvalReceiptDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "objective": "Validate fixture contracts.",
+    "allowedMutationPaths": [
+      "src/example.ts"
+    ],
+    "forbiddenPaths": [
+      "src/private.ts"
+    ],
+    "nonGoals": [
+      "authorization"
+    ],
+    "orderedTasks": [
+      {
+        "id": "T1",
+        "planningTaskId": "T1",
+        "dependsOn": [],
+        "paths": [
+          "src/example.ts"
+        ],
+        "steps": [
+          "validate"
+        ],
+        "verificationIds": [
+          "V1"
+        ],
+        "acceptanceIds": [
+          "AC1"
+        ]
+      }
+    ],
+    "verificationCommands": [
+      {
+        "id": "V1",
+        "command": "bun test",
+        "source": "package-script"
+      }
+    ],
+    "evidenceRequirements": [
+      {
+        "taskId": "T1",
+        "evidenceIds": [
+          "E1"
+        ]
+      }
+    ],
+    "risks": [
+      {
+        "id": "R1"
+      }
+    ],
+    "riskControls": [
+      {
+        "taskId": "T1",
+        "riskId": "R1",
+        "control": "Review before approval."
+      }
+    ],
+    "rollback": [
+      "Revert the isolated change."
+    ],
+    "executionApproval": {
+      "required": true,
+      "schemaVersion": "boulder.execution-approval.v1"
+    },
+    "acceptanceCriteria": [
+      {
+        "id": "AC1",
+        "verificationIds": [
+          "V1"
+        ],
+        "evidenceIds": [
+          "E1"
+        ]
+      }
+    ]
+  },
+  "challengeHistory": {
+    "schemaVersion": "boulder.approval-challenge-history.v1",
+    "previousChallenge": {
+      "schemaVersion": "boulder.plan-approval-challenge.v1",
+      "runId": "run_1",
+      "purpose": "plan",
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "challengeId": "challenge_1",
+      "challengeDigest": "",
+      "status": "pending",
+      "nonce": "nonce_1",
+      "codeHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "keyVersion": "key_1",
+      "issuedBy": "fixture",
+      "bindings": {
+        "packetDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "structuralReviewDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "semanticReviewDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "sourceDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    "previousStatus": "pending",
+    "status": "consumed",
+    "transitionedAt": "2026-07-15T00:01:00.000Z",
+    "immutable": true
+  },
+  "trustRoot": {
+    "schemaVersion": "boulder.planner-benchmark.trust-root.v1",
+    "rootId": "fixture-root",
+    "createdAt": "2026-07-15T00:00:00.000Z",
+    "delegationPolicy": {
+      "protocolThreshold": 1,
+      "allowProtocolDelegation": true,
+      "requireManifestSignerAuthorization": true,
+      "requireBundleSignerAuthorization": true
+    },
+    "keys": [
+      {
+        "keyId": "fixture-key",
+        "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+        "status": "active"
+      }
+    ]
+  },
+  "protocol": {
+    "schemaVersion": "boulder.planner-study-protocol.v1",
+    "studyId": "fixture-study",
+    "rubricVersion": "v1",
+    "rubricDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "normalizerVersion": "pr8b-strict-packet-v2",
+    "normalizerDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "runnerContractDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "protocolSigner": {
+      "keyId": "fixture-key",
+      "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925"
+    },
+    "delegatedSigners": [
+      {
+        "keyId": "fixture-key",
+        "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+        "roles": [
+          "manifest",
+          "bundle",
+          "executor"
+        ]
+      }
+    ],
+    "authorizationPolicy": "Operator approval is required before external calls and common-executor validation; automated blinded evaluation was explicitly user-authorized and remains disclosed as non-human exploratory evidence.",
+    "redactionPolicy": "Apply pr8b-redaction-v1 before blinded review while preserving technical evidence.",
+    "blindingPolicy": "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.",
+    "exclusionPolicy": "Exclude only malformed, interrupted, contaminated, or policy-violating runs with signed evidence and adjudicator reason.",
+    "replacementPolicy": "A replacement must immediately follow and reference the excluded run for the same cell and repeat.",
+    "signature": {
+      "algorithm": "Ed25519",
+      "keyId": "fixture-key",
+      "signature": "AA"
+    }
+  },
+  "manifest": {
+    "schemaVersion": "boulder.planner-study-manifest.v1",
+    "studyId": "fixture-study",
+    "protocolDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "tasks": [
+      {
+        "taskId": "TSG-BUG-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "taskId": "TSG-FEAT-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "taskId": "TSG-RISK-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "taskId": "NI-BUG-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "taskId": "NI-FEAT-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      {
+        "taskId": "NI-RISK-01",
+        "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ],
+    "repositories": [
+      {
+        "repoId": "small-ts-cli",
+        "revision": "one"
+      },
+      {
+        "repoId": "medium-multi-module",
+        "revision": "two"
+      }
+    ],
+    "cells": [
+      {
+        "cellId": "gjc:small-bug:small-ts-cli",
+        "plannerId": "gjc",
+        "taskClass": "small-bug",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "gjc:small-bug:medium-multi-module",
+        "plannerId": "gjc",
+        "taskClass": "small-bug",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "gjc:medium-feature:small-ts-cli",
+        "plannerId": "gjc",
+        "taskClass": "medium-feature",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "gjc:medium-feature:medium-multi-module",
+        "plannerId": "gjc",
+        "taskClass": "medium-feature",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "gjc:high-risk-change:small-ts-cli",
+        "plannerId": "gjc",
+        "taskClass": "high-risk-change",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "gjc:high-risk-change:medium-multi-module",
+        "plannerId": "gjc",
+        "taskClass": "high-risk-change",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "boulder-native:small-bug:small-ts-cli",
+        "plannerId": "boulder-native",
+        "taskClass": "small-bug",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "boulder-native:small-bug:medium-multi-module",
+        "plannerId": "boulder-native",
+        "taskClass": "small-bug",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "boulder-native:medium-feature:small-ts-cli",
+        "plannerId": "boulder-native",
+        "taskClass": "medium-feature",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "boulder-native:medium-feature:medium-multi-module",
+        "plannerId": "boulder-native",
+        "taskClass": "medium-feature",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "boulder-native:high-risk-change:small-ts-cli",
+        "plannerId": "boulder-native",
+        "taskClass": "high-risk-change",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "boulder-native:high-risk-change:medium-multi-module",
+        "plannerId": "boulder-native",
+        "taskClass": "high-risk-change",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:small-bug:small-ts-cli",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "small-bug",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:small-bug:medium-multi-module",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "small-bug",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:medium-feature:small-ts-cli",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "medium-feature",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:medium-feature:medium-multi-module",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "medium-feature",
+        "repoId": "medium-multi-module"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:high-risk-change:small-ts-cli",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "high-risk-change",
+        "repoId": "small-ts-cli"
+      },
+      {
+        "cellId": "lazycodex-ulw-plan:high-risk-change:medium-multi-module",
+        "plannerId": "lazycodex-ulw-plan",
+        "taskClass": "high-risk-change",
+        "repoId": "medium-multi-module"
+      }
+    ],
+    "repeats": [
+      1,
+      2
+    ],
+    "randomizationSeed": "seed",
+    "signature": {
+      "algorithm": "Ed25519",
+      "keyId": "fixture-key",
+      "signature": "AA"
+    }
+  },
+  "rawRun": {
+    "schemaVersion": "boulder.planner-study-raw-run.v1",
+    "runId": "run-1",
+    "cellId": "gjc:small-bug:small-ts-cli",
+    "repeat": 1,
+    "sequence": 1,
+    "protocolDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "operatorApprovalDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "artifacts": [
+      {
+        "path": "runs/raw.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "v1"
+      }
+    ],
+    "redactionInputDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "normalizedRun": {
+    "schemaVersion": "boulder.planner-benchmark-run.v1",
+    "runId": "run-1",
+    "cellId": "gjc:small-bug:small-ts-cli",
+    "repeat": 1,
+    "sequence": 1,
+    "protocolDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "rawRunDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sourceDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "packetDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "reviewDigests": [
+      "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "approvalDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "executionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verificationDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "reviewerDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "redactionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "normalizerVersion": "v1",
+    "normalizerDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "score": 92,
+    "rawScore": 92,
+    "criticalCaps": [],
+    "traceabilityPercent": 100,
+    "execution": {
+      "status": "passed",
+      "path": "evidence/fixture.json",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "schemaVersion": "boulder.planner-execution-receipt.v1"
+    },
+    "reviewItemId": "review-1",
+    "blindedItemDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "evidenceBundle": {
+    "schemaVersion": "boulder.planner-evidence-bundle.v1",
+    "studyId": "fixture-study",
+    "protocolDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "rubricDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "normalizerDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "normalizedRuns": [],
+    "exclusions": [],
+    "assignmentsDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "approvalsDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "redactionsDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "trustRootFingerprintSetDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "studyRootDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "signature": {
+      "algorithm": "Ed25519",
+      "keyId": "fixture-key",
+      "signature": "AA"
+    },
+    "artifactIndex": [
+      {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      }
+    ],
+    "studyArtifacts": {
+      "rubric": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "normalizer": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "assignments": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "approvals": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "redactions": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      }
+    },
+    "scoreLockReceipt": {
+      "schemaVersion": "boulder.planner-score-lock-receipt.v1",
+      "sequence": 1,
+      "occurredAt": "2026-07-15T00:00:00Z",
+      "kind": "prospective-lock",
+      "scoreSheet": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "lockDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "blindedItems": []
+    },
+    "scoreRevealReceipt": {
+      "schemaVersion": "boulder.planner-score-reveal-receipt.v1",
+      "sequence": 2,
+      "occurredAt": "2026-07-15T00:00:01Z",
+      "lockDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "scoreSheet": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "privateAssignment": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "fixture.v1"
+      },
+      "reveals": []
+    }
+  },
+  "benchmarkReport": {
+    "schemaVersion": "boulder.planner-benchmark-report.v1",
+    "bundleDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "trustRootFingerprintSetDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "eligibleRunIds": [],
+    "excludedRunIds": [],
+    "decision": "HOLD",
+    "reasons": [
+      "evidence"
+    ],
+    "metrics": {
+      "scoredRunCount": 0,
+      "eligibleRunCount": 0,
+      "weightedAverage": null,
+      "targetCaseMinimum": null,
+      "maximumRepeatVariance": null,
+      "traceabilityPercent": null,
+      "executionFailureCount": 0,
+      "criticalCapCount": 0,
+      "invalidRunCount": 0
+    }
+  }
+}
