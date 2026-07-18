@@ -14,12 +14,12 @@
     {
       "id": "official-docs-coverage",
       "status": "pass",
-      "evidence": "fixtures/replay/gajae-code/official-docs.json, fixtures/replay/awesome-codex-subagents/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
+      "evidence": "fixtures/replay/awesome-codex-subagents/official-docs.json, fixtures/replay/gajae-code/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json"
     },
     {
       "id": "external-replay",
       "status": "pass",
-      "evidence": "fixtures/replay/gajae-code/replay.json, fixtures/replay/awesome-codex-subagents/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json"
+      "evidence": "fixtures/replay/awesome-codex-subagents/replay.json, fixtures/replay/gajae-code/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json"
     },
     {
       "id": "handoff-validation",
