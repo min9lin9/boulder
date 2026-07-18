@@ -23,10 +23,12 @@ export function yamlNestedGroupScalar(text: string, section: string, group: stri
 }
 
 export function yamlList(text: string, key: string): readonly string[] | null {
-  const values = yamlSectionLines(text, key)
+  const inlineEmpty = new RegExp(`^${escapeRegExp(key)}:\\s*\\[\\s*\\]\\s*(?:#.*)?$`, "m").test(text);
+  const sectionExists = new RegExp(`^${escapeRegExp(key)}:\\s*(?:#.*)?$`, "m").test(text);
+  if (!inlineEmpty && !sectionExists) return null;
+  return yamlSectionLines(text, key)
     .map((line) => line.match(/^\s{2}-\s+(.+)$/)?.[1]?.trim())
     .filter((value): value is string => Boolean(value));
-  return values.length ? values : null;
 }
 
 export function yamlSectionLines(text: string, section: string): readonly string[] {
