@@ -5,6 +5,7 @@ import { prettyJson } from "./cli-format";
 import { optionValue, subcommandAfter } from "./cli-options";
 import {
   canonicalize,
+  controlDecisionSealHashIsValid,
   createControlDecisionSeal,
   evaluateControlRun,
   hashControlValue,
@@ -125,11 +126,12 @@ export async function recordControlRunEvent(root: string, run: ControlRunEvent):
 
 export async function recordControlDecisionSeal(root: string, seal: ControlDecisionSeal): Promise<SealResult> {
   const issues = validateControlDecisionSeal(seal);
+  if (!await controlDecisionSealHashIsValid(seal)) issues.push("decision-seal:seal-hash-mismatch");
   if (issues.length > 0) throw invalidInput("decision seal", issues);
   const location = await prepareArtifactLocation(root, "seals", seal.runId);
   if (await exists(location.absolute)) {
     const existing = await readStoredArtifact(root, location.relative);
-    if (isControlDecisionSeal(existing) && sameDecisionBinding(existing, seal)) {
+    if (isControlDecisionSeal(existing) && await controlDecisionSealHashIsValid(existing) && sameDecisionBinding(existing, seal)) {
       return { status: "already-sealed", runId: seal.runId, path: location.relative, seal: existing };
     }
     throw new ControlKernelCommandError("seal_conflict", `Run ID already has a different seal: ${location.relative}`);
