@@ -55,6 +55,7 @@ export async function evaluateControlRun(runValue: unknown, manifestValue: unkno
   if (run?.status !== undefined && run.status !== "completed") issues.push(`run-status:${run.status}`);
   if (run) {
     for (const call of run.toolCalls) {
+      if (call.status !== "completed") issues.push(`tool-call:not-completed:${call.toolId}:${call.status}`);
       if (call.status === "completed" && call.outputHash === null) issues.push(`tool-call:completed-output-missing:${call.toolId}`);
     }
     const allowedSignals = new Set(policy?.hardFailures.map((rule) => rule.signal) ?? []);
@@ -89,6 +90,7 @@ export async function createControlDecisionSeal(
 ): Promise<ControlDecisionSeal> {
   const evaluation = await evaluateControlRun(runValue, manifestValue, policyValue);
   const issues = [...evaluation.issues];
+  if (evaluation.status !== "eligible") issues.push("decision-seal:evaluation-blocked");
   if (!isIso(sealedAt)) issues.push("decision-seal:sealedAt-invalid");
   if (issues.length > 0) throw new Error(`Invalid control seal input: ${unique(issues).join(", ")}`);
   const run = runValue as ControlRunEvent;
@@ -118,6 +120,7 @@ export async function verifyControlDecisionSeal(
 ): Promise<SealVerification> {
   const evaluation = await evaluateControlRun(runValue, manifestValue, policyValue);
   const issues = [...validateControlDecisionSeal(sealValue), ...evaluation.issues];
+  if (evaluation.status !== "eligible") issues.push("decision-seal:evaluation-blocked");
   if (issues.length > 0 || !isControlDecisionSeal(sealValue) || !isControlRunEvent(runValue) || !isControlEvidenceManifest(manifestValue) || !isControlPolicy(policyValue)) {
     return { status: "invalid", issues: unique(issues) };
   }
@@ -136,10 +139,15 @@ export async function verifyControlDecisionSeal(
   if (seal.runHash !== runHash) issues.push("decision-seal:run-hash-mismatch");
   if (seal.evidenceManifestHash !== manifestHash) issues.push("decision-seal:evidence-manifest-hash-mismatch");
   if (seal.policyHash !== policyHash) issues.push("decision-seal:policy-hash-mismatch");
-  const unsigned = { ...seal } as Record<string, unknown>;
-  delete unsigned.sealHash;
-  if (seal.sealHash !== await hashControlValue(unsigned)) issues.push("decision-seal:seal-hash-mismatch");
+  if (!await controlDecisionSealHashIsValid(seal)) issues.push("decision-seal:seal-hash-mismatch");
   return { status: issues.length === 0 ? "valid" : "invalid", issues: unique(issues) };
+}
+
+export async function controlDecisionSealHashIsValid(sealValue: unknown): Promise<boolean> {
+  if (!isControlDecisionSeal(sealValue)) return false;
+  const unsigned = { ...sealValue } as Record<string, unknown>;
+  delete unsigned.sealHash;
+  return sealValue.sealHash === await hashControlValue(unsigned);
 }
 
 export async function hashControlValue(value: unknown): Promise<string> {
