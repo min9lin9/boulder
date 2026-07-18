@@ -188,6 +188,94 @@ describe("boulder CLI e2e cleanup safety", () => {
       await removeTempRepo(root);
     }
   });
+  test("supports read-only plan analysis, show, and validation diagnostics", async () => {
+    const root = await tempRepo();
+    try {
+      const analyzed = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Verify the public API with tests", "--json"]);
+      const human = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Verify the public API with tests"]);
+      const noArtifacts = await readFile(join(root, ".boulder", "plans", "analysis", "analysis.json"), "utf8").catch(() => null);
+      const missingValue = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "--json"]);
+      const invalidSubcommand = await runBoulder(["plan", "start", "--cwd", root]);
+      const unsafeRun = await runBoulder(["plan", "show", "--cwd", root, "--run-id", "../unsafe"]);
+      const missingRun = await runBoulder(["plan", "show", "--cwd", root, "--run-id", "missing"]);
+
+      expect(analyzed.exitCode).toBe(0);
+      expect(JSON.parse(analyzed.stdout).analysis.schemaVersion).toBe("boulder.plan-analysis.v1");
+      const direct = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update src/example.ts with tests and verification", "--friction", "direct", "--json"]);
+      const protectedTasks = [
+        "Update .env.local with tests and verification",
+        "Update secrets/key.txt with tests and verification",
+        "Update ./vendor//pkg/./file.ts with tests and verification",
+        "Update vendor\\pkg\\nested\\..\\file.ts with tests and verification"
+      ];
+      const protectedAnalyses = await Promise.all(protectedTasks.map(async (task) => {
+        const result = await runBoulder(["plan", "analyze", "--cwd", root, "--task", task, "--friction", "direct", "--json"]);
+        return JSON.parse(result.stdout).analysis;
+      }));
+      const config = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update config validation with tests and verification", "--friction", "direct", "--json"]);
+      const security = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update security handling with tests and verification", "--friction", "direct", "--json"]);
+      const collision = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update docs/notsecrets/key.txt with tests and verification", "--friction", "direct", "--json"]);
+      await writeFile(join(root, "boulder.yaml"), ["protectedPaths:", "  - contracts/**", ""].join("\n"), "utf8");
+      const manifestProtected = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update contracts/api.ts with tests and verification", "--friction", "direct", "--json"]);
+      await writeFile(join(root, "boulder.yaml"), ["protectedPaths:", "  - package.json", ""].join("\n"), "utf8");
+      const rootFileProtected = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update package.json with tests and verification", "--friction", "direct", "--json"]);
+      const manifestUnprotected = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update .env.local with tests and verification", "--friction", "direct", "--json"]);
+      await writeFile(join(root, "boulder.yaml"), ["protectedPaths: []", ""].join("\n"), "utf8");
+      const manifestEmpty = await runBoulder(["plan", "analyze", "--cwd", root, "--task", "Update .env.local with tests and verification", "--friction", "direct", "--json"]);
+      const directAnalysis = JSON.parse(direct.stdout).analysis;
+      const configAnalysis = JSON.parse(config.stdout).analysis;
+      const securityAnalysis = JSON.parse(security.stdout).analysis;
+      const collisionAnalysis = JSON.parse(collision.stdout).analysis;
+      const manifestProtectedAnalysis = JSON.parse(manifestProtected.stdout).analysis;
+      const manifestUnprotectedAnalysis = JSON.parse(manifestUnprotected.stdout).analysis;
+      const manifestEmptyAnalysis = JSON.parse(manifestEmpty.stdout).analysis;
+      const rootFileProtectedAnalysis = JSON.parse(rootFileProtected.stdout).analysis;
+      expect(directAnalysis.selectedMode).toBe("direct");
+      expect(directAnalysis.hardOverrides).not.toContain("public-contract");
+      for (const protectedAnalysis of protectedAnalyses) {
+        expect(protectedAnalysis.selectedMode).toBe("focused");
+        expect(protectedAnalysis.hardOverrides).toContain("public-contract");
+      }
+      expect(configAnalysis.selectedMode).toBe("focused");
+      expect(configAnalysis.hardOverrides).toContain("public-contract");
+      expect(securityAnalysis.selectedMode).toBe("deep");
+      expect(securityAnalysis.hardOverrides).toContain("security-sensitive");
+      expect(collisionAnalysis.selectedMode).toBe("direct");
+      expect(collisionAnalysis.hardOverrides).not.toContain("public-contract");
+      expect(manifestProtectedAnalysis.selectedMode).toBe("focused");
+      expect(manifestProtectedAnalysis.hardOverrides).toContain("public-contract");
+      expect(manifestUnprotectedAnalysis.selectedMode).toBe("direct");
+      expect(manifestUnprotectedAnalysis.hardOverrides).not.toContain("public-contract");
+      expect(manifestEmptyAnalysis.selectedMode).toBe("direct");
+      expect(manifestEmptyAnalysis.hardOverrides).not.toContain("public-contract");
+      expect(rootFileProtectedAnalysis.selectedMode).toBe("focused");
+      expect(rootFileProtectedAnalysis.hardOverrides).toContain("public-contract");
+      expect(human.stdout).toContain("# Plan Analysis");
+      expect(noArtifacts).toBeNull();
+      expect(missingValue.exitCode).toBe(1);
+      expect(missingValue.stderr).toContain("ERROR plan.option.value_missing: --task requires a value.");
+      expect(invalidSubcommand.exitCode).toBe(1);
+      expect(invalidSubcommand.stderr).toContain("ERROR plan.command.invalid");
+      expect(unsafeRun.exitCode).toBe(1);
+      expect(unsafeRun.stderr).toContain("ERROR plan.path.invalid");
+      expect(missingRun.exitCode).toBe(1);
+      expect(missingRun.stderr).toContain("ERROR plan.artifact.missing");
+
+      const analysis = JSON.parse(analyzed.stdout).analysis;
+      await mkdir(join(root, ".boulder", "plans", "saved"), { recursive: true });
+      await writeFile(join(root, ".boulder", "plans", "saved", "analysis.json"), JSON.stringify(analysis), "utf8");
+      const valid = await runBoulder(["plan", "validate", "--cwd", root, "--run-id", "saved", "--artifact", "analysis", "--json"]);
+      await writeFile(join(root, ".boulder", "plans", "saved", "analysis.json"), "{}", "utf8");
+      const invalid = await runBoulder(["plan", "validate", "--cwd", root, "--run-id", "saved", "--artifact", "analysis", "--json"]);
+
+      expect(valid.exitCode).toBe(0);
+      expect(JSON.parse(valid.stdout).status).toBe("ready");
+      expect(invalid.exitCode).toBe(1);
+      expect(JSON.parse(invalid.stdout).status).toBe("blocked");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
 
   test("renders release-check ready evidence after publishing", async () => {
     const root = join(import.meta.dir, "..");

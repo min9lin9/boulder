@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 202,
-  "totalPackedFiles": 203,
+  "totalUniqueFiles": 203,
+  "totalPackedFiles": 204,
   "classes": [
     {
       "class": "runtime",
-      "count": 79,
+      "count": 80,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -44,6 +44,7 @@
         "src/pipeline.ts",
         "src/plan-analysis-shape.ts",
         "src/plan-analysis.ts",
+        "src/plan-command.ts",
         "src/plan-receipts.ts",
         "src/plan-state.ts",
         "src/plan-store.ts",
