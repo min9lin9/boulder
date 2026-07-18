@@ -1,0 +1,218 @@
+{
+  "schemaVersion": "boulder.control.fixture.v1",
+  "policy": {
+    "schemaVersion": "boulder.control.policy.v1",
+    "id": "gp-screening-shadow",
+    "version": "0.1.0",
+    "blockingSeverities": [
+      "critical",
+      "major"
+    ],
+    "hardFailures": [
+      {
+        "id": "mandate-exclusion",
+        "signal": "mandate.exclusion.missed",
+        "severity": "critical",
+        "description": "A hard mandate exclusion was missed or suppressed."
+      },
+      {
+        "id": "conflict-escalation",
+        "signal": "conflict.escalation.missed",
+        "severity": "critical",
+        "description": "A required conflict or related-party escalation was missed."
+      },
+      {
+        "id": "unsupported-material-claim",
+        "signal": "evidence.material-claim.unsupported",
+        "severity": "major",
+        "description": "A material recommendation claim lacks admissible evidence."
+      }
+    ],
+    "metricRules": [
+      {
+        "metricId": "decision-accuracy",
+        "operator": "gte",
+        "threshold": 0.75,
+        "description": "Decision agreement or adjudicated quality must meet the pilot floor."
+      },
+      {
+        "metricId": "evidence-coverage",
+        "operator": "gte",
+        "threshold": 0.9,
+        "description": "Material claims must be covered by admissible evidence."
+      },
+      {
+        "metricId": "risk-recall",
+        "operator": "gte",
+        "threshold": 0.8,
+        "description": "Known material risks must be surfaced."
+      }
+    ]
+  },
+  "evidenceManifest": {
+    "schemaVersion": "boulder.control.evidence-manifest.v1",
+    "manifestId": "synthetic-screening-001-manifest",
+    "caseId": "synthetic-screening-001",
+    "evidenceCutoffAt": "2025-01-15T00:00:00.000Z",
+    "generatedAt": "2026-07-18T14:00:00.000Z",
+    "entries": [
+      {
+        "evidenceId": "cim-v1",
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "sourceType": "document",
+        "classification": "confidential",
+        "sourceVersion": "v1",
+        "observedAt": "2025-01-10T00:00:00.000Z",
+        "sourceUriHash": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      {
+        "evidenceId": "mandate-v3",
+        "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+        "sourceType": "database",
+        "classification": "restricted",
+        "sourceVersion": "v3",
+        "observedAt": "2025-01-01T00:00:00.000Z",
+        "sourceUriHash": "4444444444444444444444444444444444444444444444444444444444444444"
+      }
+    ]
+  },
+  "runs": {
+    "pass": {
+      "schemaVersion": "boulder.control.run-event.v1",
+      "caseId": "synthetic-screening-001",
+      "taskId": "screening-decision-package",
+      "agentId": "underwriting-agent",
+      "agentVersion": "0.1.0",
+      "profileId": "gp-screening-shadow",
+      "profileVersion": "0.1.0",
+      "parentRunId": null,
+      "startedAt": "2026-07-18T14:01:00.000Z",
+      "completedAt": "2026-07-18T14:02:00.000Z",
+      "evidenceCutoffAt": "2025-01-15T00:00:00.000Z",
+      "evidenceManifestHash": "39c90fcde10b441df6cdf1c81999a0eda124a72a8946f812b817ca58f22b6ac4",
+      "policyId": "gp-screening-shadow",
+      "policyVersion": "0.1.0",
+      "policyHash": "9d82eaf6062bc15d597a374f791b64405be8ccb06379dcc9c4722dbb80b451ea",
+      "promptVersion": "screening-v0.1",
+      "model": {
+        "provider": "test",
+        "name": "synthetic-screening-model",
+        "version": "1.0.0"
+      },
+      "toolCalls": [
+        {
+          "toolId": "evidence-index",
+          "toolVersion": "0.1.0",
+          "action": "read",
+          "status": "completed",
+          "inputHash": "5555555555555555555555555555555555555555555555555555555555555555",
+          "outputHash": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      ],
+      "artifactHashes": [
+        "7777777777777777777777777777777777777777777777777777777777777777"
+      ],
+      "status": "completed",
+      "runId": "synthetic-pass-run",
+      "idempotencyKey": "synthetic-pass-run-v1",
+      "metrics": {
+        "decision-accuracy": 0.83,
+        "evidence-coverage": 0.96,
+        "risk-recall": 0.88
+      },
+      "hardFailureSignals": []
+    },
+    "hardFailure": {
+      "schemaVersion": "boulder.control.run-event.v1",
+      "caseId": "synthetic-screening-001",
+      "taskId": "screening-decision-package",
+      "agentId": "underwriting-agent",
+      "agentVersion": "0.1.0",
+      "profileId": "gp-screening-shadow",
+      "profileVersion": "0.1.0",
+      "parentRunId": null,
+      "startedAt": "2026-07-18T14:01:00.000Z",
+      "completedAt": "2026-07-18T14:02:00.000Z",
+      "evidenceCutoffAt": "2025-01-15T00:00:00.000Z",
+      "evidenceManifestHash": "39c90fcde10b441df6cdf1c81999a0eda124a72a8946f812b817ca58f22b6ac4",
+      "policyId": "gp-screening-shadow",
+      "policyVersion": "0.1.0",
+      "policyHash": "9d82eaf6062bc15d597a374f791b64405be8ccb06379dcc9c4722dbb80b451ea",
+      "promptVersion": "screening-v0.1",
+      "model": {
+        "provider": "test",
+        "name": "synthetic-screening-model",
+        "version": "1.0.0"
+      },
+      "toolCalls": [
+        {
+          "toolId": "evidence-index",
+          "toolVersion": "0.1.0",
+          "action": "read",
+          "status": "completed",
+          "inputHash": "5555555555555555555555555555555555555555555555555555555555555555",
+          "outputHash": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      ],
+      "artifactHashes": [
+        "7777777777777777777777777777777777777777777777777777777777777777"
+      ],
+      "status": "completed",
+      "runId": "synthetic-hard-failure-run",
+      "idempotencyKey": "synthetic-hard-failure-run-v1",
+      "metrics": {
+        "decision-accuracy": 1.0,
+        "evidence-coverage": 1.0,
+        "risk-recall": 1.0
+      },
+      "hardFailureSignals": [
+        "mandate.exclusion.missed"
+      ]
+    },
+    "metricFailure": {
+      "schemaVersion": "boulder.control.run-event.v1",
+      "caseId": "synthetic-screening-001",
+      "taskId": "screening-decision-package",
+      "agentId": "underwriting-agent",
+      "agentVersion": "0.1.0",
+      "profileId": "gp-screening-shadow",
+      "profileVersion": "0.1.0",
+      "parentRunId": null,
+      "startedAt": "2026-07-18T14:01:00.000Z",
+      "completedAt": "2026-07-18T14:02:00.000Z",
+      "evidenceCutoffAt": "2025-01-15T00:00:00.000Z",
+      "evidenceManifestHash": "39c90fcde10b441df6cdf1c81999a0eda124a72a8946f812b817ca58f22b6ac4",
+      "policyId": "gp-screening-shadow",
+      "policyVersion": "0.1.0",
+      "policyHash": "9d82eaf6062bc15d597a374f791b64405be8ccb06379dcc9c4722dbb80b451ea",
+      "promptVersion": "screening-v0.1",
+      "model": {
+        "provider": "test",
+        "name": "synthetic-screening-model",
+        "version": "1.0.0"
+      },
+      "toolCalls": [
+        {
+          "toolId": "evidence-index",
+          "toolVersion": "0.1.0",
+          "action": "read",
+          "status": "completed",
+          "inputHash": "5555555555555555555555555555555555555555555555555555555555555555",
+          "outputHash": "6666666666666666666666666666666666666666666666666666666666666666"
+        }
+      ],
+      "artifactHashes": [
+        "7777777777777777777777777777777777777777777777777777777777777777"
+      ],
+      "status": "completed",
+      "runId": "synthetic-metric-failure-run",
+      "idempotencyKey": "synthetic-metric-failure-run-v1",
+      "metrics": {
+        "decision-accuracy": 0.83,
+        "evidence-coverage": 0.96,
+        "risk-recall": 0.6
+      },
+      "hardFailureSignals": []
+    }
+  }
+}
