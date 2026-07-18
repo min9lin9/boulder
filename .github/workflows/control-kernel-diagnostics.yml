@@ -1,0 +1,131 @@
+name: Control Kernel Diagnostics
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: TypeScript contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Run strict TypeScript check
+        id: check
+        shell: bash
+        run: |
+          set +e
+          bunx tsc --noEmit > diagnostic.txt 2>&1
+          status=$?
+          cat diagnostic.txt
+          exit "$status"
+      - name: Upload typecheck failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck-failure
+          path: diagnostic.txt
+
+  focused-tests:
+    name: New control-kernel tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Run focused test files
+        shell: bash
+        run: |
+          set +e
+          : > diagnostic.txt
+          for file in test/control-kernel.test.ts test/control-kernel-cli-e2e.test.ts test/package-inventory-contract.test.ts; do
+            echo "=== $file ===" >> diagnostic.txt
+            bun test "$file" >> diagnostic.txt 2>&1
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              echo "$file" > failed-test.txt
+              cat diagnostic.txt >> failed-test.txt
+              exit "$status"
+            fi
+          done
+      - name: Upload focused-test failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: focused-test-failure
+          path: failed-test.txt
+
+  test-shards:
+    name: Existing tests ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - a-f
+          - g-l
+          - m-r
+          - s-z
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Run one test file at a time
+        shell: bash
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          set +e
+          selected=0
+          while IFS= read -r file; do
+            name=$(basename "$file")
+            first=$(printf '%s' "$name" | cut -c1 | tr '[:upper:]' '[:lower:]')
+            case "$SHARD" in
+              a-f) [[ "$first" < "a" || "$first" > "f" ]] && continue ;;
+              g-l) [[ "$first" < "g" || "$first" > "l" ]] && continue ;;
+              m-r) [[ "$first" < "m" || "$first" > "r" ]] && continue ;;
+              s-z) [[ "$first" < "s" || "$first" > "z" ]] && continue ;;
+            esac
+            selected=$((selected + 1))
+            bun test "$file" > one-test.log 2>&1
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              {
+                echo "$file"
+                echo ""
+                cat one-test.log
+              } > failed-test.txt
+              exit "$status"
+            fi
+          done < <(find test -maxdepth 1 -type f -name '*.test.ts' | sort)
+          echo "passed-files=$selected"
+      - name: Upload shard failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-shard-${{ matrix.shard }}-failure
+          path: failed-test.txt
+
+  build-package:
+    name: Build and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Build CLI
+        shell: bash
+        run: bun run build
+      - name: Package dry run
+        shell: bash
+        run: bun run pack:dry-run
