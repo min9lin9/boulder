@@ -51,6 +51,46 @@ describe("generic control kernel", () => {
     expect(result.metricChecks.find((item) => item.metricId === "risk-recall")?.status).toBe("fail");
   });
 
+  test("refuses to seal any run that is not promotion-eligible", async () => {
+    const fixture = await loadFixture();
+
+    await expect(createControlDecisionSeal(
+      fixture.hardFailureRun,
+      fixture.manifest,
+      fixture.policy,
+      "2026-07-18T14:03:00.000Z"
+    )).rejects.toThrow("decision-seal:evaluation-blocked");
+
+    await expect(createControlDecisionSeal(
+      fixture.metricFailureRun,
+      fixture.manifest,
+      fixture.policy,
+      "2026-07-18T14:03:00.000Z"
+    )).rejects.toThrow("decision-seal:evaluation-blocked");
+  });
+
+  test("blocks incomplete tool calls before promotion or sealing", async () => {
+    const fixture = await loadFixture();
+    const firstCall = fixture.passRun.toolCalls[0];
+    if (!firstCall) throw new Error("Fixture tool call is missing.");
+    const failedToolRun: ControlRunEvent = {
+      ...fixture.passRun,
+      runId: "synthetic-failed-tool-run",
+      idempotencyKey: "synthetic-failed-tool-run-v1",
+      toolCalls: [{ ...firstCall, status: "failed", outputHash: null }]
+    };
+
+    const result = await evaluateControlRun(failedToolRun, fixture.manifest, fixture.policy);
+    expect(result.status).toBe("blocked");
+    expect(result.issues).toContain("tool-call:not-completed:evidence-index:failed");
+    await expect(createControlDecisionSeal(
+      failedToolRun,
+      fixture.manifest,
+      fixture.policy,
+      "2026-07-18T14:03:00.000Z"
+    )).rejects.toThrow("decision-seal:evaluation-blocked");
+  });
+
   test("fails closed on unknown hard-failure signals and evidence after cutoff", async () => {
     const fixture = await loadFixture();
     const unknownSignal: ControlRunEvent = { ...fixture.passRun, hardFailureSignals: ["unknown.signal"] };
@@ -92,6 +132,7 @@ describe("generic control kernel", () => {
     const result = await verifyControlDecisionSeal(seal, mismatched, fixture.manifest, fixture.policy);
     expect(result.status).toBe("invalid");
     expect(result.issues).toContain("binding:evidence-manifest-hash-mismatch");
+    expect(result.issues).toContain("decision-seal:evaluation-blocked");
   });
 });
 
