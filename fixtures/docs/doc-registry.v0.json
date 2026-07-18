@@ -9,6 +9,7 @@
   {"path":"docs/BOULDER_EXPORT.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/BOULDER_EXPORT.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/BOULDER_FINAL_PRODUCT_PLAN.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/BOULDER_FINAL_PRODUCT_PLAN.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/CAPABILITY_DOCTOR.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/CAPABILITY_DOCTOR.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
+  {"path":"docs/CASE_STUDIES/AGENTS.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/CASE_STUDIES/AGENTS.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/CASE_STUDIES/README.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/CASE_STUDIES/README.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/CASE_STUDIES/core-implementation.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/CASE_STUDIES/core-implementation.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md","kind":"generated","locale":"en","dir":"ltr","source":"docs/CASE_STUDIES/evidence/core-implementation/BOULDER_EXPORT.md","version":"0.1.16","generatedBy":"boulder evidence capture","packaging":"packaged","translatable":false},

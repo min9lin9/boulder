@@ -12,7 +12,8 @@ export type Capability = { readonly id: string; readonly kind: "skill" | "mcp" |
 export type DoctorIssue = { readonly id: string; readonly severity: DoctorSeverity; readonly message: string };
 
 export type ActiveProfileSummary = { readonly id: string; readonly source: ResolvedWorkflowProfile["source"]; readonly purpose: ResolvedWorkflowProfile["purpose"]; readonly externalDefault: ResolvedWorkflowProfile["externalPolicy"]["default"]; readonly externalRequiresApproval: boolean; readonly suggestion: ResolvedWorkflowProfile["suggestion"]; readonly drift: readonly ProfileDriftWarning[] };
-export type CapabilityDoctorReport = { readonly status: DoctorStatus; readonly activeProfile: ActiveProfileSummary | null; readonly capabilities: readonly Capability[]; readonly sourceCandidates: readonly SourceCandidateManifest[]; readonly issues: readonly DoctorIssue[]; readonly nextSteps: readonly string[] };
+export type NativePlannerPreview = { readonly profileId: "boulder-native-preview"; readonly availability: "bundled-local-preview"; readonly requiresExplicitSelection: true; readonly recommendation: string };
+export type CapabilityDoctorReport = { readonly status: DoctorStatus; readonly activeProfile: ActiveProfileSummary | null; readonly nativePlannerPreview: NativePlannerPreview; readonly capabilities: readonly Capability[]; readonly sourceCandidates: readonly SourceCandidateManifest[]; readonly issues: readonly DoctorIssue[]; readonly nextSteps: readonly string[] };
 
 export async function evaluateCapabilityDoctor(root: string, options: CapabilityDiscoveryOptions = {}): Promise<CapabilityDoctorReport> {
   const resolution = await resolveWorkflowProfile(root, {});
@@ -56,6 +57,7 @@ export async function evaluateCapabilityDoctor(root: string, options: Capability
   return {
     status: issues.some((item) => item.severity === "error") ? "fail" : issues.length ? "warn" : "pass",
     activeProfile: toActiveProfileSummary(resolution.profile),
+    nativePlannerPreview: nativePlannerPreview(),
     capabilities,
     sourceCandidates: sourceCandidates.candidates,
     issues,
@@ -74,6 +76,7 @@ function failedReport(
   return {
     status: "fail",
     activeProfile: toActiveProfileSummary(profile),
+    nativePlannerPreview: nativePlannerPreview(),
     capabilities: [],
     sourceCandidates: sourceCandidates.candidates,
     issues: [issue, ...sourceCandidates.issues],
@@ -81,6 +84,14 @@ function failedReport(
   };
 }
 
+function nativePlannerPreview(): NativePlannerPreview {
+  return {
+    profileId: "boulder-native-preview",
+    availability: "bundled-local-preview",
+    requiresExplicitSelection: true,
+    recommendation: "For local planning, explicitly select boulder-native-preview; this reports a bundled preview, not an installation or active-profile change."
+  };
+}
 function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: InventoryView): readonly Capability[] {
   const executors = executorsFromResolvedProfile(profile);
   return [
@@ -105,6 +116,7 @@ function adapterCapabilities(profile: ResolvedWorkflowProfile, inventory: Invent
 
 function adapterStatus(executorId: string, inventory: InventoryView): string {
   const normalized = executorId.toLowerCase();
+  if (normalized === "boulder-native") return "available";
   const candidates = [
     ...inventory.skills,
     ...inventory.mcpServers,

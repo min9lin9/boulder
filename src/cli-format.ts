@@ -91,6 +91,8 @@ export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCap
     "Boulder capability doctor",
     `- status: ${report.status}`,
     ...activeProfile,
+    `- native-planner-preview: ${report.nativePlannerPreview.availability} (${report.nativePlannerPreview.requiresExplicitSelection ? "explicit selection required" : "active"})`,
+    `- native-planner-guidance: ${report.nativePlannerPreview.recommendation}`,
     ...report.capabilities.map((item) => `- capability: ${item.id} (${item.kind}, ${item.lane})`),
     ...report.sourceCandidates.map((item) => `- source-candidate: ${item.capabilityId} (${item.kind}, ${item.status}) - ${item.source}`),
     ...report.issues.map((item) => `- ${item.severity}: ${item.id} - ${item.message}`)

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 209,
-  "totalPackedFiles": 210,
+  "totalUniqueFiles": 211,
+  "totalPackedFiles": 212,
   "classes": [
     {
       "class": "runtime",
@@ -95,7 +95,7 @@
     },
     {
       "class": "public-doc",
-      "count": 64,
+      "count": 65,
       "files": [
         "CHANGELOG.md",
         "CONTRIBUTING.md",
@@ -112,6 +112,7 @@
         "docs/BOULDER_EXPORT.md",
         "docs/BOULDER_FINAL_PRODUCT_PLAN.md",
         "docs/CAPABILITY_DOCTOR.md",
+        "docs/CASE_STUDIES/AGENTS.md",
         "docs/CASE_STUDIES/README.md",
         "docs/CASE_STUDIES/core-implementation.md",
         "docs/CASE_STUDIES/external-replay.md",
@@ -192,7 +193,7 @@
     },
     {
       "class": "fixture",
-      "count": 29,
+      "count": 30,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
@@ -208,6 +209,7 @@
         "fixtures/plan-receipts/vectors.json",
         "fixtures/planning-packets/invalid.json",
         "fixtures/planning-packets/valid.json",
+        "fixtures/profiles/resolved/boulder-native-preview.json",
         "fixtures/profiles/resolved/ops-default.json",
         "fixtures/profiles/resolved/programming-default.json",
         "fixtures/profiles/resolved/research-default.json",

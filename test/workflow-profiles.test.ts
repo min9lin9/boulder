@@ -100,7 +100,7 @@ describe("workflow profile resolution", () => {
 
   test("keeps resolved profile fixtures for the built-in profiles", async () => {
     const root = join(import.meta.dir, "..");
-    const fixtureNames = ["programming-default", "research-default", "ops-default"];
+    const fixtureNames = ["programming-default", "boulder-native-preview", "research-default", "ops-default"];
 
     for (const fixtureName of fixtureNames) {
       const text = await readFile(join(root, "fixtures", "profiles", "resolved", `${fixtureName}.json`), "utf8");
@@ -123,6 +123,23 @@ describe("workflow profile resolution", () => {
           "verify"
         ]);
       }
+    }
+  });
+
+  test("keeps programming-default golden and resolves boulder-native-preview only when explicit", async () => {
+    const root = await tempRepo();
+    const fixtureRoot = join(import.meta.dir, "..", "fixtures", "profiles", "resolved");
+    try {
+      const programmingDefault: unknown = JSON.parse(await readFile(join(fixtureRoot, "programming-default.json"), "utf8"));
+      const preview: unknown = JSON.parse(await readFile(join(fixtureRoot, "boulder-native-preview.json"), "utf8"));
+
+      expect((await resolveWorkflowProfile(root, {})).profile).toEqual(programmingDefault);
+      expect((await resolveWorkflowProfile(root, { profile: "boulder-native-preview" })).profile).toEqual({
+        ...(preview as Record<string, unknown>),
+        source: "cli"
+      });
+    } finally {
+      await removeTempRepo(root);
     }
   });
 

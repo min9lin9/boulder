@@ -155,6 +155,17 @@ gjc setup hermes --root . --smoke
 Live planning delegation through `gjc_delegate_plan` is suggested only after packet review and explicit approval.
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
+## Explicit boulder-native Preview
+
+`boulder-native-preview` is an opt-in local planning preview; it does not replace `programming-default`. Select it explicitly with `boulder profile use boulder-native-preview`, then use `plan analyze`, `plan show`, and `plan validate` only to inspect local inputs and plan artifacts:
+
+```bash
+boulder plan analyze --task "review the release workflow" --friction focused --json
+boulder plan show --run-id <run-id> --json
+boulder plan validate --input <packet-path> --artifact packet --json
+```
+
+These commands are read-only: they do not install software, contact providers, invoke external agents, mutate product files, or execute a plan. Preview planning approval and execution approval are separate explicit decisions. Any preview event evidence is local-only and remains in `.boulder/`; an external bridge from this preview to Handoff is a follow-up RFC, not a shipped feature. Boulder Handoff v1 remains the existing sanitized packet and review flow.
 
 ## Core Commands
 

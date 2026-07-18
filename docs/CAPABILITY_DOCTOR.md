@@ -10,6 +10,11 @@ The doctor answers three questions before Boulder hands work to GJC, LazyCodex, 
 - which workflow lane each capability should serve
 - what official documentation or runtime compatibility issue must be handled before use
 
+## Explicit boulder-native Preview
+
+`boulder-native-preview` is an explicit local planning profile, not a replacement for `programming-default`. Its `plan analyze`, `plan show`, and `plan validate` commands are read-only: they inspect local inputs or artifacts and do not install software, contact providers, invoke external agents, mutate product files, or execute a plan.
+
+Preview planning approval and execution approval are separate explicit decisions. Preview event evidence is local-only in `.boulder/`. An external bridge from preview output to Handoff is follow-up RFC work and is not implemented; it is not current doctor behavior.
 ## Inventory
 
 Default inventory path:

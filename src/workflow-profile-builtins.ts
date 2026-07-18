@@ -11,6 +11,7 @@ import type {
 const SURFACE = ["intake", "plan", "execute", "verify", "record"] as const;
 export const BUILT_IN_WORKFLOW_PROFILE_IDS = [
   "programming-default",
+  "boulder-native-preview",
   "research-default",
   "ops-default",
   "programming-heavy",
@@ -35,6 +36,7 @@ export function builtInProfile(
   drift: readonly ProfileDriftWarning[]
 ): ResolvedWorkflowProfile | null {
   if (profileId === "programming-default") return programmingDefault(source, drift, task, suggestion);
+  if (profileId === "boulder-native-preview") return boulderNativePreview(source, drift, task, suggestion);
   if (profileId === "research-default") return researchDefault(source, drift, task, suggestion);
   if (profileId === "ops-default") return opsDefault(source, drift, task, suggestion);
   if (profileId === "programming-heavy") return programmingProfile("programming-heavy", source, drift, task, suggestion);
@@ -102,6 +104,28 @@ function programmingDefault(
   suggestion: string | null
 ): ResolvedWorkflowProfile {
   return programmingProfile("programming-default", source, drift, task, suggestion);
+}
+function boulderNativePreview(
+  source: ProfileSource,
+  drift: readonly ProfileDriftWarning[],
+  task: string | null,
+  suggestion: string | null
+): ResolvedWorkflowProfile {
+  return profileWithExternalExecutors({
+    id: "boulder-native-preview",
+    source,
+    purpose: "programming",
+    planAdapter: "boulder-native",
+    planModel: null,
+    planMode: "local-only",
+    executeAdapter: "lazycodex",
+    executeModel: "gpt-5.5-medium",
+    fallbackPlan: "codex",
+    fallbackExecute: "codex",
+    drift,
+    task,
+    suggestion
+  });
 }
 
 function programmingProfile(

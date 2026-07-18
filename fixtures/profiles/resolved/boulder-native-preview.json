@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "boulder.profile.resolved.v1",
+  "source": "built-in",
+  "id": "boulder-native-preview",
+  "purpose": "programming",
+  "surface": ["intake", "plan", "execute", "verify", "record"],
+  "lanes": {
+    "intake": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["repo-context"]
+    },
+    "plan": {
+      "owner": "external-adapter",
+      "adapter": "boulder-native",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["planning-packet"]
+    },
+    "critic": {
+      "owner": "codex",
+      "adapter": "codex",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["critic-notes"]
+    },
+    "handoff": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["execution-packet"]
+    },
+    "execute": {
+      "owner": "external-adapter",
+      "adapter": "lazycodex",
+      "modelPreference": "gpt-5.5-medium",
+      "mode": "detect-and-suggest",
+      "evidenceRequired": ["execution-result"]
+    },
+    "verify": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["verification-report"]
+    },
+    "compound": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["compound-ledger"]
+    },
+    "record": {
+      "owner": "boulder",
+      "adapter": "boulder",
+      "modelPreference": null,
+      "mode": "local-only",
+      "evidenceRequired": ["decision-log"]
+    }
+  },
+  "externalPolicy": {
+    "default": "blocked",
+    "requireExplicitApproval": true,
+    "rawWorkspaceContent": "forbidden",
+    "sanitizedPacket": "allowed-after-approval"
+  },
+  "fallback": {
+    "plan": "codex",
+    "execute": "codex",
+    "critic": "codex",
+    "compound": "boulder"
+  },
+  "drift": [],
+  "suggestion": {
+    "profileId": null,
+    "applied": false,
+    "task": null
+  }
+}
