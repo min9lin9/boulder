@@ -1,0 +1,7 @@
+interface:
+  display_name: "Boulder Native Planner"
+  short_description: "Local planning packets with separate approvals"
+  default_prompt: "Use $boulder-native-planner only for an explicit Boulder Native Planner request; analyze and validate locally, then keep plan and execution approval separate."
+
+policy:
+  allow_implicit_invocation: false
