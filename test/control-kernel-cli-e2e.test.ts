@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
+import { createControlDecisionSeal } from "../src/control-kernel";
+import { recordControlDecisionSeal } from "../src/control-kernel-command";
 import { removeTempRepo, runBoulder, tempRepo, write } from "./helpers/cli";
 
 const repositoryRoot = join(import.meta.dir, "..");
@@ -72,6 +74,29 @@ describe("control kernel CLI", () => {
       const sealed = await runBoulder(controlArgs("seal", root));
       expect(sealed.exitCode).toBe(1);
       expect(sealed.stderr).toContain("decision-seal:evaluation-blocked");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("rejects forged or corrupted seal files instead of reusing them", async () => {
+    const root = await tempRepo("boulder-control-kernel-seal-integrity-");
+    try {
+      const fixture = parseFixture(await readFile(fixturePath, "utf8"));
+      const seal = await createControlDecisionSeal(
+        fixture.runs.pass,
+        fixture.evidenceManifest,
+        fixture.policy,
+        "2026-07-18T14:03:00.000Z"
+      );
+      const forged = { ...seal, sealHash: "0".repeat(64) };
+
+      await expect(recordControlDecisionSeal(root, forged)).rejects.toThrow("decision-seal:seal-hash-mismatch");
+
+      const stored = await recordControlDecisionSeal(root, seal);
+      expect(stored.status).toBe("sealed");
+      await write(root, stored.path, JSON.stringify(forged, null, 2));
+      await expect(recordControlDecisionSeal(root, seal)).rejects.toThrow("already has a different seal");
     } finally {
       await removeTempRepo(root);
     }
