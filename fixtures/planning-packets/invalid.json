@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "boulder.planning-packet.v2",
+  "runId": "../unsafe",
+  "createdAt": "not-a-date",
+  "packetDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "producer": {"adapter":"","mode":"unknown","host":"","toolVersion":""},
+  "task": {},
+  "objective": "",
+  "decisions": [],
+  "scope": {"allowedPaths":[".env.local"],"forbiddenPaths":[],"protectedPaths":[".env*"],"nonGoals":[]},
+  "tasks": [],
+  "acceptanceCriteria": [],
+  "verification": [],
+  "risks": [],
+  "approvalPolicy": {},
+  "review": {},
+  "sourceRefs": []
+}
