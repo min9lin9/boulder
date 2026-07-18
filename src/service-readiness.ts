@@ -200,7 +200,7 @@ async function loadOfficialDocs(root: string): Promise<readonly { readonly path:
 async function findReplayFiles(root: string, fileName: string): Promise<readonly string[]> {
   const replayRoot = join(root, "fixtures", "replay");
   if (!await exists(replayRoot)) return [];
-  const projects = await readdir(replayRoot);
+  const projects = (await readdir(replayRoot)).sort();
   const paths = [];
   for (const project of projects) {
     const path = `fixtures/replay/${project}/${fileName}`;

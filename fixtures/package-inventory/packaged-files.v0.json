@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 186,
-  "totalPackedFiles": 187,
+  "totalUniqueFiles": 191,
+  "totalPackedFiles": 192,
   "classes": [
     {
       "class": "runtime",
-      "count": 68,
+      "count": 72,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -22,6 +22,10 @@
         "src/cli-options.ts",
         "src/cli-run-recording.ts",
         "src/cli.ts",
+        "src/control-kernel-command.ts",
+        "src/control-kernel-types.ts",
+        "src/control-kernel-validation.ts",
+        "src/control-kernel.ts",
         "src/executor-adapters.ts",
         "src/executors.ts",
         "src/export.ts",
@@ -176,12 +180,13 @@
     },
     {
       "class": "fixture",
-      "count": 24,
+      "count": 25,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
         "fixtures/benchmarks/typescript-library.json",
         "fixtures/capabilities/codex-installed.json",
+        "fixtures/control-kernel/gp-screening-shadow-v0.json",
         "fixtures/docs/doc-registry.v0.json",
         "fixtures/handoffs/high.json",
         "fixtures/handoffs/low.json",

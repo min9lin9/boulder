@@ -37,7 +37,7 @@ export async function buildReplayRunPlan(root: string, dryRunOnly = true): Promi
   }
   const projects = [];
   const issues = [];
-  for (const project of await readdir(replayRoot)) {
+  for (const project of (await readdir(replayRoot)).sort()) {
     const replayPath = join(replayRoot, project, "replay.json");
     const parsed = parseJsonObject(await safeRead(replayPath));
     if (!isReplayManifest(parsed)) {

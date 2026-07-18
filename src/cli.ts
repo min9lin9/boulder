@@ -4,6 +4,7 @@ import { runCapabilityCommand } from "./capability-command";
 import { formatLines, prettyJson, printHelp } from "./cli-format";
 import { runOperationalCommand } from "./cli-ops-command";
 import { optionValue, parseOptions, valueAfter } from "./cli-options";
+import { runControlKernelCommand } from "./control-kernel-command";
 import { UnsafeGeneratedWritePathError, writeGeneratedText } from "./fs";
 import { exportHarness } from "./export";
 import { runHandoffCommand } from "./handoff-command";
@@ -90,6 +91,10 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "runs") {
     await runRunsCommand(parsed.commandArgs, args, options.cwd, options.json);
+    return;
+  }
+  if (command === "control") {
+    await runControlKernelCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
   if (command === "bootstrap" && args.includes("interview")) {

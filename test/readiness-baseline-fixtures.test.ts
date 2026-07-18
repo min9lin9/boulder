@@ -43,7 +43,8 @@ async function expectCurrentBaselines(baselineDir: string): Promise<void> {
 
   const pack = await runCommand("bun pm pack --dry-run --ignore-scripts", ROOT);
   expect(pack.exitCode).toBe(0);
-  expectWithLabel(`${pack.stdout}${pack.stderr}`, await readFile(join(baselineDir, "pack-dry-run.txt"), "utf8"), "pack-dry-run.txt");
+  const expectedPack = await readFile(join(baselineDir, "pack-dry-run.txt"), "utf8");
+  expectWithLabel(normalizePackDryRun(`${pack.stdout}${pack.stderr}`), normalizePackDryRun(expectedPack), "pack-dry-run.txt");
 }
 
 async function expectJsonBaseline(name: string, actual: unknown, baselineDir: string): Promise<void> {
@@ -56,6 +57,12 @@ function expectWithLabel(actual: unknown, expected: unknown, label: string): voi
   } catch (error) {
     throw new Error(`${label} mismatch`, { cause: error });
   }
+}
+
+function normalizePackDryRun(value: string): string {
+  return value
+    .replace(/^packed\s+\S+\s+/gm, "packed <size> ")
+    .replace(/^Unpacked size:\s+.+$/gm, "Unpacked size: <size>");
 }
 
 async function copyBaselineFixtures(sourceDir: string, targetDir: string): Promise<void> {

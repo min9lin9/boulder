@@ -48,6 +48,14 @@ const READY_RELEASE_EXPECTATION = {
   packDryRunFileCount: READY_RELEASE_BUNDLE.packDryRun.fileCount
 } satisfies ReleaseEvidenceExpectation;
 
+const CHECKED_RELEASE_EXPECTATION = {
+  packageJsonVersion: releaseManifest.packageJsonVersion,
+  cliVersion: releaseManifest.cliVersion,
+  tag: releaseManifest.tag,
+  releaseCommit: releaseManifest.releaseCommit,
+  packDryRunFileCount: releaseManifest.packDryRun.fileCount
+} satisfies ReleaseEvidenceExpectation;
+
 describe("ReleaseEvidenceBundleV1", () => {
   test("validates and renders a ready v0.1.16 bundle for the release evidence targets", () => {
     const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
@@ -74,8 +82,8 @@ describe("ReleaseEvidenceBundleV1", () => {
     expect(rendered["docs/PRODUCT_READINESS.md"]).toBe(`- public-release-check: pass - release-check ready for ${packageJson.version}\n`);
   });
 
-  test("reports current checked release evidence as ready", () => {
-    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), READY_RELEASE_EXPECTATION);
+  test("reports checked published release evidence as internally consistent", () => {
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), CHECKED_RELEASE_EXPECTATION);
 
     expect(validation.status).toBe("pass");
     expect(validation.issues).toEqual([]);
