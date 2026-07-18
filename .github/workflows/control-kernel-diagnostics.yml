@@ -14,11 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.14"
       - name: Run strict TypeScript check
-        id: check
         shell: bash
         run: |
           set +e
@@ -38,6 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.14"
@@ -63,6 +66,35 @@ jobs:
           name: focused-test-failure
           path: failed-test.txt
 
+  full-suite:
+    name: Full Bun test suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+      - name: Run full test suite
+        shell: bash
+        run: |
+          set +e
+          bun test > full-test.log 2>&1
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            cp full-test.log failed-test.txt
+          else
+            cat full-test.log
+          fi
+          exit "$status"
+      - name: Upload full-suite failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-test-failure
+          path: failed-test.txt
+
   test-shards:
     name: Existing tests ${{ matrix.shard }}
     runs-on: ubuntu-latest
@@ -76,6 +108,8 @@ jobs:
           - s-z
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.14"
@@ -120,6 +154,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.14"
