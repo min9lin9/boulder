@@ -7,10 +7,11 @@ import { inspectRepo } from "./inspect.js";
 import { PlanStorePathError, readPlanArtifact, validPlanRunId } from "./plan-store.js";
 import { loadManifest, MANIFEST_FILE } from "./manifest.js";
 import { validatePlanRunState } from "./plan-state.js";
+import { runPlannerBenchmarkCommand } from "./planner-benchmark-command.js";
 import { validatePlanningPacket } from "./planning-packet.js";
 import { protectedPathsReferencedByTask } from "./path-glob.js";
 
-const subcommands = new Set(["analyze", "show", "validate"]);
+const subcommands = new Set(["analyze", "benchmark", "show", "validate"]);
 const artifactNames = new Map([["analysis", "analysis.json"], ["state", "state.json"], ["packet", "packet.json"]]);
 
 type PlanCommandOptions = Readonly<{ cwd: string; json: boolean }>;
@@ -21,9 +22,10 @@ export async function runPlanCommand(args: readonly string[], options: PlanComma
   const parsed = parsePlanArgs(args);
   if (parsed.error) return printError(false, parsed.error);
   if (!parsed.subcommand || !subcommands.has(parsed.subcommand)) {
-    return printError(options.json, "ERROR plan.command.invalid: Expected one of: analyze, show, validate.");
+    return printError(options.json, "ERROR plan.command.invalid: Expected one of: analyze, benchmark, show, validate.");
   }
   if (parsed.subcommand === "analyze") return runAnalyze(parsed.values, options);
+  if (parsed.subcommand === "benchmark") return runBenchmark(args, options);
   if (parsed.subcommand === "show") return runShow(parsed.values, options);
   return runValidate(parsed.values, options);
 }
@@ -67,6 +69,30 @@ async function runAnalyze(values: ReadonlyMap<string, string>, options: PlanComm
   else console.log(["# Plan Analysis", "", `- Run: ${analysis.runId}`, `- Mode: ${analysis.selectedMode}`, `- Score: ${analysis.score}`, `- Confidence: ${analysis.confidence}`].join("\n"));
 }
 
+async function runBenchmark(args: readonly string[], options: PlanCommandOptions): Promise<void> {
+  await runPlannerBenchmarkCommand(benchmarkArgsForWorkspace(args, options.cwd), { json: options.json });
+}
+
+function benchmarkArgsForWorkspace(args: readonly string[], cwd: string): readonly string[] {
+  const planIndex = args.indexOf("plan");
+  const benchmarkIndex = args.indexOf("benchmark", planIndex + 1);
+  const result: string[] = [];
+  for (let index = benchmarkIndex + 1; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === "--json") continue;
+    if (arg === "--cwd") {
+      index += 1;
+      continue;
+    }
+    result.push(arg);
+    if (arg !== "--trust-root" && arg !== "--study-root") continue;
+    const value = args[index + 1];
+    if (!value || value.startsWith("--")) continue;
+    result.push(resolve(cwd, value));
+    index += 1;
+  }
+  return result;
+}
 async function runShow(values: ReadonlyMap<string, string>, options: PlanCommandOptions): Promise<void> {
   const runId = values.get("--run-id");
   if (!runId) return printError(options.json, "ERROR plan.run_id.required: --run-id is required for plan show.");

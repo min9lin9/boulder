@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 211,
-  "totalPackedFiles": 212,
+  "totalUniqueFiles": 221,
+  "totalPackedFiles": 222,
   "classes": [
     {
       "class": "runtime",
-      "count": 84,
+      "count": 87,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -51,7 +51,10 @@
         "src/plan-receipts.ts",
         "src/plan-state.ts",
         "src/plan-store.ts",
+        "src/planner-benchmark-command.ts",
+        "src/planner-benchmark.ts",
         "src/planner-critic.ts",
+        "src/planner-output-normalizer.ts",
         "src/planner-router.ts",
         "src/planning-canonical.ts",
         "src/planning-packet.ts",
@@ -193,7 +196,7 @@
     },
     {
       "class": "fixture",
-      "count": 30,
+      "count": 37,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
@@ -207,6 +210,13 @@
         "fixtures/plan-analysis/invalid.json",
         "fixtures/plan-analysis/valid.json",
         "fixtures/plan-receipts/vectors.json",
+        "fixtures/planner-benchmarks/invalid-bundle.json",
+        "fixtures/planner-benchmarks/invalid-study-root.json",
+        "fixtures/planner-benchmarks/study-root.json",
+        "fixtures/planner-benchmarks/trust-root.json",
+        "fixtures/planner-benchmarks/valid-bundle.json",
+        "fixtures/planning-contracts/invalid.json",
+        "fixtures/planning-contracts/valid.json",
         "fixtures/planning-packets/invalid.json",
         "fixtures/planning-packets/valid.json",
         "fixtures/profiles/resolved/boulder-native-preview.json",

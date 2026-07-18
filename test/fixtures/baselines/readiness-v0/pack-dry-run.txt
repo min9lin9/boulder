@@ -14,7 +14,7 @@ packed 1.25KB boulder.yaml
 packed 1.38KB docs/AGENTS.md
 packed 3.75KB docs/APPLICATION_EVIDENCE.md
 packed 1.75KB docs/BENCHMARK_FIXTURE_REPORT.md
-packed 0.94KB docs/BENCHMARK_PLAN.md
+packed 4.76KB docs/BENCHMARK_PLAN.md
 packed 3.61KB docs/BOOTSTRAP_INTERVIEW_RESEARCH.md
 packed 2.11KB docs/BOOTSTRAP_PROFILE_RESEARCH.md
 packed 7.88KB docs/BOULDER_CODEX_SKILL_USAGE.ko.md
@@ -100,10 +100,17 @@ packed 19.66KB fixtures/docs/doc-registry.v0.json
 packed 0.91KB fixtures/handoffs/high.json
 packed 0.63KB fixtures/handoffs/low.json
 packed 0.74KB fixtures/handoffs/medium.json
-packed 9.85KB fixtures/package-inventory/packaged-files.v0.json
+packed 10.36KB fixtures/package-inventory/packaged-files.v0.json
 packed 1.11KB fixtures/plan-analysis/invalid.json
 packed 1.34KB fixtures/plan-analysis/valid.json
 packed 4.37KB fixtures/plan-receipts/vectors.json
+packed 1.0KB fixtures/planner-benchmarks/invalid-bundle.json
+packed 0.65KB fixtures/planner-benchmarks/invalid-study-root.json
+packed 6.39KB fixtures/planner-benchmarks/study-root.json
+packed 0.53KB fixtures/planner-benchmarks/trust-root.json
+packed 1.10KB fixtures/planner-benchmarks/valid-bundle.json
+packed 1.56KB fixtures/planning-contracts/invalid.json
+packed 17.69KB fixtures/planning-contracts/valid.json
 packed 0.57KB fixtures/planning-packets/invalid.json
 packed 2.0KB fixtures/planning-packets/valid.json
 packed 2.11KB fixtures/profiles/resolved/boulder-native-preview.json
@@ -138,7 +145,7 @@ packed 11.77KB src/capability-doctor.ts
 packed 7.1KB src/capability-inventory.ts
 packed 3.29KB src/capability-source-schema.ts
 packed 9.87KB src/capability-source.ts
-packed 5.52KB src/cli-format.ts
+packed 5.61KB src/cli-format.ts
 packed 10.52KB src/cli-ops-command.ts
 packed 1.79KB src/cli-options.ts
 packed 1.99KB src/cli-run-recording.ts
@@ -168,11 +175,14 @@ packed 8.41KB src/pipeline.ts
 packed 11.91KB src/plan-analysis-shape.ts
 packed 7.82KB src/plan-analysis.ts
 packed 8.32KB src/plan-approval.ts
-packed 11.18KB src/plan-command.ts
+packed 12.26KB src/plan-command.ts
 packed 15.95KB src/plan-receipts.ts
 packed 19.47KB src/plan-state.ts
 packed 24.41KB src/plan-store.ts
+packed 16.65KB src/planner-benchmark-command.ts
+packed 89.53KB src/planner-benchmark.ts
 packed 2.46KB src/planner-critic.ts
+packed 21.63KB src/planner-output-normalizer.ts
 packed 4.63KB src/planner-router.ts
 packed 4.72KB src/planning-canonical.ts
 packed 22.75KB src/planning-packet.ts
@@ -215,5 +225,5 @@ packed 1.75KB src/workflows.ts
 
 boulder-oss-cli-0.1.16.tgz
 
-Total files: 212
-Unpacked size: 0.94MB
+Total files: 222
+Unpacked size: 1.11MB

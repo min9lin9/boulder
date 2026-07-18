@@ -36,6 +36,7 @@ export function printHelp(): void {
     "  boulder handoff review [--cwd path] [--packet path] [--json]",
     "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]",
     "  boulder plan analyze --task text [--run-id id] [--friction direct|focused|deep] [--cwd path] [--json]",
+    "  boulder plan benchmark --trust-root path --study-root path [--cwd path] [--json]",
     "  boulder plan show --run-id id [--cwd path] [--json]",
     "  boulder plan validate (--run-id id | --input path) [--artifact analysis|state|packet] [--cwd path] [--json]",
     "  boulder release-check [--cwd path] [--json]",
