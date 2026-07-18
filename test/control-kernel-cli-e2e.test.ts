@@ -11,7 +11,7 @@ describe("control kernel CLI", () => {
     const root = await tempRepo("boulder-control-kernel-");
     try {
       const fixture = parseFixture(await readFile(fixturePath, "utf8"));
-      await writeInputs(root, fixture);
+      await writeInputs(root, fixture, fixture.runs.pass);
 
       const unaudited = await runBoulder(controlArgs("evaluate", root));
       expect(unaudited.exitCode).toBe(1);
@@ -54,10 +54,32 @@ describe("control kernel CLI", () => {
       await removeTempRepo(root);
     }
   });
+
+  test("records blocked runs for audit but refuses to seal them", async () => {
+    const root = await tempRepo("boulder-control-kernel-blocked-");
+    try {
+      const fixture = parseFixture(await readFile(fixturePath, "utf8"));
+      await writeInputs(root, fixture, fixture.runs.hardFailure);
+
+      const recorded = await runBoulder(["control", "record", "--cwd", root, "--event", "inputs/event.json", "--json"]);
+      expect(recorded.exitCode).toBe(0);
+      expect(readString(parseJson(recorded.stdout), "status")).toBe("recorded");
+
+      const evaluated = await runBoulder(controlArgs("evaluate", root));
+      expect(evaluated.exitCode).toBe(1);
+      expect(readString(parseJson(evaluated.stdout), "status")).toBe("blocked");
+
+      const sealed = await runBoulder(controlArgs("seal", root));
+      expect(sealed.exitCode).toBe(1);
+      expect(sealed.stderr).toContain("decision-seal:evaluation-blocked");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
 });
 
-async function writeInputs(root: string, fixture: Fixture): Promise<void> {
-  await write(root, "inputs/event.json", JSON.stringify(fixture.runs.pass, null, 2));
+async function writeInputs(root: string, fixture: Fixture, run: Record<string, unknown>): Promise<void> {
+  await write(root, "inputs/event.json", JSON.stringify(run, null, 2));
   await write(root, "inputs/manifest.json", JSON.stringify(fixture.evidenceManifest, null, 2));
   await write(root, "inputs/policy.json", JSON.stringify(fixture.policy, null, 2));
 }
@@ -86,15 +108,27 @@ function verifyArgs(root: string): readonly string[] {
 type Fixture = {
   readonly policy: Record<string, unknown>;
   readonly evidenceManifest: Record<string, unknown>;
-  readonly runs: { readonly pass: Record<string, unknown> };
+  readonly runs: {
+    readonly pass: Record<string, unknown>;
+    readonly hardFailure: Record<string, unknown>;
+  };
 };
 
 function parseFixture(source: string): Fixture {
   const value: unknown = JSON.parse(source);
-  if (!isRecord(value) || !isRecord(value["policy"]) || !isRecord(value["evidenceManifest"]) || !isRecord(value["runs"]) || !isRecord(value["runs"]["pass"])) {
+  if (!isRecord(value)
+    || !isRecord(value["policy"])
+    || !isRecord(value["evidenceManifest"])
+    || !isRecord(value["runs"])
+    || !isRecord(value["runs"]["pass"])
+    || !isRecord(value["runs"]["hardFailure"])) {
     throw new Error("Invalid control-kernel fixture.");
   }
-  return { policy: value["policy"], evidenceManifest: value["evidenceManifest"], runs: { pass: value["runs"]["pass"] } };
+  return {
+    policy: value["policy"],
+    evidenceManifest: value["evidenceManifest"],
+    runs: { pass: value["runs"]["pass"], hardFailure: value["runs"]["hardFailure"] }
+  };
 }
 
 function parseJson(source: string): Record<string, unknown> {
