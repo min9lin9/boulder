@@ -23,13 +23,17 @@ declare module "node:child_process" {
 
 declare module "node:fs/promises" {
   type FileStat = {
+    readonly mode: number;
     readonly nlink: number;
+    readonly dev: number;
+    readonly ino: number;
     isDirectory(): boolean;
     isFile(): boolean;
     isSymbolicLink(): boolean;
   };
   type FileHandle = {
     stat(): Promise<FileStat>;
+    readFile(): Promise<Uint8Array>;
     readFile(encoding: "utf8"): Promise<string>;
     writeFile(content: string, encoding: "utf8"): Promise<void>;
     close(): Promise<void>;
@@ -40,6 +44,7 @@ declare module "node:fs/promises" {
   export function link(existingPath: string, newPath: string): Promise<void>;
   export function open(path: string, flags: number, mode?: number): Promise<FileHandle>;
   export function readFile(path: string, encoding: "utf8"): Promise<string>;
+  export function readFile(path: string): Promise<Uint8Array>;
   export function readdir(path: string): Promise<string[]>;
   export function realpath(path: string): Promise<string>;
   export function rename(oldPath: string, newPath: string): Promise<void>;
@@ -52,6 +57,7 @@ declare module "node:fs/promises" {
 
 declare module "node:fs" {
   export const constants: {
+    readonly O_APPEND: number;
     readonly O_CREAT: number;
     readonly O_EXCL: number;
     readonly O_NOFOLLOW?: number;
@@ -81,7 +87,7 @@ declare module "node:util" {
 
 declare module "bun:test" {
   export function describe(name: string, fn: () => void): void;
-  export function test(name: string, fn: () => Promise<void> | void): void;
+  export function test(name: string, fn: () => Promise<void> | void, timeout?: number): void;
   type Matchers = {
     toBe(expected: unknown): void;
     toBeNull(): void;
