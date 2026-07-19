@@ -5,7 +5,7 @@ import { validateHandoffFile } from "./handoff-validation";
 import { evaluateProductReadiness } from "./product-readiness";
 import { orderReadinessChecks } from "./readiness-registry";
 import { fieldEvidenceCheck } from "./service-field-evidence";
-import { evaluateReplayCheck } from "./replay-check";
+import { evaluateReplayCheck, orderReplayProjects } from "./replay-check";
 import { evaluateServiceGates } from "./service-gates";
 
 export type ServiceReadinessStatus = "ready" | "pilot-ready" | "blocked";
@@ -200,7 +200,7 @@ async function loadOfficialDocs(root: string): Promise<readonly { readonly path:
 async function findReplayFiles(root: string, fileName: string): Promise<readonly string[]> {
   const replayRoot = join(root, "fixtures", "replay");
   if (!await exists(replayRoot)) return [];
-  const projects = await readdir(replayRoot);
+  const projects = orderReplayProjects(await readdir(replayRoot));
   const paths = [];
   for (const project of projects) {
     const path = `fixtures/replay/${project}/${fileName}`;
