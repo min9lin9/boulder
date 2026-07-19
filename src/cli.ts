@@ -9,6 +9,7 @@ import { exportHarness } from "./export";
 import { runHandoffCommand } from "./handoff-command";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
+import { runPlanCommand } from "./plan-command";
 import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
 import { runProfileCommand } from "./profile-command";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
@@ -74,6 +75,10 @@ async function runMain(args: string[]): Promise<void> {
   }
   if (command === "capability") {
     await runCapabilityCommand(args, { cwd: options.cwd, json: options.json });
+    return;
+  }
+  if (command === "plan") {
+    await runPlanCommand(args, { cwd: options.cwd, json: options.json });
     return;
   }
   if (command === "workflow" && parsed.commandArgs[1] === "map") {
