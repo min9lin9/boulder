@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 203,
-  "totalPackedFiles": 204,
+  "totalUniqueFiles": 207,
+  "totalPackedFiles": 208,
   "classes": [
     {
       "class": "runtime",
-      "count": 80,
+      "count": 82,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -44,10 +44,12 @@
         "src/pipeline.ts",
         "src/plan-analysis-shape.ts",
         "src/plan-analysis.ts",
+        "src/plan-approval.ts",
         "src/plan-command.ts",
         "src/plan-receipts.ts",
         "src/plan-state.ts",
         "src/plan-store.ts",
+        "src/planner-critic.ts",
         "src/planner-router.ts",
         "src/planning-canonical.ts",
         "src/planning-packet.ts",
@@ -223,10 +225,12 @@
     },
     {
       "class": "skill",
-      "count": 6,
+      "count": 8,
       "files": [
         "skills/boulder-bootstrap-designer/SKILL.md",
         "skills/boulder-bootstrap-designer/agents/openai.yaml",
+        "skills/boulder-native-planner/SKILL.md",
+        "skills/boulder-native-planner/agents/openai.yaml",
         "skills/boulder/SKILL.md",
         "skills/boulder/agents/openai.yaml",
         "skills/boulder/references/usage.ko.md",

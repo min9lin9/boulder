@@ -15,7 +15,7 @@
     {
       "id": "pack-dry-run-evidence",
       "status": "pass",
-      "evidence": "204 files"
+      "evidence": "208 files"
     },
     {
       "id": "release-evidence-manifest",

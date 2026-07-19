@@ -1,6 +1,6 @@
 bun pack v1.3.14 (0d9b296a)
 
-packed 1.44KB package.json
+packed 1.47KB package.json
 packed 6.30KB CHANGELOG.md
 packed 1.28KB CONTRIBUTING.md
 packed 1.1KB LICENSE
@@ -99,7 +99,7 @@ packed 19.46KB fixtures/docs/doc-registry.v0.json
 packed 0.91KB fixtures/handoffs/high.json
 packed 0.63KB fixtures/handoffs/low.json
 packed 0.74KB fixtures/handoffs/medium.json
-packed 9.49KB fixtures/package-inventory/packaged-files.v0.json
+packed 9.67KB fixtures/package-inventory/packaged-files.v0.json
 packed 1.11KB fixtures/plan-analysis/invalid.json
 packed 1.34KB fixtures/plan-analysis/valid.json
 packed 4.37KB fixtures/plan-receipts/vectors.json
@@ -122,6 +122,8 @@ packed 0.57KB fixtures/service-readiness/metric-log-template.json
 packed 4.35KB fixtures/workflow-map/primary-workflow.v0.json
 packed 4.71KB skills/boulder-bootstrap-designer/SKILL.md
 packed 278B skills/boulder-bootstrap-designer/agents/openai.yaml
+packed 2.37KB skills/boulder-native-planner/SKILL.md
+packed 345B skills/boulder-native-planner/agents/openai.yaml
 packed 4.16KB skills/boulder/SKILL.md
 packed 245B skills/boulder/agents/openai.yaml
 packed 3.93KB skills/boulder/references/usage.ko.md
@@ -161,10 +163,12 @@ packed 7.1KB src/path-glob.ts
 packed 8.41KB src/pipeline.ts
 packed 11.91KB src/plan-analysis-shape.ts
 packed 7.82KB src/plan-analysis.ts
+packed 8.32KB src/plan-approval.ts
 packed 11.18KB src/plan-command.ts
 packed 15.95KB src/plan-receipts.ts
 packed 19.47KB src/plan-state.ts
 packed 24.41KB src/plan-store.ts
+packed 2.46KB src/planner-critic.ts
 packed 4.63KB src/planner-router.ts
 packed 4.72KB src/planning-canonical.ts
 packed 22.75KB src/planning-packet.ts
@@ -207,5 +211,5 @@ packed 1.75KB src/workflows.ts
 
 boulder-oss-cli-0.1.16.tgz
 
-Total files: 204
-Unpacked size: 0.90MB
+Total files: 208
+Unpacked size: 0.92MB
