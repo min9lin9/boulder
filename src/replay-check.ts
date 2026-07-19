@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { exists } from "./fs";
+const REPLAY_PROJECT_ORDER = ["gajae-code", "awesome-codex-subagents", "kimi-agent-swarm-skill"] as const;
 
 export type ReplayCheckStatus = "ready" | "blocked";
 
@@ -44,6 +45,15 @@ type OfficialDocs = {
   readonly constraints: readonly string[];
   readonly retrievedAt: string;
 };
+export function orderReplayProjects(projects: readonly string[]): readonly string[] {
+  const priority = new Map<string, number>(REPLAY_PROJECT_ORDER.map((project, index) => [project, index]));
+  return [...projects].sort((left, right) => {
+    const leftPriority = priority.get(left) ?? Number.MAX_SAFE_INTEGER;
+    const rightPriority = priority.get(right) ?? Number.MAX_SAFE_INTEGER;
+    if (leftPriority !== rightPriority) return leftPriority - rightPriority;
+    return left < right ? -1 : left > right ? 1 : 0;
+  });
+}
 
 export async function evaluateReplayCheck(root: string): Promise<ReplayCheckReport> {
   const replayRoot = join(root, "fixtures", "replay");
@@ -54,7 +64,7 @@ export async function evaluateReplayCheck(root: string): Promise<ReplayCheckRepo
       policy: replayPolicy()
     };
   }
-  const projects = await readdir(replayRoot);
+  const projects = orderReplayProjects(await readdir(replayRoot));
   const reports = [];
   for (const project of projects) {
     reports.push(await evaluateReplayProject(root, project));

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "boulder.plan-analysis.v1",
+  "input": {
+    "normalizedTask": "add a bounded planner contract",
+    "inputDigest": "not-a-digest"
+  },
+  "dimensions": [
+    { "id": "ambiguity", "level": 2, "weight": 25, "weightedScore": 13, "reasons": ["A reason."] },
+    { "id": "impact", "level": 2, "weight": 20, "weightedScore": 10, "reasons": ["A reason."] },
+    { "id": "irreversibility", "level": 0, "weight": 20, "weightedScore": 0, "reasons": ["A reason."] },
+    { "id": "externality", "level": 1, "weight": 15, "weightedScore": 4, "reasons": ["A reason."] },
+    { "id": "unknown", "level": 3, "weight": 20, "weightedScore": 15, "reasons": ["A reason."] }
+  ],
+  "totalScore": 42,
+  "confidence": "high",
+  "hardOverrides": [],
+  "selectedMode": "focused",
+  "approvalMinimum": ["plan", "execution"],
+  "questionBudget": 3,
+  "plannerRecommendation": "Use the boulder-native planner.",
+  "canonicalDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "volatile": {
+    "runId": "plan-analysis-fixture",
+    "createdAt": "not-a-time"
+  },
+  "unsupported": true
+}

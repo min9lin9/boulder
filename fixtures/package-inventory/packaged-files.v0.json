@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 186,
-  "totalPackedFiles": 187,
+  "totalUniqueFiles": 198,
+  "totalPackedFiles": 199,
   "classes": [
     {
       "class": "runtime",
-      "count": 68,
+      "count": 75,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -22,6 +22,8 @@
         "src/cli-options.ts",
         "src/cli-run-recording.ts",
         "src/cli.ts",
+        "src/critic-review.ts",
+        "src/execution-packet.ts",
         "src/executor-adapters.ts",
         "src/executors.ts",
         "src/export.ts",
@@ -38,7 +40,12 @@
         "src/inspect.ts",
         "src/manifest-yaml.ts",
         "src/manifest.ts",
+        "src/path-glob.ts",
         "src/pipeline.ts",
+        "src/plan-analysis-shape.ts",
+        "src/plan-receipts.ts",
+        "src/planning-canonical.ts",
+        "src/planning-packet.ts",
         "src/product-readiness.ts",
         "src/profile-command.ts",
         "src/profile-store.ts",
@@ -169,14 +176,14 @@
         "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/pr26-review-closure.md",
-        "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
         "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json",
+        "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
         "docs/CASE_STUDIES/evidence/release-workflow/run-event-redaction-repro.json"
       ]
     },
     {
       "class": "fixture",
-      "count": 24,
+      "count": 29,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
@@ -187,6 +194,11 @@
         "fixtures/handoffs/low.json",
         "fixtures/handoffs/medium.json",
         "fixtures/package-inventory/packaged-files.v0.json",
+        "fixtures/plan-analysis/invalid.json",
+        "fixtures/plan-analysis/valid.json",
+        "fixtures/plan-receipts/vectors.json",
+        "fixtures/planning-packets/invalid.json",
+        "fixtures/planning-packets/valid.json",
         "fixtures/profiles/resolved/ops-default.json",
         "fixtures/profiles/resolved/programming-default.json",
         "fixtures/profiles/resolved/research-default.json",

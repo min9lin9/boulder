@@ -4,4 +4,9 @@ coverage/
 .DS_Store
 *.log
 .omo/
+.boulder/
+.gjc/
+.debug-journal.md
+docs/*SESSION_SUMMARY*.ko.md
+docs/NEXT_*GAP*PLAN*.ko.md
 _workspace/
