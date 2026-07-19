@@ -110,7 +110,7 @@ packed 6.39KB fixtures/planner-benchmarks/study-root.json
 packed 0.53KB fixtures/planner-benchmarks/trust-root.json
 packed 1.10KB fixtures/planner-benchmarks/valid-bundle.json
 packed 1.56KB fixtures/planning-contracts/invalid.json
-packed 17.69KB fixtures/planning-contracts/valid.json
+packed 17.75KB fixtures/planning-contracts/valid.json
 packed 0.57KB fixtures/planning-packets/invalid.json
 packed 2.0KB fixtures/planning-packets/valid.json
 packed 2.11KB fixtures/profiles/resolved/boulder-native-preview.json
@@ -180,7 +180,7 @@ packed 15.95KB src/plan-receipts.ts
 packed 19.47KB src/plan-state.ts
 packed 24.41KB src/plan-store.ts
 packed 16.65KB src/planner-benchmark-command.ts
-packed 90.1KB src/planner-benchmark.ts
+packed 95.61KB src/planner-benchmark.ts
 packed 2.46KB src/planner-critic.ts
 packed 21.63KB src/planner-output-normalizer.ts
 packed 4.63KB src/planner-router.ts

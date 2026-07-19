@@ -9,10 +9,13 @@ const taskIdForCell = (cell: { readonly taskClass: string; readonly repoId: stri
   const task = cell.taskClass === "small-bug" ? "BUG" : cell.taskClass === "medium-feature" ? "FEAT" : "RISK";
   return `${repository}-${task}-01`;
 };
-const plannerRunAlias = (plannerId: string): string => plannerId === "lazycodex-ulw-plan" ? "lazycodex" : plannerId;
-const runIdForCell = (cell: typeof cells[number], index: number): string => `R${String(index + 1).padStart(2, "0")}-${plannerRunAlias(cell.plannerId)}-${taskIdForCell(cell)}-r${cell.repeat}`;
+const plannerOutputId = (plannerId: string): string => plannerId === "lazycodex-ulw-plan" ? "lazycodex" : plannerId;
+const runIdForCell = (cell: typeof cells[number], index: number): string => `R${String(index + 1).padStart(2, "0")}-${cell.plannerId}-${taskIdForCell(cell)}-r${cell.repeat}`;
 const firstRunId = runIdForCell(cells[0], 0);
 const secondRunId = runIdForCell(cells[1], 1);
+const firstLazycodexIndex = cells.findIndex((cell) => cell.plannerId === "lazycodex-ulw-plan");
+const firstLazycodexRunId = runIdForCell(cells[firstLazycodexIndex]!, firstLazycodexIndex);
+const shortenedLazycodexRunId = firstLazycodexRunId.replace("lazycodex-ulw-plan", "lazycodex");
 const wrongTaskRunId = firstRunId.replace("-TSG-BUG-01-", "-TSG-FEAT-01-");
 const wrongRepositoryRunId = firstRunId.replace("-TSG-BUG-01-", "-NI-BUG-01-");
 const wrongRepeatRunId = firstRunId.replace("-r1", "-r2");
@@ -39,12 +42,14 @@ const hash = (value: unknown) => plannerBenchmarkDigest(value);
 
 async function signedBenchmark(change: {
   readonly mutate?: (draft: Record<string, unknown>) => void;
+  readonly mutateReport?: (draft: Record<string, unknown>) => void;
   readonly tamperBytes?: string;
   readonly scenario?: "execution-failure" | "critical-cap" | "incomplete-traceability" | "preview-minimum" | "preview-variance" | "below-preview" | "observed-study-hold" | "retrospective-lock";
-  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "timeout-original-invalid";
+  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "timeout-original-invalid" | "reported-noncompletion" | "reported-noncompletion-original-wrong-signer" | "reported-noncompletion-original-tampered" | "reported-noncompletion-tail-mismatch" | "reported-noncompletion-extra-artifact" | "reported-noncompletion-missing-artifact" | "reported-noncompletion-invented-digest" | "reported-noncompletion-wrong-reason" | "approval-cycle" | "approval-cycle-original-wrong-signer" | "approval-cycle-wrong-status" | "approval-cycle-invented-digest" | "approval-cycle-extra-artifact";
+  readonly scopeFault?: "unknown" | "missing" | "execution-mismatch";
   readonly orphanIndexedRawRecord?: boolean;
-  readonly identityFault?: "run-task" | "run-repository" | "run-repeat" | "planner-output";
-  readonly contractFault?: "approval" | "redaction" | "normalizer" | "task-card-repo" | "runner-handoff" | "planner-alias" | "planner-disclosure" | "criterion-score" | "protocol-policy" | "source-revision" | "execution-body" | "execution-text-contradiction";
+  readonly identityFault?: "run-task" | "run-repository" | "run-repeat" | "run-planner-alias" | "planner-output";
+  readonly contractFault?: "approval" | "redaction" | "normalizer" | "task-card-repo" | "runner-handoff" | "runner-normalizer-contract-digest" | "runner-legacy-normalizer-digest" | "planner-alias" | "planner-disclosure" | "criterion-score" | "protocol-policy" | "source-revision" | "execution-body" | "execution-text-contradiction";
 } = {}): Promise<PlannerBenchmarkProvenance> {
   const packetPath = decodeURIComponent(new URL("../fixtures/planning-packets/valid.json", import.meta.url).pathname);
   const packet = JSON.parse(await readFile(packetPath, "utf8")) as Record<string, unknown>;
@@ -65,6 +70,13 @@ async function signedBenchmark(change: {
   const refs = new Map<string, Record<string, unknown>>();
   const add = async (path: string, schemaVersion: string, value: unknown) => {
     const bytes = encoder.encode(JSON.stringify(value));
+    files.set(path, bytes);
+    const ref = { path, digest: await artifactDigest(bytes), schemaVersion };
+    refs.set(path, ref);
+    return ref;
+  };
+  const addText = async (path: string, schemaVersion: string, value: string) => {
+    const bytes = encoder.encode(value);
     files.set(path, bytes);
     const ref = { path, digest: await artifactDigest(bytes), schemaVersion };
     refs.set(path, ref);
@@ -115,20 +127,7 @@ async function signedBenchmark(change: {
       constraints: ["Planning only."]
     }));
   }
-  const runnerContractValue = {
-    schemaVersion: "boulder.planner-runner-contract.v1",
-    transport: change.contractFault === "runner-handoff" ? "handoff" : "gjc",
-    model: "openai-codex/gpt-5.6-sol",
-    thinking: "medium",
-    scoredRunsStartAfterAmendment: true,
-    normalizerVersion: "pr8b-strict-packet-v2",
-    normalizerDigest: normalizer.digest,
-    commonConstraints: ["planning-only", "read-only repository inspection", "no source edits", "no implementation execution", "same task card and frozen revision"],
-    planners: ["gjc", "boulder-native", "lazycodex-ulw-plan"].map((plannerId) => ({ plannerId })),
-    personas: { gjc: "direct", "boulder-native": "native", lazycodex: "prometheus" }
-  };
-  await add("study/runner-contract.json", "boulder.planner-runner-contract.v1", runnerContractValue);
-  await add("study/normalizer-contract.json", "boulder.planner-normalizer-contract.v2", {
+  const normalizerContract = await add("study/normalizer-contract.json", "boulder.planner-normalizer-contract.v2", {
     schemaVersion: "boulder.planner-normalizer-contract.v2",
     version: "pr8b-strict-packet-v2",
     sourceDigest: normalizer.digest,
@@ -138,9 +137,24 @@ async function signedBenchmark(change: {
     rawCapture: "Persist raw output.",
     trustPolicy: "Only independently verified sources are trusted."
   });
+  const runnerContractValue = {
+    schemaVersion: "boulder.planner-runner-contract.v1",
+    transport: change.contractFault === "runner-handoff" ? "handoff" : "gjc",
+    model: "openai-codex/gpt-5.6-sol",
+    thinking: "medium",
+    scoredRunsStartAfterAmendment: true,
+    normalizerVersion: "pr8b-strict-packet-v2",
+    ...(change.contractFault === "runner-legacy-normalizer-digest"
+      ? { normalizerDigest: normalizer.digest }
+      : { normalizerContractDigest: change.contractFault === "runner-normalizer-contract-digest" ? digest : normalizerContract.digest }),
+    commonConstraints: ["planning-only", "read-only repository inspection", "no source edits", "no implementation execution", "same task card and frozen revision"],
+    planners: ["gjc", "boulder-native", "lazycodex-ulw-plan"].map((plannerId) => ({ plannerId })),
+    personas: { gjc: "direct", "boulder-native": "native", lazycodex: "prometheus" }
+  };
+  await add("study/runner-contract.json", "boulder.planner-runner-contract.v1", runnerContractValue);
   const protocol: Record<string, unknown> = {
     schemaVersion: "boulder.planner-study-protocol.v1", studyId: "pr8b", rubricVersion: "1", rubricDigest: rubric.digest,
-    normalizerVersion: "pr8b-strict-packet-v2", normalizerDigest: normalizer.digest, runnerContractDigest: hash(runnerContractValue), protocolSigner: { keyId: key.keyId, fingerprint: key.fingerprint },
+    normalizerVersion: "pr8b-strict-packet-v2", normalizerDigest: normalizer.digest, normalizerContractDigest: normalizerContract.digest, runnerContractDigest: hash(runnerContractValue), protocolSigner: { keyId: key.keyId, fingerprint: key.fingerprint },
     delegatedSigners: [
       { keyId: key.keyId, fingerprint: key.fingerprint, roles: ["manifest", "bundle"] },
       ...(change.executorFault === "unauthorized-signer" ? [] : [{ keyId: executorKey.keyId, fingerprint: executorKey.fingerprint, roles: ["executor"] }])
@@ -176,9 +190,11 @@ async function signedBenchmark(change: {
         : change.identityFault === "run-repository" ? wrongRepositoryRunId
           : change.identityFault === "run-repeat" ? wrongRepeatRunId
             : canonicalRunId
-      : canonicalRunId;
+      : change.identityFault === "run-planner-alias" && index === firstLazycodexIndex
+        ? shortenedLazycodexRunId
+        : canonicalRunId;
     const reviewItemId = `review-${index}`;
-    const outputPlannerId = index === 0 && change.identityFault === "planner-output" ? "boulder-native" : plannerRunAlias(cell.plannerId);
+    const outputPlannerId = index === 0 && change.identityFault === "planner-output" ? "boulder-native" : plannerOutputId(cell.plannerId);
     const plannerOutput = await add(`runs/${runId}/output.json`, "boulder.planner-output.v1", { schemaVersion: "boulder.planner-output.v1", plannerId: outputPlannerId });
     const source = await add(`runs/${runId}/source.json`, "boulder.planner-trusted-source-catalog.v1", {
       schemaVersion: "boulder.planner-trusted-source-catalog.v1",
@@ -245,9 +261,68 @@ async function signedBenchmark(change: {
     const testOutput = await add(`runs/${runId}/tests.json`, "boulder.planner-test-output.v1", change.contractFault === "execution-text-contradiction" && index === 0 ? "2 pass\n1 fail" : { schemaVersion: "boulder.planner-test-output.v1", runId: executionArtifactRunId, status: executionStatus });
     const typecheckOutput = await add(`runs/${runId}/typecheck.json`, "boulder.planner-typecheck-output.v1", change.contractFault === "execution-text-contradiction" && index === 0 ? "tsc\nFound 1 error." : { schemaVersion: "boulder.planner-typecheck-output.v1", runId: executionArtifactRunId, status: executionStatus });
     const executorFault = index === 0 ? change.executorFault : undefined;
-    const originalReceipt = executorFault === "timeout-original-invalid"
-      ? await add(`runs/${runId}/legacy-timeout-receipt.json`, "boulder.common-executor-receipt.legacy-thin-failure", { runId: "wrong-run", status: "failed", reason: "executor-timeout" })
-      : undefined;
+    const reportedNoncompletion = executorFault === "reported-noncompletion"
+      || executorFault === "reported-noncompletion-original-wrong-signer"
+      || executorFault === "reported-noncompletion-original-tampered"
+      || executorFault === "reported-noncompletion-tail-mismatch"
+      || executorFault === "reported-noncompletion-extra-artifact"
+      || executorFault === "reported-noncompletion-missing-artifact"
+      || executorFault === "reported-noncompletion-invented-digest"
+      || executorFault === "reported-noncompletion-wrong-reason";
+    const approvalCycle = executorFault === "approval-cycle"
+      || executorFault === "approval-cycle-original-wrong-signer"
+      || executorFault === "approval-cycle-wrong-status"
+      || executorFault === "approval-cycle-invented-digest"
+      || executorFault === "approval-cycle-extra-artifact";
+    let originalReceipt: Record<string, unknown> | undefined;
+    let stdout: Record<string, unknown> | undefined;
+    let stderr: Record<string, unknown> | undefined;
+    if (executorFault === "timeout-original-invalid") {
+      originalReceipt = await add(`runs/${runId}/legacy-timeout-receipt.json`, "boulder.common-executor-receipt.legacy-thin-failure", { runId: "wrong-run", status: "failed", reason: "executor-timeout" });
+    } else if (reportedNoncompletion || approvalCycle) {
+      const stdoutTail = "";
+      const stderrTail = "";
+      const originalUnsigned: Record<string, unknown> = reportedNoncompletion
+        ? {
+          schemaVersion: "boulder.common-executor-receipt.v1",
+          runId,
+          status: "failed",
+          patchDigest: patch.digest,
+          testDigest: testOutput.digest,
+          typecheckDigest: typecheckOutput.digest,
+          reason: "executor-noncompletion-reported",
+          reportedReason: "executor-timeout",
+          terminationEvidenceStatus: "unavailable-retrospectively",
+          budgetSeconds: 30,
+          elapsedSeconds: 31,
+          commandStartedAt: "2026-07-16T01:00:00Z",
+          currentCommand: "gjc -p executor apply",
+          stdoutTail,
+          stderrTail,
+          overallDisposition: "hold",
+          promotionEligibility: "hold"
+        }
+        : {
+          schemaVersion: "boulder.common-executor-receipt.v1",
+          runId,
+          status: executorFault === "approval-cycle-wrong-status" ? "passed" : "failed",
+          patchDigest: patch.digest,
+          testDigest: testOutput.digest,
+          typecheckDigest: typecheckOutput.digest,
+          reason: "approval-cycle-detected",
+          approvalCycleDetected: true
+        };
+      const originalSignature = await (executorFault === "reported-noncompletion-original-wrong-signer" || executorFault === "approval-cycle-original-wrong-signer"
+        ? sign(originalUnsigned)
+        : signExecutor(originalUnsigned));
+      const originalValue: Record<string, unknown> = { ...originalUnsigned, signature: originalSignature };
+      if (executorFault === "reported-noncompletion-original-tampered") originalValue.reportedReason = "executor-cancelled";
+      originalReceipt = await add(`runs/${runId}/original-receipt.json`, "boulder.common-executor-receipt.v1", originalValue);
+      if (reportedNoncompletion) {
+        stdout = await addText(`runs/${runId}/executor.stdout`, "boulder.planner-executor-stdout.v1", executorFault === "reported-noncompletion-tail-mismatch" ? "different stdout tail" : stdoutTail);
+        stderr = await addText(`runs/${runId}/executor.stderr`, "boulder.planner-executor-stderr.v1", stderrTail);
+      }
+    }
     const sourceReceiptValue: Record<string, unknown> = {
       schemaVersion: "boulder.common-executor-receipt.v1",
       runId,
@@ -272,12 +347,36 @@ async function signedBenchmark(change: {
       delete sourceReceiptValue.patchDigest;
       delete sourceReceiptValue.testDigest;
       delete sourceReceiptValue.typecheckDigest;
+    } else if (reportedNoncompletion || approvalCycle) {
+      sourceReceiptValue.failureKind = reportedNoncompletion ? "reported-noncompletion" : "approval-cycle";
+      sourceReceiptValue.executorExitCode = null;
+      sourceReceiptValue.testExitCode = null;
+      sourceReceiptValue.typecheckExitCode = null;
+      sourceReceiptValue.reason = reportedNoncompletion && executorFault === "reported-noncompletion-wrong-reason"
+        ? "executor-timeout"
+        : reportedNoncompletion ? "executor-noncompletion-reported" : "approval-cycle-detected";
+      sourceReceiptValue.originalReceipt = originalReceipt;
+      delete sourceReceiptValue.patchDigest;
+      delete sourceReceiptValue.testDigest;
+      delete sourceReceiptValue.typecheckDigest;
+      if (executorFault === "reported-noncompletion-invented-digest" || executorFault === "approval-cycle-invented-digest") sourceReceiptValue.patchDigest = patch.digest;
     }
     const sourceReceipt = await add(`runs/${runId}/source-receipt.json`, "boulder.common-executor-receipt.v1", sourceReceiptValue);
     const verification = executionStatus === "passed"
       ? { status: "passed", testDigest: sourceReceiptValue.testDigest, typecheckDigest: sourceReceiptValue.typecheckDigest }
-      : { status: "failed", reason: sourceReceiptValue.reason, testDigest: executorFault === "timeout-original-invalid" ? null : sourceReceiptValue.testDigest, typecheckDigest: executorFault === "timeout-original-invalid" ? null : sourceReceiptValue.typecheckDigest };
-    const executionUnsigned = { schemaVersion: "boulder.planner-execution-receipt.v1", runId, status: executionStatus, executorModel: sourceReceiptValue.executorModel, sourceReceipt, verificationArtifacts: executorFault === "timeout-original-invalid" ? [] : executorFault === "omit-test-artifact" ? [patch, typecheckOutput] : [patch, testOutput, typecheckOutput], verification, verificationDigest: hash(verification) };
+      : reportedNoncompletion
+        ? { status: "failed", reason: sourceReceiptValue.reason, testDigest: null, typecheckDigest: null, terminationEvidenceStatus: "unavailable-retrospectively" }
+        : approvalCycle || executorFault === "timeout-original-invalid"
+          ? { status: "failed", reason: sourceReceiptValue.reason, testDigest: null, typecheckDigest: null }
+          : { status: "failed", reason: sourceReceiptValue.reason, testDigest: sourceReceiptValue.testDigest, typecheckDigest: sourceReceiptValue.typecheckDigest };
+    const verificationArtifacts = reportedNoncompletion
+      ? executorFault === "reported-noncompletion-missing-artifact" ? [stdout] : executorFault === "reported-noncompletion-extra-artifact" ? [stdout, stderr, patch] : [stdout, stderr]
+      : approvalCycle
+        ? executorFault === "approval-cycle-extra-artifact" ? [patch] : []
+        : executorFault === "timeout-original-invalid" ? [] : executorFault === "omit-test-artifact" ? [patch, typecheckOutput] : [patch, testOutput, typecheckOutput];
+    const scopeStatus = index === 0 && change.scopeFault === "unknown" ? "unknown" as const : "passed" as const;
+    const nestedScopeStatus = index === 0 && change.scopeFault === "execution-mismatch" ? "unknown" as const : scopeStatus;
+    const executionUnsigned = { schemaVersion: "boulder.planner-execution-receipt.v1", runId, status: executionStatus, scopeStatus, executorModel: sourceReceiptValue.executorModel, sourceReceipt, verificationArtifacts, verification, verificationDigest: hash(verification) };
     const executionSignature = await signExecutor(executionUnsigned);
     const execution = {
       ...executionUnsigned,
@@ -292,17 +391,21 @@ async function signedBenchmark(change: {
       schemaVersion: "boulder.planner-benchmark-run.v1", runId, cellId: raw.cellId, repeat: cell.repeat, sequence: index + 1, protocolDigest, manifestDigest,
       rawRunDigest: hash(raw), sourceDigest: source.digest, packetDigest: packet.packetDigest, reviewDigests: [itemDigest], approvalDigest: approvals.digest,
       executionDigest: executionRef.digest, verificationDigest: execution.verificationDigest, reviewerDigest: itemDigest, redactionDigest: redactions.digest,
-      normalizerVersion: "pr8b-strict-packet-v2", normalizerDigest: normalizer.digest, score, rawScore, criticalCaps, traceabilityPercent,
-      execution: { status: executionStatus, path: executionRef.path, digest: executionRef.digest, schemaVersion: "boulder.planner-execution-receipt.v1" }, reviewItemId, blindedItemDigest: itemDigest
+      normalizerVersion: "pr8b-strict-packet-v2", normalizerDigest: normalizer.digest, score, rawScore, criticalCaps, traceabilityPercent, scopeStatus,
+      execution: { status: executionStatus, scopeStatus: nestedScopeStatus, path: executionRef.path, digest: executionRef.digest, schemaVersion: "boulder.planner-execution-receipt.v1" }, reviewItemId, blindedItemDigest: itemDigest
     };
+    if (index === 0 && change.scopeFault === "missing") {
+      delete (normalizedRun as Record<string, unknown>).scopeStatus;
+      delete (normalizedRun.execution as Record<string, unknown>).scopeStatus;
+    }
     normalizedRuns.push(normalizedRun);
-    if (executionStatus === "failed" || criticalCaps.length > 0 || traceabilityPercent !== 100) exclusions.push({
+    if (executionStatus === "failed" || scopeStatus !== "passed" || nestedScopeStatus !== "passed" || criticalCaps.length > 0 || traceabilityPercent !== 100) exclusions.push({
       runId,
       cellId: raw.cellId,
       repeat: cell.repeat,
       sequence: index + 1,
-      reason: scenario,
-      evidenceDigest: executionStatus === "failed" ? executionRef.digest : itemDigest,
+      reason: scenario ?? (scopeStatus !== "passed" || nestedScopeStatus !== "passed" ? "scope-attribution-not-passed" : "ineligible-run"),
+      evidenceDigest: executionStatus === "failed" || scopeStatus !== "passed" || nestedScopeStatus !== "passed" ? executionRef.digest : itemDigest,
       adjudicator: "fixture-reviewer",
       excludedAt: "2026-07-16T02:00:01Z"
     });
@@ -337,6 +440,7 @@ async function signedBenchmark(change: {
   if (change.tamperBytes) (evidenceFiles.find((file) => file.path === change.tamperBytes)!.bytes)[0] ^= 1;
   const evaluation = await evaluatePlannerBenchmarkEvidence(draft);
   const report: Record<string, unknown> = { ...evaluation.report };
+  change.mutateReport?.(report);
   report.signature = await sign(report);
   return { ...draft, report };
 }
@@ -349,6 +453,43 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     expect(await validatePlannerBenchmarkProvenance(evidence)).toEqual([]);
     expect(buildPlannerBenchmarkReport(evidence).decision).toBe("FIRST_FALLBACK_REVIEW");
   });
+  test("fails closed on missing, unknown, and mismatched execution scope attribution", async () => {
+    const [unknownScope, missingScope, mismatchedScope] = await Promise.all([
+      signedBenchmark({ scopeFault: "unknown" }),
+      signedBenchmark({ scopeFault: "missing" }),
+      signedBenchmark({ scopeFault: "execution-mismatch" })
+    ]);
+
+    expect(await validatePlannerBenchmarkProvenance(unknownScope)).toEqual([]);
+    const unknownReport = buildPlannerBenchmarkReport(unknownScope);
+    expect(unknownReport.decision).toBe("HOLD");
+    expect(unknownReport.reasons).toContain("scope_attribution_unknown");
+    expect(unknownReport.metrics.eligibleRunCount).toBe(35);
+    expect(unknownReport.excludedRunIds).toContain(firstRunId);
+
+    for (const [evidence, code, path] of [
+      [missingScope, "plan.benchmark.run_invalid", "normalizedRuns[0]"],
+      [mismatchedScope, "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution`]
+    ] as const) {
+      const issues = await validatePlannerBenchmarkProvenance(evidence);
+      expect(issues.some((entry) => entry.code === code && entry.path === path)).toBe(true);
+      const report = buildPlannerBenchmarkReport(evidence, issues);
+      expect(report.decision).toBe("HOLD");
+      expect(report.reasons).toContain("scope_attribution_unknown");
+      expect(report.metrics.eligibleRunCount).toBe(0);
+    }
+  }, 20_000);
+  test("rejects a signed report that omits the canonical scope HOLD reason", async () => {
+    const evidence = await signedBenchmark({
+      scopeFault: "unknown",
+      mutateReport: (report) => {
+        report.reasons = (report.reasons as readonly string[]).filter((reason) => reason !== "scope_attribution_unknown");
+      }
+    });
+    const issues = await validatePlannerBenchmarkProvenance(evidence);
+    expect(issues.some((entry) => entry.code === "plan.benchmark.report_invalid" && entry.path === "report")).toBe(true);
+    expect(issues.some((entry) => entry.code === "plan.benchmark.signature_invalid" && entry.path === "report.signature")).toBe(false);
+  }, 20_000);
   test("derives HOLD from coherent execution, cap, and traceability evidence", async () => {
     const [executionFailure, criticalCap, incompleteTraceability] = await Promise.all([
       signedBenchmark({ scenario: "execution-failure" }),
@@ -407,6 +548,33 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     expect(wrongPlannerIssues.some((entry) => entry.code === "plan.benchmark.evidence_invalid" && entry.path === `rawRuns.${firstRunId}.plannerOutput`)).toBe(true);
     expect(buildPlannerBenchmarkReport(wrongPlanner, wrongPlannerIssues).metrics.eligibleRunCount).toBe(0);
   }, 20_000);
+  test("requires full lazycodex raw-run IDs while preserving lazycodex planner output identity", async () => {
+    const [valid, shortened] = await Promise.all([
+      signedBenchmark(),
+      signedBenchmark({ identityFault: "run-planner-alias" })
+    ]);
+    expect((valid.rawRuns as readonly Record<string, unknown>[]).some((run) => run.runId === firstLazycodexRunId)).toBe(true);
+    expect(await validatePlannerBenchmarkProvenance(valid)).toEqual([]);
+
+    const issues = await validatePlannerBenchmarkProvenance(shortened);
+    expect(issues.some((entry) => entry.code === "plan.benchmark.run_invalid" && entry.path === `rawRuns.${shortenedLazycodexRunId}.identity`)).toBe(true);
+    expect(buildPlannerBenchmarkReport(shortened, issues).metrics.eligibleRunCount).toBe(0);
+  }, 20_000);
+
+  test("requires the runner's normalizer contract digest to exactly match the signed protocol", async () => {
+    const [valid, mismatch, legacyField] = await Promise.all([
+      signedBenchmark(),
+      signedBenchmark({ contractFault: "runner-normalizer-contract-digest" }),
+      signedBenchmark({ contractFault: "runner-legacy-normalizer-digest" })
+    ]);
+    expect(await validatePlannerBenchmarkProvenance(valid)).toEqual([]);
+
+    for (const evidence of [mismatch, legacyField]) {
+      const issues = await validatePlannerBenchmarkProvenance(evidence);
+      expect(issues.some((entry) => entry.code === "plan.benchmark.evidence_invalid" && entry.path === "runnerContract")).toBe(true);
+      expect(buildPlannerBenchmarkReport(evidence, issues).metrics.eligibleRunCount).toBe(0);
+    }
+  }, 20_000);
 
   test("fails closed across signed approval, policy, redaction, normalizer, runner, task-card, source, execution, score, and blinded-alias context changes", async () => {
     for (const [contractFault, expectedPath] of [
@@ -462,6 +630,33 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
       expect(buildPlannerBenchmarkReport(evidence, issues).metrics.eligibleRunCount).toBe(0);
     }
   }, 20_000);
+  test("accepts signed reported noncompletion and approval-cycle execution evidence", async () => {
+    for (const executorFault of ["reported-noncompletion", "approval-cycle"] as const) {
+      const evidence = await signedBenchmark({ scenario: "execution-failure", executorFault });
+      expect(await validatePlannerBenchmarkProvenance(evidence)).toEqual([]);
+      expect(buildPlannerBenchmarkReport(evidence).decision).toBe("HOLD");
+    }
+  }, 20_000);
+  test("rejects tampered signed reported-noncompletion and approval-cycle evidence", async () => {
+    const cases = [
+      ["reported-noncompletion-original-wrong-signer", "plan.benchmark.signer_unauthorized", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature.keyId`],
+      ["reported-noncompletion-original-tampered", "plan.benchmark.signature_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature`],
+      ["reported-noncompletion-tail-mismatch", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["reported-noncompletion-extra-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["reported-noncompletion-missing-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["reported-noncompletion-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["reported-noncompletion-wrong-reason", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["approval-cycle-original-wrong-signer", "plan.benchmark.signer_unauthorized", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature.keyId`],
+      ["approval-cycle-wrong-status", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["approval-cycle-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
+      ["approval-cycle-extra-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`]
+    ] as const;
+    const results = await Promise.all(cases.map(async ([executorFault, code, path]) => {
+      const evidence = await signedBenchmark({ scenario: "execution-failure", executorFault });
+      return { code, path, issues: await validatePlannerBenchmarkProvenance(evidence) };
+    }));
+    for (const { code, path, issues } of results) expect(issues.some((entry) => entry.code === code && entry.path === path)).toBe(true);
+  }, 30_000);
 
 
 

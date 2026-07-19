@@ -378,8 +378,10 @@
     "rawScore": 92,
     "criticalCaps": [],
     "traceabilityPercent": 100,
+    "scopeStatus": "passed",
     "execution": {
       "status": "passed",
+      "scopeStatus": "passed",
       "path": "evidence/fixture.json",
       "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "schemaVersion": "boulder.planner-execution-receipt.v1"
