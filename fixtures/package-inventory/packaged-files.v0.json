@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 207,
-  "totalPackedFiles": 208,
+  "totalUniqueFiles": 209,
+  "totalPackedFiles": 210,
   "classes": [
     {
       "class": "runtime",
-      "count": 82,
+      "count": 84,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -23,6 +23,8 @@
         "src/cli-run-recording.ts",
         "src/cli.ts",
         "src/critic-review.ts",
+        "src/execution-approval.ts",
+        "src/execution-conversion.ts",
         "src/execution-packet.ts",
         "src/executor-adapters.ts",
         "src/executors.ts",
