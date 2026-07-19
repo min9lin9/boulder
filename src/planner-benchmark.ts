@@ -222,10 +222,12 @@ const plannerOutputIds: Readonly<Record<string, string>> = {
 const frozenProtocolPolicies = {
   authorizationPolicy: "Operator approval is required before external calls and common-executor validation; automated blinded evaluation was explicitly user-authorized and remains disclosed as non-human exploratory evidence.",
   redactionPolicy: "Apply pr8b-redaction-v1 before blinded review while preserving technical evidence.",
-  blindingPolicy: "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.",
   exclusionPolicy: "Exclude only malformed, interrupted, contaminated, or policy-violating runs with signed evidence and adjudicator reason.",
   replacementPolicy: "A replacement must immediately follow and reference the excluded run for the same cell and repeat."
 } as const;
+const retrospectiveBlindingPolicy = "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.";
+const prospectiveBlindingPolicy = "Reviewer agents receive reviewItemId/blinded planner alias only; assignments, the empty score sheet, the private run map, and a prospective lock receipt are bound by this signed protocol before any scoring begins (prospective lock); the private run map is bound by the reveal receipt after every score item is locked.";
+const acceptedBlindingPolicies = new Set([retrospectiveBlindingPolicy, prospectiveBlindingPolicy]);
 const taskIdForCell = (cellId: string): string | undefined => {
   const [plannerId, taskClass, repoId, extra] = cellId.split(":");
   if (extra !== undefined || !plannerIds.includes(plannerId as typeof plannerIds[number])) return undefined;
@@ -636,6 +638,7 @@ function protocolShape(value: unknown): value is PlannerStudyProtocol {
     && Array.isArray(value.delegatedSigners)
     && value.delegatedSigners.every((delegate) => object(delegate) && text(delegate.keyId) && validDigest(delegate.fingerprint) && Array.isArray(delegate.roles) && delegate.roles.length > 0 && delegate.roles.every((role) => role === "manifest" || role === "bundle" || role === "executor") && new Set(delegate.roles).size === delegate.roles.length)
     && Object.entries(frozenProtocolPolicies).every(([policy, expected]) => value[policy] === expected)
+    && acceptedBlindingPolicies.has(value.blindingPolicy as string)
     && signatureShape(value.signature);
 }
 function containsTerm(values: readonly string[], term: string): boolean {

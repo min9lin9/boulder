@@ -180,7 +180,7 @@ packed 15.95KB src/plan-receipts.ts
 packed 19.47KB src/plan-state.ts
 packed 24.41KB src/plan-store.ts
 packed 16.65KB src/planner-benchmark-command.ts
-packed 89.53KB src/planner-benchmark.ts
+packed 90.1KB src/planner-benchmark.ts
 packed 2.46KB src/planner-critic.ts
 packed 21.63KB src/planner-output-normalizer.ts
 packed 4.63KB src/planner-router.ts

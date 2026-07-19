@@ -147,7 +147,9 @@ async function signedBenchmark(change: {
     ],
     authorizationPolicy: change.contractFault === "protocol-policy" ? "none" : "Operator approval is required before external calls and common-executor validation; automated blinded evaluation was explicitly user-authorized and remains disclosed as non-human exploratory evidence.",
     redactionPolicy: "Apply pr8b-redaction-v1 before blinded review while preserving technical evidence.",
-    blindingPolicy: "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.",
+    blindingPolicy: change.scenario === "retrospective-lock" || change.scenario === "observed-study-hold"
+      ? "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD."
+      : "Reviewer agents receive reviewItemId/blinded planner alias only; assignments, the empty score sheet, the private run map, and a prospective lock receipt are bound by this signed protocol before any scoring begins (prospective lock); the private run map is bound by the reveal receipt after every score item is locked.",
     exclusionPolicy: "Exclude only malformed, interrupted, contaminated, or policy-violating runs with signed evidence and adjudicator reason.",
     replacementPolicy: "A replacement must immediately follow and reference the excluded run for the same cell and repeat."
   };
