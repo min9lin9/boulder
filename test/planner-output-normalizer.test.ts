@@ -112,9 +112,9 @@ describe("normalizePlannerOutput", () => {
   test("rejects prototype names and literal optional marker keys at every schema depth", () => {
     const raw = JSON.stringify(output("gjc"));
     for (const attack of [
-      raw.replace("{", "{\"__proto__\":{},"),
-      raw.replace("{", "{\"constructor\":{},"),
-      raw.replace("{", "{\"toString\":{},"),
+      `{"__proto__":{},${raw.slice(1)}`,
+      `{"constructor":{},${raw.slice(1)}`,
+      `{"toString":{},${raw.slice(1)}`,
       raw.replace("\"scope\":{", "\"scope\":{\"__proto__\":{},"),
       raw.replace("\"verification\":[{", "\"verification\":[{\"?command\":\"hidden\","),
       raw.replace("\"sourceRefs\":[{", "\"sourceRefs\":[{\"?symbol\":\"hidden\","),
