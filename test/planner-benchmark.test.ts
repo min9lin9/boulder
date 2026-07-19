@@ -42,10 +42,12 @@ const hash = (value: unknown) => plannerBenchmarkDigest(value);
 
 async function signedBenchmark(change: {
   readonly mutate?: (draft: Record<string, unknown>) => void;
+  readonly mutateProtocol?: (draft: Record<string, unknown>) => void;
   readonly mutateReport?: (draft: Record<string, unknown>) => void;
   readonly tamperBytes?: string;
   readonly scenario?: "execution-failure" | "critical-cap" | "incomplete-traceability" | "preview-minimum" | "preview-variance" | "below-preview" | "observed-study-hold" | "retrospective-lock";
-  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "timeout-original-invalid" | "reported-noncompletion" | "reported-noncompletion-original-wrong-signer" | "reported-noncompletion-original-tampered" | "reported-noncompletion-tail-mismatch" | "reported-noncompletion-extra-artifact" | "reported-noncompletion-missing-artifact" | "reported-noncompletion-invented-digest" | "reported-noncompletion-wrong-reason" | "approval-cycle" | "approval-cycle-original-wrong-signer" | "approval-cycle-wrong-status" | "approval-cycle-invented-digest" | "approval-cycle-extra-artifact";
+  readonly chronologyFault?: "omit-artifacts" | "prospective-kind-mismatch" | "protocol-lock-digest-mismatch" | "protocol-private-map-digest-mismatch";
+  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "legacy-timeout" | "reported-noncompletion" | "reported-noncompletion-original-wrong-signer" | "reported-noncompletion-original-tampered" | "reported-noncompletion-tail-mismatch" | "reported-noncompletion-extra-artifact" | "reported-noncompletion-missing-artifact" | "reported-noncompletion-invented-digest" | "reported-noncompletion-wrong-reason" | "approval-cycle" | "approval-cycle-original-wrong-signer" | "approval-cycle-wrong-status" | "approval-cycle-invented-digest" | "approval-cycle-extra-artifact";
   readonly scopeFault?: "unknown" | "missing" | "execution-mismatch";
   readonly orphanIndexedRawRecord?: boolean;
   readonly identityFault?: "run-task" | "run-repository" | "run-repeat" | "run-planner-alias" | "planner-output";
@@ -152,6 +154,43 @@ async function signedBenchmark(change: {
     personas: { gjc: "direct", "boulder-native": "native", lazycodex: "prometheus" }
   };
   await add("study/runner-contract.json", "boulder.planner-runner-contract.v1", runnerContractValue);
+  const prospectivePolicy = change.scenario !== "retrospective-lock";
+  const plannerAliasFor = (cell: typeof cells[number], index: number): string => change.contractFault === "planner-alias" && index === 0
+    ? "planner-A"
+    : change.contractFault === "planner-disclosure" && index === 0
+      ? "planner-boulder"
+      : cell.plannerId === "gjc" ? "planner-C" : cell.plannerId === "boulder-native" ? "planner-A" : "planner-B";
+  const privateItems: Record<string, unknown>[] = cells.map((cell, index) => ({
+    reviewItemId: `review-${index}`,
+    runId: runIdForCell(cell, index),
+    cellId: `${cell.plannerId}:${cell.taskClass}:${cell.repoId}`,
+    repeat: cell.repeat,
+    plannerAlias: plannerAliasFor(cell, index)
+  }));
+  const privateAssignment = await add("scores/assignments.json", "boulder.review-private-map.v1", { schemaVersion: "boulder.review-private-map.v1", items: privateItems });
+  const prospectiveItems = cells.map((cell, index) => ({
+    reviewItemId: `review-${index}`,
+    plannerAlias: plannerAliasFor(cell, index),
+    scores: null,
+    criticalCaps: null,
+    notes: "",
+    locked: false
+  }));
+  const prospectiveScoreSheet = prospectivePolicy
+    ? await add("scores/prospective-sheet.json", "boulder.blinded-score-sheet.v1", { schemaVersion: "boulder.blinded-score-sheet.v1", items: prospectiveItems })
+    : undefined;
+  const prospectiveLockItems = prospectiveItems.map((item) => ({ reviewItemId: item.reviewItemId, blindedItemDigest: hash(item) }));
+  const prospectiveScoreLock = prospectiveScoreSheet
+    ? await add("scores/prospective-lock.json", "boulder.planner-score-lock-receipt.v1", {
+      schemaVersion: "boulder.planner-score-lock-receipt.v1",
+      sequence: 1,
+      occurredAt: "2026-07-16T00:00:00Z",
+      kind: change.chronologyFault === "prospective-kind-mismatch" ? "retrospective-attestation" : "prospective-lock",
+      scoreSheet: prospectiveScoreSheet,
+      lockDigest: hash(prospectiveLockItems),
+      blindedItems: prospectiveLockItems
+    })
+    : undefined;
   const protocol: Record<string, unknown> = {
     schemaVersion: "boulder.planner-study-protocol.v1", studyId: "pr8b", rubricVersion: "1", rubricDigest: rubric.digest,
     normalizerVersion: "pr8b-strict-packet-v2", normalizerDigest: normalizer.digest, normalizerContractDigest: normalizerContract.digest, runnerContractDigest: hash(runnerContractValue), protocolSigner: { keyId: key.keyId, fingerprint: key.fingerprint },
@@ -161,12 +200,19 @@ async function signedBenchmark(change: {
     ],
     authorizationPolicy: change.contractFault === "protocol-policy" ? "none" : "Operator approval is required before external calls and common-executor validation; automated blinded evaluation was explicitly user-authorized and remains disclosed as non-human exploratory evidence.",
     redactionPolicy: "Apply pr8b-redaction-v1 before blinded review while preserving technical evidence.",
-    blindingPolicy: change.scenario === "retrospective-lock" || change.scenario === "observed-study-hold"
-      ? "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD."
-      : "Reviewer agents receive reviewItemId/blinded planner alias only; assignments, the empty score sheet, the private run map, and a prospective lock receipt are bound by this signed protocol before any scoring begins (prospective lock); the private run map is bound by the reveal receipt after every score item is locked.",
+    blindingPolicy: prospectivePolicy
+      ? "Reviewer agents receive reviewItemId/blinded planner alias only; assignments, the empty score sheet, the private run map, and a prospective lock receipt are bound by this signed protocol before any scoring begins (prospective lock); the private run map is bound by the reveal receipt after every score item is locked."
+      : "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.",
+    ...(prospectiveScoreLock
+      ? {
+        scoreLockReceiptDigest: change.chronologyFault === "protocol-lock-digest-mismatch" ? digest : prospectiveScoreLock.digest,
+        privateMapDigest: change.chronologyFault === "protocol-private-map-digest-mismatch" ? digest : privateAssignment.digest
+      }
+      : {}),
     exclusionPolicy: "Exclude only malformed, interrupted, contaminated, or policy-violating runs with signed evidence and adjudicator reason.",
     replacementPolicy: "A replacement must immediately follow and reference the excluded run for the same cell and repeat."
   };
+  change.mutateProtocol?.(protocol);
   protocol.signature = await sign(protocol);
   const protocolDigest = hash(protocol);
   const manifest: Record<string, unknown> = {
@@ -179,7 +225,6 @@ async function signedBenchmark(change: {
   const manifestDigest = hash(manifest);
   const scoreItems: Record<string, unknown>[] = [];
   const reveals: Record<string, unknown>[] = [];
-  const privateItems: Record<string, unknown>[] = [];
   const rawRuns: Record<string, unknown>[] = [];
   const normalizedRuns: Record<string, unknown>[] = [];
   const exclusions: Record<string, unknown>[] = [];
@@ -211,7 +256,7 @@ async function signedBenchmark(change: {
     await add(`runs/${runId}/raw.json`, "boulder.planner-study-raw-run.v1", raw);
     const observedStudyHold = change.scenario === "observed-study-hold";
     const scenario = observedStudyHold
-      ? index < 7 ? "execution-failure" : [7, 8].includes(index) ? "critical-cap" : undefined
+      ? index < 18 ? "execution-failure" : undefined
       : change.scenario === "below-preview" && cell.plannerId === "boulder-native"
         ? change.scenario
         : change.scenario === "preview-minimum" && index === 12
@@ -221,7 +266,7 @@ async function signedBenchmark(change: {
             : index === 0 && !["below-preview", "preview-minimum", "preview-variance"].includes(change.scenario ?? "")
               ? change.scenario
               : undefined;
-    const criticalCaps = scenario === "critical-cap" || (observedStudyHold && index === 0)
+    const criticalCaps = scenario === "critical-cap" || observedStudyHold && index < 13
       ? ["protected-path-or-external-workspace-violation:max49"]
       : scenario === "incomplete-traceability"
         ? ["traceability-below-100:promotion-ineligible"]
@@ -246,15 +291,10 @@ async function signedBenchmark(change: {
       "execution-usability": Math.min(10, Math.max(0, rawScore - 90))
     };
     if (change.contractFault === "criterion-score" && index === 0) scoreValues["scope-correctness"] = 21;
-    const plannerAlias = change.contractFault === "planner-alias" && index === 0
-      ? "planner-A"
-      : change.contractFault === "planner-disclosure" && index === 0
-        ? "planner-boulder"
-        : cell.plannerId === "gjc" ? "planner-C" : cell.plannerId === "boulder-native" ? "planner-A" : "planner-B";
+    const plannerAlias = plannerAliasFor(cell, index);
     const item = { reviewItemId, locked: true, plannerAlias, scores: scoreValues, criticalCaps, ...(criticalCaps.length > 0 ? { notes: `Authenticated rubric cap: ${criticalCaps.join(", ")}` } : {}) };
     scoreItems.push(item);
     const itemDigest = hash(item);
-    privateItems.push({ reviewItemId, runId, cellId: raw.cellId, repeat: cell.repeat, plannerAlias });
     reveals.push({ reviewItemId, runId, cellId: raw.cellId, repeat: cell.repeat, rawScore, score, criticalCaps, traceabilityPercent });
     const executionArtifactRunId = change.contractFault === "execution-body" && index === 0 ? secondRunId : runId;
     const patch = await add(`runs/${runId}/execution.patch`, "boulder.planner-execution-patch.v1", { schemaVersion: "boulder.planner-execution-patch.v1", runId: executionArtifactRunId, status: executionStatus });
@@ -277,8 +317,8 @@ async function signedBenchmark(change: {
     let originalReceipt: Record<string, unknown> | undefined;
     let stdout: Record<string, unknown> | undefined;
     let stderr: Record<string, unknown> | undefined;
-    if (executorFault === "timeout-original-invalid") {
-      originalReceipt = await add(`runs/${runId}/legacy-timeout-receipt.json`, "boulder.common-executor-receipt.legacy-thin-failure", { runId: "wrong-run", status: "failed", reason: "executor-timeout" });
+    if (executorFault === "legacy-timeout") {
+      originalReceipt = await add(`runs/${runId}/legacy-timeout-receipt.json`, "boulder.common-executor-receipt.legacy-thin-failure", { runId, status: "failed", reason: "executor-timeout" });
     } else if (reportedNoncompletion || approvalCycle) {
       const stdoutTail = "";
       const stderrTail = "";
@@ -337,7 +377,7 @@ async function signedBenchmark(change: {
       ...(executionStatus === "failed" ? { reason: "fixture executor failure" } : {})
     };
     if (executorFault === "malformed-failed-exits") sourceReceiptValue.testExitCode = "failed";
-    if (executorFault === "timeout-original-invalid") {
+    if (executorFault === "legacy-timeout") {
       sourceReceiptValue.failureKind = "timeout";
       sourceReceiptValue.executorExitCode = null;
       sourceReceiptValue.testExitCode = null;
@@ -366,16 +406,16 @@ async function signedBenchmark(change: {
       ? { status: "passed", testDigest: sourceReceiptValue.testDigest, typecheckDigest: sourceReceiptValue.typecheckDigest }
       : reportedNoncompletion
         ? { status: "failed", reason: sourceReceiptValue.reason, testDigest: null, typecheckDigest: null, terminationEvidenceStatus: "unavailable-retrospectively" }
-        : approvalCycle || executorFault === "timeout-original-invalid"
+        : approvalCycle || executorFault === "legacy-timeout"
           ? { status: "failed", reason: sourceReceiptValue.reason, testDigest: null, typecheckDigest: null }
           : { status: "failed", reason: sourceReceiptValue.reason, testDigest: sourceReceiptValue.testDigest, typecheckDigest: sourceReceiptValue.typecheckDigest };
     const verificationArtifacts = reportedNoncompletion
       ? executorFault === "reported-noncompletion-missing-artifact" ? [stdout] : executorFault === "reported-noncompletion-extra-artifact" ? [stdout, stderr, patch] : [stdout, stderr]
       : approvalCycle
         ? executorFault === "approval-cycle-extra-artifact" ? [patch] : []
-        : executorFault === "timeout-original-invalid" ? [] : executorFault === "omit-test-artifact" ? [patch, typecheckOutput] : [patch, testOutput, typecheckOutput];
-    const scopeStatus = index === 0 && change.scopeFault === "unknown" ? "unknown" as const : "passed" as const;
-    const nestedScopeStatus = index === 0 && change.scopeFault === "execution-mismatch" ? "unknown" as const : scopeStatus;
+        : executorFault === "legacy-timeout" ? [] : executorFault === "omit-test-artifact" ? [patch, typecheckOutput] : [patch, testOutput, typecheckOutput];
+    const scopeStatus = observedStudyHold || index === 0 && change.scopeFault === "unknown" ? "unknown" as const : "passed" as const;
+    const nestedScopeStatus = observedStudyHold || index === 0 && change.scopeFault === "execution-mismatch" ? "unknown" as const : scopeStatus;
     const executionUnsigned = { schemaVersion: "boulder.planner-execution-receipt.v1", runId, status: executionStatus, scopeStatus, executorModel: sourceReceiptValue.executorModel, sourceReceipt, verificationArtifacts, verification, verificationDigest: hash(verification) };
     const executionSignature = await signExecutor(executionUnsigned);
     const execution = {
@@ -416,7 +456,6 @@ async function signedBenchmark(change: {
   }
   const lockSheet = await add("scores/lock.json", "boulder.blinded-score-sheet.v1", { schemaVersion: "boulder.blinded-score-sheet.v1", items: scoreItems });
   const revealSheet = await add("scores/reveal.json", "boulder.revealed-scores.v1", { schemaVersion: "boulder.revealed-scores.v1", rows: reveals });
-  const privateAssignment = await add("scores/assignments.json", "boulder.review-private-map.v1", { schemaVersion: "boulder.review-private-map.v1", items: privateItems });
   const lockItems = scoreItems.map((item) => ({ reviewItemId: item.reviewItemId as string, blindedItemDigest: hash(item) }));
   const itemDigestById = new Map(lockItems.map((entry) => [entry.reviewItemId, entry.blindedItemDigest]));
   const receiptReveals = reveals.map((entry) => ({
@@ -424,11 +463,15 @@ async function signedBenchmark(change: {
     blindedItemDigest: itemDigestById.get(entry.reviewItemId as string),
     traceabilityPercent: entry.traceabilityPercent
   }));
+  const scoredLockSequence = prospectivePolicy ? 2 : 1;
   const bundle: Record<string, unknown> = {
     schemaVersion: "boulder.planner-evidence-bundle.v1", studyId: "pr8b", protocolDigest, manifestDigest, rubricDigest: rubric.digest, normalizerDigest: normalizer.digest,
-    normalizedRuns, exclusions, artifactIndex: [...refs.values()], studyArtifacts: { rubric, normalizer, assignments, approvals, redactions },
-    scoreLockReceipt: { schemaVersion: "boulder.planner-score-lock-receipt.v1", sequence: 1, occurredAt: "2026-07-16T01:00:00Z", kind: change.scenario === "retrospective-lock" || change.scenario === "observed-study-hold" ? "retrospective-attestation" : "prospective-lock", scoreSheet: lockSheet, lockDigest: hash(lockItems), blindedItems: lockItems },
-    scoreRevealReceipt: { schemaVersion: "boulder.planner-score-reveal-receipt.v1", sequence: 2, occurredAt: "2026-07-16T02:00:00Z", lockDigest: hash(lockItems), scoreSheet: revealSheet, privateAssignment, reveals: receiptReveals },
+    normalizedRuns, exclusions, artifactIndex: [...refs.values()], studyArtifacts: {
+      rubric, normalizer, assignments, approvals, redactions,
+      ...(prospectiveScoreSheet && prospectiveScoreLock && change.chronologyFault !== "omit-artifacts" ? { prospectiveScoreSheet, prospectiveScoreLock } : {})
+    },
+    scoreLockReceipt: { schemaVersion: "boulder.planner-score-lock-receipt.v1", sequence: scoredLockSequence, occurredAt: "2026-07-16T01:00:00Z", kind: change.scenario === "observed-study-hold" || change.scenario === "retrospective-lock" ? "retrospective-attestation" : "prospective-lock", scoreSheet: lockSheet, lockDigest: hash(lockItems), blindedItems: lockItems },
+    scoreRevealReceipt: { schemaVersion: "boulder.planner-score-reveal-receipt.v1", sequence: scoredLockSequence + 1, occurredAt: "2026-07-16T02:00:00Z", lockDigest: hash(lockItems), scoreSheet: revealSheet, privateAssignment, reveals: receiptReveals },
     assignmentsDigest: assignments.digest, approvalsDigest: approvals.digest, redactionsDigest: redactions.digest, trustRootFingerprintSetDigest: trustRootFingerprintSetDigest(root),
     studyRootDigest: ""
   };
@@ -446,13 +489,29 @@ async function signedBenchmark(change: {
 }
 
 describe("planner benchmark byte-verified PR8B provenance", () => {
-  test("accepts a signed 36-run evidence graph and promotes it", async () => {
+  test("accepts a signed 36-run prospective chronology", async () => {
     const evidence = await signedBenchmark();
     expect(buildPlannerBenchmarkReport(evidence).decision).toBe("HOLD");
     expect(buildPlannerBenchmarkReport(evidence).reasons).toContain("plan.benchmark.provenance_missing");
     expect(await validatePlannerBenchmarkProvenance(evidence)).toEqual([]);
-    expect(buildPlannerBenchmarkReport(evidence).decision).toBe("FIRST_FALLBACK_REVIEW");
+    const report = buildPlannerBenchmarkReport(evidence);
+    expect(report.decision).toBe("FIRST_FALLBACK_REVIEW");
+    expect(report.reasons).toEqual(["first_fallback_threshold_met"]);
   });
+  test("fails closed on omitted, tampered, mismatched, and incorrectly bound prospective locks", async () => {
+    const cases = [
+      [await signedBenchmark({ chronologyFault: "omit-artifacts" }), "plan.benchmark.evidence_invalid", "studyArtifacts.prospectiveScoreLock"],
+      [await signedBenchmark({ tamperBytes: "scores/prospective-sheet.json" }), "plan.benchmark.digest_mismatch", "artifactIndex.scores/prospective-sheet.json"],
+      [await signedBenchmark({ chronologyFault: "prospective-kind-mismatch" }), "plan.benchmark.evidence_invalid", "studyArtifacts.prospectiveScoreLock"],
+      [await signedBenchmark({ chronologyFault: "protocol-lock-digest-mismatch" }), "plan.benchmark.evidence_invalid", "studyArtifacts.prospectiveScoreLock"],
+      [await signedBenchmark({ chronologyFault: "protocol-private-map-digest-mismatch" }), "plan.benchmark.evidence_invalid", "scoreReceipts"]
+    ] as const;
+    for (const [evidence, code, path] of cases) {
+      const issues = await validatePlannerBenchmarkProvenance(evidence);
+      expect(issues.some((entry) => entry.code === code && entry.path === path)).toBe(true);
+      expect(buildPlannerBenchmarkReport(evidence, issues).decision).toBe("HOLD");
+    }
+  }, 30_000);
   test("fails closed on missing, unknown, and mismatched execution scope attribution", async () => {
     const [unknownScope, missingScope, mismatchedScope] = await Promise.all([
       signedBenchmark({ scopeFault: "unknown" }),
@@ -519,10 +578,17 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     const report = buildPlannerBenchmarkReport(evidence);
     expect(report.decision).toBe("HOLD");
     expect(report.metrics.scoredRunCount).toBe(36);
-    expect(report.metrics.eligibleRunCount).toBe(27);
-    expect(report.metrics.executionFailureCount).toBe(7);
-    expect(report.metrics.criticalCapCount).toBe(3);
-    expect(report.reasons).toContain("retrospective_lock_attestation");
+    expect(report.metrics.eligibleRunCount).toBe(0);
+    expect(report.metrics.executionFailureCount).toBe(18);
+    expect(report.metrics.criticalCapCount).toBe(13);
+    expect(report.reasons).toEqual([
+      "critical_caps",
+      "execution_failures",
+      "insufficient_eligible_runs",
+      "retrospective_lock_attestation",
+      "scope_attribution_unknown"
+    ]);
+    expect(["PREVIEW", "FIRST_FALLBACK_REVIEW"]).not.toContain(report.decision);
   }, 20_000);
   test("holds an otherwise valid retrospective lock attestation", async () => {
     const evidence = await signedBenchmark({ scenario: "retrospective-lock" });
@@ -621,8 +687,8 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
       expect(buildPlannerBenchmarkReport(evidence, issues).metrics.eligibleRunCount).toBe(0);
     }
   }, 30_000);
-  test("rejects malformed failed exit evidence and an unbound legacy timeout receipt", async () => {
-    for (const executorFault of ["malformed-failed-exits", "timeout-original-invalid"] as const) {
+  test("rejects malformed failed exit evidence and a valid-shape unsigned legacy timeout receipt", async () => {
+    for (const executorFault of ["malformed-failed-exits", "legacy-timeout"] as const) {
       const evidence = await signedBenchmark({ scenario: "execution-failure", executorFault });
       const issues = await validatePlannerBenchmarkProvenance(evidence);
       expect(issues.some((entry) => entry.code === "plan.benchmark.evidence_invalid" && entry.path === `normalizedRuns.${firstRunId}.execution.sourceReceipt`)).toBe(true);
@@ -728,7 +794,7 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     expect(report.reasons).toContain("plan.benchmark.provenance_missing");
   }, 20_000);
 
-  test("keeps valid high-average sub-fallback score and variance at preview", async () => {
+  test("routes valid high-average sub-fallback score and variance to preview", async () => {
     for (const scenario of ["preview-minimum", "preview-variance"] as const) {
       const evidence = await signedBenchmark({ scenario });
       expect(await validatePlannerBenchmarkProvenance(evidence)).toEqual([]);

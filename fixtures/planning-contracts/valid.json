@@ -147,6 +147,7 @@
     "rubricDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "normalizerVersion": "pr8b-strict-packet-v2",
     "normalizerDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "normalizerContractDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "runnerContractDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "protocolSigner": {
       "keyId": "fixture-key",
@@ -165,7 +166,9 @@
     ],
     "authorizationPolicy": "Operator approval is required before external calls and common-executor validation; automated blinded evaluation was explicitly user-authorized and remains disclosed as non-human exploratory evidence.",
     "redactionPolicy": "Apply pr8b-redaction-v1 before blinded review while preserving technical evidence.",
-    "blindingPolicy": "Reviewer agents receive reviewItemId/blinded planner alias only; the private run map is bound by the reveal receipt after every score item is locked. This repaired receipt is a retrospective chronology attestation and therefore forces HOLD.",
+    "blindingPolicy": "Reviewer agents receive reviewItemId/blinded planner alias only; assignments, the empty score sheet, the private run map, and a prospective lock receipt are bound by this signed protocol before any scoring begins (prospective lock); the private run map is bound by the reveal receipt after every score item is locked.",
+    "scoreLockReceiptDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "privateMapDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "exclusionPolicy": "Exclude only malformed, interrupted, contaminated, or policy-violating runs with signed evidence and adjudicator reason.",
     "replacementPolicy": "A replacement must immediately follow and reference the excluded run for the same cell and repeat.",
     "signature": {
@@ -440,13 +443,23 @@
         "path": "evidence/fixture.json",
         "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "schemaVersion": "fixture.v1"
+      },
+      "prospectiveScoreSheet": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "boulder.blinded-score-sheet.v1"
+      },
+      "prospectiveScoreLock": {
+        "path": "evidence/fixture.json",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "schemaVersion": "boulder.planner-score-lock-receipt.v1"
       }
     },
     "scoreLockReceipt": {
       "schemaVersion": "boulder.planner-score-lock-receipt.v1",
-      "sequence": 1,
+      "sequence": 2,
       "occurredAt": "2026-07-15T00:00:00Z",
-      "kind": "prospective-lock",
+      "kind": "retrospective-attestation",
       "scoreSheet": {
         "path": "evidence/fixture.json",
         "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -457,7 +470,7 @@
     },
     "scoreRevealReceipt": {
       "schemaVersion": "boulder.planner-score-reveal-receipt.v1",
-      "sequence": 2,
+      "sequence": 3,
       "occurredAt": "2026-07-15T00:00:01Z",
       "lockDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "scoreSheet": {

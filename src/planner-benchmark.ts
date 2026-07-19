@@ -38,6 +38,8 @@ export interface PlannerStudyArtifacts {
   readonly assignments: PlannerEvidenceArtifact;
   readonly approvals: PlannerEvidenceArtifact;
   readonly redactions: PlannerEvidenceArtifact;
+  readonly prospectiveScoreSheet?: PlannerEvidenceArtifact;
+  readonly prospectiveScoreLock?: PlannerEvidenceArtifact;
 }
 export interface PlannerScoreLockReceipt {
   readonly schemaVersion: "boulder.planner-score-lock-receipt.v1";
@@ -81,6 +83,8 @@ export interface PlannerStudyProtocol {
   readonly authorizationPolicy: string;
   readonly redactionPolicy: string;
   readonly blindingPolicy: string;
+  readonly scoreLockReceiptDigest?: string;
+  readonly privateMapDigest?: string;
   readonly exclusionPolicy: string;
   readonly replacementPolicy: string;
   readonly signature: SignatureEnvelope;
@@ -469,7 +473,9 @@ export function validatePlannerEvidenceBundle(value: unknown): readonly PlannerB
     if (!artifactShape(artifact) || artifactPaths.has(artifact.path)) issues.push(issue("plan.benchmark.bundle_invalid", `artifactIndex[${index}]`, "Artifact index entries must be unique, safe, and digested."));
     else artifactPaths.add(artifact.path);
   }
-  if (![value.studyArtifacts.rubric, value.studyArtifacts.normalizer, value.studyArtifacts.assignments, value.studyArtifacts.approvals, value.studyArtifacts.redactions].every(artifactShape)) issues.push(issue("plan.benchmark.bundle_invalid", "studyArtifacts", "Study artifacts are invalid."));
+  const prospectiveArtifactsValid = (value.studyArtifacts.prospectiveScoreSheet === undefined && value.studyArtifacts.prospectiveScoreLock === undefined)
+    || (artifactShape(value.studyArtifacts.prospectiveScoreSheet) && artifactShape(value.studyArtifacts.prospectiveScoreLock));
+  if (![value.studyArtifacts.rubric, value.studyArtifacts.normalizer, value.studyArtifacts.assignments, value.studyArtifacts.approvals, value.studyArtifacts.redactions].every(artifactShape) || !prospectiveArtifactsValid) issues.push(issue("plan.benchmark.bundle_invalid", "studyArtifacts", "Study artifacts are invalid."));
   const runIds = new Set<string>();
   const identities = new Set<string>();
   for (const [index, run] of value.normalizedRuns.entries()) {
@@ -523,13 +529,13 @@ function deriveState(value: PlannerBenchmarkProvenance, issues: readonly Planner
   };
   const reasons = unique([
     ...issues.map((entry) => entry.code),
-    metrics.executionFailureCount > 0 ? "execution_failures" : "",
     metrics.criticalCapCount > 0 ? "critical_caps" : "",
-    metrics.traceabilityPercent !== 100 ? "incomplete_traceability" : "",
-    runs.some((run) => run.scopeStatus !== "passed" || !object(run.execution) || run.execution.scopeStatus !== "passed") ? "scope_attribution_unknown" : "",
-    metrics.invalidRunCount > 0 ? "invalid_or_malformed_runs" : "",
+    metrics.executionFailureCount > 0 ? "execution_failures" : "",
+    eligible.length < 36 ? "insufficient_eligible_runs" : "",
     object(bundle.scoreLockReceipt) && bundle.scoreLockReceipt.kind === "retrospective-attestation" ? "retrospective_lock_attestation" : "",
-    eligible.length < 36 ? "insufficient_eligible_runs" : ""
+    runs.some((run) => run.scopeStatus !== "passed" || !object(run.execution) || run.execution.scopeStatus !== "passed") ? "scope_attribution_unknown" : "",
+    metrics.traceabilityPercent !== 100 ? "incomplete_traceability" : "",
+    metrics.invalidRunCount > 0 ? "invalid_or_malformed_runs" : ""
   ].filter(text));
   return { eligible, excluded, reasons, metrics };
 }
@@ -639,6 +645,7 @@ function concatenatedArtifactDigest(references: readonly PlannerEvidenceArtifact
   return sha256Bytes(combined);
 }
 function protocolShape(value: unknown): value is PlannerStudyProtocol {
+  const prospective = object(value) && value.blindingPolicy === prospectiveBlindingPolicy;
   return object(value)
     && value.schemaVersion === "boulder.planner-study-protocol.v1"
     && text(value.studyId) && text(value.rubricVersion) && validDigest(value.rubricDigest)
@@ -650,6 +657,7 @@ function protocolShape(value: unknown): value is PlannerStudyProtocol {
     && value.delegatedSigners.every((delegate) => object(delegate) && text(delegate.keyId) && validDigest(delegate.fingerprint) && Array.isArray(delegate.roles) && delegate.roles.length > 0 && delegate.roles.every((role) => role === "manifest" || role === "bundle" || role === "executor") && new Set(delegate.roles).size === delegate.roles.length)
     && Object.entries(frozenProtocolPolicies).every(([policy, expected]) => value[policy] === expected)
     && acceptedBlindingPolicies.has(value.blindingPolicy as string)
+    && (!prospective || validDigest(value.scoreLockReceiptDigest) && validDigest(value.privateMapDigest))
     && signatureShape(value.signature);
 }
 function containsTerm(values: readonly string[], term: string): boolean {
@@ -764,13 +772,55 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
 
   const indexed = indexArtifacts(bundle, value.evidenceFiles ?? [], issues);
   const studyArtifacts = bundle.studyArtifacts;
-  const studyRefs = [studyArtifacts.rubric, studyArtifacts.normalizer, studyArtifacts.assignments, studyArtifacts.approvals, studyArtifacts.redactions];
+  const prospectivePolicy = protocol.blindingPolicy === prospectiveBlindingPolicy;
+  const prospectiveScoreSheet = studyArtifacts.prospectiveScoreSheet;
+  const prospectiveScoreLock = studyArtifacts.prospectiveScoreLock;
+  const studyRefs = [studyArtifacts.rubric, studyArtifacts.normalizer, studyArtifacts.assignments, studyArtifacts.approvals, studyArtifacts.redactions, ...(prospectiveScoreSheet && prospectiveScoreLock ? [prospectiveScoreSheet, prospectiveScoreLock] : [])];
   for (const reference of studyRefs) if (!artifactJoined(reference, indexed.artifacts, indexed.files)) issues.push(issue("plan.benchmark.evidence_invalid", `studyArtifacts.${reference.path}`, "Study artifact is not byte-verified by the signed index."));
   bind(studyArtifacts.rubric.digest, bundle.rubricDigest, "studyArtifacts.rubric");
   bind(studyArtifacts.normalizer.digest, bundle.normalizerDigest, "studyArtifacts.normalizer");
   bind(studyArtifacts.assignments.digest, bundle.assignmentsDigest, "studyArtifacts.assignments");
   bind(studyArtifacts.approvals.digest, bundle.approvalsDigest, "studyArtifacts.approvals");
   bind(studyArtifacts.redactions.digest, bundle.redactionsDigest, "studyArtifacts.redactions");
+  if (prospectivePolicy) {
+    const prospectiveSheet = prospectiveScoreSheet ? parsedArtifact(prospectiveScoreSheet, indexed.artifacts, indexed.files) : undefined;
+    const prospectiveLock = prospectiveScoreLock ? parsedArtifact(prospectiveScoreLock, indexed.artifacts, indexed.files) : undefined;
+    const prospectiveItems = object(prospectiveSheet) && prospectiveSheet.schemaVersion === "boulder.blinded-score-sheet.v1" && Array.isArray(prospectiveSheet.items) && prospectiveSheet.items.every(object)
+      ? prospectiveSheet.items as Record<string, unknown>[]
+      : [];
+    const prospectiveReceipt = scoreLockReceiptShape(prospectiveLock) ? prospectiveLock : undefined;
+    const prospectiveById = new Map<string, Record<string, unknown>>();
+    for (const item of prospectiveItems) if (text(item.reviewItemId) && !prospectiveById.has(item.reviewItemId)) prospectiveById.set(item.reviewItemId, item);
+    const prospectiveReceiptItems = prospectiveReceipt ? new Map(prospectiveReceipt.blindedItems.map((entry) => [entry.reviewItemId, entry.blindedItemDigest])) : new Map<string, string>();
+    const prospectiveItemsValid = prospectiveItems.length === 36
+      && prospectiveById.size === 36
+      && prospectiveItems.every((item) => {
+        const keys = Object.keys(item).sort();
+        const shapeValid = canonical(keys) === canonical(["criticalCaps", "locked", "plannerAlias", "reviewItemId", "scores"])
+          || canonical(keys) === canonical(["criticalCaps", "locked", "notes", "plannerAlias", "reviewItemId", "scores"]);
+        return shapeValid
+          && ["planner-A", "planner-B", "planner-C"].includes(item.plannerAlias as string)
+          && item.scores === null
+          && item.criticalCaps === null
+          && item.locked === false
+          && (item.notes === undefined || item.notes === "");
+      });
+    if (!prospectiveScoreSheet
+      || !prospectiveScoreLock
+      || !artifactJoined(prospectiveScoreSheet, indexed.artifacts, indexed.files)
+      || !artifactJoined(prospectiveScoreLock, indexed.artifacts, indexed.files)
+      || prospectiveScoreLock.digest !== protocol.scoreLockReceiptDigest
+      || !prospectiveReceipt
+      || prospectiveReceipt.kind !== "prospective-lock"
+      || canonical(prospectiveReceipt.scoreSheet) !== canonical(prospectiveScoreSheet)
+      || prospectiveReceipt.lockDigest !== hash(prospectiveReceipt.blindedItems)
+      || !prospectiveItemsValid
+      || prospectiveReceipt.blindedItems.length !== 36
+      || prospectiveReceiptItems.size !== 36
+      || [...prospectiveById].some(([id, item]) => prospectiveReceiptItems.get(id) !== hash(item))) {
+      issues.push(issue("plan.benchmark.evidence_invalid", "studyArtifacts.prospectiveScoreLock", "Prospective score lock must byte-bind exactly 36 unique, blinded, unscored items before scoring."));
+    }
+  }
   if (studyArtifacts.normalizer.schemaVersion !== "boulder.planner-normalizer-source.v1") issues.push(issue("plan.benchmark.evidence_invalid", "studyArtifacts.normalizer", "Normalizer source must be byte-verified under the PR8B source schema."));
   const approvals = parsedArtifact(studyArtifacts.approvals, indexed.artifacts, indexed.files);
   const redactions = parsedArtifact(studyArtifacts.redactions, indexed.artifacts, indexed.files);
@@ -875,8 +925,9 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
 
   const lock = bundle.scoreLockReceipt;
   const reveal = bundle.scoreRevealReceipt;
+  const prospectiveReceiptForChronology = prospectiveScoreLock ? parsedArtifact(prospectiveScoreLock, indexed.artifacts, indexed.files) : undefined;
   if (!artifactJoined(lock.scoreSheet, indexed.artifacts, indexed.files) || !artifactJoined(reveal.scoreSheet, indexed.artifacts, indexed.files) || !artifactJoined(reveal.privateAssignment, indexed.artifacts, indexed.files)) issues.push(issue("plan.benchmark.evidence_invalid", "scoreReceipts", "Score lock, reveal, and private assignment artifacts must be byte-verified."));
-  if (lock.lockDigest !== hash(lock.blindedItems) || reveal.lockDigest !== lock.lockDigest || reveal.sequence !== lock.sequence + 1 || Date.parse(reveal.occurredAt) <= Date.parse(lock.occurredAt)) issues.push(issue("plan.benchmark.evidence_invalid", "scoreReceipts", "Score reveal must immediately follow and bind the score lock."));
+  if (lock.lockDigest !== hash(lock.blindedItems) || reveal.lockDigest !== lock.lockDigest || reveal.sequence !== lock.sequence + 1 || Date.parse(reveal.occurredAt) <= Date.parse(lock.occurredAt) || prospectivePolicy && (!scoreLockReceiptShape(prospectiveReceiptForChronology) || Date.parse(prospectiveReceiptForChronology.occurredAt) >= Date.parse(lock.occurredAt)) || prospectivePolicy && reveal.privateAssignment.digest !== protocol.privateMapDigest || prospectivePolicy && prospectiveScoreSheet && canonical(lock.scoreSheet) === canonical(prospectiveScoreSheet)) issues.push(issue("plan.benchmark.evidence_invalid", "scoreReceipts", "Scored evidence must use a later lock and bind the prospective private assignment."));
   const lockSheet = parsedArtifact(lock.scoreSheet, indexed.artifacts, indexed.files);
   const revealSheet = parsedArtifact(reveal.scoreSheet, indexed.artifacts, indexed.files);
   const privateAssignment = parsedArtifact(reveal.privateAssignment, indexed.artifacts, indexed.files);
@@ -987,12 +1038,6 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
         ? sourceReceipt.originalReceipt
         : undefined;
       const originalReceipt = originalReceiptReference ? parsedArtifact(originalReceiptReference, indexed.artifacts, indexed.files) : undefined;
-      const originalTimeoutReceiptValid = originalReceiptReference?.schemaVersion === "boulder.common-executor-receipt.legacy-thin-failure"
-        && object(originalReceipt)
-        && canonical(Object.keys(originalReceipt).sort()) === canonical(["reason", "runId", "status"])
-        && originalReceipt.runId === run.runId
-        && originalReceipt.status === "failed"
-        && originalReceipt.reason === "executor-timeout";
       const failureKind = object(sourceReceipt) ? sourceReceipt.failureKind : undefined;
       const requiresSignedOriginal = failureKind === "reported-noncompletion" || failureKind === "approval-cycle";
       const originalReceiptSignature = requiresSignedOriginal && object(originalReceipt)
@@ -1011,14 +1056,6 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
         && [sourceReceipt.executorExitCode, sourceReceipt.testExitCode, sourceReceipt.typecheckExitCode].every((exitCode) => Number.isInteger(exitCode));
       const failedExitEvidence = exitCodesValid
         && [sourceReceipt.executorExitCode, sourceReceipt.testExitCode, sourceReceipt.typecheckExitCode].some((exitCode) => (exitCode as number) !== 0);
-      const timeoutEvidence = object(sourceReceipt)
-        && sourceReceipt.failureKind === "timeout"
-        && sourceReceipt.executorExitCode === null
-        && sourceReceipt.testExitCode === null
-        && sourceReceipt.typecheckExitCode === null
-        && noOutputDigestClaims(sourceReceipt)
-        && sourceReceipt.reason === "executor-timeout"
-        && originalTimeoutReceiptValid;
       const stdoutArtifacts = verificationArtifacts.filter((artifact) => artifact.schemaVersion === "boulder.planner-executor-stdout.v1");
       const stderrArtifacts = verificationArtifacts.filter((artifact) => artifact.schemaVersion === "boulder.planner-executor-stderr.v1");
       const originalStdoutTail = object(originalReceipt) && typeof originalReceipt.stdoutTail === "string" ? originalReceipt.stdoutTail : undefined;
@@ -1082,7 +1119,6 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
         && (failedExitEvidence && sourceReceipt.failureKind === undefined && claimedOutputsValid && verificationBodiesValid
           && verification.testDigest === sourceReceipt.testDigest
           && verification.typecheckDigest === sourceReceipt.typecheckDigest
-          || timeoutEvidence && verificationArtifacts.length === 0 && verification.testDigest === null && verification.typecheckDigest === null
           || reportedNoncompletionEvidence
           || approvalCycleEvidence);
       if (run.execution.status === "passed" ? !passedReceiptValid : !failedReceiptValid) issues.push(issue("plan.benchmark.evidence_invalid", `normalizedRuns.${run.runId}.execution.sourceReceipt`, "Execution outcome must derive from one signed common-executor receipt and exact byte-verified patch, test, and typecheck evidence."));
