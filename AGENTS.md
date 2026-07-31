@@ -9,7 +9,7 @@ Public workflow verbs are `intake -> plan -> execute -> verify -> record`. The d
 ## Architecture & Data Flow
 
 - `bin/boulder.ts` is the development entry point (Bun shebang, calls `main(Bun.argv.slice(2))`); packaged commands `boulder` and `boulder-oss-cli` resolve through `bin/boulder.js`, a Node shim that spawns `bun bin/boulder.ts`.
-- `src/cli.ts` is a router only — it parses global options and dispatches; it owns no domain logic. Subcommand routers live in `*-command.ts` modules (`plan-command.ts`, `profile-command.ts`, `capability-command.ts`, `handoff-command.ts`, `routine-command.ts`).
+- `src/cli.ts` is a router only — it parses global options and dispatches; it owns no domain logic. Subcommand routers live in `*-command.ts` modules (`plan-command.ts`, `profile-command.ts`, `capability-command.ts`, `handoff-command.ts`, `routine-command.ts`, `runs-command.ts`, `v2-command.ts`, `planner-benchmark-command.ts`); release/evidence/replay/readiness/doctor verbs route through `src/cli-ops-command.ts`.
 - Typical flow: CLI args -> `parseOptions`/dispatch -> domain `evaluate*`/`build*` module -> report object -> `prettyJson()` (with `--json`) or a `*ToMarkdown()` formatter -> stdout, and when required a guarded repo-local write via `src/fs.ts`.
 - Fail statuses (`blocked`/`fail`) set `process.exitCode = 1` and print `ERROR <id>: message` to stderr; never `process.exit()`. JSON-mode errors use `boulder.error.v1` envelopes.
 - Profile routing is preferred: `resolveWorkflowProfile()` precedence is explicit CLI profile -> `.boulder/current-profile` -> legacy `boulder.yaml.executors` -> built-in `programming-default`, attaching `profile.drift.*` warnings.
@@ -22,15 +22,15 @@ Public workflow verbs are `intake -> plan -> execute -> verify -> record`. The d
 | Path | Purpose |
 | --- | --- |
 | `bin/` | Development (`boulder.ts`) and packaged (`boulder.js`) CLI entry points. |
-| `src/` | Command routing, domain modules, profiles, capabilities, handoffs, planner, readiness gates. Read `src/AGENTS.md` before editing. |
-| `test/` | Bun unit, contract/fixture, and CLI/e2e tests plus `helpers/cli.ts`. Read `test/AGENTS.md` before editing. |
-| `fixtures/` | Stable contract inputs: `profiles/`, `capabilities/`, `benchmarks/`, `planner-benchmarks/`, `planning-contracts/`, `plan-analysis/`, `plan-receipts/`, `planning-packets/`, `replay/`, `provider-policies/`, `handoffs/`, `service-readiness/`. |
+| `src/` | Command routing, domain modules, profiles, capabilities, handoffs, planner, readiness gates; gated subsystems in `src/v2/` and `src/k2a-f/`. Read `src/AGENTS.md` (and the subsystem AGENTS.md) before editing. |
+| `test/` | Bun unit, contract/fixture, and CLI/e2e tests plus `helpers/cli.ts` and the k0r evidence harness. Read `test/AGENTS.md` before editing. |
+| `fixtures/` | Stable contract inputs across 17 areas (`profiles/`, `planner-benchmarks/`, `planning-packets/`, `v2-kernel/`, `k2a-f/`, `workflow-map/`, `package-inventory/`, ...). Read `fixtures/AGENTS.md` before adding fixtures. |
 | `docs/` | User-facing behavior, architecture, readiness gates, `CASE_STUDIES/` + evidence. Documentation is product surface; read `docs/AGENTS.md` (and `docs/CASE_STUDIES/AGENTS.md` for case studies). |
 | `skills/` | Packaged Codex skills (`boulder`, `boulder-bootstrap-designer`, `boulder-native-planner`) and local wrapper scripts. Read `skills/AGENTS.md`. |
 | `examples/` | Embedded target repos (`mcp-server`, `python-package`, `typescript-library`) maintained as fixture contracts. Read `examples/AGENTS.md`. |
 | `.boulder/` | Repo-local runtime state; not source code. |
-| `evidence/`, `plans/` | Checked-in maintainer evidence and planning docs (not runtime state; `evidence/field-readiness/` feeds the service-readiness gate). |
-| `.codegraph`, `.code-review-graph/`, `.omo/`, `.gjc/` | Host-specific tooling/workflow state; not source, package, or release content. |
+| `evidence/`, `plans/` | Checked-in maintainer evidence and planning docs (not runtime state; `evidence/field-readiness/` feeds the service-readiness gate). Read `evidence/AGENTS.md` before regenerating evidence. |
+| `.codegraph`, `.code-review-graph/`, `.omo/`, `.gjc/`, `.agents/`, `.codex/`, `.senpi/` | Host-specific tooling/workflow state; not source, package, or release content. |
 
 ## Development Commands
 
@@ -62,7 +62,7 @@ Command-specific options follow the command; do not place `--cwd` before it.
 - Error handling has three tiers: typed error subclasses with dotted stable ids (`fs.path_invalid`, `plan.path.invalid`) for contract violations; validators returning issue lists (`{id, path, message}` / `{valid, issues}`) for user-supplied artifacts; `null`-on-missing reads so absence is data, not an exception.
 - Use `camelCase` for functions/variables, `PascalCase` for types and error classes, kebab-case file names (`capability-doctor.ts`).
 - Keep JSON contracts additive unless a deliberate breaking change is pinned by tests. JSON output exposes targeted domain fields; human output uses domain-specific Markdown helpers.
-- Import extensions are split by cohort and stable: legacy modules use extensionless relative imports; the newer `plan-*`/`planner-*` stack uses explicit `.js` specifiers. Match the surrounding file.
+- Import extensions are split by cohort and stable: legacy modules use extensionless relative imports; the newer `plan-*`/`planner-*` stack and the `v2/`/`k2a-f/` subsystems use explicit `.js` specifiers. Match the surrounding file.
 - Keep recommendation, `--dry-run`, persisted `--write`, `doctor` verification, and approval-gated execution as distinct states.
 - `doctor` reports availability only (`available` vs `configured-unverified`); it never installs, clones, updates, or launches. Capability import records canonical source candidates only. GitHub sources canonicalize to `https://github.com/<owner>/<repo>` with ids like `github__owner__repo`.
 - Keep built-in workflow presets and bootstrap-interview recommendations aligned; do not create a second profile taxonomy.
@@ -71,6 +71,8 @@ Command-specific options follow the command; do not place `--cwd` before it.
 ## Important Files
 
 - `src/cli.ts`: public `main(args)`, dispatch, output selection, exit-code policy. `const VERSION` duplicates `package.json` version — bump both together.
+- `src/cli-ops-command.ts`: ops verb router (`release-plan`, `release evidence refresh`, `release-check`, `evidence inspect|diff`, `replay-check`, `replay-run`, `product-readiness`, `service-readiness`, `doctor`, `record field-readiness`).
+- `src/v2/`, `src/k2a-f/`: self-contained gated subsystems with sibling-only imports and their own conventions; v2 gating is pinned by `docs/adr/0003-v2-kernel-gates.md`.
 - `src/cli-options.ts` / `src/cli-format.ts`: shared option parsing and output formatting.
 - `src/workflow-profiles.ts`, `src/workflow-profile-builtins.ts`, `src/profile-command.ts`, `src/profile-store.ts`: profile resolution, built-ins, state-changing commands, persistence.
 - `src/plan-command.ts`, `src/plan-store.ts`, `src/plan-state.ts`, `src/plan-receipts.ts`: planner subcommands, hardened persistence (containment, locks, atomic writes), lifecycle, HMAC-signed challenges/receipts.
