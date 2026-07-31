@@ -47,7 +47,7 @@ async function signedBenchmark(change: {
   readonly tamperBytes?: string;
   readonly scenario?: "execution-failure" | "critical-cap" | "incomplete-traceability" | "preview-minimum" | "preview-variance" | "below-preview" | "observed-study-hold" | "retrospective-lock";
   readonly chronologyFault?: "omit-artifacts" | "prospective-kind-mismatch" | "protocol-lock-digest-mismatch" | "protocol-private-map-digest-mismatch";
-  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "legacy-timeout" | "reported-noncompletion" | "reported-noncompletion-original-wrong-signer" | "reported-noncompletion-original-tampered" | "reported-noncompletion-tail-mismatch" | "reported-noncompletion-extra-artifact" | "reported-noncompletion-missing-artifact" | "reported-noncompletion-invented-digest" | "reported-noncompletion-wrong-reason" | "approval-cycle" | "approval-cycle-original-wrong-signer" | "approval-cycle-wrong-status" | "approval-cycle-invented-digest" | "approval-cycle-extra-artifact";
+  readonly executorFault?: "unauthorized-signer" | "unknown-signer" | "revoked-signer" | "invalid-signature" | "wrong-model" | "nonzero-exit" | "patch-digest-mismatch" | "test-digest-mismatch" | "typecheck-digest-mismatch" | "omit-test-artifact" | "malformed-failed-exits" | "legacy-timeout" | "reported-noncompletion" | "reported-noncompletion-original-wrong-signer" | "reported-noncompletion-original-tampered" | "reported-noncompletion-original-invented-digest" | "reported-noncompletion-tail-mismatch" | "reported-noncompletion-extra-artifact" | "reported-noncompletion-missing-artifact" | "reported-noncompletion-invented-digest" | "reported-noncompletion-wrong-reason" | "approval-cycle" | "approval-cycle-original-wrong-signer" | "approval-cycle-original-invented-digest" | "approval-cycle-wrong-status" | "approval-cycle-invented-digest" | "approval-cycle-extra-artifact";
   readonly scopeFault?: "unknown" | "missing" | "execution-mismatch";
   readonly orphanIndexedRawRecord?: boolean;
   readonly identityFault?: "run-task" | "run-repository" | "run-repeat" | "run-planner-alias" | "planner-output";
@@ -304,6 +304,7 @@ async function signedBenchmark(change: {
     const reportedNoncompletion = executorFault === "reported-noncompletion"
       || executorFault === "reported-noncompletion-original-wrong-signer"
       || executorFault === "reported-noncompletion-original-tampered"
+      || executorFault === "reported-noncompletion-original-invented-digest"
       || executorFault === "reported-noncompletion-tail-mismatch"
       || executorFault === "reported-noncompletion-extra-artifact"
       || executorFault === "reported-noncompletion-missing-artifact"
@@ -311,6 +312,7 @@ async function signedBenchmark(change: {
       || executorFault === "reported-noncompletion-wrong-reason";
     const approvalCycle = executorFault === "approval-cycle"
       || executorFault === "approval-cycle-original-wrong-signer"
+      || executorFault === "approval-cycle-original-invented-digest"
       || executorFault === "approval-cycle-wrong-status"
       || executorFault === "approval-cycle-invented-digest"
       || executorFault === "approval-cycle-extra-artifact";
@@ -327,9 +329,6 @@ async function signedBenchmark(change: {
           schemaVersion: "boulder.common-executor-receipt.v1",
           runId,
           status: "failed",
-          patchDigest: patch.digest,
-          testDigest: testOutput.digest,
-          typecheckDigest: typecheckOutput.digest,
           reason: "executor-noncompletion-reported",
           reportedReason: "executor-timeout",
           terminationEvidenceStatus: "unavailable-retrospectively",
@@ -346,12 +345,12 @@ async function signedBenchmark(change: {
           schemaVersion: "boulder.common-executor-receipt.v1",
           runId,
           status: executorFault === "approval-cycle-wrong-status" ? "passed" : "failed",
-          patchDigest: patch.digest,
-          testDigest: testOutput.digest,
-          typecheckDigest: typecheckOutput.digest,
           reason: "approval-cycle-detected",
           approvalCycleDetected: true
         };
+      if (executorFault === "reported-noncompletion-original-invented-digest" || executorFault === "approval-cycle-original-invented-digest") {
+        originalUnsigned.patchDigest = patch.digest;
+      }
       const originalSignature = await (executorFault === "reported-noncompletion-original-wrong-signer" || executorFault === "approval-cycle-original-wrong-signer"
         ? sign(originalUnsigned)
         : signExecutor(originalUnsigned));
@@ -707,12 +706,14 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     const cases = [
       ["reported-noncompletion-original-wrong-signer", "plan.benchmark.signer_unauthorized", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature.keyId`],
       ["reported-noncompletion-original-tampered", "plan.benchmark.signature_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature`],
+      ["reported-noncompletion-original-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["reported-noncompletion-tail-mismatch", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["reported-noncompletion-extra-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["reported-noncompletion-missing-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["reported-noncompletion-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["reported-noncompletion-wrong-reason", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["approval-cycle-original-wrong-signer", "plan.benchmark.signer_unauthorized", `normalizedRuns.${firstRunId}.execution.sourceReceipt.originalReceipt.signature.keyId`],
+      ["approval-cycle-original-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["approval-cycle-wrong-status", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["approval-cycle-invented-digest", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`],
       ["approval-cycle-extra-artifact", "plan.benchmark.evidence_invalid", `normalizedRuns.${firstRunId}.execution.sourceReceipt`]
@@ -808,4 +809,27 @@ describe("planner benchmark byte-verified PR8B provenance", () => {
     expect(buildPlannerBenchmarkReport(evidence).decision).toBe("HOLD");
     expect(buildPlannerBenchmarkReport(evidence).reasons).toContain("target_threshold_not_met");
   }, 20_000);
+  test("preserves signed v1 evidence when the remediation policy is absent", async () => {
+    const evidence = await signedBenchmark();
+    expect(await validatePlannerBenchmarkProvenance(evidence)).toEqual([]);
+  });
+  test("fails closed when a fresh-study remediation policy lacks a complete indexed graph", async () => {
+    const missing = await signedBenchmark({
+      mutateProtocol: (protocol) => { protocol.remediationPolicy = "scope-lifecycle-score-v1"; }
+    });
+    const unknownSchema = await signedBenchmark({
+      mutateProtocol: (protocol) => { protocol.remediationPolicy = "scope-lifecycle-score-v1"; },
+      mutate: (bundle) => {
+        bundle.remediationEvidence = {
+          path: "study/remediation.json",
+          digest,
+          schemaVersion: "boulder.planner-study-remediation-evidence.v9"
+        };
+      }
+    });
+    for (const evidence of [missing, unknownSchema]) {
+      const issues = await validatePlannerBenchmarkProvenance(evidence);
+      expect(issues.some((entry) => entry.code === "plan.benchmark.evidence_invalid" || entry.code === "plan.benchmark.bundle_invalid")).toBe(true);
+    }
+  });
 });

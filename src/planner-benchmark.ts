@@ -1,5 +1,6 @@
 import { validatePlanningPacket } from "./planning-packet.js";
 import { sha256Digest } from "./planning-canonical.js";
+import { plannerStudyRemediationPolicy, validatePlannerStudyRemediationEvidence } from "./planner-study-remediation.js";
 
 export type PlannerBenchmarkErrorCode =
   | "plan.benchmark.trust_root_invalid" | "plan.benchmark.key_unknown" | "plan.benchmark.key_revoked"
@@ -88,6 +89,7 @@ export interface PlannerStudyProtocol {
   readonly exclusionPolicy: string;
   readonly replacementPolicy: string;
   readonly signature: SignatureEnvelope;
+  readonly remediationPolicy?: typeof plannerStudyRemediationPolicy;
 }
 export interface PlannerStudyCell { readonly cellId: string; readonly plannerId: string; readonly taskClass: string; readonly repoId: string; }
 export interface PlannerStudyManifest {
@@ -184,6 +186,7 @@ export interface PlannerEvidenceBundle {
   readonly trustRootFingerprintSetDigest: string;
   readonly studyRootDigest: string;
   readonly signature: SignatureEnvelope;
+  readonly remediationEvidence?: PlannerEvidenceArtifact;
 }
 export interface PlannerBenchmarkMetrics {
   readonly scoredRunCount: number;
@@ -371,6 +374,7 @@ export function plannerStudyRootDigest(input: Readonly<{ protocol: Record<string
     assignmentsDigest: input.bundle.assignmentsDigest,
     approvalsDigest: input.bundle.approvalsDigest,
     redactionsDigest: input.bundle.redactionsDigest,
+    ...(input.bundle.remediationEvidence === undefined ? {} : { remediationEvidence: input.bundle.remediationEvidence }),
     trustRoot: input.trustRoot
   });
 }
@@ -475,7 +479,9 @@ export function validatePlannerEvidenceBundle(value: unknown): readonly PlannerB
   }
   const prospectiveArtifactsValid = (value.studyArtifacts.prospectiveScoreSheet === undefined && value.studyArtifacts.prospectiveScoreLock === undefined)
     || (artifactShape(value.studyArtifacts.prospectiveScoreSheet) && artifactShape(value.studyArtifacts.prospectiveScoreLock));
-  if (![value.studyArtifacts.rubric, value.studyArtifacts.normalizer, value.studyArtifacts.assignments, value.studyArtifacts.approvals, value.studyArtifacts.redactions].every(artifactShape) || !prospectiveArtifactsValid) issues.push(issue("plan.benchmark.bundle_invalid", "studyArtifacts", "Study artifacts are invalid."));
+  const remediationEvidenceValid = value.remediationEvidence === undefined
+    || artifactShape(value.remediationEvidence) && value.remediationEvidence.schemaVersion === "boulder.planner-study-remediation-evidence.v1";
+  if (![value.studyArtifacts.rubric, value.studyArtifacts.normalizer, value.studyArtifacts.assignments, value.studyArtifacts.approvals, value.studyArtifacts.redactions].every(artifactShape) || !prospectiveArtifactsValid || !remediationEvidenceValid) issues.push(issue("plan.benchmark.bundle_invalid", "studyArtifacts", "Study artifacts are invalid."));
   const runIds = new Set<string>();
   const identities = new Set<string>();
   for (const [index, run] of value.normalizedRuns.entries()) {
@@ -505,8 +511,9 @@ function deriveState(value: PlannerBenchmarkProvenance, issues: readonly Planner
   const runValues = Array.isArray(bundle.normalizedRuns) ? bundle.normalizedRuns : [];
   const runs = runValues.filter(object);
   const exclusions = Array.isArray(bundle.exclusions) ? bundle.exclusions.filter(object) : [];
+  const freshRemediationStudy = object(value.protocol) && value.protocol.remediationPolicy === plannerStudyRemediationPolicy;
   const eligible = issues.length === 0
-    ? unique(runs.filter((run) => object(run.execution) && run.execution.status === "passed" && run.scopeStatus === "passed" && run.execution.scopeStatus === "passed" && Array.isArray(run.criticalCaps) && run.criticalCaps.length === 0 && run.traceabilityPercent === 100).map((run) => run.runId).filter(text))
+    ? unique(runs.filter((run) => object(run.execution) && run.execution.status === "passed" && (freshRemediationStudy || run.scopeStatus === "passed" && run.execution.scopeStatus === "passed") && Array.isArray(run.criticalCaps) && run.criticalCaps.length === 0 && run.traceabilityPercent === 100).map((run) => run.runId).filter(text))
     : [];
   const excluded = unique(exclusions.map((entry) => entry.runId).filter(text));
   const target = runs.filter((run) => text(run.cellId) && run.cellId.startsWith("boulder-native:"));
@@ -533,7 +540,7 @@ function deriveState(value: PlannerBenchmarkProvenance, issues: readonly Planner
     metrics.executionFailureCount > 0 ? "execution_failures" : "",
     eligible.length < 36 ? "insufficient_eligible_runs" : "",
     object(bundle.scoreLockReceipt) && bundle.scoreLockReceipt.kind === "retrospective-attestation" ? "retrospective_lock_attestation" : "",
-    runs.some((run) => run.scopeStatus !== "passed" || !object(run.execution) || run.execution.scopeStatus !== "passed") ? "scope_attribution_unknown" : "",
+    !freshRemediationStudy && runs.some((run) => run.scopeStatus !== "passed" || !object(run.execution) || run.execution.scopeStatus !== "passed") ? "scope_attribution_unknown" : "",
     metrics.traceabilityPercent !== 100 ? "incomplete_traceability" : "",
     metrics.invalidRunCount > 0 ? "invalid_or_malformed_runs" : ""
   ].filter(text));
@@ -657,6 +664,7 @@ function protocolShape(value: unknown): value is PlannerStudyProtocol {
     && value.delegatedSigners.every((delegate) => object(delegate) && text(delegate.keyId) && validDigest(delegate.fingerprint) && Array.isArray(delegate.roles) && delegate.roles.length > 0 && delegate.roles.every((role) => role === "manifest" || role === "bundle" || role === "executor") && new Set(delegate.roles).size === delegate.roles.length)
     && Object.entries(frozenProtocolPolicies).every(([policy, expected]) => value[policy] === expected)
     && acceptedBlindingPolicies.has(value.blindingPolicy as string)
+    && (value.remediationPolicy === undefined || value.remediationPolicy === plannerStudyRemediationPolicy)
     && (!prospective || validDigest(value.scoreLockReceiptDigest) && validDigest(value.privateMapDigest))
     && signatureShape(value.signature);
 }
@@ -771,6 +779,35 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
   if (protocol.studyId !== manifest.studyId || protocol.studyId !== bundle.studyId) issues.push(issue("plan.benchmark.study_identity_mismatch", "studyId", "Protocol, manifest, and bundle must bind the same study ID."));
 
   const indexed = indexArtifacts(bundle, value.evidenceFiles ?? [], issues);
+  const freshRemediationStudy = protocol.remediationPolicy === plannerStudyRemediationPolicy;
+  if (!freshRemediationStudy && bundle.remediationEvidence !== undefined) {
+    issues.push(issue("plan.benchmark.evidence_invalid", "remediationEvidence", "Remediation evidence requires the explicit fresh-study remediation policy."));
+  }
+  if (freshRemediationStudy) {
+    if (bundle.scoreLockReceipt.kind === "retrospective-attestation") {
+      issues.push(issue("plan.benchmark.evidence_invalid", "scoreLockReceipt", "Fresh remediation studies reject retrospective score lock or reveal evidence."));
+    }
+    const remediationIssues = await validatePlannerStudyRemediationEvidence({
+      remediationEvidence: bundle.remediationEvidence,
+      artifactIndex: bundle.artifactIndex,
+      normalizedRuns: bundle.normalizedRuns,
+      studyId: bundle.studyId,
+      protocolDigest,
+      artifactJoined: (reference) => artifactJoined(reference, indexed.artifacts, indexed.files),
+      readArtifact: (reference) => parsedArtifact(reference, indexed.artifacts, indexed.files),
+      verifyExecutorSignature: (signed, path) => verifySignature(root, signed, path, "executor", protocol),
+      verifyOperatorSignature: async (signed, path) => {
+        const signatureIssue = await verifySignature(root, signed, path);
+        if (signatureIssue) return signatureIssue;
+        const signature = signed.signature;
+        if (!signatureShape(signature) || !object(protocol.protocolSigner) || signature.keyId !== protocol.protocolSigner.keyId) {
+          return issue("plan.benchmark.signer_unauthorized", `${path}.signature.keyId`, "Score workflow signer must be the trusted protocol operator.");
+        }
+        return undefined;
+      }
+    });
+    issues.push(...remediationIssues);
+  }
   const studyArtifacts = bundle.studyArtifacts;
   const prospectivePolicy = protocol.blindingPolicy === prospectiveBlindingPolicy;
   const prospectiveScoreSheet = studyArtifacts.prospectiveScoreSheet;
@@ -994,7 +1031,7 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
       ? await verifySignature(root, executionValue, `normalizedRuns.${run.runId}.execution`, "executor", protocol)
       : issue("plan.benchmark.signature_invalid", `normalizedRuns.${run.runId}.execution.signature`, "Execution receipt signature is missing.");
     if (executionSignature) issues.push(executionSignature);
-    if (!executionReference || !executionFile || executionReference.digest !== run.execution.digest || run.execution.digest !== run.executionDigest || executionReference.schemaVersion !== run.execution.schemaVersion || !object(executionValue) || executionValue.schemaVersion !== "boulder.planner-execution-receipt.v1" || executionValue.runId !== run.runId || executionValue.status !== run.execution.status || executionValue.scopeStatus !== run.scopeStatus || executionValue.scopeStatus !== run.execution.scopeStatus || executionValue.executorModel !== "openai-codex/gpt-5.6-sol" || !object(executionValue.sourceReceipt) || !artifactShape(executionValue.sourceReceipt) || !artifactJoined(executionValue.sourceReceipt, indexed.artifacts, indexed.files) || !object(executionValue.verification) || executionValue.verificationDigest !== hash(executionValue.verification) || run.verificationDigest !== executionValue.verificationDigest || !Array.isArray(executionValue.verificationArtifacts) || !executionValue.verificationArtifacts.every(artifactShape) || !executionValue.verificationArtifacts.every((artifact) => artifactJoined(artifact, indexed.artifacts, indexed.files))) {
+    if (!executionReference || !executionFile || executionReference.digest !== run.execution.digest || run.execution.digest !== run.executionDigest || executionReference.schemaVersion !== run.execution.schemaVersion || !object(executionValue) || executionValue.schemaVersion !== "boulder.planner-execution-receipt.v1" || executionValue.runId !== run.runId || executionValue.status !== run.execution.status || (!freshRemediationStudy && (executionValue.scopeStatus !== run.scopeStatus || executionValue.scopeStatus !== run.execution.scopeStatus)) || executionValue.executorModel !== "openai-codex/gpt-5.6-sol" || !object(executionValue.sourceReceipt) || !artifactShape(executionValue.sourceReceipt) || !artifactJoined(executionValue.sourceReceipt, indexed.artifacts, indexed.files) || !object(executionValue.verification) || executionValue.verificationDigest !== hash(executionValue.verification) || run.verificationDigest !== executionValue.verificationDigest || !Array.isArray(executionValue.verificationArtifacts) || !executionValue.verificationArtifacts.every(artifactShape) || !executionValue.verificationArtifacts.every((artifact) => artifactJoined(artifact, indexed.artifacts, indexed.files))) {
       issues.push(issue("plan.benchmark.evidence_invalid", `normalizedRuns.${run.runId}.execution`, "Execution receipt, signer, and verification artifacts are not authenticated."));
     } else {
       const sourceReceipt = parsedArtifact(executionValue.sourceReceipt, indexed.artifacts, indexed.files);
@@ -1047,11 +1084,37 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
       const noOutputDigestClaims = (receipt: Record<string, unknown>): boolean => receipt.patchDigest === undefined
         && receipt.testDigest === undefined
         && receipt.typecheckDigest === undefined;
+      const originalReceiptKeys = object(originalReceipt) ? Object.keys(originalReceipt).sort() : [];
+      const expectedOriginalReceiptKeys = failureKind === "reported-noncompletion"
+        ? [
+          "budgetSeconds",
+          "commandStartedAt",
+          "currentCommand",
+          "elapsedSeconds",
+          "overallDisposition",
+          "promotionEligibility",
+          "reason",
+          "reportedReason",
+          "runId",
+          "schemaVersion",
+          "signature",
+          "status",
+          "stderrTail",
+          "stdoutTail",
+          "terminationEvidenceStatus"
+        ].sort()
+        : failureKind === "approval-cycle"
+          ? ["approvalCycleDetected", "reason", "runId", "schemaVersion", "signature", "status"].sort()
+          : [];
+      const originalReceiptKeysValid = originalReceiptKeys.length === expectedOriginalReceiptKeys.length
+        && originalReceiptKeys.every((key, index) => key === expectedOriginalReceiptKeys[index]);
       const originalFailureReceiptValid = originalReceiptReference?.schemaVersion === "boulder.common-executor-receipt.v1"
         && object(originalReceipt)
         && originalReceipt.runId === run.runId
         && originalReceipt.status === "failed"
-        && originalReceiptSignature === undefined;
+        && originalReceiptSignature === undefined
+        && noOutputDigestClaims(originalReceipt)
+        && originalReceiptKeysValid;
       const exitCodesValid = object(sourceReceipt)
         && [sourceReceipt.executorExitCode, sourceReceipt.testExitCode, sourceReceipt.typecheckExitCode].every((exitCode) => Number.isInteger(exitCode));
       const failedExitEvidence = exitCodesValid
@@ -1169,7 +1232,7 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
   }
 
   const derivedExcluded = new Set<string>();
-  for (const run of bundle.normalizedRuns) if (run.execution.status !== "passed" || run.scopeStatus !== "passed" || run.execution.scopeStatus !== "passed" || run.criticalCaps.length > 0 || run.traceabilityPercent !== 100) derivedExcluded.add(run.runId);
+  for (const run of bundle.normalizedRuns) if (run.execution.status !== "passed" || (!freshRemediationStudy && (run.scopeStatus !== "passed" || run.execution.scopeStatus !== "passed")) || run.criticalCaps.length > 0 || run.traceabilityPercent !== 100) derivedExcluded.add(run.runId);
   for (const [rawId, raw] of rawById) {
     if (scoredIds.has(rawId)) continue;
     if (raw.runId.endsWith("-replacement")) {
@@ -1202,7 +1265,7 @@ async function validatePlannerBenchmarkEvidenceGraph(value: PlannerBenchmarkProv
     if (shouldExclude && !exclusion) issues.push(issue("plan.benchmark.evidence_invalid", `exclusions.${run.runId}`, "Derived ineligible run is missing an exclusion."));
     if (!shouldExclude && exclusion) issues.push(issue("plan.benchmark.evidence_invalid", `exclusions.${run.runId}`, "Eligible run cannot be declared excluded."));
     if (exclusion) {
-      const expectedEvidence = run.execution.status !== "passed" || run.scopeStatus !== "passed" || run.execution.scopeStatus !== "passed" ? run.execution.digest : run.blindedItemDigest;
+      const expectedEvidence = run.execution.status !== "passed" || (!freshRemediationStudy && (run.scopeStatus !== "passed" || run.execution.scopeStatus !== "passed")) ? run.execution.digest : run.blindedItemDigest;
       if (exclusion.evidenceDigest !== expectedEvidence || exclusion.cellId !== run.cellId || exclusion.repeat !== run.repeat || exclusion.sequence !== run.sequence || exclusion.replacementOf !== undefined) issues.push(issue("plan.benchmark.evidence_invalid", `exclusions.${run.runId}`, "Exclusion must bind the derived failure or critical-cap evidence."));
     }
   }
