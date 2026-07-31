@@ -21,6 +21,7 @@ import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
 import { buildPrimaryWorkflowMap } from "./workflow-map";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
+import { runV2Command } from "./v2-command";
 
 const VERSION = "0.1.16";
 
@@ -44,6 +45,10 @@ async function runMain(args: string[]): Promise<void> {
   const startedAt = new Date().toISOString();
   if (command === "version" || args.includes("--version")) { console.log(VERSION); return; }
   if (command === "help" || args.includes("--help") || args.includes("-h")) { printHelp(); return; }
+  if (command === "v2") {
+    await runV2Command(args);
+    return;
+  }
   if (command === "init") {
     const results = await initHarness(options.cwd, options.force);
     console.log(formatLines("Boulder initialized", results));
