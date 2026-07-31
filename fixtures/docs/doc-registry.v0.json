@@ -74,6 +74,7 @@
   {"path":"docs/WORKFLOW_PROFILE_PLAN_REVIEW.ko.md","kind":"canonical","locale":"ko","dir":"ltr","source":"docs/WORKFLOW_PROFILE_PLAN_REVIEW.ko.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/adr/0001-project-scope.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/adr/0001-project-scope.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/adr/0002-contract-first-development.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/adr/0002-contract-first-development.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
+  {"path":"docs/adr/0003-v2-kernel-gates.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/adr/0003-v2-kernel-gates.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/branch-protection.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/branch-protection.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/contributing/ai-contribution-policy.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/contributing/ai-contribution-policy.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/contributing/development-setup.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/contributing/development-setup.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},

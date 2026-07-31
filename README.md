@@ -125,9 +125,9 @@ The designer chooses one of the built-in bootstrap profiles: `programming-heavy`
 For recurring work outside interviews, use the learning loop docs directly:
 
 ```bash
-boulder routine capture --task "weekly release note draft"
+boulder routine capture --task "weekly release note draft" --dry-run
 boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
+boulder skill propose --from-routine <routine-id> --dry-run
 ```
 
 Recommended order:
@@ -190,9 +190,9 @@ boulder replay-run --dry-run
 boulder release-check
 boulder product-readiness
 boulder service-readiness
-boulder routine capture --task "<text>"
+boulder routine capture --task "<text>" --dry-run
 boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
+boulder skill propose --from-routine <routine-id> --dry-run
 boulder export
 ```
 
