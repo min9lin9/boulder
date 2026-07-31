@@ -4,7 +4,7 @@ subtitle: "Senpi · OMO-Senpi · Gajae-Code · Callee 기반 설계 및 구현 �
 version: "0.2"
 status: "Architecture Proposal"
 date: "2026-07-31"
-boulder_baseline: "min9lin9/boulder@10732cb0f3c1b5032ce4b2a542f8c514b658bd12"
+boulder_baseline: "min9lin9/boulder@51994a8ade73a4638bcb4cc798c91328eb3028db"
 reference_sources:
   - "code-yeongyu/senpi@c0c9e6cdc1d34ef961241e0b4fbd1633de7d12ab"
   - "code-yeongyu/oh-my-openagent@bc9295823d11b2a9afc19c2c35818a29db1c6b6c:packages/omo-senpi"
