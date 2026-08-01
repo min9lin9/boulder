@@ -1,5 +1,5 @@
 import { canonicalizePlanningValue, sha256Digest } from "./planning-canonical.js";
-import type { PlanningValidationIssue } from "./critic-review";
+import type { PlanningValidationIssue } from "./critic-review.js";
 
 export type ApprovalPurpose = "plan" | "execution";
 export type ChallengeStatus = "pending" | "consumed" | "invalidated";
