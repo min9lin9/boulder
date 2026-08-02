@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 254,
-  "totalPackedFiles": 255,
+  "totalUniqueFiles": 267,
+  "totalPackedFiles": 268,
   "classes": [
     {
       "class": "runtime",
-      "count": 109,
+      "count": 119,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -108,6 +108,16 @@
         "src/v2/lifecycle.ts",
         "src/v2/procedure.ts",
         "src/v2/validation.ts",
+        "src/v2/work-durable-contracts.ts",
+        "src/v2/work-durable-validation.ts",
+        "src/v2/work-durable.ts",
+        "src/v2/work-event-contracts.ts",
+        "src/v2/work-event-data.ts",
+        "src/v2/work-event-validation.ts",
+        "src/v2/work-events.ts",
+        "src/v2/work-reducer.ts",
+        "src/v2/work-replay-contracts.ts",
+        "src/v2/work-replay.ts",
         "src/v2/work.ts",
         "src/validation.ts",
         "src/verify.ts",
@@ -219,7 +229,7 @@
     },
     {
       "class": "fixture",
-      "count": 47,
+      "count": 50,
       "files": [
         "fixtures/AGENTS.md",
         "fixtures/benchmarks/mcp-server.json",
@@ -267,6 +277,9 @@
         "fixtures/v2-procedure/invalid-ref-e-sop-01.json",
         "fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json",
         "fixtures/v2-procedure/valid-ref-e-sop-01.json",
+        "fixtures/v2-work/adversarial-evidence-ref-e-work-01.json",
+        "fixtures/v2-work/invalid-ref-e-work-01.json",
+        "fixtures/v2-work/valid-ref-e-work-01.json",
         "fixtures/workflow-map/primary-workflow.v0.json"
       ]
     },

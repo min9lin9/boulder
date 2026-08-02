@@ -45,10 +45,14 @@ All v2 records are plain I-JSON with exact `boulder.v2.*.v1` schema versions. ID
 | `eventDigest` | `boulder.v2.authority-event.v1` | complete AuthorityEvent except `eventDigest` and `signature` |
 | `procedureDigest` | `boulder.v2.procedure.v1` | complete static Procedure except `procedureDigest` |
 | `workRevisionDigest` | `boulder.v2.work-revision.v1` | complete static Work revision except `workRevisionDigest` |
+| `durableWork.semanticDigest` | `boulder.v2.work-semantic.v1` | Procedure digest plus resolved contract |
+| `durableWorkRevisionDigest` | `boulder.v2.work-revision.v2` | complete durable Work revision except `workRevisionDigest` |
+| `workEventDigest` | `boulder.v2.work-event.v1` | complete Work event except `eventDigest` |
+| `completionDigest` | `boulder.v2.work-completion.v1` | terminal receipt digest plus sink identity |
 
 Artifacts bind their content, Plan, step, and input. Evidence names the produced artifact and artifact digest. Results and critiques carry ordered digest arrays paired position-for-position with their ID arrays. An injected evaluator may return `pass` only when exact result/artifact/evidence provenance and digests match, required evidence kinds are present, evaluator policy/provenance match, and no hard finding exists.
 
-The Procedure and Work-revision rows pin additive static candidate projections only. They do not authorize Procedure execution, durable Work transitions, acceptance-as-completion, or any K2-K4 gate claim.
+The Procedure and v1 Work-revision rows pin additive static candidate projections only. REF-E-WORK-01 adds versioned durable identity, exact and bounded canonical JSONL records, and injected-observation reconcile contracts. Replay fails closed without a caller-supplied trusted root, per-event authenticator, and approval authenticator; revision, terminal, completion, effect, attempt, and action identities remain digest-bound. A missing runner proposes recording a durable retryable terminal before any retry. These pure contracts perform no persistence, runner launch, adapter call, or effect. They do not wire Procedure or Work into K1 execution and authorize no K2-K4 gate claim.
 
 ### Effect and authority boundary
 

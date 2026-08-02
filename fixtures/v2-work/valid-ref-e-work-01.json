@@ -1,0 +1,236 @@
+{
+  "schemaVersion": "boulder.v2.work-vectors.v1",
+  "vectors": [
+    {
+      "id": "local-complete",
+      "workId": "fixture-local",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedStatus": "completed",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-local",
+            "attempt": 1,
+            "runnerKind": "in-process",
+            "sessionId": "session-local"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "data": {
+            "attemptId": "attempt-local",
+            "status": "completed",
+            "terminalReceiptDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        {
+          "kind": "completion-recorded",
+          "data": {
+            "terminalReceiptDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "completionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "sinkId": "sink-local"
+          }
+        }
+      ]
+    },
+    {
+      "id": "external-approved-complete",
+      "workId": "fixture-external",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedStatus": "completed",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-external",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-external"
+          }
+        },
+        {
+          "kind": "approval-requested",
+          "data": {
+            "gateId": "gate-external",
+            "actionId": "action-transient",
+            "effectId": "effect-external"
+          }
+        },
+        {
+          "kind": "approval-recorded",
+          "data": {
+            "gateId": "gate-external",
+            "effectId": "effect-external",
+            "decision": "approved"
+          }
+        },
+        {
+          "kind": "effect-claimed",
+          "data": {
+            "gateId": "gate-external",
+            "effectId": "effect-external",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "external",
+            "role": "primary",
+            "targetEffectReceiptDigest": null
+          }
+        },
+        {
+          "kind": "effect-receipt-recorded",
+          "data": {
+            "effectId": "effect-external",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "external",
+            "outcome": "committed",
+            "receiptDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "data": {
+            "attemptId": "attempt-external",
+            "status": "completed",
+            "terminalReceiptDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        },
+        {
+          "kind": "completion-recorded",
+          "data": {
+            "terminalReceiptDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "completionDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "sinkId": "sink-external"
+          }
+        }
+      ]
+    },
+    {
+      "id": "failure-retry-revision-rollback",
+      "workId": "fixture-revision",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedStatus": "completed",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-one",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-one"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "data": {
+            "attemptId": "attempt-one",
+            "status": "failed",
+            "terminalReceiptDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-two",
+            "attempt": 2,
+            "runnerKind": "process",
+            "sessionId": "session-two"
+          }
+        },
+        {
+          "kind": "effect-claimed",
+          "data": {
+            "gateId": null,
+            "effectId": "effect-local",
+            "operationKey": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "boundary": "local",
+            "role": "primary",
+            "checkpointDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "targetEffectReceiptDigest": null
+          }
+        },
+        {
+          "kind": "effect-receipt-recorded",
+          "data": {
+            "effectId": "effect-local",
+            "operationKey": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "boundary": "local",
+            "outcome": "committed",
+            "receiptDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "data": {
+            "attemptId": "attempt-two",
+            "status": "failed",
+            "terminalReceiptDigest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+          }
+        },
+        {
+          "kind": "critique-recorded",
+          "data": {
+            "critiqueDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "requiresMaterialChange": true
+          }
+        },
+        {
+          "kind": "revision-created",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "revision": 2,
+            "previousWorkRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        {
+          "kind": "rollback-recorded",
+          "data": {
+            "targetEffectReceiptDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "checkpointDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "receiptDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "outcome": "rolled-back"
+          }
+        },
+        {
+          "kind": "attempt-started",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "attemptId": "attempt-three",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-three"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "attemptId": "attempt-three",
+            "status": "completed",
+            "terminalReceiptDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        },
+        {
+          "kind": "completion-recorded",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "terminalReceiptDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "completionDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "sinkId": "sink-revision"
+          }
+        }
+      ]
+    }
+  ]
+}
