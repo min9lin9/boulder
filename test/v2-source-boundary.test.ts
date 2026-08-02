@@ -21,7 +21,10 @@ describe("v2 source boundary", () => {
       const specifiers = [...source.matchAll(/(?:import|export)\s+(?:type\s+)?(?:[^"']+?\s+from\s+)?["']([^"']+)["']/g)].map((match) => match[1]);
       expect(specifiers.some((specifier) => specifier.startsWith("../") || specifier.includes("/v1/") || specifier.includes("v1-"))).toBe(false);
       for (const specifier of specifiers) {
-        if (specifier.startsWith(".")) expect(specifier.startsWith("./")).toBe(true);
+        if (specifier.startsWith(".")) {
+          expect(specifier.startsWith("./")).toBe(true);
+          expect(specifier.endsWith(".js")).toBe(true);
+        }
       }
     }
   });

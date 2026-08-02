@@ -1,11 +1,11 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 249,
-  "totalPackedFiles": 250,
+  "totalUniqueFiles": 254,
+  "totalPackedFiles": 255,
   "classes": [
     {
       "class": "runtime",
-      "count": 107,
+      "count": 109,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
@@ -106,7 +106,9 @@
         "src/v2/effect-gate.ts",
         "src/v2/execution.ts",
         "src/v2/lifecycle.ts",
+        "src/v2/procedure.ts",
         "src/v2/validation.ts",
+        "src/v2/work.ts",
         "src/validation.ts",
         "src/verify.ts",
         "src/workflow-map.ts",
@@ -217,7 +219,7 @@
     },
     {
       "class": "fixture",
-      "count": 44,
+      "count": 47,
       "files": [
         "fixtures/AGENTS.md",
         "fixtures/benchmarks/mcp-server.json",
@@ -262,6 +264,9 @@
         "fixtures/v2-kernel/invalid-schema-version.json",
         "fixtures/v2-kernel/valid-ed25519-authority-unsupported-effect.json",
         "fixtures/v2-kernel/valid-none-effect-execution.json",
+        "fixtures/v2-procedure/invalid-ref-e-sop-01.json",
+        "fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json",
+        "fixtures/v2-procedure/valid-ref-e-sop-01.json",
         "fixtures/workflow-map/primary-workflow.v0.json"
       ]
     },

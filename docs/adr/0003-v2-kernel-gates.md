@@ -43,8 +43,12 @@ All v2 records are plain I-JSON with exact `boulder.v2.*.v1` schema versions. ID
 | `critiqueDigest` | `boulder.v2.critique.v1` | complete Critique except `critiqueDigest` |
 | `evaluator.policyDigest` | `boulder.v2.evaluator-policy.v1` | complete evaluator policy |
 | `eventDigest` | `boulder.v2.authority-event.v1` | complete AuthorityEvent except `eventDigest` and `signature` |
+| `procedureDigest` | `boulder.v2.procedure.v1` | complete static Procedure except `procedureDigest` |
+| `workRevisionDigest` | `boulder.v2.work-revision.v1` | complete static Work revision except `workRevisionDigest` |
 
 Artifacts bind their content, Plan, step, and input. Evidence names the produced artifact and artifact digest. Results and critiques carry ordered digest arrays paired position-for-position with their ID arrays. An injected evaluator may return `pass` only when exact result/artifact/evidence provenance and digests match, required evidence kinds are present, evaluator policy/provenance match, and no hard finding exists.
+
+The Procedure and Work-revision rows pin additive static candidate projections only. They do not authorize Procedure execution, durable Work transitions, acceptance-as-completion, or any K2-K4 gate claim.
 
 ### Effect and authority boundary
 

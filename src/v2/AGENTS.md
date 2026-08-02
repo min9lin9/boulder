@@ -4,7 +4,7 @@ Scope: `src/v2/`
 
 ## OVERVIEW
 
-Self-contained K1 kernel: a bounded execution pipeline (plan validation -> effect gating -> capability execution -> result synthesis -> injected critique). Gating and status are pinned by `docs/adr/0003-v2-kernel-gates.md`. Entry point: `executeV2Envelope()` in `execution.ts`; CLI via `src/v2-command.ts` (`boulder v2`).
+Self-contained K1 kernel: a bounded execution pipeline (plan validation -> effect gating -> capability execution -> result synthesis -> injected critique). Gating and status are pinned by `docs/adr/0003-v2-kernel-gates.md`. Entry point: `executeV2Envelope()` in `execution.ts`; CLI via `src/v2-command.ts` (`boulder v2`). Static Procedure and Work candidates are additive contract experiments only; they are not wired into K1 execution.
 
 ## STRUCTURE
 
@@ -17,6 +17,8 @@ Self-contained K1 kernel: a bounded execution pipeline (plan validation -> effec
 | `capability.ts`, `critique.ts` | Fixture capability registry / critique evaluator |
 | `execution.ts` | End-to-end execute pipeline |
 | `lifecycle.ts` | Lifecycle state machine |
+| `procedure.ts` | Strict static Procedure compiler candidate; no executor |
+| `work.ts` | Immutable Work revision/attempt/receipt candidate; no state machine |
 
 ## CONVENTIONS
 
@@ -26,6 +28,7 @@ Self-contained K1 kernel: a bounded execution pipeline (plan validation -> effec
 - `extensions` keys must be reverse-domain and non-reserved.
 - Verifier, evaluator, and time are injected; no ambient clock and no runtime writes.
 - Fixtures live in `fixtures/v2-kernel/`: canonical none-effect baseline, unsupported-authority path, and authority mutation vectors.
+- Static Procedure fixtures live separately in `fixtures/v2-procedure/` and never imply same-run Human-loop execution.
 
 ## ANTI-PATTERNS
 
@@ -36,5 +39,5 @@ Self-contained K1 kernel: a bounded execution pipeline (plan validation -> effec
 ## CHECKS
 
 ```bash
-bun test test/v2-contracts.test.ts test/v2-execution.test.ts test/v2-effect-gate.test.ts test/v2-cli-e2e.test.ts test/v2-source-boundary.test.ts
+bun test test/v2-contracts.test.ts test/v2-execution.test.ts test/v2-effect-gate.test.ts test/v2-cli-e2e.test.ts test/v2-source-boundary.test.ts test/v2-procedure.test.ts test/v2-work.test.ts
 ```
