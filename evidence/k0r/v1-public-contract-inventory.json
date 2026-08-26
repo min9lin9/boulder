@@ -1,1 +1,2306 @@
-{"categories":["commands","outputContracts","exitAndStderrPolicy","statePaths","profileAndDefaultPrecedence","packageAndRuntime","inventoryReferences","ownershipAndOracle","evidenceBindings"],"commands":[{"argv":["help"],"flags":["--help","-h"],"id":"help","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["version"],"flags":["--version"],"id":"version","source":{"path":"src/cli.ts","symbol":"VERSION, runMain"}},{"argv":["init"],"flags":["--cwd <path>","--force"],"id":"init","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["workflow","map"],"flags":["--json"],"id":"workflow-map","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["quickstart"],"flags":["--cwd <path>","--json"],"id":"quickstart","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["onboard"],"flags":["--cwd <path>","--json"],"id":"onboard","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["bootstrap","interview"],"flags":["--cwd <path>","--task <text>","--json"],"id":"bootstrap-interview","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["inspect"],"flags":["--cwd <path>","--json"],"id":"inspect","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["profile","list"],"flags":["--cwd <path>","--json"],"id":"profile-list","source":{"path":"src/profile-command.ts","symbol":"runProfileCommand"}},{"argv":["profile","resolve"],"flags":["--cwd <path>","--profile <name>","--task <kind>","--json"],"id":"profile-resolve","source":{"path":"src/profile-command.ts","symbol":"resolveCommand"}},{"argv":["profile","show","[name]"],"flags":["--cwd <path>","--json"],"id":"profile-show","source":{"path":"src/profile-command.ts","symbol":"resolveCommand"}},{"argv":["profile","save","<name>"],"flags":["--cwd <path>","--profile <source>","--json"],"id":"profile-save","source":{"path":"src/profile-command.ts","symbol":"saveCommand"}},{"argv":["profile","use","<name>"],"flags":["--cwd <path>","--json"],"id":"profile-use","source":{"path":"src/profile-command.ts","symbol":"useCommand"}},{"argv":["capability","import"],"flags":["--from <source>","--dry-run|--write","--kind <skill|adapter|agent-catalog>","--id <id>","--cwd <path>","--json"],"id":"capability-import","source":{"path":"src/capability-command.ts","symbol":"importCapabilitySource"}},{"argv":["capability","status"],"flags":["--cwd <path>","--json"],"id":"capability-status","source":{"path":"src/capability-command.ts","symbol":"capabilityStatus"}},{"argv":["handoff","packet"],"flags":["--cwd <path>","--adapter <name>","--include <path>","--json"],"id":"handoff-packet","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["handoff","review"],"flags":["--cwd <path>","--packet <path>","--json"],"id":"handoff-review","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["handoff","send"],"flags":["--cwd <path>","--packet <path>","--approve-external","--approval-code <code>","--dry-run"],"id":"handoff-send","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["plan","analyze"],"flags":["--task <text>","--run-id <id>","--friction <direct|focused|deep>","--cwd <path>","--json"],"id":"plan-analyze","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["plan","benchmark"],"flags":["--trust-root <path>","--study-root <path>","--cwd <path>","--json"],"id":"plan-benchmark","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["plan","show"],"flags":["--run-id <id>","--cwd <path>","--json"],"id":"plan-show","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["plan","validate"],"flags":["--run-id <id>|--input <path>","--artifact <analysis|state|packet>","--cwd <path>","--json"],"id":"plan-validate","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"aliases":[["runs"]],"argv":["runs","list"],"flags":["--cwd <path>","--json"],"id":"runs-list","source":{"path":"src/runs-command.ts","symbol":"runRunsCommand"}},{"argv":["runs","show","<run-id>"],"flags":["--latest","--cwd <path>","--json"],"id":"runs-show","source":{"path":"src/runs-command.ts","symbol":"runRunsCommand"}},{"argv":["runs","prune"],"flags":["--older-than <days>d","--keep <count>","--cwd <path>","--json"],"id":"runs-prune","source":{"path":"src/runs-command.ts","symbol":"runRunsCommand"}},{"argv":["release-check"],"flags":["--cwd <path>","--json"],"id":"release-check","source":{"path":"src/cli-ops-command.ts","symbol":"runReleaseCheckCommand"}},{"argv":["evidence","inspect"],"flags":["--cwd <path>","--json"],"id":"evidence-inspect","source":{"path":"src/cli-ops-command.ts","symbol":"runEvidenceInspectCommand"}},{"argv":["evidence","diff"],"flags":["--from <path>","--to <path>","--cwd <path>","--json"],"id":"evidence-diff","source":{"path":"src/cli-ops-command.ts","symbol":"runEvidenceDiffCommand"}},{"argv":["product-readiness"],"flags":["--cwd <path>","--json"],"id":"product-readiness","source":{"path":"src/cli-ops-command.ts","symbol":"runProductReadinessCommand"}},{"argv":["service-readiness"],"flags":["--cwd <path>","--json"],"id":"service-readiness","source":{"path":"src/cli-ops-command.ts","symbol":"runServiceReadinessCommand"}},{"argv":["routine","capture"],"flags":["--task <text>","--dry-run|--write","--cwd <path>","--json"],"id":"routine-capture","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["retro","weekly"],"flags":["--dry-run","--cwd <path>","--json"],"id":"retro-weekly","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["skill","propose"],"flags":["--from-routine <id>","--dry-run|--write","--cwd <path>","--json"],"id":"skill-propose","source":{"path":"src/cli-format.ts","symbol":"printHelp"}},{"argv":["validate"],"flags":["--cwd <path>"],"id":"validate","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["verify"],"flags":["--cwd <path>","--dry-run"],"id":"verify","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["pipeline"],"flags":["--cwd <path>","--friction <low|medium|high>","--json"],"id":"pipeline","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["scorecard"],"flags":["--cwd <path>","--json"],"id":"scorecard","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["benchmark"],"flags":["--cwd <path>","--json"],"id":"benchmark","source":{"path":"src/cli.ts","symbol":"runMain"}},{"argv":["release-plan"],"flags":["--cwd <path>","--json"],"id":"release-plan","source":{"path":"src/cli-ops-command.ts","symbol":"runReleasePlanCommand"}},{"argv":["release","evidence","refresh"],"flags":["--dry-run|--write","--cwd <path>","--json"],"id":"release-evidence-refresh","source":{"path":"src/cli-ops-command.ts","symbol":"runReleaseEvidenceRefreshCommand"}},{"argv":["replay-check"],"flags":["--cwd <path>","--json"],"id":"replay-check","source":{"path":"src/cli-ops-command.ts","symbol":"runReplayCheckCommand"}},{"argv":["replay-run"],"flags":["--cwd <path>","--dry-run","--json"],"id":"replay-run","source":{"path":"src/cli-ops-command.ts","symbol":"runReplayRunCommand"}},{"argv":["doctor"],"flags":["--cwd <path>","--json"],"id":"doctor","source":{"path":"src/cli-ops-command.ts","symbol":"runDoctorCommand"}},{"argv":["record","field-readiness"],"flags":["--run-id <id>","--evidence <path>","--cwd <path>","--json"],"id":"record-field-readiness","source":{"path":"src/cli-ops-command.ts","symbol":"runFieldReadinessCommand"}},{"argv":["export"],"flags":["--cwd <path>","--force"],"id":"export","source":{"path":"src/cli.ts","symbol":"runMain"}}],"compatibilityBoundaries":[{"boundary":"A top-level array is intentional; consumers must not infer a missing bundle schemaVersion.","path":"fixtures/docs/doc-registry.v0.json","schemaVersion":null,"source":{"path":"fixtures/docs/doc-registry.v0.json","symbol":"root array"},"surface":"documentation registry"},{"boundary":"Package inventory remains a checked-in fixture contract.","path":"fixtures/package-inventory/packaged-files.v0.json","schemaVersion":"packaged-files.v0","source":{"path":"fixtures/package-inventory/packaged-files.v0.json","symbol":"schemaVersion, classes"},"surface":"package inventory"},{"boundary":"The bundle contains independently versioned planner objects and has no bundle-level schemaVersion.","path":"fixtures/planning-contracts/valid.json","schemaVersion":null,"source":{"path":"fixtures/planning-contracts/valid.json","symbol":"root object"},"surface":"planning fixtures"},{"boundary":"The packet schema is a v1 compatibility boundary.","path":"fixtures/planning-packets/valid.json","schemaVersion":"boulder.planning-packet.v1","source":{"path":"fixtures/planning-packets/valid.json","symbol":"schemaVersion"},"surface":"planning packet fixture"},{"boundary":"Checked-in release evidence is a documentation compatibility fixture.","path":"docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json","schemaVersion":1,"source":{"path":"docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json","symbol":"schemaVersion"},"surface":"release evidence"},{"boundary":"npm files allowlist ships bin, src, docs, fixtures, and packaged skills. Root AGENTS.md and test/** are excluded; src/AGENTS.md, docs/AGENTS.md, and docs/CASE_STUDIES/AGENTS.md are shipped.","path":"package.json","schemaVersion":null,"source":{"path":"package.json","symbol":"files"},"surface":"published package"}],"contractVersion":"v1","evidenceBindings":{"bindingManifestPath":"evidence/k0r/evidence-manifest.json","bindingManifestSchemaVersion":"boulder.k0r.evidence-manifest.v2","requiredBindingIds":["approved-plan","root-agents-byte-baseline","k0r-artifact-digests","independent-oracle-report","hash-bound-prior-k0-k1-inventory"],"selfHashPolicy":"This inventory contains no dynamic artifact digest. The separately generated evidence manifest binds this inventory and every other K0R artifact without self-hashing.","status":"evidence_collected_pending_review"},"exitAndStderrPolicy":{"knownErrorForms":[{"form":"ERROR <id>: <message>","source":{"path":"src/cli.ts","symbol":"main"},"stream":"stderr"},{"form":"Unknown command: <command>","source":{"path":"src/cli.ts","symbol":"runMain"},"stream":"stderr"},{"form":"boulder.error.v1","source":{"path":"src/plan-command.ts","symbol":"printError"},"stream":"stdout only when plan command receives --json"}],"source":{"path":"src/cli.ts","symbol":"main, runMain"},"unhandledPolicy":"Handled failures set process.exitCode = 1; the router does not call process.exit()."},"exitEligibility":{"rule":"Collected evidence requires independent complete-byte reproduction, Architect and Critic exact-byte reviews, exact ADR-byte maintainer approval, and a separate K0R exit receipt. This inventory grants neither exit nor K2 authority.","status":"pending_review"},"inventoryReferences":[{"fact":"Top-level documentation registry array; no schemaVersion field is claimed.","kind":"documentation registry","path":"fixtures/docs/doc-registry.v0.json"},{"kind":"package inventory","path":"fixtures/package-inventory/packaged-files.v0.json","schemaVersion":"packaged-files.v0"},{"fact":"Contains several independently versioned planner contract objects; no bundle-level schemaVersion is claimed.","kind":"planning contract fixture bundle","path":"fixtures/planning-contracts/valid.json"},{"kind":"planning packet fixture","path":"fixtures/planning-packets/valid.json","schemaVersion":"boulder.planning-packet.v1"},{"kind":"release evidence","path":"docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json","schemaVersion":1}],"outputContracts":[{"commands":["quickstart","onboard","inspect","profile-*","capability-*","handoff-*","plan-*","runs-*","release-*","evidence-*","replay-*","product-readiness","service-readiness","pipeline","scorecard","benchmark","doctor","record-field-readiness","routine-capture","retro-weekly","skill-propose"],"contract":"JSON mode uses prettyJson with two-space indentation unless the command writes JSON.stringify directly; no common payload schema is inferred for unversioned reports.","id":"json-serialization","source":{"path":"src/cli-format.ts","symbol":"prettyJson"},"transport":"stdout"},{"id":"versioned-json-schemas","schemas":[{"commands":["workflow-map"],"schemaVersion":"boulder.workflow-map.v1","source":{"path":"src/workflow-map.ts","symbol":"PRIMARY_WORKFLOW_MAP"}},{"commands":["profile-resolve","profile-show","profile-use"],"schemaVersion":"boulder.profile.resolved.v1","source":{"path":"src/workflow-profile-builtins.ts","symbol":"builtInProfile"}},{"commands":["capability-import","capability-status"],"schemaVersion":"boulder.capability.import.v1","source":{"path":"src/capability-source-schema.ts","symbol":"SCHEMA_VERSION"}},{"commands":["handoff-packet","handoff-review","handoff-send"],"schemaVersion":"boulder.handoff.v1","source":{"path":"src/handoff-packet.ts","symbol":"HandoffPacket"}},{"commands":["plan-analyze","plan-show","plan-validate"],"schemaVersion":"boulder.plan.command-result.v1","source":{"path":"src/plan-command.ts","symbol":"runAnalyze, runShow, runValidate"}},{"commands":["plan-benchmark"],"schemaVersion":"boulder.planner-benchmark-command-result.v1","source":{"path":"src/planner-benchmark-command.ts","symbol":"PlannerBenchmarkCommandResult"}},{"commands":["plan-benchmark"],"direction":"input","schemaVersion":"boulder.planner-study-root.v1","source":{"path":"src/planner-benchmark-command.ts","symbol":"envelopeProvenance"}},{"commands":["runs-show"],"schemaVersion":"boulder.run-event.v1","source":{"path":"src/run-event-shape.ts","symbol":"RunEventRecord"}},{"commands":["runs-list"],"schemaVersion":"boulder.runs.list.v1","source":{"path":"src/run-event-shape.ts","symbol":"RunEventsList"}},{"commands":["runs-prune"],"schemaVersion":"boulder.runs.prune.v1","source":{"path":"src/run-event-shape.ts","symbol":"RunEventsPruneResult"}},{"commands":["evidence-inspect"],"schemaVersion":"boulder.evidence.inspect.v1","source":{"path":"src/field-evidence.ts","symbol":"EvidenceInspectReport"}},{"commands":["evidence-diff"],"schemaVersion":"boulder.evidence.diff.v1","source":{"path":"src/field-evidence.ts","symbol":"EvidenceDiffReport"}},{"commands":["evidence-diff"],"direction":"input","schemaVersion":"packaged-files.v0","source":{"path":"src/field-evidence.ts","symbol":"isPackageInventory"}}],"transport":"stdout"},{"contract":"Human mode is command-specific Markdown or line-oriented text. workflow map and runs require --json; evidence inspect and diff always print JSON.","id":"human-success","source":{"path":"src/cli.ts","symbol":"runMain"},"transport":"stdout"},{"commands":["plan-analyze","plan-benchmark","plan-show","plan-validate"],"id":"plan-json-error-envelope","schema":{"error":{"id":"string","message":"string"},"schemaVersion":"boulder.error.v1"},"source":{"path":"src/plan-command.ts","symbol":"printError"},"transport":"stdout"},{"contracts":[{"commands":["runs-*"],"form":"ERROR runs.json_required | ERROR runs.not_found | Unknown runs command: <action>","source":{"path":"src/runs-command.ts","symbol":"runRunsCommand"}},{"commands":["evidence-*"],"form":"No command-local human error envelope; blocked evidence diff sets exit code 1 after JSON output.","source":{"path":"src/cli-ops-command.ts","symbol":"runEvidenceDiffCommand"}},{"commands":["capability-import","capability-status"],"form":"ERROR capability.<id>: <message>","source":{"path":"src/capability-command.ts","symbol":"fail"}},{"commands":["handoff-packet","handoff-review","handoff-send"],"form":"Unknown handoff command: <subcommand> or ERROR handoff.<id>: <message>","source":{"path":"src/handoff-command.ts","symbol":"runHandoffCommand, invalidPacketPath"}},{"commands":["profile-*"],"form":"ERROR profile.required | profile.invalid_name | profile.not_found | profile.path_invalid","source":{"path":"src/profile-command.ts","symbol":"reportProfileError"}},{"commands":["plan-*"],"form":"ERROR plan.<id>: <message> or boulder.error.v1 in JSON mode","source":{"path":"src/plan-command.ts","symbol":"printError"}},{"commands":["routine-capture","retro-weekly","skill-propose"],"form":"ERROR routine.* | retro.* | skill_proposal.*: <message>","source":{"path":"src/routine-command.ts","symbol":"runRoutineCapture, runWeeklyRetro, runSkillPropose"}}],"id":"command-errors","transport":"stderr"}],"ownershipAndOracle":{"contractOwnerRole":"K0R v1 public-contract inventory steward","independentOracleRole":"K0R independent clean-source reproduction oracle","oracleRequirement":"A fresh clean checkout independently executes the declared vector set and records byte comparisons and disagreements before K0R exit.","sourceOfTruth":"Current checked-in v1 source, public CLI help, package manifest, and checked-in fixtures; this inventory does not infer undocumented behavior."},"packageAndRuntime":{"binaries":{"boulder":"bin/boulder.js","boulder-oss-cli":"bin/boulder.js"},"developmentEntry":"bin/boulder.ts","moduleType":"module","package":"boulder-oss-cli","packagedEntryShim":"bin/boulder.js","runtime":"Bun >=1.3.14","source":{"path":"package.json","symbol":"name, version, type, engines, bin"},"version":"0.1.16"},"profileAndDefaultPrecedence":{"builtInProfileIds":["programming-default","boulder-native-preview","research-default","ops-default","programming-heavy","research-corpus","release-safe","issue-triage","docs-reviewer"],"builtInProfileSource":{"path":"src/workflow-profile-builtins.ts","symbol":"BUILT_IN_WORKFLOW_PROFILE_IDS"},"defaultIdentity":{"id":"programming-default","purpose":"programming","source":"built-in"},"defaultProfile":"programming-default","order":["explicit CLI --profile",".boulder/current-profile","legacy boulder.yaml.executors","built-in programming-default"],"previewIdentity":{"id":"boulder-native-preview","planMode":"local-only","selection":"explicit only","source":{"path":"src/workflow-profile-builtins.ts","symbol":"boulderNativePreview"}},"source":{"path":"src/workflow-profiles.ts","symbol":"resolveWorkflowProfile"},"v2RouteExcluded":true},"routeClassifications":{"coverageRule":"Every source-routed top-level route is exactly one public route or exactly one excluded internal route; public subcommands are catalogued in commands.","excludedInternalRoutes":[{"classification":"v2-only","reason":"Dispatched before v1 routing and excluded by this inventory's scope.","route":"v2","source":{"path":"src/cli.ts","symbol":"runMain"}}],"hiddenPublicTopLevelRoutes":[{"reason":"Routed by src/cli.ts but absent from src/cli-format.ts printHelp.","route":"runs"},{"reason":"Routed by src/cli-ops-command.ts but absent from src/cli-format.ts printHelp.","route":"evidence"}],"publicTopLevelRoutes":["benchmark","bootstrap","capability","doctor","evidence","export","handoff","help","init","inspect","onboard","pipeline","plan","product-readiness","profile","quickstart","record","release","release-check","release-plan","replay-check","replay-run","retro","routine","runs","scorecard","service-readiness","skill","validate","verify","version","workflow"]},"schemaVersion":"k0r.v1-public-contract-inventory.v1","schemaVersionDiscovery":{"classifications":["public","persisted/internal","fixture-only","v2-excluded","unapproved-dirty-excluded"],"contracts":[{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/package-inventory/packaged-files.v0.json","schemaVersions":["packaged-files.v0"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/plan-analysis/invalid.json","schemaVersions":["boulder.plan-analysis.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/plan-analysis/valid.json","schemaVersions":["boulder.plan-analysis.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planner-benchmarks/invalid-bundle.json","schemaVersions":["boulder.planner-evidence-bundle.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planner-benchmarks/invalid-study-root.json","schemaVersions":["boulder.planner-study-root.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planner-benchmarks/study-root.json","schemaVersions":["boulder.planner-evidence-bundle.v1","boulder.planner-study-manifest.v1","boulder.planner-study-protocol.v1","boulder.planner-study-root.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planner-benchmarks/trust-root.json","schemaVersions":["boulder.planner-benchmark.trust-root.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planner-benchmarks/valid-bundle.json","schemaVersions":["boulder.planner-evidence-bundle.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planning-contracts/invalid.json","schemaVersions":["other","v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planning-contracts/valid.json","schemaVersions":["boulder.approval-challenge-history.v1","boulder.blinded-score-sheet.v1","boulder.critic-review.v1","boulder.execution-approval.v1","boulder.execution-packet.v1","boulder.plan-approval-challenge.v1","boulder.planner-benchmark-report.v1","boulder.planner-benchmark-run.v1","boulder.planner-benchmark.trust-root.v1","boulder.planner-evidence-bundle.v1","boulder.planner-execution-receipt.v1","boulder.planner-score-lock-receipt.v1","boulder.planner-score-reveal-receipt.v1","boulder.planner-study-manifest.v1","boulder.planner-study-protocol.v1","boulder.planner-study-raw-run.v1","fixture.v1","v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/planning-packets/invalid.json","schemaVersions":["boulder.planning-packet.v2"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/planning-packets/valid.json","schemaVersions":["boulder.planning-packet.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/profiles/resolved/boulder-native-preview.json","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/profiles/resolved/ops-default.json","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/profiles/resolved/programming-default.json","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/profiles/resolved/research-default.json","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/v2-kernel/invalid-authority-vectors.json","schemaVersions":["boulder.v2.authority-event.v1","boulder.v2.authority-mutation-wrapper.v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/v2-kernel/invalid-multi-error.json","schemaVersions":["boulder.v2.effect.v1","boulder.v2.execution-envelope.v1","boulder.v2.plan.v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/v2-kernel/invalid-schema-version.json","schemaVersions":["boulder.v2.effect.v1","boulder.v2.execution-envelope.v999","boulder.v2.plan.v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/v2-kernel/valid-ed25519-authority-unsupported-effect.json","schemaVersions":["boulder.v2.authority-baseline-wrapper.v1","boulder.v2.authority-event.v1","boulder.v2.effect.v1","boulder.v2.execution-envelope.v1","boulder.v2.plan.v1"]},{"classification":"v2-excluded","ownership":"v2 fixture contract owner (excluded from K0R v1 baseline)","path":"fixtures/v2-kernel/valid-none-effect-execution.json","schemaVersions":["boulder.v2.effect.v1","boulder.v2.execution-envelope.v1","boulder.v2.plan.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/workflow-map/primary-workflow.v0.json","schemaVersions":["boulder.workflow-map.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/capability-source-schema.ts","schemaVersions":["boulder.capability.import.v1"]},{"classification":"unapproved-dirty-excluded","ownership":"Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness","path":"src/common-executor-evidence.ts","schemaVersions":["boulder.common-executor-event.v1","boulder.common-executor-final-receipt.v2","boulder.common-executor-lifecycle.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/critic-review.ts","schemaVersions":["boulder.critic-attestation.v1","boulder.critic-review.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/execution-approval.ts","schemaVersions":["boulder.execution-approval-challenge.v1","boulder.execution-approval.v1","boulder.execution.approval-code-hmac.v1","boulder.execution.approval.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/execution-conversion.ts","schemaVersions":["boulder.execution-approval.v1","boulder.execution-packet.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/execution-packet.ts","schemaVersions":["boulder.execution-approval.v1","boulder.execution-packet.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/field-evidence.ts","schemaVersions":["boulder.evidence.diff.v1","boulder.evidence.inspect.v1","packaged-files.v0"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/handoff-packet-shape.ts","schemaVersions":["boulder.handoff.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/handoff-packet.ts","schemaVersions":["boulder.handoff.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/handoff-paths.ts","schemaVersions":["boulder.handoff.review.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-analysis-shape.ts","schemaVersions":["boulder.plan-analysis.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-analysis.ts","schemaVersions":["boulder.plan-analysis.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-approval.ts","schemaVersions":["boulder.plan-approval-challenge.v1","boulder.plan-approval.v1","boulder.plan.approval-code-hmac.v1","boulder.plan.approval.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/plan-command.ts","schemaVersions":["boulder.error.v1","boulder.plan.command-result.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-receipts.ts","schemaVersions":["boulder.approval-challenge-history.v1","boulder.execution-approval-challenge.v1","boulder.execution-approval.v1","boulder.execution.approval-code.v1","boulder.execution.approval.v1","boulder.execution.challenge.v1","boulder.plan-approval-challenge.v1","boulder.plan-approval.v1","boulder.plan.approval-code.v1","boulder.plan.approval.v1","boulder.plan.challenge.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-state.ts","schemaVersions":["boulder.approval-challenge-history.v1","boulder.plan-run-state.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/plan-store.ts","schemaVersions":["boulder.planner-local-event.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/planner-benchmark-command.ts","schemaVersions":["boulder.planner-benchmark-command-result.v1","boulder.planner-study-root.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/planner-benchmark.ts","schemaVersions":["boulder.blinded-score-sheet.v1","boulder.common-executor-receipt.v1","boulder.planner-benchmark-report.v1","boulder.planner-benchmark-run.v1","boulder.planner-benchmark.trust-root.v1","boulder.planner-evidence-bundle.v1","boulder.planner-execution-patch.v1","boulder.planner-execution-receipt.v1","boulder.planner-executor-stderr.v1","boulder.planner-executor-stdout.v1","boulder.planner-normalization-artifact.v1","boulder.planner-normalization-result.v1","boulder.planner-normalizer-source.v1","boulder.planner-output.v1","boulder.planner-redaction-policy.v1","boulder.planner-rubric.v1","boulder.planner-runner-contract.v1","boulder.planner-score-lock-receipt.v1","boulder.planner-score-reveal-receipt.v1","boulder.planner-study-approval.v1","boulder.planner-study-manifest.v1","boulder.planner-study-protocol.v1","boulder.planner-study-raw-run.v1","boulder.planner-study-remediation-evidence.v1","boulder.planner-task-card.v1","boulder.planner-test-output.v1","boulder.planner-trusted-source-catalog.v1","boulder.planner-typecheck-output.v1","boulder.planning-packet.v1","boulder.revealed-scores.v1","boulder.review-private-map.v1"]},{"classification":"v2-excluded","ownership":"v2 contract owner (excluded from K0R v1 baseline)","path":"src/planner-benchmark.ts","schemaVersions":["boulder.planner-normalizer-contract.v2"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/planner-output-normalizer.ts","schemaVersions":["boulder.planner-normalization-artifact.v1","boulder.planner-output.v1","boulder.planning-packet.v1"]},{"classification":"unapproved-dirty-excluded","ownership":"Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness","path":"src/planner-pre-execution-safety.ts","schemaVersions":["boulder.planner-pre-execution-safety-receipt-signature.v1","boulder.planner-pre-execution-safety-receipt.v1"]},{"classification":"unapproved-dirty-excluded","ownership":"Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness","path":"src/planner-scope-attribution.ts","schemaVersions":["boulder.planner-scope-attribution-receipt.v1"]},{"classification":"unapproved-dirty-excluded","ownership":"Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness","path":"src/planner-score-workflow.ts","schemaVersions":["boulder.planner-score-lock-receipt.v1","boulder.planner-score-workflow.v1"]},{"classification":"unapproved-dirty-excluded","ownership":"Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness","path":"src/planner-study-remediation.ts","schemaVersions":["boulder.common-executor-final-receipt.v2","boulder.common-executor-lifecycle.v1","boulder.execution-approval.v1","boulder.execution-packet.v1","boulder.plan-approval.v1","boulder.planner-pre-execution-safety-receipt.v1","boulder.planner-scope-attribution-receipt.v1","boulder.planner-score-workflow.v1","boulder.planner-study-remediation-evidence.v1","boulder.planning-packet.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/planning-packet.ts","schemaVersions":["boulder.planning-packet.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/profile-store.ts","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/run-event-shape.ts","schemaVersions":["boulder.run-event.v1","boulder.runs.list.v1","boulder.runs.prune.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/run-events.ts","schemaVersions":["boulder.run-event.v1","boulder.runs.list.v1","boulder.runs.prune.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/types.ts","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"v2-excluded","ownership":"v2 contract owner (excluded from K0R v1 baseline)","path":"src/v2-command.ts","schemaVersions":["boulder.error.v1","boulder.v2.command-result.v1"]},{"classification":"v2-excluded","ownership":"v2 contract owner (excluded from K0R v1 baseline)","path":"src/v2/canonical.ts","schemaVersions":["boulder.v2.artifact.v1","boulder.v2.authority-event.v1","boulder.v2.content.v1","boulder.v2.critique.v1","boulder.v2.evaluator-policy.v1","boulder.v2.evidence.v1","boulder.v2.execution-result.v1","boulder.v2.input.v1","boulder.v2.plan.v1","boulder.v2.policy.v1","boulder.v2.scope.v1"]},{"classification":"v2-excluded","ownership":"v2 contract owner (excluded from K0R v1 baseline)","path":"src/v2/contracts.ts","schemaVersions":["boulder.v2.artifact.v1","boulder.v2.authority-event.v1","boulder.v2.critique.v1","boulder.v2.effect.v1","boulder.v2.evidence.v1","boulder.v2.execution-envelope.v1","boulder.v2.execution-result.v1","boulder.v2.plan.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/workflow-map.ts","schemaVersions":["boulder.workflow-map.v1"]},{"classification":"public","ownership":"Boulder CLI public-contract owner","path":"src/workflow-profile-builtins.ts","schemaVersions":["boulder.profile.resolved.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/k2a-f/contract-foundation.v1.json","schemaVersions":["boulder.k2a-f.contract-foundation.fixture.v1","boulder.k2a-f.contract-foundation.v0","boulder.k2a-f.contract-foundation.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-procedure/invalid-ref-e-sop-01.json","schemaVersions":["boulder.v2.procedure.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json","schemaVersions":["boulder.v2.procedure.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-procedure/valid-ref-e-sop-01.json","schemaVersions":["boulder.v2.procedure.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-work/adversarial-evidence-ref-e-work-01.json","schemaVersions":["boulder.v2.work-adversarial-vectors.v1","boulder.v2.work-event.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-work/invalid-ref-e-work-01.json","schemaVersions":["boulder.v2.work-vectors.v1"]},{"classification":"v2-excluded","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-work/valid-ref-e-work-01.json","schemaVersions":["boulder.v2.work-vectors.v1"]},{"classification":"persisted/internal","ownership":"Boulder persisted/internal contract owner","path":"src/k2a-f/contracts.ts","schemaVersions":["boulder.k2a-f.contract-foundation.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/procedure.ts","schemaVersions":["boulder.v2.procedure.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work-durable-contracts.ts","schemaVersions":["boulder.v2.work-attempt.v2","boulder.v2.work-completion.v1","boulder.v2.work-revision.v2","boulder.v2.work-terminal.v2"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work-durable-validation.ts","schemaVersions":["boulder.v2.work-semantic.v1","boulder.v2.work-submission.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work-durable.ts","schemaVersions":["boulder.v2.work-semantic.v1","boulder.v2.work-submission.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work-event-contracts.ts","schemaVersions":["boulder.v2.work-event.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work-event-validation.ts","schemaVersions":["boulder.v2.work-approval.v1","boulder.v2.work-semantic.v1"]},{"classification":"v2-excluded","ownership":"Boulder persisted/internal contract owner","path":"src/v2/work.ts","schemaVersions":["boulder.v2.human-answer.v1","boulder.v2.procedure-authority-receipt.v1","boulder.v2.work-accepted.v1","boulder.v2.work-attempt.v1","boulder.v2.work-revision.v1","boulder.v2.work-terminal.v1"]},{"classification":"fixture-only","ownership":"shipped deterministic fixture contract","path":"fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json","schemaVersions":["boulder.ref-e-sop-02.static.v1"]}],"exclusions":{"reason":"K0R inventories the v1 baseline. V2 paths and values remain shipped but are explicitly excluded from that baseline.","unapprovedDirtyOwnerPaths":["src/common-executor-evidence.ts","src/planner-pre-execution-safety.ts","src/planner-scope-attribution.ts","src/planner-score-workflow.ts","src/planner-study-remediation.ts"],"unapprovedDirtyOwnerReason":"These exact unapproved dirty source owners are absent from the immutable HEAD archive and are explicitly recorded, rather than silently filtered, outside K0R repository-wide schema completeness.","v2PathPrefixes":["src/v2/"],"v2Paths":["src/v2-command.ts"],"v2SchemaPrefixes":["boulder.v2."],"v2SchemaSuffixes":[".v2"]},"scope":{"discoveryRule":"Discover every shipped TypeScript string literal matching a Boulder or package schema-version identifier and every string JSON value whose key is schemaVersion; compare path-and-value pairs exactly.","fixturePathPattern":"fixtures/**/*.json","packageInventoryPath":"fixtures/package-inventory/packaged-files.v0.json","sourcePathPattern":"src/**/*.ts"}},"scope":{"excluded":["v2","v2 execute","src/v2/**","v2-only fixtures and tests"],"exclusionSource":{"fact":"The v2 route is dispatched separately before v1 command routing.","path":"src/cli.ts","symbol":"runMain"},"included":"Documented Boulder v1 public CLI and supporting observable contracts."},"sourceRefs":[{"binding":"current","path":"src/cli.ts","sha256":"sha256:907ff337e72f020948d7b92d6cec3001974e6ef5deb6f6a548b79f0f18f36113","symbol":"main, runMain, parseArgv"},{"binding":"current","path":"src/cli-format.ts","sha256":"sha256:fb21b5a8f77f81e1ce0376180602839049923a848b50bce6c4a4d98a61ce57e6","symbol":"printHelp, prettyJson"},{"binding":"current","path":"src/cli-options.ts","sha256":"sha256:6b580706afa15677a5d90aa5270fad325a8cf9dd3e5c87e66525fbc792a94646","symbol":"parseOptions"},{"binding":"current","path":"src/cli-ops-command.ts","sha256":"sha256:8c0245fde83a70533d05d773c72f3f60f99102ef5973cbb65e93e65ff49e5f96","symbol":"runOperationalCommand"},{"binding":"current","path":"src/runs-command.ts","sha256":"sha256:13f82c19ae0d0840620d702268b57e724e0e7a12f36155e5a5348571df5e0aa1","symbol":"runRunsCommand"},{"binding":"current","path":"src/run-events.ts","sha256":"sha256:7e60252ab9f809f7234b6fcb17f99bf1b5fad12e28e23aeb8ab99d4fb9fca78c","symbol":"runEventsList, pruneRunEvents"},{"binding":"current","path":"src/run-event-shape.ts","sha256":"sha256:0c3f471046a653b5b859ea7d5dfd1dc87910a0c48a968ca42055dec7726763cd","symbol":"RunEventRecord, RunEventsList, RunEventsPruneResult"},{"binding":"current","path":"src/plan-command.ts","sha256":"sha256:4af99c758902991cb68cc408bbe2be422c5af0a485f3fc6e3728bfa3371980e5","symbol":"runPlanCommand, printError"},{"binding":"current","path":"src/planner-benchmark-command.ts","sha256":"sha256:bb40a2be9e90b647f2166cbf7d3682578c7f3b6cda4e0f33cb92ff49d231c94b","symbol":"runPlannerBenchmarkCommand"},{"binding":"current","path":"src/profile-command.ts","sha256":"sha256:357ad546977de871a38dd4051cf0e099f7dbf0f73da1b0e3f96764b49480e3aa","symbol":"runProfileCommand"},{"binding":"current","path":"src/workflow-profiles.ts","sha256":"sha256:22ee0477b5ee183389a2966137d96fa40b4fb59902f1d5f1c00ef163484cb91c","symbol":"resolveWorkflowProfile"},{"binding":"current","path":"src/workflow-profile-builtins.ts","sha256":"sha256:a082d88a35b53b01ddc90f404f3c32097a404ddfa710c86f719df8fdf16cdcbb","symbol":"BUILT_IN_WORKFLOW_PROFILE_IDS, builtInProfile"},{"binding":"current","path":"src/profile-store.ts","sha256":"sha256:a05f2b4c595464e6cf8e4aa9a515cd40e48d584003fb4fd2c5801fbb6d0b25d5","symbol":"profile state storage"},{"binding":"current","path":"src/capability-command.ts","sha256":"sha256:6d37ebd44bf1c9348f7c1d3c4cb1a29181fb9c64c1009d17bae484a6a6674753","symbol":"runCapabilityCommand"},{"binding":"current","path":"src/capability-source-schema.ts","sha256":"sha256:54ab6cafa1dba86eedf00549f838d4ee6e538d17385df50e25ee242a3d78f533","symbol":"SCHEMA_VERSION"},{"binding":"current","path":"src/handoff-command.ts","sha256":"sha256:044574cca72cc37cfe112b38747b6b7856ae5333b6ea0f338373eb495e7ebe2d","symbol":"runHandoffCommand"},{"binding":"current","path":"src/handoff-packet.ts","sha256":"sha256:3543b50fd4a08dac6cdd662640088cd2df8c796ef8f7127cc2f1f7e0ed6cdd5c","symbol":"HandoffPacket"},{"binding":"current","path":"src/routine-command.ts","sha256":"sha256:8e10f21f67d596d4df125211e553f1412b30fe82a67a84d778da8084f44e8d23","symbol":"runRoutineCommand"},{"binding":"current","path":"src/routine.ts","sha256":"sha256:4036337073f32ddac464cc3dfddbca173df40751ca97eb49452b81e44c050261","symbol":"RoutineArtifact, captureRoutine"},{"binding":"current","path":"src/skill-proposal.ts","sha256":"sha256:45fb0de8ed394f55c5ad5f30daf30647daf38df6b3c2f8914f5d00b918d5dbf3","symbol":"proposeSkillFromRoutine"},{"binding":"current","path":"src/plan-store.ts","sha256":"sha256:4b3f000a690bbcc0664f502554928cdda92f89747d33be4db42cc3fa3d82e178","symbol":"PlanStorePathError"},{"binding":"current","path":"src/field-evidence.ts","sha256":"sha256:9f6a679a3d7683817ec3cd7024d3fa0a81f8db1d9d6e2790308dffd4d46eefae","symbol":"inspectEvidence, diffEvidence, recordFieldEvidence"},{"binding":"current","path":"src/workflow-map.ts","sha256":"sha256:ce8cb84332bc439a16e5f5ed90fb7a260f8b28badf9630a4ff6828c721387b34","symbol":"PRIMARY_WORKFLOW_MAP"},{"binding":"current","path":"package.json","sha256":"sha256:9d6f5ffc6a00f1626bd2ab9f3dbd731974753b71e2354d17ae5d16c027a900c0","symbol":"name, version, bin, engines, files"},{"binding":"current","path":"README.md","sha256":"sha256:f444f74016cce898e24f30bfd5f21352c634d3dacad71451998d29786ee9df3b","symbol":"Install, Core Commands, Explicit boulder-native Preview"},{"binding":"current","path":"AGENTS.md","sha256":"sha256:484fcd435c9d05fa7ee1ca26269bcbfef1cf0c28b3924524d01a502ae1c35656","symbol":"Architecture & Data Flow, Important Files"},{"binding":"current","path":"fixtures/docs/doc-registry.v0.json","sha256":"sha256:7b28a8f0f9f6b5e20f85194a7a732a1f373351f7ceee4a07ed6eeb5d03e99e55","symbol":"top-level documentation registry array"},{"binding":"current","path":"fixtures/package-inventory/packaged-files.v0.json","sha256":"sha256:4d0a444e7a117cefbd7baa756f4ebbd96796fc23914e278b6776c6164cd621b7","symbol":"schemaVersion, classes"},{"binding":"current","path":"fixtures/planning-contracts/valid.json","sha256":"sha256:26e0a01e5c2d05de4ae46ccc8df37a67c2b943653dd6ff22b3f37faabcd0b7a0","symbol":"planner fixture contracts"},{"binding":"current","path":"fixtures/planning-packets/valid.json","sha256":"sha256:688369d8b9cca9d839ceafcbd5f6b3f28170eebb263c557ebf0e553ccda59af2","symbol":"planning packet fixture"},{"binding":"current","path":"docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json","sha256":"sha256:66afc3e6d6146d623f1be56b9aa67a6bc9c876fd8411b11bfec2d2e3df8fda4f","symbol":"release evidence manifest"}],"statePaths":[{"path":".boulder/plans/<runId>/{analysis,state,packet}.json","purpose":"Plan artifacts with atomic writes and cooperative locks.","source":{"path":"AGENTS.md","symbol":"Architecture & Data Flow"}},{"path":".boulder/profiles/*.json","purpose":"Saved workflow profiles.","source":{"path":"src/profile-command.ts","symbol":"saveCommand"}},{"path":".boulder/current-profile","purpose":"Selected workflow profile.","source":{"path":"src/workflow-profiles.ts","symbol":"resolveWorkflowProfile"}},{"path":".boulder/capabilities/imports/*.json","purpose":"Capability source candidate manifests.","source":{"path":"src/capability-command.ts","symbol":"importCapabilitySource"}},{"path":".boulder/handoffs","purpose":"Handoff packet storage boundary.","source":{"path":"src/handoff-command.ts","symbol":"invalidPacketPath"}},{"path":".boulder/routines/*.json","purpose":"Routine evidence artifacts.","source":{"path":"src/routine.ts","symbol":"captureRoutine"}},{"path":".boulder/skill-proposals/*.md","purpose":"Reviewable skill proposals.","source":{"path":"src/skill-proposal.ts","symbol":"proposeSkillFromRoutine"}},{"path":".boulder/runs/*.json","purpose":"Sanitized run-event records listed, shown, and pruned by runs commands.","source":{"path":"src/run-events.ts","symbol":"recordRunEvent, runsDir"}},{"path":"evidence/field-readiness/<runId>/manifest.json","purpose":"Generated field-readiness evidence result; its input directory is constrained to the same run-id path.","source":{"path":"src/field-evidence.ts","symbol":"recordFieldEvidence, normalizeEvidencePath"}}]}
+{
+  "categories": [
+    "commands",
+    "outputContracts",
+    "exitAndStderrPolicy",
+    "statePaths",
+    "profileAndDefaultPrecedence",
+    "packageAndRuntime",
+    "inventoryReferences",
+    "ownershipAndOracle",
+    "evidenceBindings"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "help"
+      ],
+      "flags": [
+        "--help",
+        "-h"
+      ],
+      "id": "help",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "version"
+      ],
+      "flags": [
+        "--version"
+      ],
+      "id": "version",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "VERSION, runMain"
+      }
+    },
+    {
+      "argv": [
+        "init"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--force"
+      ],
+      "id": "init",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "workflow",
+        "map"
+      ],
+      "flags": [
+        "--json"
+      ],
+      "id": "workflow-map",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "quickstart"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "quickstart",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "onboard"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "onboard",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "bootstrap",
+        "interview"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--task <text>",
+        "--json"
+      ],
+      "id": "bootstrap-interview",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "inspect"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "inspect",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "profile",
+        "list"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "profile-list",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "runProfileCommand"
+      }
+    },
+    {
+      "argv": [
+        "profile",
+        "resolve"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--profile <name>",
+        "--task <kind>",
+        "--json"
+      ],
+      "id": "profile-resolve",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "resolveCommand"
+      }
+    },
+    {
+      "argv": [
+        "profile",
+        "show",
+        "[name]"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "profile-show",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "resolveCommand"
+      }
+    },
+    {
+      "argv": [
+        "profile",
+        "save",
+        "<name>"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--profile <source>",
+        "--json"
+      ],
+      "id": "profile-save",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "saveCommand"
+      }
+    },
+    {
+      "argv": [
+        "profile",
+        "use",
+        "<name>"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "profile-use",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "useCommand"
+      }
+    },
+    {
+      "argv": [
+        "capability",
+        "import"
+      ],
+      "flags": [
+        "--from <source>",
+        "--dry-run|--write",
+        "--kind <skill|adapter|agent-catalog>",
+        "--id <id>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "capability-import",
+      "source": {
+        "path": "src/capability-command.ts",
+        "symbol": "importCapabilitySource"
+      }
+    },
+    {
+      "argv": [
+        "capability",
+        "status"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "capability-status",
+      "source": {
+        "path": "src/capability-command.ts",
+        "symbol": "capabilityStatus"
+      }
+    },
+    {
+      "argv": [
+        "handoff",
+        "packet"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--adapter <name>",
+        "--include <path>",
+        "--json"
+      ],
+      "id": "handoff-packet",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "handoff",
+        "review"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--packet <path>",
+        "--json"
+      ],
+      "id": "handoff-review",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "handoff",
+        "send"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--packet <path>",
+        "--approve-external",
+        "--approval-code <code>",
+        "--dry-run"
+      ],
+      "id": "handoff-send",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "plan",
+        "analyze"
+      ],
+      "flags": [
+        "--task <text>",
+        "--run-id <id>",
+        "--friction <direct|focused|deep>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "plan-analyze",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "plan",
+        "benchmark"
+      ],
+      "flags": [
+        "--trust-root <path>",
+        "--study-root <path>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "plan-benchmark",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "plan",
+        "show"
+      ],
+      "flags": [
+        "--run-id <id>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "plan-show",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "plan",
+        "validate"
+      ],
+      "flags": [
+        "--run-id <id>|--input <path>",
+        "--artifact <analysis|state|packet>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "plan-validate",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "aliases": [
+        [
+          "runs"
+        ]
+      ],
+      "argv": [
+        "runs",
+        "list"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "runs-list",
+      "source": {
+        "path": "src/runs-command.ts",
+        "symbol": "runRunsCommand"
+      }
+    },
+    {
+      "argv": [
+        "runs",
+        "show",
+        "<run-id>"
+      ],
+      "flags": [
+        "--latest",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "runs-show",
+      "source": {
+        "path": "src/runs-command.ts",
+        "symbol": "runRunsCommand"
+      }
+    },
+    {
+      "argv": [
+        "runs",
+        "prune"
+      ],
+      "flags": [
+        "--older-than <days>d",
+        "--keep <count>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "runs-prune",
+      "source": {
+        "path": "src/runs-command.ts",
+        "symbol": "runRunsCommand"
+      }
+    },
+    {
+      "argv": [
+        "release-check"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "release-check",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runReleaseCheckCommand"
+      }
+    },
+    {
+      "argv": [
+        "evidence",
+        "inspect"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "evidence-inspect",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runEvidenceInspectCommand"
+      }
+    },
+    {
+      "argv": [
+        "evidence",
+        "diff"
+      ],
+      "flags": [
+        "--from <path>",
+        "--to <path>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "evidence-diff",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runEvidenceDiffCommand"
+      }
+    },
+    {
+      "argv": [
+        "product-readiness"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "product-readiness",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runProductReadinessCommand"
+      }
+    },
+    {
+      "argv": [
+        "service-readiness"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "service-readiness",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runServiceReadinessCommand"
+      }
+    },
+    {
+      "argv": [
+        "routine",
+        "capture"
+      ],
+      "flags": [
+        "--task <text>",
+        "--dry-run|--write",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "routine-capture",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "retro",
+        "weekly"
+      ],
+      "flags": [
+        "--dry-run",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "retro-weekly",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "skill",
+        "propose"
+      ],
+      "flags": [
+        "--from-routine <id>",
+        "--dry-run|--write",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "skill-propose",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "printHelp"
+      }
+    },
+    {
+      "argv": [
+        "validate"
+      ],
+      "flags": [
+        "--cwd <path>"
+      ],
+      "id": "validate",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "verify"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--dry-run"
+      ],
+      "id": "verify",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "pipeline"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--friction <low|medium|high>",
+        "--json"
+      ],
+      "id": "pipeline",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "scorecard"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "scorecard",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "benchmark"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "benchmark",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    },
+    {
+      "argv": [
+        "release-plan"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "release-plan",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runReleasePlanCommand"
+      }
+    },
+    {
+      "argv": [
+        "release",
+        "evidence",
+        "refresh"
+      ],
+      "flags": [
+        "--dry-run|--write",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "release-evidence-refresh",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runReleaseEvidenceRefreshCommand"
+      }
+    },
+    {
+      "argv": [
+        "replay-check"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "replay-check",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runReplayCheckCommand"
+      }
+    },
+    {
+      "argv": [
+        "replay-run"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--dry-run",
+        "--json"
+      ],
+      "id": "replay-run",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runReplayRunCommand"
+      }
+    },
+    {
+      "argv": [
+        "doctor"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "doctor",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runDoctorCommand"
+      }
+    },
+    {
+      "argv": [
+        "record",
+        "field-readiness"
+      ],
+      "flags": [
+        "--run-id <id>",
+        "--evidence <path>",
+        "--cwd <path>",
+        "--json"
+      ],
+      "id": "record-field-readiness",
+      "source": {
+        "path": "src/cli-ops-command.ts",
+        "symbol": "runFieldReadinessCommand"
+      }
+    },
+    {
+      "argv": [
+        "export"
+      ],
+      "flags": [
+        "--cwd <path>",
+        "--force"
+      ],
+      "id": "export",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      }
+    }
+  ],
+  "compatibilityBoundaries": [
+    {
+      "boundary": "A top-level array is intentional; consumers must not infer a missing bundle schemaVersion.",
+      "path": "fixtures/docs/doc-registry.v0.json",
+      "schemaVersion": null,
+      "source": {
+        "path": "fixtures/docs/doc-registry.v0.json",
+        "symbol": "root array"
+      },
+      "surface": "documentation registry"
+    },
+    {
+      "boundary": "Package inventory remains a checked-in fixture contract.",
+      "path": "fixtures/package-inventory/packaged-files.v0.json",
+      "schemaVersion": "packaged-files.v0",
+      "source": {
+        "path": "fixtures/package-inventory/packaged-files.v0.json",
+        "symbol": "schemaVersion, classes"
+      },
+      "surface": "package inventory"
+    },
+    {
+      "boundary": "The bundle contains independently versioned planner objects and has no bundle-level schemaVersion.",
+      "path": "fixtures/planning-contracts/valid.json",
+      "schemaVersion": null,
+      "source": {
+        "path": "fixtures/planning-contracts/valid.json",
+        "symbol": "root object"
+      },
+      "surface": "planning fixtures"
+    },
+    {
+      "boundary": "The packet schema is a v1 compatibility boundary.",
+      "path": "fixtures/planning-packets/valid.json",
+      "schemaVersion": "boulder.planning-packet.v1",
+      "source": {
+        "path": "fixtures/planning-packets/valid.json",
+        "symbol": "schemaVersion"
+      },
+      "surface": "planning packet fixture"
+    },
+    {
+      "boundary": "Checked-in release evidence is a documentation compatibility fixture.",
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
+      "schemaVersion": 1,
+      "source": {
+        "path": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
+        "symbol": "schemaVersion"
+      },
+      "surface": "release evidence"
+    },
+    {
+      "boundary": "npm files allowlist ships bin, src, docs, fixtures, and packaged skills. Root AGENTS.md and test/** are excluded; src/AGENTS.md, docs/AGENTS.md, and docs/CASE_STUDIES/AGENTS.md are shipped.",
+      "path": "package.json",
+      "schemaVersion": null,
+      "source": {
+        "path": "package.json",
+        "symbol": "files"
+      },
+      "surface": "published package"
+    }
+  ],
+  "contractVersion": "v1",
+  "evidenceBindings": {
+    "bindingManifestPath": "evidence/k0r/evidence-manifest.json",
+    "bindingManifestSchemaVersion": "boulder.k0r.evidence-manifest.v2",
+    "requiredBindingIds": [
+      "approved-plan",
+      "root-agents-byte-baseline",
+      "k0r-artifact-digests",
+      "independent-oracle-report",
+      "hash-bound-prior-k0-k1-inventory"
+    ],
+    "selfHashPolicy": "This inventory contains no dynamic artifact digest. The separately generated evidence manifest binds this inventory and every other K0R artifact without self-hashing.",
+    "status": "evidence_collected_pending_review"
+  },
+  "exitAndStderrPolicy": {
+    "knownErrorForms": [
+      {
+        "form": "ERROR <id>: <message>",
+        "source": {
+          "path": "src/cli.ts",
+          "symbol": "main"
+        },
+        "stream": "stderr"
+      },
+      {
+        "form": "Unknown command: <command>",
+        "source": {
+          "path": "src/cli.ts",
+          "symbol": "runMain"
+        },
+        "stream": "stderr"
+      },
+      {
+        "form": "boulder.error.v1",
+        "source": {
+          "path": "src/plan-command.ts",
+          "symbol": "printError"
+        },
+        "stream": "stdout only when plan command receives --json"
+      }
+    ],
+    "source": {
+      "path": "src/cli.ts",
+      "symbol": "main, runMain"
+    },
+    "unhandledPolicy": "Handled failures set process.exitCode = 1; the router does not call process.exit()."
+  },
+  "exitEligibility": {
+    "rule": "Collected evidence requires independent complete-byte reproduction, Architect and Critic exact-byte reviews, exact ADR-byte maintainer approval, and a separate K0R exit receipt. This inventory grants neither exit nor K2 authority.",
+    "status": "pending_review"
+  },
+  "inventoryReferences": [
+    {
+      "fact": "Top-level documentation registry array; no schemaVersion field is claimed.",
+      "kind": "documentation registry",
+      "path": "fixtures/docs/doc-registry.v0.json"
+    },
+    {
+      "kind": "package inventory",
+      "path": "fixtures/package-inventory/packaged-files.v0.json",
+      "schemaVersion": "packaged-files.v0"
+    },
+    {
+      "fact": "Contains several independently versioned planner contract objects; no bundle-level schemaVersion is claimed.",
+      "kind": "planning contract fixture bundle",
+      "path": "fixtures/planning-contracts/valid.json"
+    },
+    {
+      "kind": "planning packet fixture",
+      "path": "fixtures/planning-packets/valid.json",
+      "schemaVersion": "boulder.planning-packet.v1"
+    },
+    {
+      "kind": "release evidence",
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
+      "schemaVersion": 1
+    }
+  ],
+  "outputContracts": [
+    {
+      "commands": [
+        "quickstart",
+        "onboard",
+        "inspect",
+        "profile-*",
+        "capability-*",
+        "handoff-*",
+        "plan-*",
+        "runs-*",
+        "release-*",
+        "evidence-*",
+        "replay-*",
+        "product-readiness",
+        "service-readiness",
+        "pipeline",
+        "scorecard",
+        "benchmark",
+        "doctor",
+        "record-field-readiness",
+        "routine-capture",
+        "retro-weekly",
+        "skill-propose"
+      ],
+      "contract": "JSON mode uses prettyJson with two-space indentation unless the command writes JSON.stringify directly; no common payload schema is inferred for unversioned reports.",
+      "id": "json-serialization",
+      "source": {
+        "path": "src/cli-format.ts",
+        "symbol": "prettyJson"
+      },
+      "transport": "stdout"
+    },
+    {
+      "id": "versioned-json-schemas",
+      "schemas": [
+        {
+          "commands": [
+            "workflow-map"
+          ],
+          "schemaVersion": "boulder.workflow-map.v1",
+          "source": {
+            "path": "src/workflow-map.ts",
+            "symbol": "PRIMARY_WORKFLOW_MAP"
+          }
+        },
+        {
+          "commands": [
+            "profile-resolve",
+            "profile-show",
+            "profile-use"
+          ],
+          "schemaVersion": "boulder.profile.resolved.v1",
+          "source": {
+            "path": "src/workflow-profile-builtins.ts",
+            "symbol": "builtInProfile"
+          }
+        },
+        {
+          "commands": [
+            "capability-import",
+            "capability-status"
+          ],
+          "schemaVersion": "boulder.capability.import.v1",
+          "source": {
+            "path": "src/capability-source-schema.ts",
+            "symbol": "SCHEMA_VERSION"
+          }
+        },
+        {
+          "commands": [
+            "handoff-packet",
+            "handoff-review",
+            "handoff-send"
+          ],
+          "schemaVersion": "boulder.handoff.v1",
+          "source": {
+            "path": "src/handoff-packet.ts",
+            "symbol": "HandoffPacket"
+          }
+        },
+        {
+          "commands": [
+            "plan-analyze",
+            "plan-show",
+            "plan-validate"
+          ],
+          "schemaVersion": "boulder.plan.command-result.v1",
+          "source": {
+            "path": "src/plan-command.ts",
+            "symbol": "runAnalyze, runShow, runValidate"
+          }
+        },
+        {
+          "commands": [
+            "plan-benchmark"
+          ],
+          "schemaVersion": "boulder.planner-benchmark-command-result.v1",
+          "source": {
+            "path": "src/planner-benchmark-command.ts",
+            "symbol": "PlannerBenchmarkCommandResult"
+          }
+        },
+        {
+          "commands": [
+            "plan-benchmark"
+          ],
+          "direction": "input",
+          "schemaVersion": "boulder.planner-study-root.v1",
+          "source": {
+            "path": "src/planner-benchmark-command.ts",
+            "symbol": "envelopeProvenance"
+          }
+        },
+        {
+          "commands": [
+            "runs-show"
+          ],
+          "schemaVersion": "boulder.run-event.v1",
+          "source": {
+            "path": "src/run-event-shape.ts",
+            "symbol": "RunEventRecord"
+          }
+        },
+        {
+          "commands": [
+            "runs-list"
+          ],
+          "schemaVersion": "boulder.runs.list.v1",
+          "source": {
+            "path": "src/run-event-shape.ts",
+            "symbol": "RunEventsList"
+          }
+        },
+        {
+          "commands": [
+            "runs-prune"
+          ],
+          "schemaVersion": "boulder.runs.prune.v1",
+          "source": {
+            "path": "src/run-event-shape.ts",
+            "symbol": "RunEventsPruneResult"
+          }
+        },
+        {
+          "commands": [
+            "evidence-inspect"
+          ],
+          "schemaVersion": "boulder.evidence.inspect.v1",
+          "source": {
+            "path": "src/field-evidence.ts",
+            "symbol": "EvidenceInspectReport"
+          }
+        },
+        {
+          "commands": [
+            "evidence-diff"
+          ],
+          "schemaVersion": "boulder.evidence.diff.v1",
+          "source": {
+            "path": "src/field-evidence.ts",
+            "symbol": "EvidenceDiffReport"
+          }
+        },
+        {
+          "commands": [
+            "evidence-diff"
+          ],
+          "direction": "input",
+          "schemaVersion": "packaged-files.v0",
+          "source": {
+            "path": "src/field-evidence.ts",
+            "symbol": "isPackageInventory"
+          }
+        }
+      ],
+      "transport": "stdout"
+    },
+    {
+      "contract": "Human mode is command-specific Markdown or line-oriented text. workflow map and runs require --json; evidence inspect and diff always print JSON.",
+      "id": "human-success",
+      "source": {
+        "path": "src/cli.ts",
+        "symbol": "runMain"
+      },
+      "transport": "stdout"
+    },
+    {
+      "commands": [
+        "plan-analyze",
+        "plan-benchmark",
+        "plan-show",
+        "plan-validate"
+      ],
+      "id": "plan-json-error-envelope",
+      "schema": {
+        "error": {
+          "id": "string",
+          "message": "string"
+        },
+        "schemaVersion": "boulder.error.v1"
+      },
+      "source": {
+        "path": "src/plan-command.ts",
+        "symbol": "printError"
+      },
+      "transport": "stdout"
+    },
+    {
+      "contracts": [
+        {
+          "commands": [
+            "runs-*"
+          ],
+          "form": "ERROR runs.json_required | ERROR runs.not_found | Unknown runs command: <action>",
+          "source": {
+            "path": "src/runs-command.ts",
+            "symbol": "runRunsCommand"
+          }
+        },
+        {
+          "commands": [
+            "evidence-*"
+          ],
+          "form": "No command-local human error envelope; blocked evidence diff sets exit code 1 after JSON output.",
+          "source": {
+            "path": "src/cli-ops-command.ts",
+            "symbol": "runEvidenceDiffCommand"
+          }
+        },
+        {
+          "commands": [
+            "capability-import",
+            "capability-status"
+          ],
+          "form": "ERROR capability.<id>: <message>",
+          "source": {
+            "path": "src/capability-command.ts",
+            "symbol": "fail"
+          }
+        },
+        {
+          "commands": [
+            "handoff-packet",
+            "handoff-review",
+            "handoff-send"
+          ],
+          "form": "Unknown handoff command: <subcommand> or ERROR handoff.<id>: <message>",
+          "source": {
+            "path": "src/handoff-command.ts",
+            "symbol": "runHandoffCommand, invalidPacketPath"
+          }
+        },
+        {
+          "commands": [
+            "profile-*"
+          ],
+          "form": "ERROR profile.required | profile.invalid_name | profile.not_found | profile.path_invalid",
+          "source": {
+            "path": "src/profile-command.ts",
+            "symbol": "reportProfileError"
+          }
+        },
+        {
+          "commands": [
+            "plan-*"
+          ],
+          "form": "ERROR plan.<id>: <message> or boulder.error.v1 in JSON mode",
+          "source": {
+            "path": "src/plan-command.ts",
+            "symbol": "printError"
+          }
+        },
+        {
+          "commands": [
+            "routine-capture",
+            "retro-weekly",
+            "skill-propose"
+          ],
+          "form": "ERROR routine.* | retro.* | skill_proposal.*: <message>",
+          "source": {
+            "path": "src/routine-command.ts",
+            "symbol": "runRoutineCapture, runWeeklyRetro, runSkillPropose"
+          }
+        }
+      ],
+      "id": "command-errors",
+      "transport": "stderr"
+    }
+  ],
+  "ownershipAndOracle": {
+    "contractOwnerRole": "K0R v1 public-contract inventory steward",
+    "independentOracleRole": "K0R independent clean-source reproduction oracle",
+    "oracleRequirement": "A fresh clean checkout independently executes the declared vector set and records byte comparisons and disagreements before K0R exit.",
+    "sourceOfTruth": "Current checked-in v1 source, public CLI help, package manifest, and checked-in fixtures; this inventory does not infer undocumented behavior."
+  },
+  "packageAndRuntime": {
+    "binaries": {
+      "boulder": "bin/boulder.js",
+      "boulder-oss-cli": "bin/boulder.js"
+    },
+    "developmentEntry": "bin/boulder.ts",
+    "moduleType": "module",
+    "package": "boulder-oss-cli",
+    "packagedEntryShim": "bin/boulder.js",
+    "runtime": "Bun >=1.3.14",
+    "source": {
+      "path": "package.json",
+      "symbol": "name, version, type, engines, bin"
+    },
+    "version": "0.1.16"
+  },
+  "profileAndDefaultPrecedence": {
+    "builtInProfileIds": [
+      "programming-default",
+      "boulder-native-preview",
+      "research-default",
+      "ops-default",
+      "programming-heavy",
+      "research-corpus",
+      "release-safe",
+      "issue-triage",
+      "docs-reviewer"
+    ],
+    "builtInProfileSource": {
+      "path": "src/workflow-profile-builtins.ts",
+      "symbol": "BUILT_IN_WORKFLOW_PROFILE_IDS"
+    },
+    "defaultIdentity": {
+      "id": "programming-default",
+      "purpose": "programming",
+      "source": "built-in"
+    },
+    "defaultProfile": "programming-default",
+    "order": [
+      "explicit CLI --profile",
+      ".boulder/current-profile",
+      "legacy boulder.yaml.executors",
+      "built-in programming-default"
+    ],
+    "previewIdentity": {
+      "id": "boulder-native-preview",
+      "planMode": "local-only",
+      "selection": "explicit only",
+      "source": {
+        "path": "src/workflow-profile-builtins.ts",
+        "symbol": "boulderNativePreview"
+      }
+    },
+    "source": {
+      "path": "src/workflow-profiles.ts",
+      "symbol": "resolveWorkflowProfile"
+    },
+    "v2RouteExcluded": true
+  },
+  "routeClassifications": {
+    "coverageRule": "Every source-routed top-level route is exactly one public route or exactly one excluded internal route; public subcommands are catalogued in commands.",
+    "excludedInternalRoutes": [
+      {
+        "classification": "v2-only",
+        "reason": "Dispatched before v1 routing and excluded by this inventory's scope.",
+        "route": "v2",
+        "source": {
+          "path": "src/cli.ts",
+          "symbol": "runMain"
+        }
+      }
+    ],
+    "hiddenPublicTopLevelRoutes": [
+      {
+        "reason": "Routed by src/cli.ts but absent from src/cli-format.ts printHelp.",
+        "route": "runs"
+      },
+      {
+        "reason": "Routed by src/cli-ops-command.ts but absent from src/cli-format.ts printHelp.",
+        "route": "evidence"
+      }
+    ],
+    "publicTopLevelRoutes": [
+      "benchmark",
+      "bootstrap",
+      "capability",
+      "doctor",
+      "evidence",
+      "export",
+      "handoff",
+      "help",
+      "init",
+      "inspect",
+      "onboard",
+      "pipeline",
+      "plan",
+      "product-readiness",
+      "profile",
+      "quickstart",
+      "record",
+      "release",
+      "release-check",
+      "release-plan",
+      "replay-check",
+      "replay-run",
+      "retro",
+      "routine",
+      "runs",
+      "scorecard",
+      "service-readiness",
+      "skill",
+      "validate",
+      "verify",
+      "version",
+      "workflow"
+    ]
+  },
+  "schemaVersion": "k0r.v1-public-contract-inventory.v1",
+  "schemaVersionDiscovery": {
+    "classifications": [
+      "public",
+      "persisted/internal",
+      "fixture-only",
+      "v2-excluded",
+      "unapproved-dirty-excluded"
+    ],
+    "contracts": [
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/package-inventory/packaged-files.v0.json",
+        "schemaVersions": [
+          "packaged-files.v0"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/plan-analysis/invalid.json",
+        "schemaVersions": [
+          "boulder.plan-analysis.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/plan-analysis/valid.json",
+        "schemaVersions": [
+          "boulder.plan-analysis.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planner-benchmarks/invalid-bundle.json",
+        "schemaVersions": [
+          "boulder.planner-evidence-bundle.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planner-benchmarks/invalid-study-root.json",
+        "schemaVersions": [
+          "boulder.planner-study-root.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planner-benchmarks/study-root.json",
+        "schemaVersions": [
+          "boulder.planner-evidence-bundle.v1",
+          "boulder.planner-study-manifest.v1",
+          "boulder.planner-study-protocol.v1",
+          "boulder.planner-study-root.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planner-benchmarks/trust-root.json",
+        "schemaVersions": [
+          "boulder.planner-benchmark.trust-root.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planner-benchmarks/valid-bundle.json",
+        "schemaVersions": [
+          "boulder.planner-evidence-bundle.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planning-contracts/invalid.json",
+        "schemaVersions": [
+          "other",
+          "v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planning-contracts/valid.json",
+        "schemaVersions": [
+          "boulder.approval-challenge-history.v1",
+          "boulder.blinded-score-sheet.v1",
+          "boulder.critic-review.v1",
+          "boulder.execution-approval.v1",
+          "boulder.execution-packet.v1",
+          "boulder.plan-approval-challenge.v1",
+          "boulder.planner-benchmark-report.v1",
+          "boulder.planner-benchmark-run.v1",
+          "boulder.planner-benchmark.trust-root.v1",
+          "boulder.planner-evidence-bundle.v1",
+          "boulder.planner-execution-receipt.v1",
+          "boulder.planner-score-lock-receipt.v1",
+          "boulder.planner-score-reveal-receipt.v1",
+          "boulder.planner-study-manifest.v1",
+          "boulder.planner-study-protocol.v1",
+          "boulder.planner-study-raw-run.v1",
+          "fixture.v1",
+          "v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/planning-packets/invalid.json",
+        "schemaVersions": [
+          "boulder.planning-packet.v2"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/planning-packets/valid.json",
+        "schemaVersions": [
+          "boulder.planning-packet.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/profiles/resolved/boulder-native-preview.json",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/profiles/resolved/ops-default.json",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/profiles/resolved/programming-default.json",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/profiles/resolved/research-default.json",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/v2-kernel/invalid-authority-vectors.json",
+        "schemaVersions": [
+          "boulder.v2.authority-event.v1",
+          "boulder.v2.authority-mutation-wrapper.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/v2-kernel/invalid-multi-error.json",
+        "schemaVersions": [
+          "boulder.v2.effect.v1",
+          "boulder.v2.execution-envelope.v1",
+          "boulder.v2.plan.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/v2-kernel/invalid-schema-version.json",
+        "schemaVersions": [
+          "boulder.v2.effect.v1",
+          "boulder.v2.execution-envelope.v999",
+          "boulder.v2.plan.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/v2-kernel/valid-ed25519-authority-unsupported-effect.json",
+        "schemaVersions": [
+          "boulder.v2.authority-baseline-wrapper.v1",
+          "boulder.v2.authority-event.v1",
+          "boulder.v2.effect.v1",
+          "boulder.v2.execution-envelope.v1",
+          "boulder.v2.plan.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 fixture contract owner (excluded from K0R v1 baseline)",
+        "path": "fixtures/v2-kernel/valid-none-effect-execution.json",
+        "schemaVersions": [
+          "boulder.v2.effect.v1",
+          "boulder.v2.execution-envelope.v1",
+          "boulder.v2.plan.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/workflow-map/primary-workflow.v0.json",
+        "schemaVersions": [
+          "boulder.workflow-map.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/capability-source-schema.ts",
+        "schemaVersions": [
+          "boulder.capability.import.v1"
+        ]
+      },
+      {
+        "classification": "unapproved-dirty-excluded",
+        "ownership": "Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness",
+        "path": "src/common-executor-evidence.ts",
+        "schemaVersions": [
+          "boulder.common-executor-event.v1",
+          "boulder.common-executor-final-receipt.v2",
+          "boulder.common-executor-lifecycle.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/critic-review.ts",
+        "schemaVersions": [
+          "boulder.critic-attestation.v1",
+          "boulder.critic-review.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/execution-approval.ts",
+        "schemaVersions": [
+          "boulder.execution-approval-challenge.v1",
+          "boulder.execution-approval.v1",
+          "boulder.execution.approval-code-hmac.v1",
+          "boulder.execution.approval.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/execution-conversion.ts",
+        "schemaVersions": [
+          "boulder.execution-approval.v1",
+          "boulder.execution-packet.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/execution-packet.ts",
+        "schemaVersions": [
+          "boulder.execution-approval.v1",
+          "boulder.execution-packet.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/field-evidence.ts",
+        "schemaVersions": [
+          "boulder.evidence.diff.v1",
+          "boulder.evidence.inspect.v1",
+          "packaged-files.v0"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/handoff-packet-shape.ts",
+        "schemaVersions": [
+          "boulder.handoff.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/handoff-packet.ts",
+        "schemaVersions": [
+          "boulder.handoff.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/handoff-paths.ts",
+        "schemaVersions": [
+          "boulder.handoff.review.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-analysis-shape.ts",
+        "schemaVersions": [
+          "boulder.plan-analysis.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-analysis.ts",
+        "schemaVersions": [
+          "boulder.plan-analysis.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-approval.ts",
+        "schemaVersions": [
+          "boulder.plan-approval-challenge.v1",
+          "boulder.plan-approval.v1",
+          "boulder.plan.approval-code-hmac.v1",
+          "boulder.plan.approval.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/plan-command.ts",
+        "schemaVersions": [
+          "boulder.error.v1",
+          "boulder.plan.command-result.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-receipts.ts",
+        "schemaVersions": [
+          "boulder.approval-challenge-history.v1",
+          "boulder.execution-approval-challenge.v1",
+          "boulder.execution-approval.v1",
+          "boulder.execution.approval-code.v1",
+          "boulder.execution.approval.v1",
+          "boulder.execution.challenge.v1",
+          "boulder.plan-approval-challenge.v1",
+          "boulder.plan-approval.v1",
+          "boulder.plan.approval-code.v1",
+          "boulder.plan.approval.v1",
+          "boulder.plan.challenge.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-state.ts",
+        "schemaVersions": [
+          "boulder.approval-challenge-history.v1",
+          "boulder.plan-run-state.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/plan-store.ts",
+        "schemaVersions": [
+          "boulder.planner-local-event.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/planner-benchmark-command.ts",
+        "schemaVersions": [
+          "boulder.planner-benchmark-command-result.v1",
+          "boulder.planner-study-root.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/planner-benchmark.ts",
+        "schemaVersions": [
+          "boulder.blinded-score-sheet.v1",
+          "boulder.common-executor-receipt.v1",
+          "boulder.planner-benchmark-report.v1",
+          "boulder.planner-benchmark-run.v1",
+          "boulder.planner-benchmark.trust-root.v1",
+          "boulder.planner-evidence-bundle.v1",
+          "boulder.planner-execution-patch.v1",
+          "boulder.planner-execution-receipt.v1",
+          "boulder.planner-executor-stderr.v1",
+          "boulder.planner-executor-stdout.v1",
+          "boulder.planner-normalization-artifact.v1",
+          "boulder.planner-normalization-result.v1",
+          "boulder.planner-normalizer-source.v1",
+          "boulder.planner-output.v1",
+          "boulder.planner-redaction-policy.v1",
+          "boulder.planner-rubric.v1",
+          "boulder.planner-runner-contract.v1",
+          "boulder.planner-score-lock-receipt.v1",
+          "boulder.planner-score-reveal-receipt.v1",
+          "boulder.planner-study-approval.v1",
+          "boulder.planner-study-manifest.v1",
+          "boulder.planner-study-protocol.v1",
+          "boulder.planner-study-raw-run.v1",
+          "boulder.planner-study-remediation-evidence.v1",
+          "boulder.planner-task-card.v1",
+          "boulder.planner-test-output.v1",
+          "boulder.planner-trusted-source-catalog.v1",
+          "boulder.planner-typecheck-output.v1",
+          "boulder.planning-packet.v1",
+          "boulder.revealed-scores.v1",
+          "boulder.review-private-map.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 contract owner (excluded from K0R v1 baseline)",
+        "path": "src/planner-benchmark.ts",
+        "schemaVersions": [
+          "boulder.planner-normalizer-contract.v2"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/planner-output-normalizer.ts",
+        "schemaVersions": [
+          "boulder.planner-normalization-artifact.v1",
+          "boulder.planner-output.v1",
+          "boulder.planning-packet.v1"
+        ]
+      },
+      {
+        "classification": "unapproved-dirty-excluded",
+        "ownership": "Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness",
+        "path": "src/planner-pre-execution-safety.ts",
+        "schemaVersions": [
+          "boulder.planner-pre-execution-safety-receipt-signature.v1",
+          "boulder.planner-pre-execution-safety-receipt.v1"
+        ]
+      },
+      {
+        "classification": "unapproved-dirty-excluded",
+        "ownership": "Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness",
+        "path": "src/planner-scope-attribution.ts",
+        "schemaVersions": [
+          "boulder.planner-scope-attribution-receipt.v1"
+        ]
+      },
+      {
+        "classification": "unapproved-dirty-excluded",
+        "ownership": "Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness",
+        "path": "src/planner-score-workflow.ts",
+        "schemaVersions": [
+          "boulder.planner-score-lock-receipt.v1",
+          "boulder.planner-score-workflow.v1"
+        ]
+      },
+      {
+        "classification": "unapproved-dirty-excluded",
+        "ownership": "Exact unapproved dirty source owner excluded from K0R repository-wide schema completeness",
+        "path": "src/planner-study-remediation.ts",
+        "schemaVersions": [
+          "boulder.common-executor-final-receipt.v2",
+          "boulder.common-executor-lifecycle.v1",
+          "boulder.execution-approval.v1",
+          "boulder.execution-packet.v1",
+          "boulder.plan-approval.v1",
+          "boulder.planner-pre-execution-safety-receipt.v1",
+          "boulder.planner-scope-attribution-receipt.v1",
+          "boulder.planner-score-workflow.v1",
+          "boulder.planner-study-remediation-evidence.v1",
+          "boulder.planning-packet.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/planning-packet.ts",
+        "schemaVersions": [
+          "boulder.planning-packet.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/profile-store.ts",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/run-event-shape.ts",
+        "schemaVersions": [
+          "boulder.run-event.v1",
+          "boulder.runs.list.v1",
+          "boulder.runs.prune.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/run-events.ts",
+        "schemaVersions": [
+          "boulder.run-event.v1",
+          "boulder.runs.list.v1",
+          "boulder.runs.prune.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/types.ts",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 contract owner (excluded from K0R v1 baseline)",
+        "path": "src/v2-command.ts",
+        "schemaVersions": [
+          "boulder.error.v1",
+          "boulder.v2.command-result.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 contract owner (excluded from K0R v1 baseline)",
+        "path": "src/v2/canonical.ts",
+        "schemaVersions": [
+          "boulder.v2.artifact.v1",
+          "boulder.v2.authority-event.v1",
+          "boulder.v2.content.v1",
+          "boulder.v2.critique.v1",
+          "boulder.v2.evaluator-policy.v1",
+          "boulder.v2.evidence.v1",
+          "boulder.v2.execution-result.v1",
+          "boulder.v2.input.v1",
+          "boulder.v2.plan.v1",
+          "boulder.v2.policy.v1",
+          "boulder.v2.scope.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "v2 contract owner (excluded from K0R v1 baseline)",
+        "path": "src/v2/contracts.ts",
+        "schemaVersions": [
+          "boulder.v2.artifact.v1",
+          "boulder.v2.authority-event.v1",
+          "boulder.v2.critique.v1",
+          "boulder.v2.effect.v1",
+          "boulder.v2.evidence.v1",
+          "boulder.v2.execution-envelope.v1",
+          "boulder.v2.execution-result.v1",
+          "boulder.v2.plan.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/workflow-map.ts",
+        "schemaVersions": [
+          "boulder.workflow-map.v1"
+        ]
+      },
+      {
+        "classification": "public",
+        "ownership": "Boulder CLI public-contract owner",
+        "path": "src/workflow-profile-builtins.ts",
+        "schemaVersions": [
+          "boulder.profile.resolved.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/k2a-f/contract-foundation.v1.json",
+        "schemaVersions": [
+          "boulder.k2a-f.contract-foundation.fixture.v1",
+          "boulder.k2a-f.contract-foundation.v0",
+          "boulder.k2a-f.contract-foundation.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-procedure/invalid-ref-e-sop-01.json",
+        "schemaVersions": [
+          "boulder.v2.procedure.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json",
+        "schemaVersions": [
+          "boulder.v2.procedure.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-procedure/valid-ref-e-sop-01.json",
+        "schemaVersions": [
+          "boulder.v2.procedure.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-work/adversarial-evidence-ref-e-work-01.json",
+        "schemaVersions": [
+          "boulder.v2.work-adversarial-vectors.v1",
+          "boulder.v2.work-event.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-work/invalid-ref-e-work-01.json",
+        "schemaVersions": [
+          "boulder.v2.work-vectors.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-work/valid-ref-e-work-01.json",
+        "schemaVersions": [
+          "boulder.v2.work-vectors.v1"
+        ]
+      },
+      {
+        "classification": "persisted/internal",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/k2a-f/contracts.ts",
+        "schemaVersions": [
+          "boulder.k2a-f.contract-foundation.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/procedure.ts",
+        "schemaVersions": [
+          "boulder.v2.procedure.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work-durable-contracts.ts",
+        "schemaVersions": [
+          "boulder.v2.work-attempt.v2",
+          "boulder.v2.work-completion.v1",
+          "boulder.v2.work-revision.v2",
+          "boulder.v2.work-terminal.v2"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work-durable-validation.ts",
+        "schemaVersions": [
+          "boulder.v2.work-semantic.v1",
+          "boulder.v2.work-submission.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work-durable.ts",
+        "schemaVersions": [
+          "boulder.v2.work-semantic.v1",
+          "boulder.v2.work-submission.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work-event-contracts.ts",
+        "schemaVersions": [
+          "boulder.v2.work-event.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work-event-validation.ts",
+        "schemaVersions": [
+          "boulder.v2.work-approval.v1",
+          "boulder.v2.work-semantic.v1"
+        ]
+      },
+      {
+        "classification": "v2-excluded",
+        "ownership": "Boulder persisted/internal contract owner",
+        "path": "src/v2/work.ts",
+        "schemaVersions": [
+          "boulder.v2.human-answer.v1",
+          "boulder.v2.procedure-authority-receipt.v1",
+          "boulder.v2.work-accepted.v1",
+          "boulder.v2.work-attempt.v1",
+          "boulder.v2.work-revision.v1",
+          "boulder.v2.work-terminal.v1"
+        ]
+      },
+      {
+        "classification": "fixture-only",
+        "ownership": "shipped deterministic fixture contract",
+        "path": "fixtures/v2-procedure/static-ref-e-sop-02-human-loop.json",
+        "schemaVersions": [
+          "boulder.ref-e-sop-02.static.v1"
+        ]
+      }
+    ],
+    "exclusions": {
+      "reason": "K0R inventories the v1 baseline. V2 paths and values remain shipped but are explicitly excluded from that baseline.",
+      "unapprovedDirtyOwnerPaths": [
+        "src/common-executor-evidence.ts",
+        "src/planner-pre-execution-safety.ts",
+        "src/planner-scope-attribution.ts",
+        "src/planner-score-workflow.ts",
+        "src/planner-study-remediation.ts"
+      ],
+      "unapprovedDirtyOwnerReason": "These exact unapproved dirty source owners are absent from the immutable HEAD archive and are explicitly recorded, rather than silently filtered, outside K0R repository-wide schema completeness.",
+      "v2PathPrefixes": [
+        "src/v2/"
+      ],
+      "v2Paths": [
+        "src/v2-command.ts"
+      ],
+      "v2SchemaPrefixes": [
+        "boulder.v2."
+      ],
+      "v2SchemaSuffixes": [
+        ".v2"
+      ]
+    },
+    "scope": {
+      "discoveryRule": "Discover every shipped TypeScript string literal matching a Boulder or package schema-version identifier and every string JSON value whose key is schemaVersion; compare path-and-value pairs exactly.",
+      "fixturePathPattern": "fixtures/**/*.json",
+      "packageInventoryPath": "fixtures/package-inventory/packaged-files.v0.json",
+      "sourcePathPattern": "src/**/*.ts"
+    }
+  },
+  "scope": {
+    "excluded": [
+      "v2",
+      "v2 execute",
+      "src/v2/**",
+      "v2-only fixtures and tests"
+    ],
+    "exclusionSource": {
+      "fact": "The v2 route is dispatched separately before v1 command routing.",
+      "path": "src/cli.ts",
+      "symbol": "runMain"
+    },
+    "included": "Documented Boulder v1 public CLI and supporting observable contracts."
+  },
+  "sourceRefs": [
+    {
+      "binding": "current",
+      "path": "src/cli.ts",
+      "sha256": "sha256:93d6b8ba372ea3a69b8c6ee32608a6c1471257190eeca92587228a0609816472",
+      "symbol": "main, runMain, parseArgv"
+    },
+    {
+      "binding": "current",
+      "path": "src/cli-format.ts",
+      "sha256": "sha256:fb21b5a8f77f81e1ce0376180602839049923a848b50bce6c4a4d98a61ce57e6",
+      "symbol": "printHelp, prettyJson"
+    },
+    {
+      "binding": "current",
+      "path": "src/cli-options.ts",
+      "sha256": "sha256:6b580706afa15677a5d90aa5270fad325a8cf9dd3e5c87e66525fbc792a94646",
+      "symbol": "parseOptions"
+    },
+    {
+      "binding": "current",
+      "path": "src/cli-ops-command.ts",
+      "sha256": "sha256:8c0245fde83a70533d05d773c72f3f60f99102ef5973cbb65e93e65ff49e5f96",
+      "symbol": "runOperationalCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/runs-command.ts",
+      "sha256": "sha256:13f82c19ae0d0840620d702268b57e724e0e7a12f36155e5a5348571df5e0aa1",
+      "symbol": "runRunsCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/run-events.ts",
+      "sha256": "sha256:7e60252ab9f809f7234b6fcb17f99bf1b5fad12e28e23aeb8ab99d4fb9fca78c",
+      "symbol": "runEventsList, pruneRunEvents"
+    },
+    {
+      "binding": "current",
+      "path": "src/run-event-shape.ts",
+      "sha256": "sha256:0c3f471046a653b5b859ea7d5dfd1dc87910a0c48a968ca42055dec7726763cd",
+      "symbol": "RunEventRecord, RunEventsList, RunEventsPruneResult"
+    },
+    {
+      "binding": "current",
+      "path": "src/plan-command.ts",
+      "sha256": "sha256:4af99c758902991cb68cc408bbe2be422c5af0a485f3fc6e3728bfa3371980e5",
+      "symbol": "runPlanCommand, printError"
+    },
+    {
+      "binding": "current",
+      "path": "src/planner-benchmark-command.ts",
+      "sha256": "sha256:bb40a2be9e90b647f2166cbf7d3682578c7f3b6cda4e0f33cb92ff49d231c94b",
+      "symbol": "runPlannerBenchmarkCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/profile-command.ts",
+      "sha256": "sha256:357ad546977de871a38dd4051cf0e099f7dbf0f73da1b0e3f96764b49480e3aa",
+      "symbol": "runProfileCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/workflow-profiles.ts",
+      "sha256": "sha256:22ee0477b5ee183389a2966137d96fa40b4fb59902f1d5f1c00ef163484cb91c",
+      "symbol": "resolveWorkflowProfile"
+    },
+    {
+      "binding": "current",
+      "path": "src/workflow-profile-builtins.ts",
+      "sha256": "sha256:a082d88a35b53b01ddc90f404f3c32097a404ddfa710c86f719df8fdf16cdcbb",
+      "symbol": "BUILT_IN_WORKFLOW_PROFILE_IDS, builtInProfile"
+    },
+    {
+      "binding": "current",
+      "path": "src/profile-store.ts",
+      "sha256": "sha256:a05f2b4c595464e6cf8e4aa9a515cd40e48d584003fb4fd2c5801fbb6d0b25d5",
+      "symbol": "profile state storage"
+    },
+    {
+      "binding": "current",
+      "path": "src/capability-command.ts",
+      "sha256": "sha256:6d37ebd44bf1c9348f7c1d3c4cb1a29181fb9c64c1009d17bae484a6a6674753",
+      "symbol": "runCapabilityCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/capability-source-schema.ts",
+      "sha256": "sha256:54ab6cafa1dba86eedf00549f838d4ee6e538d17385df50e25ee242a3d78f533",
+      "symbol": "SCHEMA_VERSION"
+    },
+    {
+      "binding": "current",
+      "path": "src/handoff-command.ts",
+      "sha256": "sha256:044574cca72cc37cfe112b38747b6b7856ae5333b6ea0f338373eb495e7ebe2d",
+      "symbol": "runHandoffCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/handoff-packet.ts",
+      "sha256": "sha256:3543b50fd4a08dac6cdd662640088cd2df8c796ef8f7127cc2f1f7e0ed6cdd5c",
+      "symbol": "HandoffPacket"
+    },
+    {
+      "binding": "current",
+      "path": "src/routine-command.ts",
+      "sha256": "sha256:8e10f21f67d596d4df125211e553f1412b30fe82a67a84d778da8084f44e8d23",
+      "symbol": "runRoutineCommand"
+    },
+    {
+      "binding": "current",
+      "path": "src/routine.ts",
+      "sha256": "sha256:4036337073f32ddac464cc3dfddbca173df40751ca97eb49452b81e44c050261",
+      "symbol": "RoutineArtifact, captureRoutine"
+    },
+    {
+      "binding": "current",
+      "path": "src/skill-proposal.ts",
+      "sha256": "sha256:45fb0de8ed394f55c5ad5f30daf30647daf38df6b3c2f8914f5d00b918d5dbf3",
+      "symbol": "proposeSkillFromRoutine"
+    },
+    {
+      "binding": "current",
+      "path": "src/plan-store.ts",
+      "sha256": "sha256:e81c8f935ba54536a3d5e97e1b2f1a8021fbaec2bb9d455d70d2e7aa22747ed7",
+      "symbol": "PlanStorePathError"
+    },
+    {
+      "binding": "current",
+      "path": "src/field-evidence.ts",
+      "sha256": "sha256:9f6a679a3d7683817ec3cd7024d3fa0a81f8db1d9d6e2790308dffd4d46eefae",
+      "symbol": "inspectEvidence, diffEvidence, recordFieldEvidence"
+    },
+    {
+      "binding": "current",
+      "path": "src/workflow-map.ts",
+      "sha256": "sha256:ce8cb84332bc439a16e5f5ed90fb7a260f8b28badf9630a4ff6828c721387b34",
+      "symbol": "PRIMARY_WORKFLOW_MAP"
+    },
+    {
+      "binding": "current",
+      "path": "package.json",
+      "sha256": "sha256:3fd3cab97ba8d72cbfc7a019bcc5c1d6832918da811dcfee10c27d6acbe2fabe",
+      "symbol": "name, version, bin, engines, files"
+    },
+    {
+      "binding": "current",
+      "path": "README.md",
+      "sha256": "sha256:905b8e1771b45cb1b18fe8f7c4897b9823260ba7f5540d0814dc242d6e06b92a",
+      "symbol": "Install, Core Commands, Explicit boulder-native Preview"
+    },
+    {
+      "binding": "current",
+      "path": "AGENTS.md",
+      "sha256": "sha256:484fcd435c9d05fa7ee1ca26269bcbfef1cf0c28b3924524d01a502ae1c35656",
+      "symbol": "Architecture & Data Flow, Important Files"
+    },
+    {
+      "binding": "current",
+      "path": "fixtures/docs/doc-registry.v0.json",
+      "sha256": "sha256:c107f18dfb47e840f9dd633f4d3e98e8cc0458052dd62e84eb928a04976c49ec",
+      "symbol": "top-level documentation registry array"
+    },
+    {
+      "binding": "current",
+      "path": "fixtures/package-inventory/packaged-files.v0.json",
+      "sha256": "sha256:10abb728be9a50285291c2cae1fa115fd97aa1cf7c68a234cfa85f00b29486db",
+      "symbol": "schemaVersion, classes"
+    },
+    {
+      "binding": "current",
+      "path": "fixtures/planning-contracts/valid.json",
+      "sha256": "sha256:26e0a01e5c2d05de4ae46ccc8df37a67c2b943653dd6ff22b3f37faabcd0b7a0",
+      "symbol": "planner fixture contracts"
+    },
+    {
+      "binding": "current",
+      "path": "fixtures/planning-packets/valid.json",
+      "sha256": "sha256:688369d8b9cca9d839ceafcbd5f6b3f28170eebb263c557ebf0e553ccda59af2",
+      "symbol": "planning packet fixture"
+    },
+    {
+      "binding": "current",
+      "path": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
+      "sha256": "sha256:d40504e5ce95c90c6d3e598f85171080b26b46e0a8a17e40c70a8a5b293186d4",
+      "symbol": "release evidence manifest"
+    }
+  ],
+  "statePaths": [
+    {
+      "path": ".boulder/plans/<runId>/{analysis,state,packet}.json",
+      "purpose": "Plan artifacts with atomic writes and cooperative locks.",
+      "source": {
+        "path": "AGENTS.md",
+        "symbol": "Architecture & Data Flow"
+      }
+    },
+    {
+      "path": ".boulder/profiles/*.json",
+      "purpose": "Saved workflow profiles.",
+      "source": {
+        "path": "src/profile-command.ts",
+        "symbol": "saveCommand"
+      }
+    },
+    {
+      "path": ".boulder/current-profile",
+      "purpose": "Selected workflow profile.",
+      "source": {
+        "path": "src/workflow-profiles.ts",
+        "symbol": "resolveWorkflowProfile"
+      }
+    },
+    {
+      "path": ".boulder/capabilities/imports/*.json",
+      "purpose": "Capability source candidate manifests.",
+      "source": {
+        "path": "src/capability-command.ts",
+        "symbol": "importCapabilitySource"
+      }
+    },
+    {
+      "path": ".boulder/handoffs",
+      "purpose": "Handoff packet storage boundary.",
+      "source": {
+        "path": "src/handoff-command.ts",
+        "symbol": "invalidPacketPath"
+      }
+    },
+    {
+      "path": ".boulder/routines/*.json",
+      "purpose": "Routine evidence artifacts.",
+      "source": {
+        "path": "src/routine.ts",
+        "symbol": "captureRoutine"
+      }
+    },
+    {
+      "path": ".boulder/skill-proposals/*.md",
+      "purpose": "Reviewable skill proposals.",
+      "source": {
+        "path": "src/skill-proposal.ts",
+        "symbol": "proposeSkillFromRoutine"
+      }
+    },
+    {
+      "path": ".boulder/runs/*.json",
+      "purpose": "Sanitized run-event records listed, shown, and pruned by runs commands.",
+      "source": {
+        "path": "src/run-events.ts",
+        "symbol": "recordRunEvent, runsDir"
+      }
+    },
+    {
+      "path": "evidence/field-readiness/<runId>/manifest.json",
+      "purpose": "Generated field-readiness evidence result; its input directory is constrained to the same run-id path.",
+      "source": {
+        "path": "src/field-evidence.ts",
+        "symbol": "recordFieldEvidence, normalizeEvidencePath"
+      }
+    }
+  ]
+}
