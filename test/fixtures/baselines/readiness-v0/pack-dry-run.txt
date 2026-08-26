@@ -38,12 +38,12 @@ packed 98B docs/CASE_STUDIES/evidence/pr-review/export-command.txt
 packed 0.78KB docs/CASE_STUDIES/evidence/pr-review/inspect.json
 packed 252B docs/CASE_STUDIES/evidence/pr-review/pipeline.txt
 packed 76B docs/CASE_STUDIES/evidence/release-workflow/ci.txt
-packed 134B docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
-packed 170B docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
+packed 133B docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt
+packed 437B docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt
 packed 57B docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt
 packed 0.93KB docs/CASE_STUDIES/evidence/release-workflow/pr26-review-closure.md
 packed 0.75KB docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json
-packed 0.63KB docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json
+packed 0.70KB docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json
 packed 1.0KB docs/CASE_STUDIES/evidence/release-workflow/run-event-redaction-repro.json
 packed 2.0KB docs/CASE_STUDIES/external-replay.md
 packed 1.10KB docs/CASE_STUDIES/issue-pr-ci-cycle.md
@@ -55,7 +55,8 @@ packed 8.28KB docs/CODEX_OSS_SCORECARD.md
 packed 0.77KB docs/CODEX_WORKFLOW_NOTES.md
 packed 1.23KB docs/COMMUNITY.md
 packed 38.57KB docs/COMPETITIVE_BENCHMARK_HARNESS_MANAGER.md
-packed 2.25KB docs/CONTRIBUTOR_START_HERE.md
+packed 2.41KB docs/CONTRIBUTOR_START_HERE.md
+packed 5.91KB docs/DEVELOPERS.md
 packed 1.0KB docs/EXTERNAL_REPLAY.md
 packed 4.17KB docs/FOLLOW_UP_BRIEFING.md
 packed 8.87KB docs/GJC_DEEP_INTERVIEW_REVIEW.md
@@ -99,12 +100,12 @@ packed 0.70KB fixtures/benchmarks/mcp-server.json
 packed 0.69KB fixtures/benchmarks/python-package.json
 packed 0.72KB fixtures/benchmarks/typescript-library.json
 packed 1.47KB fixtures/capabilities/codex-installed.json
-packed 20.1KB fixtures/docs/doc-registry.v0.json
+packed 25.23KB fixtures/docs/doc-registry.v0.json
 packed 0.91KB fixtures/handoffs/high.json
 packed 0.63KB fixtures/handoffs/low.json
 packed 0.74KB fixtures/handoffs/medium.json
 packed 1.55KB fixtures/k2a-f/contract-foundation.v1.json
-packed 12.34KB fixtures/package-inventory/packaged-files.v0.json
+packed 12.37KB fixtures/package-inventory/packaged-files.v0.json
 packed 1.11KB fixtures/plan-analysis/invalid.json
 packed 1.34KB fixtures/plan-analysis/valid.json
 packed 4.37KB fixtures/plan-receipts/vectors.json
@@ -272,5 +273,5 @@ packed 1.75KB src/workflows.ts
 
 boulder-oss-cli-0.1.17.tgz
 
-Total files: 269
-Unpacked size: 1.58MB
+Total files: 270
+Unpacked size: 1.59MB
