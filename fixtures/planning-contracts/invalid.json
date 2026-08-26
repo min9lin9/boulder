@@ -1,0 +1,17 @@
+{
+  "criticReview": {"value":null,"error":"plan.packet.invalid"},
+  "executionPacket": {"value":{"schemaVersion":"other"},"error":"plan.execution_packet.schema_invalid"},
+  "challengeHistory": {"value":null,"error":"plan.approval.challenge_history_invalid"},
+  "trustRoot": {"value":null,"error":"plan.benchmark.trust_root_invalid"},
+  "protocol": {"mutation":{"delegatedSigners":[]},"error":"plan.benchmark.signer_unauthorized"},
+  "manifest": {"value":{"schemaVersion":"other"},"error":"plan.benchmark.manifest_invalid"},
+  "rawRun": {"value":{"schemaVersion":"other"},"error":"plan.benchmark.run_invalid"},
+  "normalizedRun": {"mutation":{"runId":""},"error":"plan.benchmark.run_invalid"},
+  "evidenceBundle": {"value":{"schemaVersion":"other"},"error":"plan.benchmark.bundle_invalid"},
+  "benchmarkReport": {"value":{"schemaVersion":"other"},"error":"plan.benchmark.report_invalid"},
+  "stableErrors": [
+    {"family":"executionPacket","mutation":{"allowedMutationPaths":["../outside.ts"]},"error":"plan.execution_packet.path_invalid"},
+    {"family":"rawRun","mutation":{"artifacts":[{"path":"../outside.json","digest":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","schemaVersion":"v1"}]},"error":"plan.benchmark.study_path_invalid"},
+    {"family":"trustRoot","mutation":{"keys":[{"keyId":"fixture-key","publicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","fingerprint":"sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","status":"active"}]},"error":"plan.benchmark.key_fingerprint_mismatch"}
+  ]
+}

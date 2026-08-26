@@ -1,6 +1,6 @@
 {
   "name": "boulder-oss-cli",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.",
   "type": "module",
   "license": "MIT",

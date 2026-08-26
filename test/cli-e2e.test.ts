@@ -188,6 +188,73 @@ describe("boulder CLI e2e cleanup safety", () => {
       await removeTempRepo(root);
     }
   });
+  test("keeps planner benchmark validation fail-closed with globally ordered options", async () => {
+    const root = await tempRepo();
+    try {
+      const missingRoots = await runBoulder(["plan", "benchmark", "--cwd", root, "--json"]);
+      const missingTrustRootValue = await runBoulder(["plan", "benchmark", "--cwd", root, "--trust-root", "--study-root", "fixtures/planner-benchmarks/study-root.json", "--json"]);
+      const missingStudyRoot = await runBoulder(["--json", "--cwd", root, "plan", "benchmark", "--trust-root", "fixtures/planner-benchmarks/trust-root.json"]);
+      const missingTrustRoot = await runBoulder(["--json", "--cwd", root, "plan", "benchmark", "--study-root", "fixtures/planner-benchmarks/study-root.json"]);
+      const human = await runBoulder(["plan", "benchmark", "--cwd", root]);
+      const unknownOption = await runBoulder(["plan", "benchmark", "--cwd", root, "--bogus", "--json"]);
+      const duplicateTrustRoot = await runBoulder(["plan", "benchmark", "--cwd", root, "--trust-root", "first.json", "--trust-root", "second.json", "--study-root", "study", "--json"]);
+      const duplicateStudyRoot = await runBoulder(["plan", "benchmark", "--cwd", root, "--trust-root", "trust.json", "--study-root", "first-study", "--study-root", "second-study", "--json"]);
+
+      for (const result of [missingRoots, missingStudyRoot, missingTrustRoot]) {
+        const payload = JSON.parse(result.stdout);
+        expect(result.exitCode).toBe(1);
+        expect(payload.command).toBe("plan benchmark");
+        expect(payload.status).toBe("blocked");
+        expect(payload.report.decision).toBe("HOLD");
+        expect(payload.issues[0].code).toBe("plan.benchmark.provenance_missing");
+      }
+      const missingValuePayload = JSON.parse(missingTrustRootValue.stdout);
+      expect(missingTrustRootValue.exitCode).toBe(1);
+      expect(missingValuePayload.issues[0].code).toBe("plan.benchmark.provenance_missing");
+      expect(missingValuePayload.issues[0].path).toBe("--trust-root");
+      expect(human.exitCode).toBe(1);
+      expect(human.stdout).toContain("Planner benchmark: HOLD");
+      for (const [result, path] of [[unknownOption, "--bogus"], [duplicateTrustRoot, "--trust-root"], [duplicateStudyRoot, "--study-root"]] as const) {
+        const payload = JSON.parse(result.stdout);
+        expect(result.exitCode).toBe(1);
+        expect(payload.status).toBe("blocked");
+        expect(payload.issues[0].code).toBe("plan.benchmark.provenance_missing");
+        expect(payload.issues[0].path).toBe(path);
+      }
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("resolves planner benchmark roots relative to the selected workspace", async () => {
+    const root = await tempRepo();
+    try {
+      const fixture = await readFile(join(import.meta.dir, "..", "fixtures", "planner-benchmarks", "study-root.json"), "utf8");
+      await mkdir(join(root, "fixtures", "planner-benchmarks"), { recursive: true });
+      await writeFile(join(root, "trust-root.json"), "{}", "utf8");
+      await writeFile(join(root, "fixtures", "planner-benchmarks", "study-root.json"), fixture, "utf8");
+
+      const result = await runBoulder([
+        "plan",
+        "benchmark",
+        "--cwd",
+        root,
+        "--trust-root",
+        "./trust-root.json",
+        "--study-root",
+        "fixtures/./planner-benchmarks/../planner-benchmarks/study-root.json",
+        "--json"
+      ]);
+
+      const payload = JSON.parse(result.stdout);
+      expect(result.exitCode).toBe(1);
+      expect(payload.issues).toEqual([]);
+      expect(payload.report.reasons).toEqual(["field_study_not_performed"]);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
   test("supports read-only plan analysis, show, and validation diagnostics", async () => {
     const root = await tempRepo();
     try {
@@ -284,7 +351,7 @@ describe("boulder CLI e2e cleanup safety", () => {
     const payload = JSON.parse(result.stdout);
 
     expect(result.exitCode).toBe(0);
-    expect(payload.version).toBe("0.1.16");
+    expect(payload.version).toBe("0.1.17");
     expect(payload.status).toBe("ready");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);

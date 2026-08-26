@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "boulder.planner-study-root.v1",
+  "fixtureOnly": true,
+  "fixtureNotice": "Deterministic contract fixture only; it is not field-study evidence and its key material must never be used operationally.",
+  "study": {
+    "studyId": "fixture-pr8a-36-run-matrix",
+    "matrix": {
+      "planners": ["gjc", "boulder-native", "lazycodex-ulw-plan"],
+      "taskClasses": ["small-bug", "medium-feature", "high-risk-change"],
+      "repositories": ["small-ts-cli", "medium-multi-module"],
+      "repeats": [1, 2],
+      "requiredRunCount": 36
+    },
+    "fieldStudyStatus": "NOT_PERFORMED"
+  },
+  "protocol": {
+    "schemaVersion": "boulder.planner-study-protocol.v1",
+    "studyId": "fixture-pr8a-36-run-matrix",
+    "rubricVersion": "fixture-v1",
+    "rubricDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "normalizerVersion": "fixture-v1",
+    "normalizerDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "protocolSigner": { "keyId": "fixture-only-operator", "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925" },
+    "delegatedSigners": [{ "keyId": "fixture-only-operator", "fingerprint": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925", "roles": ["manifest", "bundle"] }],
+    "authorizationPolicy": "fixture-only fixed operator approval",
+    "redactionPolicy": "fixture-only immutable redaction digest",
+    "blindingPolicy": "fixture-only blinded review",
+    "exclusionPolicy": "fixture-only adjudicated exclusion",
+    "replacementPolicy": "fixture-only immediate replacement linkage",
+    "signature": { "algorithm": "Ed25519", "keyId": "fixture-only-operator", "signature": "AA" }
+  },
+  "manifest": {
+    "schemaVersion": "boulder.planner-study-manifest.v1",
+    "studyId": "fixture-pr8a-36-run-matrix",
+    "protocolDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "tasks": [{ "taskId": "fixture-task", "sha256": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925" }],
+    "repositories": [{ "repoId": "small-ts-cli", "revision": "fixture" }, { "repoId": "medium-multi-module", "revision": "fixture" }],
+    "cells": [
+      { "cellId": "gjc:small-bug:small-ts-cli", "plannerId": "gjc", "taskClass": "small-bug", "repoId": "small-ts-cli" },
+      { "cellId": "gjc:small-bug:medium-multi-module", "plannerId": "gjc", "taskClass": "small-bug", "repoId": "medium-multi-module" },
+      { "cellId": "gjc:medium-feature:small-ts-cli", "plannerId": "gjc", "taskClass": "medium-feature", "repoId": "small-ts-cli" },
+      { "cellId": "gjc:medium-feature:medium-multi-module", "plannerId": "gjc", "taskClass": "medium-feature", "repoId": "medium-multi-module" },
+      { "cellId": "gjc:high-risk-change:small-ts-cli", "plannerId": "gjc", "taskClass": "high-risk-change", "repoId": "small-ts-cli" },
+      { "cellId": "gjc:high-risk-change:medium-multi-module", "plannerId": "gjc", "taskClass": "high-risk-change", "repoId": "medium-multi-module" },
+      { "cellId": "boulder-native:small-bug:small-ts-cli", "plannerId": "boulder-native", "taskClass": "small-bug", "repoId": "small-ts-cli" },
+      { "cellId": "boulder-native:small-bug:medium-multi-module", "plannerId": "boulder-native", "taskClass": "small-bug", "repoId": "medium-multi-module" },
+      { "cellId": "boulder-native:medium-feature:small-ts-cli", "plannerId": "boulder-native", "taskClass": "medium-feature", "repoId": "small-ts-cli" },
+      { "cellId": "boulder-native:medium-feature:medium-multi-module", "plannerId": "boulder-native", "taskClass": "medium-feature", "repoId": "medium-multi-module" },
+      { "cellId": "boulder-native:high-risk-change:small-ts-cli", "plannerId": "boulder-native", "taskClass": "high-risk-change", "repoId": "small-ts-cli" },
+      { "cellId": "boulder-native:high-risk-change:medium-multi-module", "plannerId": "boulder-native", "taskClass": "high-risk-change", "repoId": "medium-multi-module" },
+      { "cellId": "lazycodex-ulw-plan:small-bug:small-ts-cli", "plannerId": "lazycodex-ulw-plan", "taskClass": "small-bug", "repoId": "small-ts-cli" },
+      { "cellId": "lazycodex-ulw-plan:small-bug:medium-multi-module", "plannerId": "lazycodex-ulw-plan", "taskClass": "small-bug", "repoId": "medium-multi-module" },
+      { "cellId": "lazycodex-ulw-plan:medium-feature:small-ts-cli", "plannerId": "lazycodex-ulw-plan", "taskClass": "medium-feature", "repoId": "small-ts-cli" },
+      { "cellId": "lazycodex-ulw-plan:medium-feature:medium-multi-module", "plannerId": "lazycodex-ulw-plan", "taskClass": "medium-feature", "repoId": "medium-multi-module" },
+      { "cellId": "lazycodex-ulw-plan:high-risk-change:small-ts-cli", "plannerId": "lazycodex-ulw-plan", "taskClass": "high-risk-change", "repoId": "small-ts-cli" },
+      { "cellId": "lazycodex-ulw-plan:high-risk-change:medium-multi-module", "plannerId": "lazycodex-ulw-plan", "taskClass": "high-risk-change", "repoId": "medium-multi-module" }
+    ],
+    "repeats": [1, 2],
+    "randomizationSeed": "fixture-only-deterministic-seed",
+    "signature": { "algorithm": "Ed25519", "keyId": "fixture-only-operator", "signature": "AA" }
+  },
+  "evidenceBundle": {
+    "schemaVersion": "boulder.planner-evidence-bundle.v1",
+    "studyId": "fixture-pr8a-36-run-matrix",
+    "protocolDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "manifestDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "rubricDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "normalizerDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "normalizedRuns": [],
+    "exclusions": [],
+    "assignmentsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "approvalsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "redactionsDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "trustRootFingerprintSetDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "studyRootDigest": "sha256:66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
+    "signature": { "algorithm": "Ed25519", "keyId": "fixture-only-operator", "signature": "AA" }
+  }
+}

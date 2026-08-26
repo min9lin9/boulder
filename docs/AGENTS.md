@@ -14,7 +14,8 @@ Documentation is product surface. Keep it aligned with actual CLI behavior and e
 | Bootstrap profiles/interview | `BOOTSTRAP_PROFILE_RESEARCH.md`, `BOOTSTRAP_INTERVIEW_RESEARCH.md`, `BOULDER_CODEX_SKILL_USAGE.ko.md` |
 | Capability source/doctor | `CAPABILITY_DOCTOR.md`, `GJC_LAZYCODEX_HANDOFF.md` |
 | Architecture | `WORKFLOW_ARCHITECTURE.md`, `OPERATOR_WORKFLOW_STACK.md` |
-| Product gates | `PRODUCT_READINESS.md`, `SERVICE_READINESS.md`, `RELEASE_WORKFLOW.md` |
+| Product gates | `PRODUCT_READINESS.md`, `SERVICE_READINESS.md`, `RELEASE_WORKFLOW.md`, `RELEASE_PLAN.md`, `VERIFICATION_GATES.md` |
+| Policy/process | `contributing/`, `adr/`, `branch-protection.md`, `labels-and-milestones.md` |
 | Evidence | `CASE_STUDIES/`, `APPLICATION_EVIDENCE.md`, `CODEX_OSS_FINAL_AUDIT.md` |
 
 ## CONVENTIONS
@@ -23,6 +24,8 @@ Documentation is product surface. Keep it aligned with actual CLI behavior and e
 - Separate recommendation, dry-run, doctor verification, and approval-gated use.
 - For Korean docs, keep the user path short and concrete.
 - Do not claim external tools are installed just because a profile recommends them.
+- Contract-first (ADR 0002): command names, flags, stdout/stderr, exit codes, `boulder.yaml`, pipeline JSON, provider policy, and protected paths change together — code, tests, docs, fixtures, and evidence in one change.
+- Docs-only changes still state why no behavior test was needed (see `contributing/review-policy.md`).
 
 ## ANTI-PATTERNS
 

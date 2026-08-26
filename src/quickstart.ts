@@ -120,7 +120,7 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     "",
     "This is the first-run guided flow for a maintainer opening Boulder in a repository.",
     "",
-    "GJC and LazyCodex are adapter preferences. agency-agents is a profile-scoped subagent catalog. boulder-native-preview is a bundled local planner recommendation that remains inactive until explicitly selected. Bootstrap task-category profiles such as programming-heavy and release-safe sit on top of broader base profiles such as programming-default and ops-default. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
+    "How routing works: Boulder delegates planning and coding to adapters - GJC is the planning adapter and LazyCodex is the execution adapter, with agency-agents as their catalog of helper subagents. Profiles tune behavior on top: programming-default is the base profile, bootstrap task-category profiles such as programming-heavy or release-safe refine it for specific kinds of work, and boulder-native-preview is an optional local planner that stays inactive until you explicitly select it. The doctor command verifies your installation before anything runs, and nothing executes without your approval.",
     "",
     "## Checks",
     "",

@@ -54,7 +54,7 @@
     {
       "id": "public-release-check",
       "status": "pass",
-      "evidence": "release-check ready for 0.1.16"
+      "evidence": "release-check ready for 0.1.17"
     },
     {
       "id": "limitations-explicit",

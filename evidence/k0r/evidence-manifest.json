@@ -1,0 +1,687 @@
+{
+  "schemaVersion": "boulder.k0r.evidence-manifest.v2",
+  "status": "evidence_collected_pending_review",
+  "approvalProvenance": {
+    "path": "evidence/k0r/approval-provenance.json",
+    "sha256": "sha256:e54add58465b842db0bdaaeba55d13225f3ba5eae9a379830fed03e30b729bcd",
+    "schemaVersion": "boulder.k0r.approval-provenance.v1",
+    "status": "scope_approved_adr_exact_bytes_pending",
+    "consensusPlanSha256": "sha256:12c210a0c57a611f3450c78e7e4743b11ae10258a682ea47a3eef4a1033d5c3a",
+    "selectedBranch": "superseding-adr",
+    "authorizedScope": "K0R evidence/ADR preparation only",
+    "prohibitedActions": [
+      "K2 authority",
+      "K3 authority",
+      "K4 authority",
+      "repository actions",
+      "publication actions",
+      "release actions",
+      "root-guidance actions"
+    ]
+  },
+  "head": {
+    "commit": "3bedbb8ebda89666ed1e16b68a5ceb06d3c4bb0f",
+    "tree": "136bb3043c0786b4230bd23c417b46b76e8d5cec",
+    "diffSha256": "sha256:5a532909a39ec6c95543251d9d458d7845a3e8cad7533c5581fd19b8bee51084"
+  },
+  "rootAgents": {
+    "path": "AGENTS.md",
+    "sha256": "sha256:484fcd435c9d05fa7ee1ca26269bcbfef1cf0c28b3924524d01a502ae1c35656",
+    "headSha256": "sha256:484fcd435c9d05fa7ee1ca26269bcbfef1cf0c28b3924524d01a502ae1c35656",
+    "matchesHead": true
+  },
+  "provenance": {
+    "runtime": {
+      "bunVersion": "1.3.14",
+      "gitVersion": "git version 2.43.0"
+    },
+    "commandResults": [
+      {
+        "id": "root-agents-head",
+        "argv": [
+          "git",
+          "show",
+          "HEAD:AGENTS.md"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:484fcd435c9d05fa7ee1ca26269bcbfef1cf0c28b3924524d01a502ae1c35656",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "status-inventory",
+        "argv": [
+          "git",
+          "status",
+          "--porcelain=v1",
+          "-z",
+          "--untracked-files=all",
+          "--ignored=matching"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:4a8d0e86145e320d5350320fc96888c67596003003b8b6b8a6d8578f3343e7a6",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "discover-artifacts",
+        "argv": [
+          "git",
+          "ls-files",
+          "--cached",
+          "--others",
+          "--exclude-standard",
+          "-z"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:77fb10cb684705d69fad3a99fd67e6e69f560171b05c5710cd3c6457e0ecda27",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "status-inventory",
+        "argv": [
+          "git",
+          "status",
+          "--porcelain=v1",
+          "-z",
+          "--untracked-files=all",
+          "--ignored=matching"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:4a8d0e86145e320d5350320fc96888c67596003003b8b6b8a6d8578f3343e7a6",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "head-commit",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:f0b051701fd41b1c093a61dc7b3d9b1a5712eab5cf91e3909f30770b1832f500",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "head-tree",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD^{tree}"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:1b142c06fd3d1c73ed3002b82bd5dd74290fdd46690e1df0423757b6330cad60",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "repo-diff",
+        "argv": [
+          "git",
+          "diff",
+          "--binary",
+          "HEAD"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:5a532909a39ec6c95543251d9d458d7845a3e8cad7533c5581fd19b8bee51084",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "git-version",
+        "argv": [
+          "git",
+          "--version"
+        ],
+        "cwd": ".",
+        "exitCode": 0,
+        "stdoutSha256": "sha256:25f3602b5caaf92437be1e76b53698e8d73f14a6c71c2e91c8d5875f923ab29f",
+        "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "isolation": {
+      "kind": "head-archive-plus-approved-overlay",
+      "dedicatedRoots": {
+        "HOME": "${K0R_ROOT}/home",
+        "XDG_CACHE_HOME": "${K0R_ROOT}/cache",
+        "TMPDIR": "${K0R_ROOT}/tmp",
+        "registry": "${K0R_ROOT}/registry",
+        "credentials": "${K0R_ROOT}/credentials-empty",
+        "BOULDER_ROOT": "${K0R_ROOT}/boulder"
+      },
+      "requirements": {
+        "allRootsMustBeNewAndOwnedByRun": true,
+        "credentialsRootMustBeEmpty": true,
+        "hostHomeCacheTempRegistryCredentialsAndBoulderAreForbidden": true,
+        "network": "disabled",
+        "networkBreachInvalidates": true,
+        "prePostInventoryMustMatchAfterCleanup": true,
+        "rootAgentsMustBeRecheckedAfterAllCommands": true
+      },
+      "sourceDerivation": {
+        "base": "immutable HEAD tracked bytes via git archive",
+        "baseCommitAndTreeRequired": true,
+        "archiveDigestRequired": true,
+        "overlay": "hash-bound current bytes only for approved K0/K1/K0R paths; generated isolated-run receipt is installed as not_run, and evidence-manifest is excluded from the mutable overlay then installed as deterministic canonical pending/not_run disposable bytes",
+        "overlayPathAndDigestRequired": true,
+        "unapprovedDirtyPathsExcluded": true
+      },
+      "dependencies": {
+        "typescript": {
+          "required": true,
+          "executable": "tsc",
+          "bunLockPath": "bun.lock",
+          "packageName": "typescript",
+          "packageVersionRange": "^6.0.3",
+          "packageJsonPath": "package.json",
+          "artifactPath": "lib/tsc.js",
+          "packageTreeDigestRequired": true,
+          "symlinkBoundaryForbidden": true,
+          "readOnlyDestinations": [
+            "/k0r/typescript"
+          ]
+        }
+      },
+      "bwrap": {
+        "runtime": "bwrap",
+        "required": true,
+        "mandatoryArgv": [
+          "--die-with-parent",
+          "--new-session",
+          "--unshare-net",
+          "--clearenv"
+        ],
+        "readOnlySystemRuntimePaths": [
+          "/usr",
+          "/lib",
+          "/lib64",
+          "/etc"
+        ],
+        "readOnlyRepositoryDestination": "/workspace",
+        "writableDedicatedRootDestinations": [
+          "/k0r/home",
+          "/k0r/cache",
+          "/tmp",
+          "/k0r/registry",
+          "/k0r/credentials",
+          "/k0r/boulder"
+        ],
+        "hostHomeBindForbidden": true,
+        "hostHomeProbePath": "/home",
+        "runtimeExecutable": {
+          "hostSource": "Bun.argv[0]",
+          "destination": "/k0r/runtime/bun",
+          "logicalArgv0": "bun",
+          "readOnly": true
+        },
+        "networkBreachProbe": [
+          "bun",
+          "-e",
+          "await fetch(\"http://198.51.100.1:9\", { signal: AbortSignal.timeout(1000) }); process.exit(0);"
+        ]
+      }
+    }
+  },
+  "inventories": {
+    "pre": {
+      "tracked": [
+        {
+          "path": "test/k0r-capture-evidence.ts",
+          "status": " M",
+          "sha256": "sha256:caafd5f159b49e8572cf2d341cc1fc8b206e4256016180eae9472f4a3aa4acb5",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-evidence-contract.test.ts",
+          "status": " M",
+          "sha256": "sha256:3d879d4286c5d07bff507d17f10f0e064f876b19d525ee673cfc047df6198469",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-run-evidence.ts",
+          "status": " M",
+          "sha256": "sha256:13807adff5f34c073c86417d730e1dcdc1da11f3644a2bb20760e6872011be52",
+          "classification": "k0r"
+        }
+      ],
+      "untracked": [
+        {
+          "path": "evidence/k0r/acceptance-manifest.json",
+          "status": "??",
+          "sha256": "sha256:32040d50ffe320cf88a86c9554bf9451119f24bc47cb84919a366d6dc3475e22",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/approval-provenance.json",
+          "status": "??",
+          "sha256": "sha256:e54add58465b842db0bdaaeba55d13225f3ba5eae9a379830fed03e30b729bcd",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/independent-clean-source-reproduction.json",
+          "status": "??",
+          "sha256": "sha256:7e7fa66a16b5fe6c4c349e098181d356cb38e7bfafdc616b254924be9014ffa2",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/isolated-run-receipt.json",
+          "status": "??",
+          "sha256": "sha256:a641904dff16350a443369780c50b196693479c4c12ddb900f4d8b15ec7f2546",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/isolation-manifest.json",
+          "status": "??",
+          "sha256": "sha256:40ebf19b2ad4b955e6ad9c495c14f7a141bb35d5de1e3f8c30eb54be305e8653",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/superseding-adr.md",
+          "status": "??",
+          "sha256": "sha256:75f8bef99692326816838b5e83162fa8f37168a304cb1de8ef9add3a4d6bc08f",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/v1-public-contract-inventory.json",
+          "status": "??",
+          "sha256": "sha256:b8f55b94572873c41d267313b3330753e90d5f9e5cdd71012a4529f137d8ca51",
+          "classification": "k0r"
+        },
+        {
+          "path": "reference/DESIGN.md",
+          "status": "??",
+          "sha256": "sha256:8970989a07a3170fefba07e8fe2538030fc421812341e51d71886e13b4a2bfb5",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "test/k0r-baseline-generator.test.ts",
+          "status": "??",
+          "sha256": "sha256:b9e62bcffe932e92ddf0176e6ae4bc54f0213746d1b3cd6e3708397787868905",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-baseline-generator.ts",
+          "status": "??",
+          "sha256": "sha256:167c26bf89338538bf85a0d73d1119165184b5fad9923da3f43efb8e2eb3540e",
+          "classification": "k0r"
+        }
+      ],
+      "ignored": [
+        {
+          "path": ".boulder",
+          "status": "!!",
+          "sha256": "sha256:9a565dcfafb1faa1c6fbd6bbc15dcad06ed9982fcbf617743797ab80c1002a51",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".code-review-graph/.gitignore",
+          "status": "!!",
+          "sha256": "sha256:0372cef6feb8cafaacc589b124a0afaf613ecd97de03c58e8c6cc949254bf464",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".code-review-graph/graph.db",
+          "status": "!!",
+          "sha256": "sha256:c9bcc976788295ae496a2bda0209cc33adf1989f744ede19caa8cd44a3de3e0d",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".codegraph",
+          "status": "!!",
+          "sha256": "sha256:788e56ebc86c2ce4bfd2f5f8d7f75558278ba6d835396bc96944f6f0e323b165",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".gjc",
+          "status": "!!",
+          "sha256": "sha256:d19c83a749d227ba6470bd0fed1ae47c0c117201104d18e9c4a8874cc7578494",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".omo",
+          "status": "!!",
+          "sha256": "sha256:9e22876e67f42d65ee8b630e9334e0a5ff4bfdb21bf6e789eabe34018e4ca6f7",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "_workspace",
+          "status": "!!",
+          "sha256": "sha256:2de2d025bbfd515bb281006f89db4f22528832145ebf8a5ba479e03e1644ec99",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "docs/BOULDER_PROJECT_SESSION_SUMMARY.ko.md",
+          "status": "!!",
+          "sha256": "sha256:976fb3fcf559327b57d0cf52b3731023328e1c7b26b94335f251da0bfa56da24",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "docs/NEXT_GAP_REMEDIATION_PLAN.ko.md",
+          "status": "!!",
+          "sha256": "sha256:146125c3f7fff442b4b557ae863cdf8033b39f73e7f5e9dc9ec4c4da901f98b8",
+          "classification": "unrelated-existing"
+        }
+      ]
+    },
+    "post": {
+      "tracked": [
+        {
+          "path": "test/k0r-capture-evidence.ts",
+          "status": " M",
+          "sha256": "sha256:caafd5f159b49e8572cf2d341cc1fc8b206e4256016180eae9472f4a3aa4acb5",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-evidence-contract.test.ts",
+          "status": " M",
+          "sha256": "sha256:3d879d4286c5d07bff507d17f10f0e064f876b19d525ee673cfc047df6198469",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-run-evidence.ts",
+          "status": " M",
+          "sha256": "sha256:13807adff5f34c073c86417d730e1dcdc1da11f3644a2bb20760e6872011be52",
+          "classification": "k0r"
+        }
+      ],
+      "untracked": [
+        {
+          "path": "evidence/k0r/acceptance-manifest.json",
+          "status": "??",
+          "sha256": "sha256:32040d50ffe320cf88a86c9554bf9451119f24bc47cb84919a366d6dc3475e22",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/approval-provenance.json",
+          "status": "??",
+          "sha256": "sha256:e54add58465b842db0bdaaeba55d13225f3ba5eae9a379830fed03e30b729bcd",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/independent-clean-source-reproduction.json",
+          "status": "??",
+          "sha256": "sha256:7e7fa66a16b5fe6c4c349e098181d356cb38e7bfafdc616b254924be9014ffa2",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/isolated-run-receipt.json",
+          "status": "??",
+          "sha256": "sha256:a641904dff16350a443369780c50b196693479c4c12ddb900f4d8b15ec7f2546",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/isolation-manifest.json",
+          "status": "??",
+          "sha256": "sha256:40ebf19b2ad4b955e6ad9c495c14f7a141bb35d5de1e3f8c30eb54be305e8653",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/superseding-adr.md",
+          "status": "??",
+          "sha256": "sha256:75f8bef99692326816838b5e83162fa8f37168a304cb1de8ef9add3a4d6bc08f",
+          "classification": "k0r"
+        },
+        {
+          "path": "evidence/k0r/v1-public-contract-inventory.json",
+          "status": "??",
+          "sha256": "sha256:b8f55b94572873c41d267313b3330753e90d5f9e5cdd71012a4529f137d8ca51",
+          "classification": "k0r"
+        },
+        {
+          "path": "reference/DESIGN.md",
+          "status": "??",
+          "sha256": "sha256:8970989a07a3170fefba07e8fe2538030fc421812341e51d71886e13b4a2bfb5",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "test/k0r-baseline-generator.test.ts",
+          "status": "??",
+          "sha256": "sha256:b9e62bcffe932e92ddf0176e6ae4bc54f0213746d1b3cd6e3708397787868905",
+          "classification": "k0r"
+        },
+        {
+          "path": "test/k0r-baseline-generator.ts",
+          "status": "??",
+          "sha256": "sha256:167c26bf89338538bf85a0d73d1119165184b5fad9923da3f43efb8e2eb3540e",
+          "classification": "k0r"
+        }
+      ],
+      "ignored": [
+        {
+          "path": ".boulder",
+          "status": "!!",
+          "sha256": "sha256:9a565dcfafb1faa1c6fbd6bbc15dcad06ed9982fcbf617743797ab80c1002a51",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".code-review-graph/.gitignore",
+          "status": "!!",
+          "sha256": "sha256:0372cef6feb8cafaacc589b124a0afaf613ecd97de03c58e8c6cc949254bf464",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".code-review-graph/graph.db",
+          "status": "!!",
+          "sha256": "sha256:c9bcc976788295ae496a2bda0209cc33adf1989f744ede19caa8cd44a3de3e0d",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".codegraph",
+          "status": "!!",
+          "sha256": "sha256:788e56ebc86c2ce4bfd2f5f8d7f75558278ba6d835396bc96944f6f0e323b165",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".gjc",
+          "status": "!!",
+          "sha256": "sha256:d19c83a749d227ba6470bd0fed1ae47c0c117201104d18e9c4a8874cc7578494",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": ".omo",
+          "status": "!!",
+          "sha256": "sha256:9e22876e67f42d65ee8b630e9334e0a5ff4bfdb21bf6e789eabe34018e4ca6f7",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "_workspace",
+          "status": "!!",
+          "sha256": "sha256:2de2d025bbfd515bb281006f89db4f22528832145ebf8a5ba479e03e1644ec99",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "docs/BOULDER_PROJECT_SESSION_SUMMARY.ko.md",
+          "status": "!!",
+          "sha256": "sha256:976fb3fcf559327b57d0cf52b3731023328e1c7b26b94335f251da0bfa56da24",
+          "classification": "unrelated-existing"
+        },
+        {
+          "path": "docs/NEXT_GAP_REMEDIATION_PLAN.ko.md",
+          "status": "!!",
+          "sha256": "sha256:146125c3f7fff442b4b557ae863cdf8033b39f73e7f5e9dc9ec4c4da901f98b8",
+          "classification": "unrelated-existing"
+        }
+      ]
+    },
+    "generatedManifestExcludedFromOwnInventory": true
+  },
+  "mutationAssessment": {
+    "declaredK0rMutations": [],
+    "undeclaredMutations": [],
+    "count": 0
+  },
+  "k0rArtifacts": [
+    {
+      "path": "evidence/k0r/acceptance-manifest.json",
+      "sha256": "sha256:32040d50ffe320cf88a86c9554bf9451119f24bc47cb84919a366d6dc3475e22"
+    },
+    {
+      "path": "evidence/k0r/approval-provenance.json",
+      "sha256": "sha256:e54add58465b842db0bdaaeba55d13225f3ba5eae9a379830fed03e30b729bcd"
+    },
+    {
+      "path": "evidence/k0r/independent-clean-source-reproduction.json",
+      "sha256": "sha256:7e7fa66a16b5fe6c4c349e098181d356cb38e7bfafdc616b254924be9014ffa2"
+    },
+    {
+      "path": "evidence/k0r/isolated-run-receipt.json",
+      "sha256": "sha256:a641904dff16350a443369780c50b196693479c4c12ddb900f4d8b15ec7f2546"
+    },
+    {
+      "path": "evidence/k0r/isolation-manifest.json",
+      "sha256": "sha256:40ebf19b2ad4b955e6ad9c495c14f7a141bb35d5de1e3f8c30eb54be305e8653"
+    },
+    {
+      "path": "evidence/k0r/superseding-adr.md",
+      "sha256": "sha256:75f8bef99692326816838b5e83162fa8f37168a304cb1de8ef9add3a4d6bc08f"
+    },
+    {
+      "path": "evidence/k0r/v1-public-contract-inventory.json",
+      "sha256": "sha256:b8f55b94572873c41d267313b3330753e90d5f9e5cdd71012a4529f137d8ca51"
+    },
+    {
+      "path": "test/k0r-baseline-generator.test.ts",
+      "sha256": "sha256:b9e62bcffe932e92ddf0176e6ae4bc54f0213746d1b3cd6e3708397787868905"
+    },
+    {
+      "path": "test/k0r-baseline-generator.ts",
+      "sha256": "sha256:167c26bf89338538bf85a0d73d1119165184b5fad9923da3f43efb8e2eb3540e"
+    },
+    {
+      "path": "test/k0r-capture-evidence.ts",
+      "sha256": "sha256:caafd5f159b49e8572cf2d341cc1fc8b206e4256016180eae9472f4a3aa4acb5"
+    },
+    {
+      "path": "test/k0r-evidence-contract.test.ts",
+      "sha256": "sha256:3d879d4286c5d07bff507d17f10f0e064f876b19d525ee673cfc047df6198469"
+    },
+    {
+      "path": "test/k0r-globals.d.ts",
+      "sha256": "sha256:cf725c42e1b83181039929bec598234f23af78724cb81efefe2d1cf1b96969ce"
+    },
+    {
+      "path": "test/k0r-independent-oracle.test.ts",
+      "sha256": "sha256:2d50e7a9f10b90a3c58ec061920321f99a44900f2992d3654945e1b65a83aaef"
+    },
+    {
+      "path": "test/k0r-independent-oracle.ts",
+      "sha256": "sha256:aa57239ad0d96ad468c87df57ce4921b2cd8a10a8d684b116758a09123090680"
+    },
+    {
+      "path": "test/k0r-run-evidence.ts",
+      "sha256": "sha256:13807adff5f34c073c86417d730e1dcdc1da11f3644a2bb20760e6872011be52"
+    }
+  ],
+  "commandIdentities": [
+    {
+      "id": "baseline-generator",
+      "command": "bun test/k0r-baseline-generator.ts --write",
+      "expected": "refreshes the current-HEAD K0R acceptance, isolation, inventory, and independent-oracle manifests"
+    },
+    {
+      "id": "contract-schema-check",
+      "command": "bun test test/k0r-evidence-contract.test.ts",
+      "expected": "exit 0 only when K0R contract schemas and the external-binding policy remain valid"
+    },
+    {
+      "id": "independent-clean-source-reproduction",
+      "command": "bun test test/k0r-independent-oracle.test.ts",
+      "expected": "records byte-exact independent-oracle vector results and fails on any disagreement"
+    },
+    {
+      "id": "evidence-generator",
+      "command": "bun test/k0r-capture-evidence.ts --approval-receipt evidence/k0r/approval-provenance.json",
+      "expected": "writes an atomic external manifest only inside evidence/k0r after recording measured provenance"
+    },
+    {
+      "id": "isolation-review",
+      "command": "git diff --exit-code -- AGENTS.md",
+      "expected": "exit 0 only when root AGENTS.md matches HEAD"
+    },
+    {
+      "id": "isolated-run-evidence",
+      "command": "bun test/k0r-run-evidence.ts --write",
+      "expected": "generates a measured isolated-run receipt with exact source hashes and observed argv-array command results"
+    }
+  ],
+  "independentOracle": {
+    "reportPath": "evidence/k0r/independent-clean-source-reproduction.json",
+    "reportSha256": "sha256:7e7fa66a16b5fe6c4c349e098181d356cb38e7bfafdc616b254924be9014ffa2",
+    "reproductionMode": "complete-byte-independent",
+    "status": "pass",
+    "artifactDigests": {
+      "baseline": "sha256:0172bc8c3241db159f45b45d5320a466e612856afa2ca6c3478d6d55f5fda750",
+      "mutations": "sha256:88ed614d1757525c543d86e71b301887b9160465ea9b5126193045d4d0d388ec",
+      "none": "sha256:df3a2d6da157837886206a2512e50868e1b468b9b48dbcf5ce4bba582cc7c754"
+    },
+    "reproduced": {
+      "baseline": {
+        "sha256": "sha256:0172bc8c3241db159f45b45d5320a466e612856afa2ca6c3478d6d55f5fda750",
+        "fixtureSha256": "sha256:0172bc8c3241db159f45b45d5320a466e612856afa2ca6c3478d6d55f5fda750",
+        "byteMatch": true
+      },
+      "mutations": {
+        "sha256": "sha256:88ed614d1757525c543d86e71b301887b9160465ea9b5126193045d4d0d388ec",
+        "fixtureSha256": "sha256:88ed614d1757525c543d86e71b301887b9160465ea9b5126193045d4d0d388ec",
+        "byteMatch": true
+      },
+      "none": {
+        "sha256": "sha256:df3a2d6da157837886206a2512e50868e1b468b9b48dbcf5ce4bba582cc7c754",
+        "fixtureSha256": "sha256:df3a2d6da157837886206a2512e50868e1b468b9b48dbcf5ce4bba582cc7c754",
+        "byteMatch": true
+      }
+    },
+    "oracleSourceSha256": "sha256:aa57239ad0d96ad468c87df57ce4921b2cd8a10a8d684b116758a09123090680",
+    "generationSetDigest": "sha256:cae1b30b108761597e83350dd359206a87edc629231f7fcbffba9cc599117b65",
+    "vectorIds": [
+      "algorithm-unsupported",
+      "key-unknown",
+      "key-revoked",
+      "event-digest-invalid",
+      "signature-invalid",
+      "timestamp-invalid",
+      "expired",
+      "stale",
+      "policy-mismatch",
+      "binding-workflow",
+      "binding-plan-revision",
+      "binding-step",
+      "binding-effect",
+      "binding-class",
+      "binding-scope",
+      "binding-input",
+      "replayed",
+      "verifier-unavailable"
+    ],
+    "seedMaterial": {
+      "status": "absentOutsideApprovedOracleAndGenerator",
+      "scannedFileCount": 470
+    }
+  },
+  "reviews": {
+    "architect": {
+      "status": "pending_review",
+      "exactByteApproval": false
+    },
+    "critic": {
+      "status": "pending_review",
+      "exactByteApproval": false
+    },
+    "maintainerAdr": {
+      "status": "pending_review",
+      "exactByteApproval": false
+    },
+    "exitReceipt": {
+      "status": "not_issued",
+      "approved": false
+    },
+    "pendingReviewCount": 4
+  },
+  "externalSelfHash": {
+    "policy": "not_recorded",
+    "reason": "A generated manifest cannot bind its own bytes without circularity; exact-byte reviews and maintainer ADR approval bind it externally."
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "version": "0.1.16",
+  "version": "0.1.17",
   "status": "ready",
   "checks": [
     {
@@ -45,7 +45,7 @@
     {
       "id": "git-tag-local",
       "status": "pass",
-      "evidence": "release tag evidence available for v0.1.16"
+      "evidence": "release tag evidence available for v0.1.17"
     },
     {
       "id": "release-evidence-manifest",

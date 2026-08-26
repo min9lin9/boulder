@@ -1,0 +1,166 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/min9lin9/boulder/spec/evidence-format/boulder plan approval challenge",
+  "title": "boulder plan approval challenge",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "enum": [
+        "boulder.plan-approval-challenge.v1",
+        "boulder.execution-approval-challenge.v1"
+      ],
+      "description": "Frozen format identifier."
+    },
+    "runId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "description": "Run identifier this challenge belongs to."
+    },
+    "purpose": {
+      "type": "string",
+      "enum": [
+        "plan",
+        "execution"
+      ],
+      "description": "Which gate this challenge guards."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "RFC 3339 timestamp when the challenge was issued."
+    },
+    "challengeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "description": "Unique identifier of this challenge."
+    },
+    "challengeDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Canonical digest of the challenge body."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "consumed",
+        "invalidated"
+      ],
+      "description": "Lifecycle status."
+    },
+    "nonce": {
+      "type": "string",
+      "description": "Single-use nonce bound into the approval code hash."
+    },
+    "codeHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "HMAC-domain canonical hash of the human approval code."
+    },
+    "keyVersion": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "description": "Signing key version used for the challenge MAC."
+    },
+    "issuedBy": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$",
+      "description": "Issuer identity string."
+    },
+    "challengeMac": {
+      "type": "string",
+      "description": "Optional HMAC over the canonical signing payload; domain depends on purpose.",
+      "x-optional": true
+    },
+    "bindings": {
+      "$ref": "#/$defs/bindings"
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "runId",
+    "purpose",
+    "createdAt",
+    "challengeId",
+    "challengeDigest",
+    "status",
+    "nonce",
+    "codeHash",
+    "keyVersion",
+    "issuedBy",
+    "bindings"
+  ],
+  "$defs": {
+    "bindings": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "packetDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the reviewed planning packet"
+            },
+            "structuralReviewDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the accepted structural review"
+            },
+            "semanticReviewDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the accepted semantic review"
+            },
+            "sourceDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the source tree state"
+            }
+          },
+          "required": [
+            "packetDigest",
+            "structuralReviewDigest",
+            "semanticReviewDigest",
+            "sourceDigest"
+          ],
+          "description": "Plan approval bindings."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "planningPacketDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the planning packet"
+            },
+            "planApprovalDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the plan approval receipt"
+            },
+            "executionPacketDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the execution packet"
+            },
+            "sourceDigest": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "description": "sha256 digest of the source tree state"
+            }
+          },
+          "required": [
+            "planningPacketDigest",
+            "planApprovalDigest",
+            "executionPacketDigest",
+            "sourceDigest"
+          ],
+          "description": "Execution approval bindings."
+        }
+      ]
+    }
+  }
+}

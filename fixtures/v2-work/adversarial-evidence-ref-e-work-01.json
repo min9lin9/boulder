@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "boulder.v2.work-adversarial-vectors.v1",
+  "oracle": {
+    "canonicalization": "RFC8785-compatible I-JSON subset: UTF-8, lexicographically sorted keys, compact JSON",
+    "digest": "SHA-256",
+    "eventDigestPreimage": "boulder.v2.work-event.v1 + LF + canonical event without eventDigest",
+    "producer": "Python 3 stdlib json.dumps/hashlib; no Boulder production import"
+  },
+  "acceptance": {
+    "id": "acceptance-is-durable-nonterminal-state",
+    "events": [
+      {
+        "schemaVersion": "boulder.v2.work-event.v1",
+        "eventId": "event-1",
+        "sequence": 1,
+        "occurredAt": "2026-08-01T00:00:01.000Z",
+        "workId": "work-accepted",
+        "workRevisionDigest": "sha256:68136f310625f20408f8e8218fffd39eba21a31e958d3c36879335c070980207",
+        "previousEventDigest": null,
+        "kind": "revision-created",
+        "data": {
+          "revision": 1,
+          "previousWorkRevisionDigest": null,
+          "procedureDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "resolvedContract": {
+            "contractDigest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "revision": 1
+          },
+          "basis": {
+            "kind": "initial"
+          },
+          "semanticDigest": "sha256:7319ca8bb4225da3b6ceaabc1716cdab94a633c98c02ca81303c5669d15d9691"
+        },
+        "eventDigest": "sha256:b77e7c26b2da3716623b53fa581a373e4f49f3d0bf2eb90ccfccee700436b8c6"
+      },
+      {
+        "schemaVersion": "boulder.v2.work-event.v1",
+        "eventId": "event-2",
+        "sequence": 2,
+        "occurredAt": "2026-08-01T00:00:02.000Z",
+        "workId": "work-accepted",
+        "workRevisionDigest": "sha256:68136f310625f20408f8e8218fffd39eba21a31e958d3c36879335c070980207",
+        "previousEventDigest": "sha256:b77e7c26b2da3716623b53fa581a373e4f49f3d0bf2eb90ccfccee700436b8c6",
+        "kind": "attempt-started",
+        "data": {
+          "attemptId": "attempt-1",
+          "attempt": 1,
+          "runnerKind": "in-process",
+          "sessionId": "session-in-process"
+        },
+        "eventDigest": "sha256:fdeea3032f2c43e04670c4c9c370e25e3a47dc93e4a6566eaeee403ac0cf151f"
+      },
+      {
+        "schemaVersion": "boulder.v2.work-event.v1",
+        "eventId": "event-3",
+        "sequence": 3,
+        "occurredAt": "2026-08-01T00:00:03.000Z",
+        "workId": "work-accepted",
+        "workRevisionDigest": "sha256:68136f310625f20408f8e8218fffd39eba21a31e958d3c36879335c070980207",
+        "previousEventDigest": "sha256:fdeea3032f2c43e04670c4c9c370e25e3a47dc93e4a6566eaeee403ac0cf151f",
+        "kind": "attempt-accepted",
+        "data": {
+          "attemptId": "attempt-1",
+          "acceptedAt": "2026-08-01T00:00:03.000Z"
+        },
+        "eventDigest": "sha256:171a6d59da4f74e20dc4985d568456a025c13c6d75dd01fbc9fd0813eb3bfae3"
+      }
+    ],
+    "eventDigests": [
+      "sha256:b77e7c26b2da3716623b53fa581a373e4f49f3d0bf2eb90ccfccee700436b8c6",
+      "sha256:fdeea3032f2c43e04670c4c9c370e25e3a47dc93e4a6566eaeee403ac0cf151f",
+      "sha256:171a6d59da4f74e20dc4985d568456a025c13c6d75dd01fbc9fd0813eb3bfae3"
+    ],
+    "expectedState": "accepted"
+  },
+  "crashPrefixes": [
+    {
+      "id": "in-process-missing-after-attempt-started",
+      "runnerKind": "in-process",
+      "crashAfterSequence": 2,
+      "events": [
+        {
+          "schemaVersion": "boulder.v2.work-event.v1",
+          "eventId": "event-1",
+          "sequence": 1,
+          "occurredAt": "2026-08-01T00:00:01.000Z",
+          "workId": "work-in-process-crash",
+          "workRevisionDigest": "sha256:026a14b8df0acdaca44c546e30bc209473e2f4de5a561088d7b4553568c6d122",
+          "previousEventDigest": null,
+          "kind": "revision-created",
+          "data": {
+            "revision": 1,
+            "previousWorkRevisionDigest": null,
+            "procedureDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "resolvedContract": {
+            "contractDigest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "revision": 1
+          },
+          "basis": {
+            "kind": "initial"
+          },
+          "semanticDigest": "sha256:7319ca8bb4225da3b6ceaabc1716cdab94a633c98c02ca81303c5669d15d9691"
+          },
+          "eventDigest": "sha256:7fa21ec0071ca2d052147fd529e88dc7b5488d205706a56df342150479813a7b"
+        },
+        {
+          "schemaVersion": "boulder.v2.work-event.v1",
+          "eventId": "event-2",
+          "sequence": 2,
+          "occurredAt": "2026-08-01T00:00:02.000Z",
+          "workId": "work-in-process-crash",
+          "workRevisionDigest": "sha256:026a14b8df0acdaca44c546e30bc209473e2f4de5a561088d7b4553568c6d122",
+          "previousEventDigest": "sha256:7fa21ec0071ca2d052147fd529e88dc7b5488d205706a56df342150479813a7b",
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-1",
+            "attempt": 1,
+            "runnerKind": "in-process",
+            "sessionId": "session-in-process"
+          },
+          "eventDigest": "sha256:490d2a9659d41eace8e62f8d3885921210c10e28d2552a6df20067d50fdfa16d"
+        }
+      ],
+      "eventDigests": [
+        "sha256:7fa21ec0071ca2d052147fd529e88dc7b5488d205706a56df342150479813a7b",
+        "sha256:490d2a9659d41eace8e62f8d3885921210c10e28d2552a6df20067d50fdfa16d"
+      ],
+      "observationStatus": "missing",
+      "expectedRecoveryAction": "record-runner-missing"
+    },
+    {
+      "id": "process-missing-after-attempt-started",
+      "runnerKind": "process",
+      "crashAfterSequence": 2,
+      "events": [
+        {
+          "schemaVersion": "boulder.v2.work-event.v1",
+          "eventId": "event-1",
+          "sequence": 1,
+          "occurredAt": "2026-08-01T00:00:01.000Z",
+          "workId": "work-process-crash",
+          "workRevisionDigest": "sha256:6122740dd2cf3514476b30a918bbd8384257beb79d772250981a38082d7ad396",
+          "previousEventDigest": null,
+          "kind": "revision-created",
+          "data": {
+            "revision": 1,
+            "previousWorkRevisionDigest": null,
+            "procedureDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "resolvedContract": {
+            "contractDigest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "revision": 1
+          },
+          "basis": {
+            "kind": "initial"
+          },
+          "semanticDigest": "sha256:7319ca8bb4225da3b6ceaabc1716cdab94a633c98c02ca81303c5669d15d9691"
+          },
+          "eventDigest": "sha256:f5d7a8f5ec98edd22978e07c3704aae4523711f8ee8376e4902b2813d4657728"
+        },
+        {
+          "schemaVersion": "boulder.v2.work-event.v1",
+          "eventId": "event-2",
+          "sequence": 2,
+          "occurredAt": "2026-08-01T00:00:02.000Z",
+          "workId": "work-process-crash",
+          "workRevisionDigest": "sha256:6122740dd2cf3514476b30a918bbd8384257beb79d772250981a38082d7ad396",
+          "previousEventDigest": "sha256:f5d7a8f5ec98edd22978e07c3704aae4523711f8ee8376e4902b2813d4657728",
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-1",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-process"
+          },
+          "eventDigest": "sha256:684a517b9d98e477b47bcdb01672191845529a7ca83a5de5961b2d2b6514fac1"
+        }
+      ],
+      "eventDigests": [
+        "sha256:f5d7a8f5ec98edd22978e07c3704aae4523711f8ee8376e4902b2813d4657728",
+        "sha256:684a517b9d98e477b47bcdb01672191845529a7ca83a5de5961b2d2b6514fac1"
+      ],
+      "observationStatus": "missing",
+      "expectedRecoveryAction": "record-runner-missing"
+    }
+  ]
+}

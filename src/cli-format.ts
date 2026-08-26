@@ -1,6 +1,7 @@
 import type { evaluateCapabilityDoctor } from "./capability-doctor";
 import type { recordFieldEvidence } from "./field-evidence";
 import type { WeeklyRetroReport } from "./routine-retro";
+import type { V2ExecutionOutcome } from "./v2/execution";
 
 export function formatLines(title: string, lines: readonly string[]): string {
   return [title, ...lines.map((line) => `- ${line}`)].join("\n");
@@ -20,6 +21,7 @@ export function printHelp(): void {
     "",
     "Main route:",
     "  boulder init [--cwd path] [--force]",
+    "  boulder v2 execute --input path [--cwd directory] [--json]",
     "  boulder workflow map --json",
     "  boulder quickstart [--cwd path] [--json]",
     "  boulder onboard [--cwd path] [--json]",
@@ -36,6 +38,7 @@ export function printHelp(): void {
     "  boulder handoff review [--cwd path] [--packet path] [--json]",
     "  boulder handoff send [--cwd path] [--packet path] [--approve-external] [--approval-code code] [--dry-run]",
     "  boulder plan analyze --task text [--run-id id] [--friction direct|focused|deep] [--cwd path] [--json]",
+    "  boulder plan benchmark --trust-root path --study-root path [--cwd path] [--json]",
     "  boulder plan show --run-id id [--cwd path] [--json]",
     "  boulder plan validate (--run-id id | --input path) [--artifact analysis|state|packet] [--cwd path] [--json]",
     "  boulder release-check [--cwd path] [--json]",
@@ -107,4 +110,15 @@ export function formatFieldEvidenceResult(result: Awaited<ReturnType<typeof reco
     `- manifest: ${result.manifestPath}`,
     ...result.checks.map((item) => `- ${item.id}: ${item.status} - ${item.evidence}`)
   ].join("\n");
+}
+export function formatV2ExecutionOutcome(outcome: V2ExecutionOutcome): string {
+  const lines = [
+    "Boulder v2 execute",
+    `- status: ${outcome.status}`,
+    `- lifecycle: ${outcome.lifecycle}`,
+  ];
+  if (outcome.result) lines.push(`- result: ${outcome.result.status}`);
+  if (outcome.status === "succeeded") lines.push(`- critique: ${outcome.critique.verdict}`);
+  else lines.push(`- failure: ${outcome.failure.code}`);
+  return lines.join("\n");
 }

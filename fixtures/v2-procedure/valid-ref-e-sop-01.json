@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "boulder.v2.procedure.v1",
+  "procedureId": "ref-e-sop-01",
+  "revision": 1,
+  "entryNodeId": "agent-task",
+  "nodes": [
+    { "id": "agent-task", "kind": "agent-task" },
+    { "id": "human-task", "kind": "human-task" },
+    { "id": "validate", "kind": "deterministic-task" },
+    { "id": "bounded-loop", "kind": "bounded-loop", "maxIterations": 2 }
+  ],
+  "edges": [
+    { "id": "agent-human", "from": "agent-task", "to": "human-task" },
+    { "id": "human-validate", "from": "human-task", "to": "validate" },
+    { "id": "validate-loop", "from": "validate", "to": "bounded-loop" },
+    {
+      "id": "loop-human",
+      "from": "bounded-loop",
+      "to": "human-task",
+      "authority": {
+        "action": "complete-loop",
+        "policyDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      }
+    }
+  ]
+}

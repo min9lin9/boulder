@@ -21,21 +21,44 @@ declare module "node:child_process" {
   export function exec(command: string, options: { cwd?: string; timeout?: number }, callback: (error: Error | null, stdout: string, stderr: string) => void): void;
 }
 
+declare module "node:crypto" {
+  type KeyObject = {
+    export(options: { readonly format: "der"; readonly type: "spki" }): Uint8Array;
+  };
+
+  type Hash = {
+    update(value: string, encoding: "utf8"): Hash;
+    update(value: Uint8Array): Hash;
+    digest(encoding: "hex"): string;
+  };
+
+  export function createHash(algorithm: "sha256"): Hash;
+  export function createPrivateKey(input: { readonly key: Uint8Array; readonly format: "der"; readonly type: "pkcs8" }): KeyObject;
+  export function createPublicKey(input: KeyObject | { readonly key: Uint8Array; readonly format: "der"; readonly type: "spki" }): KeyObject;
+  export function sign(algorithm: null, data: Uint8Array, key: KeyObject): Uint8Array;
+  export function verify(algorithm: null, data: Uint8Array, key: KeyObject, signature: Uint8Array): boolean;
+}
+
 declare module "node:fs/promises" {
   type FileStat = {
     readonly mode: number;
     readonly nlink: number;
     readonly dev: number;
     readonly ino: number;
+    readonly size: number;
+    readonly mtimeMs: number;
     isDirectory(): boolean;
     isFile(): boolean;
     isSymbolicLink(): boolean;
   };
   type FileHandle = {
+    readonly fd: number;
     stat(): Promise<FileStat>;
+    read(buffer: Uint8Array, offset: number, length: number, position: number): Promise<{ readonly bytesRead: number; readonly buffer: Uint8Array }>;
     readFile(): Promise<Uint8Array>;
     readFile(encoding: "utf8"): Promise<string>;
     writeFile(content: string, encoding: "utf8"): Promise<void>;
+    sync(): Promise<void>;
     close(): Promise<void>;
   };
   export function mkdir(path: string, options?: { recursive?: boolean }): Promise<void>;
@@ -43,6 +66,7 @@ declare module "node:fs/promises" {
   export function lstat(path: string): Promise<FileStat>;
   export function link(existingPath: string, newPath: string): Promise<void>;
   export function open(path: string, flags: number, mode?: number): Promise<FileHandle>;
+  export function open(path: string, flags: string, mode?: number): Promise<FileHandle>;
   export function readFile(path: string, encoding: "utf8"): Promise<string>;
   export function readFile(path: string): Promise<Uint8Array>;
   export function readdir(path: string): Promise<string[]>;
@@ -52,6 +76,7 @@ declare module "node:fs/promises" {
   export function stat(path: string): Promise<FileStat>;
   export function symlink(target: string, path: string): Promise<void>;
   export function unlink(path: string): Promise<void>;
+  export function utimes(path: string, atime: Date | string | number, mtime: Date | string | number): Promise<void>;
   export function writeFile(path: string, content: string, encoding: "utf8"): Promise<void>;
 }
 
@@ -73,6 +98,7 @@ declare module "node:os" {
 
 declare module "node:path" {
   export function dirname(path: string): string;
+  export function isAbsolute(path: string): boolean;
   export function join(...parts: string[]): string;
   export function relative(from: string, to: string): string;
   export function resolve(...parts: string[]): string;
