@@ -46,6 +46,7 @@ declare module "node:fs/promises" {
     readonly dev: number;
     readonly ino: number;
     readonly size: number;
+    readonly mtimeMs: number;
     isDirectory(): boolean;
     isFile(): boolean;
     isSymbolicLink(): boolean;
@@ -75,6 +76,7 @@ declare module "node:fs/promises" {
   export function stat(path: string): Promise<FileStat>;
   export function symlink(target: string, path: string): Promise<void>;
   export function unlink(path: string): Promise<void>;
+  export function utimes(path: string, atime: Date | string | number, mtime: Date | string | number): Promise<void>;
   export function writeFile(path: string, content: string, encoding: "utf8"): Promise<void>;
 }
 
