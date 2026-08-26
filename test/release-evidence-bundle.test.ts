@@ -49,11 +49,11 @@ const PROSPECTIVE_RELEASE_EXPECTATION = {
 } satisfies ReleaseEvidenceExpectation;
 
 const CHECKED_RELEASE_EXPECTATION = {
-  packageJsonVersion: "0.1.16",
-  cliVersion: "0.1.16",
-  tag: "v0.1.16",
-  releaseCommit: "6671bcaceb4b35180a5756d6a340798ccdf3c206",
-  packDryRunFileCount: 222
+  packageJsonVersion: "0.1.17",
+  cliVersion: "0.1.17",
+  tag: "v0.1.17",
+  releaseCommit: "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
+  packDryRunFileCount: 268
 } satisfies ReleaseEvidenceExpectation;
 
 describe("ReleaseEvidenceBundleV1", () => {

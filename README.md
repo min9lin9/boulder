@@ -14,8 +14,8 @@ Boulder makes an OSS repo agent-ready without giving up maintainer control. It c
 4. **Verify** - `doctor`, `release-check`, and `replay-check` prove the result before anyone trusts it.
 5. **Record** - signed receipts, run events, and `export` leave an audit trail behind.
 
-Current published package: `boulder-oss-cli@0.1.16`.
-Current release candidate: `v0.1.16`.
+Current published package: `boulder-oss-cli@0.1.17`.
+Current release candidate: `v0.1.17`.
 
 ## 3-minute route for non-developers
 

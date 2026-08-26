@@ -61,12 +61,12 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("reports root release evidence as ready after 0.1.16 is published and tagged", async () => {
+  test("reports root release evidence as ready after 0.1.17 is published and tagged", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.version).toBe("0.1.16");
+    expect(report.version).toBe("0.1.17");
     expect(report.status).toBe("ready");
     expect(report.checks.every((item) => item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "published-version-evidence")).toBe(true);

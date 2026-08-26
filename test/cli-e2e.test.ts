@@ -351,7 +351,7 @@ describe("boulder CLI e2e cleanup safety", () => {
     const payload = JSON.parse(result.stdout);
 
     expect(result.exitCode).toBe(0);
-    expect(payload.version).toBe("0.1.16");
+    expect(payload.version).toBe("0.1.17");
     expect(payload.status).toBe("ready");
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "release-workflow-doc" && item.status === "pass")).toBe(true);
     expect(payload.checks.some((item: { id: string; status: string }) => item.id === "published-version-evidence" && item.status === "pass")).toBe(true);
