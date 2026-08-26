@@ -6,6 +6,14 @@ Boulder makes an OSS repo agent-ready without giving up maintainer control. It c
 
 **Start in 90 seconds:** `bunx boulder-oss-cli@latest init && bunx boulder-oss-cli@latest quickstart` - `quickstart` verifies your local installation and prints your next commands.
 
+## How Boulder works
+
+1. **Intake** - `init` reads the repository shape and writes the operator contract.
+2. **Plan** - `bootstrap interview` and `profile resolve` map the task onto the right workflow profile.
+3. **Execute** - approved packets run through gated adapters (`v2 execute`, `handoff packet`).
+4. **Verify** - `doctor`, `release-check`, and `replay-check` prove the result before anyone trusts it.
+5. **Record** - signed receipts, run events, and `export` leave an audit trail behind.
+
 Current published package: `boulder-oss-cli@0.1.16`.
 Current release candidate: `v0.1.16`.
 
