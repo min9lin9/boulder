@@ -41,11 +41,11 @@ describe("package inventory contract", () => {
 
     expect(result.exitCode).toBe(0);
     expect(packed.files.filter((path) => path === "docs/boulder-guide.ko.html")).toHaveLength(1);
-    expect(summary.totalUniqueFiles).toBe(268);
-    expect(summary.totalPackedFiles).toBe(269);
+    expect(summary.totalUniqueFiles).toBe(269);
+    expect(summary.totalPackedFiles).toBe(270);
     expect(summary.counts).toEqual({
       runtime: 119,
-      "public-doc": 67,
+      "public-doc": 68,
       "case-study-evidence": 21,
       fixture: 50,
       skill: 8,

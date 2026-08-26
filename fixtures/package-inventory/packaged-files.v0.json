@@ -1,7 +1,7 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 268,
-  "totalPackedFiles": 269,
+  "totalUniqueFiles": 269,
+  "totalPackedFiles": 270,
   "classes": [
     {
       "class": "runtime",
@@ -130,7 +130,7 @@
     },
     {
       "class": "public-doc",
-      "count": 67,
+      "count": 68,
       "files": [
         "CHANGELOG.md",
         "CONTRIBUTING.md",
@@ -161,6 +161,7 @@
         "docs/COMMUNITY.md",
         "docs/COMPETITIVE_BENCHMARK_HARNESS_MANAGER.md",
         "docs/CONTRIBUTOR_START_HERE.md",
+        "docs/DEVELOPERS.md",
         "docs/EXTERNAL_REPLAY.md",
         "docs/FOLLOW_UP_BRIEFING.md",
         "docs/GJC_DEEP_INTERVIEW_REVIEW.md",
