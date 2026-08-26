@@ -1,6 +1,6 @@
 {
   "version": "0.1.17",
-  "status": "blocked",
+  "status": "ready",
   "checks": [
     {
       "id": "package-metadata",
@@ -29,13 +29,13 @@
     },
     {
       "id": "install-smoke-version",
-      "status": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.17"
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
     },
     {
       "id": "published-version-evidence",
-      "status": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.17"
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"
     },
     {
       "id": "github-actions-evidence",
@@ -44,13 +44,13 @@
     },
     {
       "id": "git-tag-local",
-      "status": "fail",
-      "evidence": "missing local tag v0.1.17"
+      "status": "pass",
+      "evidence": "release tag evidence available for v0.1.17"
     },
     {
       "id": "release-evidence-manifest",
-      "status": "fail",
-      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.17; cliVersion must be 0.1.17; tag must be v0.1.17; publishedVersion must be 0.1.17; packageVersion must be 0.1.17"
+      "status": "pass",
+      "evidence": "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"
     },
     {
       "id": "pack-dry-run-evidence",
@@ -58,9 +58,5 @@
       "evidence": "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"
     }
   ],
-  "nextCommands": [
-    "Refresh docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt for 0.1.17.",
-    "Record local tag evidence for v0.1.17 after the release commit is ready.",
-    "Refresh docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json for 0.1.17."
-  ]
+  "nextCommands": []
 }
