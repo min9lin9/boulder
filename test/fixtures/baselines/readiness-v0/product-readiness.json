@@ -1,5 +1,5 @@
 {
-  "status": "ready",
+  "status": "blocked",
   "checks": [
     {
       "id": "clean-release-tree",
@@ -53,8 +53,8 @@
     },
     {
       "id": "public-release-check",
-      "status": "pass",
-      "evidence": "release-check ready for 0.1.16"
+      "status": "fail",
+      "evidence": "release-check blocked: install-smoke-version=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: 0.1.17; published-version-evidence=docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt missing terms: Published version: 0.1.17; git-tag-local=missing local tag v0.1.17; release-evidence-manifest=docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json: packageJsonVersion must be 0.1.17; cliVersion must be 0.1.17; tag must be v0.1.17; publishedVersion must be 0.1.17; packageVersion must be 0.1.17"
     },
     {
       "id": "limitations-explicit",
@@ -83,6 +83,6 @@
     }
   ],
   "nextSteps": [
-    "Public product gate is ready; keep OpenAI acceptance and adoption outside Boulder claims."
+    "Fill every failed public product evidence path before claiming 9.5+ readiness."
   ]
 }

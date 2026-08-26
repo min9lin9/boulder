@@ -1435,7 +1435,7 @@ describe("K0R isolated-run receipt", () => {
       const cleanInventory = recordValue(recordValue(receipt.run.isolation, "isolation")["cleanTempInventory"], "clean temporary inventory");
       const gitMetadata = recordValue(cleanInventory["gitMetadata"], "clean temporary Git metadata");
       const releaseManifest = parseRecord(await readFile(releaseManifestPath, "utf8"), "release manifest");
-      expect(gitMetadata["packageVersion"]).toBe("0.1.16");
+      expect(gitMetadata["packageVersion"]).toBe("0.1.17");
       expect(gitMetadata["tag"]).toBe(releaseManifest["tag"]);
       expect(gitMetadata["tagCommit"]).toBe(releaseManifest["tagCommit"]);
       expect(gitMetadata["commit"]).toMatch(/^[0-9a-f]{40}$/);

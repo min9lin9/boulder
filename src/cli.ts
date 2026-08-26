@@ -23,7 +23,7 @@ import { buildPrimaryWorkflowMap } from "./workflow-map";
 import { executorsFromResolvedProfile, resolveWorkflowProfile } from "./workflow-profiles";
 import { runV2Command } from "./v2-command";
 
-const VERSION = "0.1.16";
+const VERSION = "0.1.17";
 
 export async function main(args: string[]): Promise<void> {
   try {

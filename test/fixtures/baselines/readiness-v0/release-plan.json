@@ -1,6 +1,6 @@
 {
-  "version": "0.1.16",
-  "status": "ready",
+  "version": "0.1.17",
+  "status": "blocked",
   "checks": [
     {
       "id": "package-json",
@@ -59,8 +59,8 @@
     },
     {
       "id": "version-evidence",
-      "status": "pass",
-      "evidence": "v0.1.16 appears in release-facing docs"
+      "status": "fail",
+      "evidence": "version marker missing from README.md"
     },
     {
       "id": "package-scripts",
@@ -70,7 +70,7 @@
   ],
   "manualSteps": [
     "Run bun run ci.",
-    "Create and push tag v0.1.16.",
+    "Create and push tag v0.1.17.",
     "Create the GitHub release with verification notes.",
     "Publishing remains manual; npm publish is not automated by Boulder."
   ]
