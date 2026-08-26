@@ -1,8 +1,8 @@
-bunx boulder-oss-cli@0.1.16 --version
-Published help smoke:
-bunx boulder-oss-cli --help
+bunx boulder-oss-cli@0.1.17 --version
+0.1.17
+Published version smoke: bunx boulder-oss-cli@0.1.17 --help
 Usage:
-Published version: 0.1.16
+Published version: 0.1.17
 Result: success
-Generated at: 2026-07-07
+Generated at: 2026-08-26
 exit: 0
