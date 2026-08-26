@@ -1,22 +1,38 @@
 import { createHash, randomUUID } from "node:crypto";
-import { execFile } from "node:child_process";
+import { constants as fsConstants } from "node:fs";
 import { copyFile, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { canonicalizeK0rJson, runBoundedK0rProcess, sha256CanonicalK0r } from "./k0r-canonical.js";
 import { runK0rIndependentOracle } from "./k0r-independent-oracle.js";
+import { verifyK0rPending } from "./k0r-issue-exit.js";
 
 const repositoryRoot = resolve(import.meta.dir, "..");
 export const isolatedRunReceiptPath = "evidence/k0r/isolated-run-receipt.json";
+export const isolatedPriorSnapshotMode = 0o600;
 const generatedEvidenceManifestPath = "evidence/k0r/evidence-manifest.json";
 export const isolatedRunSchemaVersion = "boulder.k0r.isolated-run-receipt.v1";
-export const isolatedRunCommandArgv = ["bun", "test/k0r-run-evidence.ts", "--write"] as const;
-export const isolatedRepositoryCheckArgv = [
-  ["bun", "test", "test/k0r-evidence-contract.test.ts", "test/k0r-independent-oracle.test.ts"],
-  ["bunx", "tsc", "--noEmit"],
-  ["bun", "run", "ci"],
-  ["git", "diff", "--exit-code", "--", "AGENTS.md"]
+export const isolatedRunCommandArgv = [
+  "bun", "test/k0r-run-evidence.ts", "--write",
+  "--pending-transition", "${QA_ROOT}/protected/k0r-transition.pending.json",
+  "--private-candidate", "${QA_ROOT}/receipts/isolated-run.candidate.json",
+  "--private-work-root", "${QA_ROOT}/work/isolated-run",
 ] as const;
-const isolatedOracleArgv = ["bun", "test/k0r-run-evidence.ts", "--isolated-oracle"] as const;
+export const isolatedRepositoryCheckArgv = [
+  ["bun", "test/k0r-issue-exit.ts", "--verify-pending", "${QA_ROOT}/protected/k0r-transition.pending.json", "--private-root", "${QA_ROOT}"],
+  ["bun", "test", "test/k0r-independent-oracle.test.ts"],
+  ["bun", "test", "${NON_K0R_TEST_FILES}"],
+  ["bunx", "--no-install", "tsc", "--noEmit"],
+  ["bun", "pm", "pack", "--dry-run", "--ignore-scripts"],
+] as const;
+export const isolatedOracleArgv = ["bun", "test/k0r-run-evidence.ts", "--isolated-oracle"] as const;
+
+export function resolveK0rRepositoryCheckExecution(index: number): { readonly location: "repository" | "boulder"; readonly readOnlyBoulder: boolean } {
+  if (!Number.isInteger(index) || index < 0 || index >= isolatedRepositoryCheckArgv.length) throw new Error(`K0R repository check index is invalid: ${index}.`);
+  return index === 0
+    ? { location: "repository", readOnlyBoulder: true }
+    : { location: "boulder", readOnlyBoulder: false };
+}
 const bwrapVersionArgv = ["bwrap", "--version"] as const;
 const networkBreachProbeArgv = ["bun", "-e", "await fetch(\"http://198.51.100.1:9\", { signal: AbortSignal.timeout(1000) }); process.exit(0);"] as const;
 const systemRuntimePaths = ["/usr", "/lib", "/lib64", "/etc"] as const;
@@ -33,9 +49,15 @@ const sandboxDestinations = {
   runtimeExecutable: "/k0r/runtime/bun"
 } as const;
 
-const sourceBundlePaths = [
+export const isolatedSourceBundlePaths = [
   "test/k0r-run-evidence.ts",
+  "test/k0r-baseline-generator.ts",
   "test/k0r-independent-oracle.ts",
+  "test/k0r-canonical.ts",
+  "test/k0r-issue-exit.ts",
+  "test/k0r-reconcile-evidence.ts",
+  "test/boulder-guide-contract.test.ts",
+  "test/helpers/boulder-guide.ts",
   "fixtures/v2-kernel/valid-ed25519-authority-unsupported-effect.json",
   "fixtures/v2-kernel/invalid-authority-vectors.json",
   "fixtures/v2-kernel/valid-none-effect-execution.json"
@@ -44,7 +66,7 @@ const packageInventoryPath = "fixtures/package-inventory/packaged-files.v0.json"
 const docRegistryPath = "fixtures/docs/doc-registry.v0.json";
 const packDryRunBaselinePath = "test/fixtures/baselines/readiness-v0/pack-dry-run.txt";
 const packageInventoryContractTestPath = "test/package-inventory-contract.test.ts";
-const disposableGeneratedInventoryPaths = [packageInventoryPath, docRegistryPath, packDryRunBaselinePath, packageInventoryContractTestPath, generatedEvidenceManifestPath] as const;
+export const disposableGeneratedInventoryPaths = [packageInventoryPath, docRegistryPath, packDryRunBaselinePath, packageInventoryContractTestPath, generatedEvidenceManifestPath] as const;
 const disposableInventoryDerivationAlgorithm = "k0r.disposable-inventories";
 const disposableInventoryDerivationVersion = "v2";
 const safeEnvironmentNames = ["BOULDER_ROOT", "BUN_INSTALL_CACHE_DIR", "GIT_AUTHOR_DATE", "GIT_AUTHOR_EMAIL", "GIT_AUTHOR_NAME", "GIT_COMMITTER_DATE", "GIT_COMMITTER_EMAIL", "GIT_COMMITTER_NAME", "HOME", "LANG", "NPM_CONFIG_CACHE", "NPM_CONFIG_REGISTRY", "NPM_CONFIG_USERCONFIG", "PATH", "TMPDIR", "XDG_CACHE_HOME"] as const;
@@ -73,10 +95,6 @@ const historicalTagBundleArgv = [
 ] as const;
 const isolatedPackDryRunArgv = ["bun", "pm", "pack", "--dry-run", "--ignore-scripts"] as const;
 const headSourceArchiveFileName = "head-source.tar";
-const headSourceArchiveArgv = [
-  ["git", "archive", "--format=tar", "--output", `${runRootPlaceholder}/tmp/${headSourceArchiveFileName}`, "HEAD"],
-  ["tar", "-xf", `${runRootPlaceholder}/tmp/${headSourceArchiveFileName}`, "-C", `${runRootPlaceholder}/boulder`]
-] as const;
 const isolatedGitSetupArgv = [
   ["git", "init", "--quiet"],
   ["git", "add", "--all"],
@@ -110,6 +128,49 @@ type CleanTempInventory = {
     readonly commands: readonly CommandResult[];
   };
 };
+
+export type K0rRunEvidenceCommand =
+  | { readonly mode: "isolated-oracle" }
+  | { readonly mode: "write"; readonly pendingTransition: string; readonly privateCandidate: string; readonly privateWorkRoot: string };
+
+export function parseK0rRunEvidenceArgv(argv: readonly string[]): K0rRunEvidenceCommand {
+  if (argv.length === 1 && argv[0] === "--isolated-oracle") return { mode: "isolated-oracle" };
+  if (
+    argv.length === 7
+    && argv[0] === "--write"
+    && argv[1] === "--pending-transition"
+    && argv[3] === "--private-candidate"
+    && argv[5] === "--private-work-root"
+  ) {
+    const value = (index: number): string => {
+      const candidate = argv[index];
+      if (candidate === undefined || candidate === "" || candidate.startsWith("--")) throw new Error("Task 8 runner option value is invalid.");
+      return candidate;
+    };
+    return { mode: "write", pendingTransition: value(2), privateCandidate: value(4), privateWorkRoot: value(6) };
+  }
+  throw new Error("Expected exact Task 8 --write arguments or --isolated-oracle.");
+}
+
+async function resolveNonK0rTestArgv(root: string): Promise<string[]> {
+  const files = (await readdir(join(root, "test")))
+    .filter((name) => name.endsWith(".test.ts") && !name.startsWith("k0r-"))
+    .sort()
+    .map((name) => `test/${name}`);
+  if (files.length === 0) throw new Error("Non-K0R test set is empty.");
+  return ["bun", "test", ...files];
+}
+
+export async function resolveK0rRepositoryCheckArgv(root: string, pendingTransition = "${QA_ROOT}/protected/k0r-transition.pending.json", privateRoot = "${QA_ROOT}"): Promise<readonly (readonly string[])[]> {
+  return [
+    ["bun", "test/k0r-issue-exit.ts", "--verify-pending", pendingTransition, "--private-root", privateRoot],
+    ["bun", "test", "test/k0r-independent-oracle.test.ts"],
+    await resolveNonK0rTestArgv(root),
+    ["bunx", "--no-install", "tsc", "--noEmit"],
+    ["bun", "pm", "pack", "--dry-run", "--ignore-scripts"],
+  ];
+}
+
 type SourceDerivation = {
   readonly base: { readonly archiveSha256: string; readonly commit: string; readonly tree: string };
   readonly overlay: {
@@ -158,10 +219,35 @@ type HistoricalTagBundle = {
   readonly sourceTagCommit: string;
   readonly commands: readonly CommandResult[];
 };
+export type K0rIsolationBoundaryPhase = "fixture-root-ready" | "access-complete";
+export type K0rIsolationBoundaryAccess = {
+  readonly phase: "access-complete";
+  readonly resources: readonly { readonly id: "evidenceRoot" | "tempRoot" | "sourceBundlePath" | "candidatePath"; readonly path: string; readonly device: number; readonly inode: number }[];
+};
+type K0rIsolationBoundaryEvent = { readonly phase: "fixture-root-ready"; readonly fixtureRoot: string; readonly temporaryRoot: string } | K0rIsolationBoundaryAccess;
+const isolationBoundaryHandlers = new Map<string, (event: K0rIsolationBoundaryEvent) => Promise<void>>();
+const isolationBoundaryEvents = new Map<string, K0rIsolationBoundaryEvent>();
+
+export function registerK0rIsolationBoundaryHandler(runId: string, handler: (event: K0rIsolationBoundaryEvent) => Promise<void>): () => void {
+  if (runId === "" || isolationBoundaryHandlers.has(runId)) throw new Error(`K0R isolation boundary handler is already registered: ${runId}.`);
+  isolationBoundaryHandlers.set(runId, handler);
+  return () => {
+    isolationBoundaryHandlers.delete(runId);
+    isolationBoundaryEvents.delete(`${runId}\0fixture-root-ready`);
+    isolationBoundaryEvents.delete(`${runId}\0access-complete`);
+  };
+}
+
+export async function onIsolationBoundary(runId: string, phase: K0rIsolationBoundaryPhase): Promise<void> {
+  const event = isolationBoundaryEvents.get(`${runId}\0${phase}`);
+  if (event === undefined || event.phase !== phase) throw new Error(`K0R isolation boundary event is unavailable or out of order: ${runId}:${phase}.`);
+  const handler = isolationBoundaryHandlers.get(runId);
+  if (handler !== undefined) await handler(event);
+}
 
 export type K0rIsolatedRunReceipt = {
   readonly schemaVersion: typeof isolatedRunSchemaVersion;
-  readonly status: "not_run" | "pass" | "fail";
+  readonly status: "not_run" | "pass_pending_exact_byte_review" | "fail";
   readonly networkSurface: "none";
   readonly run: null | {
     readonly sourceBundle: SourceBundle;
@@ -197,11 +283,37 @@ export const notRunK0rIsolatedRunReceipt: K0rIsolatedRunReceipt = {
   run: null
 };
 
-export async function runK0rIsolatedEvidence(options: { readonly root?: string; readonly outputPath?: string } = {}): Promise<K0rIsolatedRunReceipt> {
-  const root = resolve(options.root ?? repositoryRoot);
-  const outputPath = resolve(root, options.outputPath ?? isolatedRunReceiptPath);
-  if (outputPath !== resolve(root, isolatedRunReceiptPath)) throw new Error("Isolated-run receipt output path is fixed.");
-  const temporaryRoot = await mkdtemp(join(tmpdir(), "boulder-k0r-isolated-"));
+export async function runK0rIsolatedEvidence(options: { readonly root?: string; readonly outputPath?: string; readonly runId?: string; readonly pendingTransition?: string; readonly privateCandidate?: string; readonly privateWorkRoot?: string } = {}): Promise<K0rIsolatedRunReceipt> {
+  const root = await realpath(resolve(options.root ?? repositoryRoot));
+  let privateQaRoot: string | undefined;
+  if (options.pendingTransition !== undefined || options.privateCandidate !== undefined || options.privateWorkRoot !== undefined) {
+    if (options.pendingTransition === undefined || options.privateCandidate === undefined || options.privateWorkRoot === undefined) throw new Error("Task 8 private paths must be supplied together.");
+    const qaRoot = await canonicalPrivateQaRoot(options.pendingTransition);
+    privateQaRoot = qaRoot;
+    await recoverIsolatedPublication(root, qaRoot, options.pendingTransition);
+    if (
+      resolve(options.pendingTransition) !== join(qaRoot, "protected/k0r-transition.pending.json")
+      || resolve(options.privateCandidate) !== join(qaRoot, "receipts/isolated-run.candidate.json")
+      || resolve(options.privateWorkRoot) !== join(qaRoot, "work/isolated-run")
+    ) throw new Error("Task 8 private paths are not canonical.");
+    await verifiedContainedDirectory(qaRoot, dirname(options.pendingTransition));
+    await verifiedContainedDirectory(qaRoot, dirname(options.privateCandidate));
+    await verifiedContainedDirectory(qaRoot, dirname(options.privateWorkRoot));
+    const pendingBytes = await readImmutablePrivateFile(options.pendingTransition, 0o400);
+    const pending = recordValue(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(pendingBytes)), "pending transition");
+    if (pending["schemaVersion"] !== "boulder.k0r.protected-transition.pending.v1" || pending["status"] !== "pending_exit") throw new Error("Task 8 pending transition identity is invalid.");
+    await verifyK0rPending(options.pendingTransition, qaRoot);
+    if (sha256Bytes(await readImmutablePrivateFile(options.pendingTransition, 0o400)) !== sha256Bytes(pendingBytes)) throw new Error("Task 8 pending transition changed during verification.");
+  }
+  const runId = options.runId ?? randomUUID();
+  const temporaryRoot = options.privateWorkRoot === undefined
+    ? await mkdtemp(join(tmpdir(), "boulder-k0r-isolated-"))
+    : resolve(options.privateWorkRoot);
+  if (options.privateWorkRoot !== undefined) {
+    await mkdir(temporaryRoot, { recursive: false });
+    const workState = await lstat(temporaryRoot);
+    if (!workState.isDirectory() || workState.isSymbolicLink() || (workState.mode & 0o777) !== 0o700) throw new Error("Private isolated work root is not mode 0700.");
+  }
   const roots = {
     home: join(temporaryRoot, "home"),
     cache: join(temporaryRoot, "cache"),
@@ -213,9 +325,32 @@ export async function runK0rIsolatedEvidence(options: { readonly root?: string; 
   let cleanupSucceeded = false;
   try {
     await Promise.all(Object.values(roots).map((path) => mkdir(path, { recursive: true })));
+    const descriptor = Object.freeze({
+      fixtureRoot: root,
+      temporaryRoot,
+      evidenceRoot: join(root, "evidence/k0r"),
+      tempRoot: temporaryRoot,
+      sourceBundlePath: join(root, "test/k0r-run-evidence.ts"),
+      candidatePath: options.privateCandidate ?? options.outputPath ?? isolatedRunReceiptPath
+    });
+    isolationBoundaryEvents.set(`${runId}\0fixture-root-ready`, { phase: "fixture-root-ready", fixtureRoot: descriptor.fixtureRoot, temporaryRoot: descriptor.temporaryRoot });
+    await onIsolationBoundary(runId, "fixture-root-ready");
+    const contestedPaths = { ...descriptor, candidatePath: options.privateCandidate === undefined ? resolve(root, descriptor.candidatePath) : resolve(descriptor.candidatePath) };
+    if (options.privateCandidate === undefined && contestedPaths.candidatePath !== join(root, isolatedRunReceiptPath)) throw new Error("Isolated-run receipt output path is fixed.");
+    if (options.privateCandidate !== undefined && await pathExists(contestedPaths.candidatePath)) throw new Error("Private isolated candidate already exists.");
+    if (options.privateCandidate === undefined) {
+      const resources = await Promise.all((["evidenceRoot", "tempRoot", "sourceBundlePath", "candidatePath"] as const).map(async (id) => {
+        const path = await realpath(contestedPaths[id]);
+        const state = await lstat(path);
+        return { id, path, device: state.dev, inode: state.ino };
+      }));
+      isolationBoundaryEvents.set(`${runId}\0access-complete`, { phase: "access-complete", resources });
+      await onIsolationBoundary(runId, "access-complete");
+    }
+    const outputPath = contestedPaths.candidatePath;
     const environment = isolatedEnvironment(roots);
     const hostEnvironment = hostIsolatedEnvironment(roots);
-    const policy = bindK0rRunRoot(await readK0rIsolationPolicy(root), temporaryRoot);
+    const policy = bindK0rRunRoot(await readK0rIsolationPolicy(root), temporaryRoot, privateQaRoot);
     const dependencies = await bindK0rDependencies(root, policy.dependencies);
     const bwrapVersionResult = await runHostCommand(bwrapVersionArgv, root, hostEnvironment, policy);
     if (bwrapVersionResult.exitCode !== 0 || bwrapVersionResult.stdout.trim() === "") throw new Error("bwrap is unavailable or unusable for K0R isolation.");
@@ -224,7 +359,6 @@ export async function runK0rIsolatedEvidence(options: { readonly root?: string; 
     const historicalTagBundle = await createHistoricalTagBundle(root, join(roots.tmp, historicalTagBundleFileName), hostEnvironment, policy);
     const cleanTempInventory = await cleanTempTrackedInventory(root, roots, environment, policy, dependencies, historicalTagBundle);
     const preInventory = await inventory(temporaryRoot);
-    await writeK0rIsolatedRunReceipt(root, outputPath, `${JSON.stringify(notRunK0rIsolatedRunReceipt, null, 2)}\n`);
     const [bunResult, gitResult] = await Promise.all([
       runCommand(["bun", "--version"], "boulder", root, roots, environment, policy, dependencies, true),
       runCommand(["git", "--version"], "boulder", root, roots, environment, policy, dependencies, true)
@@ -237,10 +371,11 @@ export async function runK0rIsolatedEvidence(options: { readonly root?: string; 
     const oracleResult = await runCommand(isolatedOracleArgv, "boulder", root, roots, environment, policy, dependencies, true);
     const oracleReport = parseOracleReport(oracleResult.stdout);
     const commands: CommandResult[] = [];
-    for (const argv of isolatedRepositoryCheckArgv) {
-      commands.push(JSON.stringify(argv) === JSON.stringify(["git", "diff", "--exit-code", "--", "AGENTS.md"])
-        ? observedCommand(await runHostRecordedCommand(argv, root, hostEnvironment, policy))
-        : observedCommand(await runCommand(argv, "boulder", root, roots, environment, policy, dependencies, JSON.stringify(argv) !== JSON.stringify(["bun", "run", "ci"]))));
+    const qaRoot = options.pendingTransition === undefined ? "${QA_ROOT}" : resolve(dirname(options.pendingTransition), "..");
+    const repositoryChecks = await resolveK0rRepositoryCheckArgv(root, options.pendingTransition, qaRoot);
+    for (const [index, argv] of repositoryChecks.entries()) {
+      const execution = resolveK0rRepositoryCheckExecution(index);
+      commands.push(observedCommand(await runCommand(argv, execution.location, root, roots, environment, policy, dependencies, execution.readOnlyBoulder)));
     }
     for (const path of [roots.home, roots.cache, roots.tmp, roots.registry, roots.credentials]) {
       await rm(path, { recursive: true, force: true });
@@ -249,7 +384,7 @@ export async function runK0rIsolatedEvidence(options: { readonly root?: string; 
     const postInventory = await inventory(temporaryRoot);
     if (!inventoryEqual(preInventory, postInventory)) throw new Error("Isolated source and dedicated-root inventory changed after cleanup.");
     const rootOwnership = await verifyOwnership(temporaryRoot, roots);
-    const status = bun.exitCode === 0 && git.exitCode === 0 && oracleResult.exitCode === 0 && oracleReport.status === "pass" && cleanTempInventory.gitMetadata.historicalTagBundle.commands.every((result) => result.exitCode === 0) && cleanTempInventory.gitMetadata.commands.every((result) => result.exitCode === 0) && commands.every((result) => result.exitCode === 0) ? "pass" : "fail";
+    const status = bun.exitCode === 0 && git.exitCode === 0 && oracleResult.exitCode === 0 && oracleReport.status === "pass" && cleanTempInventory.gitMetadata.historicalTagBundle.commands.every((result) => result.exitCode === 0) && cleanTempInventory.gitMetadata.commands.every((result) => result.exitCode === 0) && commands.every((result) => result.exitCode === 0) ? "pass_pending_exact_byte_review" : "fail";
     await rm(temporaryRoot, { recursive: true, force: true });
     cleanupSucceeded = true;
     const receipt: K0rIsolatedRunReceipt = {
@@ -282,7 +417,17 @@ export async function runK0rIsolatedEvidence(options: { readonly root?: string; 
         commands
       }
     };
-    await writeK0rIsolatedRunReceipt(root, outputPath, `${JSON.stringify(receipt, null, 2)}\n`);
+    const receiptText = `${JSON.stringify(receipt, null, 2)}\n`;
+    if (options.privateCandidate === undefined) {
+      await writeK0rIsolatedRunReceipt(root, outputPath, receiptText);
+      await validateK0rIsolatedRunReceipt(new TextEncoder().encode(receiptText), root);
+    } else if (receipt.status === "pass_pending_exact_byte_review") {
+      await writePrivateCandidate(options.pendingTransition!, options.privateCandidate, receiptText);
+      const candidateBytes = await readImmutablePrivateFile(options.privateCandidate, 0o600);
+      const candidate = await validateK0rIsolatedRunReceipt(candidateBytes, root);
+      if (candidate.status !== "pass_pending_exact_byte_review") throw new Error("Private isolated candidate is not passing pending review.");
+      await installPublicCandidateBytes(root, options.pendingTransition!, options.privateCandidate, candidateBytes);
+    }
     return receipt;
   } finally {
     if (!cleanupSucceeded) await rm(temporaryRoot, { recursive: true, force: true });
@@ -324,7 +469,7 @@ export async function validateK0rIsolatedRunReceipt(bytes: Uint8Array, sourceRoo
     if (receipt["run"] !== null) throw new Error("A not_run isolated receipt must not contain measured output.");
     return receipt as K0rIsolatedRunReceipt;
   }
-  if (status !== "pass" && status !== "fail") throw new Error("Isolated-run receipt status is invalid.");
+  if (status !== "pass_pending_exact_byte_review" && status !== "fail") throw new Error("Isolated-run receipt status is invalid.");
   const run = recordValue(receipt["run"], "isolated-run receipt run");
   exactKeys(run, ["commands", "dependencyBinding", "isolation", "oracle", "runtime", "sourceBundle", "staticBoundary"], "isolated-run receipt run");
   const sourceBundle = validateSourceBundle(recordValue(run["sourceBundle"], "isolated source bundle"));
@@ -368,7 +513,7 @@ export async function validateK0rIsolatedRunReceipt(bytes: Uint8Array, sourceRoo
   exactKeys(cleanInventory, ["gitMetadata", "tracked", "untracked"], "clean temporary inventory");
   const tracked = stringArray(cleanInventory["tracked"], "clean temporary tracked paths");
   const untracked = stringArray(cleanInventory["untracked"], "clean temporary untracked paths");
-  if (tracked.length === 0 || JSON.stringify(tracked) !== JSON.stringify([...tracked].sort()) || tracked.some((path) => path === ".git" || path.startsWith(".git/")) || sourceBundlePaths.some((path) => !tracked.includes(path)) || !tracked.includes("package.json") || untracked.length !== 0) throw new Error("Clean temporary tracked/untracked inventory is invalid.");
+  if (tracked.length === 0 || JSON.stringify(tracked) !== JSON.stringify([...tracked].sort()) || tracked.some((path) => path === ".git" || path.startsWith(".git/")) || isolatedSourceBundlePaths.some((path) => !tracked.includes(path)) || !tracked.includes("package.json") || untracked.length !== 0) throw new Error("Clean temporary tracked/untracked inventory is invalid.");
   const gitMetadata = recordValue(cleanInventory["gitMetadata"], "clean temporary Git metadata");
   exactKeys(gitMetadata, ["commands", "commit", "historicalTagBundle", "packageVersion", "tag", "tagCommit", "tree"], "clean temporary Git metadata");
   const packageVersion = stringValue(gitMetadata["packageVersion"], "clean temporary package version");
@@ -377,7 +522,10 @@ export async function validateK0rIsolatedRunReceipt(bytes: Uint8Array, sourceRoo
   const historicalTagBundle = recordValue(gitMetadata["historicalTagBundle"], "historical tag bundle");
   exactKeys(historicalTagBundle, ["commands", "path", "removed", "sha256", "sourceTagCommit"], "historical tag bundle");
   const bundlePath = stringValue(historicalTagBundle["path"], "historical tag bundle path");
-  if (!bundlePath.startsWith(`${tmpdir()}/boulder-k0r-isolated-`) || !bundlePath.endsWith(`/${historicalTagBundleFileName}`) || historicalTagBundle["removed"] !== true || !digestValue(historicalTagBundle["sha256"], "historical tag bundle digest") || historicalTagBundle["sourceTagCommit"] !== releaseTag.tagCommit) throw new Error("Historical tag bundle binding is invalid.");
+  const privateBundleSuffix = `/work/isolated-run/tmp/${historicalTagBundleFileName}`;
+  const defaultBundlePath = bundlePath.startsWith(`${tmpdir()}/boulder-k0r-isolated-`) && bundlePath.endsWith(`/${historicalTagBundleFileName}`);
+  const privateBundlePath = bundlePath.startsWith("/") && bundlePath.length > privateBundleSuffix.length && bundlePath.endsWith(privateBundleSuffix) && resolve(bundlePath) === bundlePath;
+  if ((!defaultBundlePath && !privateBundlePath) || historicalTagBundle["removed"] !== true || !digestValue(historicalTagBundle["sha256"], "historical tag bundle digest") || historicalTagBundle["sourceTagCommit"] !== releaseTag.tagCommit) throw new Error("Historical tag bundle binding is invalid.");
   const bundleCommands = recordArray(historicalTagBundle["commands"], "historical tag bundle commands");
   if (bundleCommands.length !== historicalTagBundleArgv.length) throw new Error("Historical tag bundle command count is invalid.");
   validateCommandResult(bundleCommands[0] ?? {}, historicalTagBundleArgv[0] ?? []);
@@ -388,15 +536,21 @@ export async function validateK0rIsolatedRunReceipt(bytes: Uint8Array, sourceRoo
   gitCommands.forEach((command, index) => validateCommandResult(command, (isolatedGitSetupArgv[index] ?? []).map((part) => part.replaceAll(runRootPlaceholder, dirname(bundlePath)))));
   const cleanup = recordValue(isolation["cleanup"], "isolated cleanup");
   exactKeys(cleanup, ["attempted", "inventoriesEqual", "rootAgentsRechecked", "succeeded"], "isolated cleanup");
-  if (cleanup["attempted"] !== true || cleanup["inventoriesEqual"] !== true || cleanup["rootAgentsRechecked"] !== true || typeof cleanup["succeeded"] !== "boolean" || (status === "pass" && cleanup["succeeded"] !== true)) throw new Error("Isolated cleanup result is invalid.");
+  if (cleanup["attempted"] !== true || cleanup["inventoriesEqual"] !== true || cleanup["rootAgentsRechecked"] !== true || typeof cleanup["succeeded"] !== "boolean" || (status === "pass_pending_exact_byte_review" && cleanup["succeeded"] !== true)) throw new Error("Isolated cleanup result is invalid.");
   const oracle = recordValue(run["oracle"], "isolated oracle");
   exactKeys(oracle, ["argv", "cwd", "envNames", "exitCode", "reportSha256", "reportStatus", "stderrSha256", "stdoutSha256"], "isolated oracle");
   validateCommandResult(oracle, isolatedOracleArgv, true);
-  if (!digestValue(oracle["reportSha256"], "isolated oracle report") || (oracle["reportStatus"] !== "pass" && oracle["reportStatus"] !== "fail") || (status === "pass" && oracle["reportStatus"] !== "pass")) throw new Error("Isolated oracle report is invalid.");
+  if (!digestValue(oracle["reportSha256"], "isolated oracle report") || (oracle["reportStatus"] !== "pass" && oracle["reportStatus"] !== "fail") || (status === "pass_pending_exact_byte_review" && oracle["reportStatus"] !== "pass")) throw new Error("Isolated oracle report is invalid.");
   const commands = recordArray(run["commands"], "isolated repository commands");
   if (commands.length !== isolatedRepositoryCheckArgv.length) throw new Error("Isolated receipt command count is invalid.");
-  commands.forEach((command, index) => validateCommandResult(command, isolatedRepositoryCheckArgv[index] ?? []));
-  if (status === "pass" && [runtime["bun"], runtime["git"], oracle, ...bundleCommands, ...gitCommands, ...commands].some((result) => recordValue(result, "command result")["exitCode"] !== 0)) throw new Error("Passing isolated receipt contains a nonzero command.");
+  const pendingArgv = stringArray(recordValue(commands[0] ?? {}, "pending verification command")["argv"], "pending verification argv");
+  if (pendingArgv.length !== 6 || pendingArgv[0] !== "bun" || pendingArgv[1] !== "test/k0r-issue-exit.ts" || pendingArgv[2] !== "--verify-pending" || pendingArgv[4] !== "--private-root") throw new Error("Isolated pending verification argv is invalid.");
+  const pendingPath = resolve(pendingArgv[3] ?? "");
+  const privateRoot = resolve(pendingArgv[5] ?? "");
+  if (pendingPath !== join(privateRoot, "protected/k0r-transition.pending.json")) throw new Error("Isolated pending verification paths are not canonical.");
+  const expectedCommands = await resolveK0rRepositoryCheckArgv(sourceRoot, pendingPath, privateRoot);
+  commands.forEach((command, index) => validateCommandResult(command, expectedCommands[index] ?? []));
+  if (status === "pass_pending_exact_byte_review" && [runtime["bun"], runtime["git"], oracle, ...bundleCommands, ...gitCommands, ...commands].some((result) => recordValue(result, "command result")["exitCode"] !== 0)) throw new Error("Passing isolated receipt contains a nonzero command.");
   return receipt as K0rIsolatedRunReceipt;
 }
 
@@ -405,7 +559,7 @@ async function copyAndVerifySourceBundle(root: string, roots: DedicatedRoots, ho
   const overlay = await applyApprovedOverlay(root, roots.boulder, policy.allowedOverlayPaths);
   const generatedInventories = await deriveDisposableGeneratedInventories(root, roots, environment, policy, dependencies);
   await writeFile(join(roots.boulder, isolatedRunReceiptPath), `${JSON.stringify(notRunK0rIsolatedRunReceipt, null, 2)}\n`, "utf8");
-  const files = await Promise.all(sourceBundlePaths.map(async (path) => {
+  const files = await Promise.all(isolatedSourceBundlePaths.map(async (path) => {
     const source = await readRegularFile(root, path, "source bundle");
     const copied = await readRegularFile(roots.boulder, path, "isolated source bundle");
     const sourceSha256 = sha256Bytes(source);
@@ -636,7 +790,7 @@ async function validateSourceDerivation(derivation: RecordValue, sourceRoot: str
 
 async function staticBoundaryCheck(root: string): Promise<{ readonly networkImports: readonly string[]; readonly productV2Imports: readonly string[] }> {
   const violations = { networkImports: [] as string[], productV2Imports: [] as string[] };
-  for (const path of sourceBundlePaths.filter((path) => path.endsWith(".ts"))) {
+  for (const path of isolatedSourceBundlePaths.filter((path) => path.endsWith(".ts"))) {
     const source = await readFile(join(root, path), "utf8");
     for (const match of source.matchAll(/(?:import|export)\s+(?:[^"']+?\s+from\s+)?["']([^"']+)["']/g)) {
       const imported = match[1] ?? "";
@@ -811,10 +965,12 @@ async function readK0rIsolationPolicy(root: string): Promise<IsolationPolicy> {
   if (!hostHomeProbePath.startsWith("/") || hostHomeProbePath === "/") throw new Error("K0R bwrap host-home probe path is invalid.");
   return { argvAllowlist, hostHomeProbePath, runtimeExecutableDestination: sandboxDestinations.runtimeExecutable, dependencies, allowedOverlayPaths, sourceDerivationDirtyExclusions };
 }
-function bindK0rRunRoot(policy: IsolationPolicy, temporaryRoot: string): IsolationPolicy {
+function bindK0rRunRoot(policy: IsolationPolicy, temporaryRoot: string, qaRoot?: string): IsolationPolicy {
   return {
     ...policy,
-    argvAllowlist: policy.argvAllowlist.map((argv) => argv.map((part) => part.replaceAll(runRootPlaceholder, temporaryRoot)))
+    argvAllowlist: policy.argvAllowlist.map((argv) => argv.map((part) => part
+      .replaceAll(runRootPlaceholder, temporaryRoot)
+      .replaceAll("${QA_ROOT}", qaRoot ?? "${QA_ROOT}")))
   };
 }
 async function bindK0rDependencies(root: string, policy: DependencyPolicy): Promise<ResolvedDependencyBinding> {
@@ -931,13 +1087,16 @@ async function resolveK0rRuntimeExecutable(destination: string): Promise<Runtime
   return { source, destination };
 }
 
-function sandboxArgv(argv: readonly string[], location: "repository" | "boulder", _root: string, roots: DedicatedRoots, env: Record<string, string>, runtime: RuntimeBinding, dependencies: ResolvedDependencyBinding, readOnlyBoulder: boolean): string[] {
+function sandboxArgv(argv: readonly string[], location: "repository" | "boulder", root: string, roots: DedicatedRoots, env: Record<string, string>, runtime: RuntimeBinding, dependencies: ResolvedDependencyBinding, readOnlyBoulder: boolean): string[] {
   const destination = location === "repository" ? sandboxDestinations.repository : sandboxDestinations.boulder;
   const executableArgv = argv[0] === "bun"
     ? [runtime.destination, ...argv.slice(1)]
-    : argv[0] === "bunx" && argv[1] === dependencies.binding.typescript.executable
-      ? [runtime.destination, join(sandboxDestinations.typescript, dependencies.binding.typescript.artifactPath), ...argv.slice(2)]
+    : argv[0] === "bunx" && (argv[1] === dependencies.binding.typescript.executable || (argv[1] === "--no-install" && argv[2] === dependencies.binding.typescript.executable))
+      ? [runtime.destination, join(sandboxDestinations.typescript, dependencies.binding.typescript.artifactPath), ...argv.slice(argv[1] === "--no-install" ? 3 : 2)]
       : [...argv];
+  const privateRootIndex = argv.indexOf("--private-root");
+  const privateRoot = privateRootIndex === -1 ? undefined : argv[privateRootIndex + 1];
+  if (privateRootIndex !== -1 && (privateRoot === undefined || !privateRoot.startsWith("/"))) throw new Error("Sandbox private root is invalid.");
   return [
     ...sandboxMandatoryArgs,
     "--proc", "/proc",
@@ -946,6 +1105,7 @@ function sandboxArgv(argv: readonly string[], location: "repository" | "boulder"
     "--dir", "/bin",
     "--ro-bind", "/usr/bin/dash", "/bin/sh",
     "--dir", sandboxDestinations.repository,
+    "--ro-bind", root, sandboxDestinations.repository,
     "--dir", "/k0r",
     "--dir", sandboxDestinations.typescript,
     "--dir", dirname(runtime.destination),
@@ -956,6 +1116,7 @@ function sandboxArgv(argv: readonly string[], location: "repository" | "boulder"
     "--dir", sandboxDestinations.credentials,
     "--dir", sandboxDestinations.boulder,
     "--ro-bind", runtime.source, runtime.destination,
+    ...(privateRoot === undefined ? [] : ["--ro-bind", privateRoot, privateRoot]),
     "--bind", roots.home, sandboxDestinations.home,
     "--bind", roots.cache, sandboxDestinations.cache,
     "--bind", roots.tmp, sandboxDestinations.tmp,
@@ -964,7 +1125,7 @@ function sandboxArgv(argv: readonly string[], location: "repository" | "boulder"
     ...(readOnlyBoulder ? ["--ro-bind", roots.boulder, sandboxDestinations.boulder] : ["--bind", roots.boulder, sandboxDestinations.boulder]),
     ...dependencies.binding.readOnlyDestinations.flatMap((path) => ["--ro-bind", dependencies.typescriptPackageRoot, path]),
     "--chdir", destination,
-    ...safeEnvironmentNames.flatMap((name) => ["--setenv", name, env[name] ?? ""]),
+    ...safeEnvironmentNames.flatMap((name) => ["--setenv", name, name === "BOULDER_ROOT" ? destination : env[name] ?? ""]),
     "--",
     ...executableArgv
   ];
@@ -975,12 +1136,19 @@ function observedCommand(result: CommandResult & { readonly stdout: string; read
   return observed;
 }
 
-function exec(file: string, args: readonly string[], cwd: string, env: Record<string, string>): Promise<{ readonly stdout: string; readonly stderr: string; readonly exitCode: number }> {
-  return new Promise((complete) => {
-    execFile(file, args, { cwd, env } as { readonly cwd?: string; readonly env?: Record<string, string> }, (error, stdout, stderr) => {
-      complete({ stdout, stderr, exitCode: error === null ? 0 : typeof error.code === "number" ? error.code : 1 });
-    });
+async function exec(file: string, args: readonly string[], cwd: string, env: Record<string, string>): Promise<{ readonly stdout: string; readonly stderr: string; readonly exitCode: number }> {
+  const result = await runBoundedK0rProcess({
+    argv: [file, ...args],
+    cwd,
+    environment: env,
+    deadlineMs: 120_000,
+    stdoutCapBytes: 8 * 1024 * 1024,
+    stderrCapBytes: 8 * 1024 * 1024
   });
+  if (result.timedOut || result.stdoutOverflow || result.stderrOverflow || result.orphanProcess) {
+    throw new Error(`Bounded K0R command failed: ${result.stderr}`);
+  }
+  return { stdout: result.stdout, stderr: result.stderr, exitCode: result.exitCode ?? 1 };
 }
 
 function parseOracleReport(stdout: string): { readonly status: "pass" | "fail" } {
@@ -993,7 +1161,15 @@ function parseOracleReport(stdout: string): { readonly status: "pass" | "fail" }
   return { status: "fail" };
 }
 
-export async function writeK0rIsolatedRunReceipt(root: string, outputPath: string, content: string, testHooks: { readonly beforeRename?: (temporary: string) => Promise<void>; readonly rename?: (temporary: string, destination: string) => Promise<void> } = {}): Promise<void> {
+export async function writeK0rIsolatedRunReceipt(root: string, outputPath: string, content: string): Promise<void> {
+  await writeK0rIsolatedRunReceiptInternal(root, outputPath, content, {});
+}
+
+export async function writeK0rIsolatedRunReceiptForTest(root: string, outputPath: string, content: string, testHooks: { readonly beforeRename?: (temporary: string) => Promise<void>; readonly rename?: (temporary: string, destination: string) => Promise<void> }): Promise<void> {
+  await writeK0rIsolatedRunReceiptInternal(root, outputPath, content, testHooks);
+}
+
+async function writeK0rIsolatedRunReceiptInternal(root: string, outputPath: string, content: string, testHooks: { readonly beforeRename?: (temporary: string) => Promise<void>; readonly rename?: (temporary: string, destination: string) => Promise<void> }): Promise<void> {
   const rootReal = await verifiedContainedDirectory(root, root);
   const destination = resolve(outputPath);
   const expected = join(rootReal, isolatedRunReceiptPath);
@@ -1014,6 +1190,7 @@ export async function writeK0rIsolatedRunReceipt(root: string, outputPath: strin
     if (testHooks.rename === undefined) await rename(temporary, destination);
     else await testHooks.rename(temporary, destination);
     await assertSingleLinkRegularFile(destination, "isolated-run receipt destination");
+    if (sha256Bytes(await readFile(destination)) !== sha256Text(content)) throw new Error("Installed isolated-run receipt differs from intended bytes.");
     const directory = await open(parent, "r");
     try {
       await directory.sync();
@@ -1026,6 +1203,160 @@ export async function writeK0rIsolatedRunReceipt(root: string, outputPath: strin
   }
 }
 
+async function installPublicCandidateBytes(root: string, pendingPath: string, candidatePath: string, bytes: Uint8Array): Promise<void> {
+  const rootReal = await verifiedContainedDirectory(root, root);
+  const destination = join(rootReal, isolatedRunReceiptPath);
+  const parent = await verifiedContainedDirectory(rootReal, dirname(destination));
+  const qaRoot = await canonicalPrivateQaRoot(pendingPath);
+  const journalPath = join(qaRoot, "protected/k0r-isolated-publication.json");
+  const priorSnapshotPath = join(qaRoot, "protected/prior-k0r/isolated-run-receipt.json");
+  const priorSnapshot = await readImmutablePrivateFile(priorSnapshotPath, isolatedPriorSnapshotMode).catch((error: unknown) => error instanceof Error && "code" in error && error.code === "ENOENT" ? undefined : Promise.reject(error));
+  const priorExists = priorSnapshot !== undefined;
+  const priorBytes = priorSnapshot;
+  const liveExists = await pathExists(destination);
+  if (liveExists !== priorExists || (liveExists && sha256Bytes(await readImmutablePrivateFile(destination, 0o600)) !== sha256Bytes(priorSnapshot!))) throw new Error("Live isolated receipt differs from protected prior authority.");
+  const pendingChecksPath = join(qaRoot, "receipts/k0r-pending-checks.json");
+  if (await pathExists(pendingChecksPath)) throw new Error("Pending-checks receipt already exists.");
+  if (priorExists) await assertSingleLinkRegularFile(destination, "isolated-run receipt destination");
+  const temporary = join(parent, `.isolated-run-receipt.${randomUUID()}.tmp`);
+  try {
+    await writeIsolatedPublicationJournal(journalPath, qaRoot, pendingPath, priorSnapshot, bytes);
+    const handle = await open(temporary, "wx", 0o600);
+    try {
+      await handle.writeFile(new TextDecoder("utf-8", { fatal: true }).decode(bytes), "utf8");
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+    await assertSingleLinkRegularFile(temporary, "public candidate temporary");
+    if (sha256Bytes(await readImmutablePrivateFile(temporary, 0o600)) !== sha256Bytes(bytes)) throw new Error("Public candidate temporary differs from candidate bytes.");
+    await rename(temporary, destination);
+    if (sha256Bytes(await readImmutablePrivateFile(destination, 0o600)) !== sha256Bytes(bytes)) throw new Error("Installed public receipt differs from candidate bytes.");
+    const directory = await open(parent, "r");
+    try { await directory.sync(); } finally { await directory.close(); }
+    await writePendingChecksReceipt(qaRoot, pendingPath, bytes);
+    await rm(candidatePath);
+    await rm(journalPath);
+  } catch (error) {
+    await rm(pendingChecksPath, { force: true });
+    if (priorBytes === undefined) await rm(destination, { force: true });
+    else await restorePublicReceiptBytes(rootReal, priorBytes);
+    throw error;
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function writeIsolatedPublicationJournal(path: string, qaRoot: string, pendingPath: string, priorBytes: Uint8Array | undefined, intendedBytes: Uint8Array): Promise<void> {
+  const value = {
+    schemaVersion: "boulder.k0r.isolated-publication-journal.v1",
+    status: "mutating",
+    pendingTransitionSha256: sha256Bytes(await readImmutablePrivateFile(pendingPath, 0o400)),
+    prior: priorBytes === undefined ? { state: "absent", sha256: null } : { state: "present", sha256: sha256Bytes(priorBytes) },
+    intendedSha256: sha256Bytes(intendedBytes),
+  };
+  const parent = await verifiedContainedDirectory(qaRoot, dirname(path));
+  const handle = await open(path, fsConstants.O_WRONLY | fsConstants.O_CREAT | fsConstants.O_EXCL | (fsConstants.O_NOFOLLOW ?? 0), 0o400);
+  try { await handle.writeFile(`${canonicalizeK0rJson(value)}\n`, "utf8"); await handle.sync(); } finally { await handle.close(); }
+  const directory = await open(parent, "r");
+  try { await directory.sync(); } finally { await directory.close(); }
+}
+
+async function recoverIsolatedPublication(root: string, qaRoot: string, pendingPath: string): Promise<void> {
+  const journalPath = join(qaRoot, "protected/k0r-isolated-publication.json");
+  if (!await pathExists(journalPath)) return;
+  const journalBytes = await readImmutablePrivateFile(journalPath, 0o400);
+  const journal = recordValue(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(journalBytes)), "isolated publication journal");
+  exactKeys(journal, ["intendedSha256", "pendingTransitionSha256", "prior", "schemaVersion", "status"], "isolated publication journal");
+  if (journal["schemaVersion"] !== "boulder.k0r.isolated-publication-journal.v1" || journal["status"] !== "mutating" || journal["pendingTransitionSha256"] !== sha256Bytes(await readImmutablePrivateFile(pendingPath, 0o400))) throw new Error("Isolated publication journal authority is invalid.");
+  const prior = recordValue(journal["prior"], "isolated publication prior");
+  exactKeys(prior, ["sha256", "state"], "isolated publication prior");
+  if (!sha256Pattern.test(stringValue(journal["intendedSha256"], "isolated publication intended digest"))) throw new Error("Isolated publication intended digest is invalid.");
+  const priorSnapshotPath = join(qaRoot, "protected/prior-k0r/isolated-run-receipt.json");
+  if (prior["state"] === "absent" && prior["sha256"] === null) {
+    if (await pathExists(priorSnapshotPath)) throw new Error("Protected prior snapshot contradicts absent publication authority.");
+    await rm(join(root, isolatedRunReceiptPath), { force: true });
+    const publicDirectory = await open(join(root, dirname(isolatedRunReceiptPath)), "r");
+    try { await publicDirectory.sync(); } finally { await publicDirectory.close(); }
+  }
+  else {
+    const priorBytes = await readImmutablePrivateFile(priorSnapshotPath, 0o400);
+    if (prior["state"] !== "present" || prior["sha256"] !== sha256Bytes(priorBytes)) throw new Error("Isolated publication prior authority is invalid.");
+    await restorePublicReceiptBytes(root, priorBytes);
+  }
+  await rm(join(qaRoot, "receipts/isolated-run.candidate.json"), { force: true });
+  await rm(join(qaRoot, "receipts/k0r-pending-checks.json"), { force: true });
+  await rm(journalPath);
+  const protectedDirectory = await open(join(qaRoot, "protected"), "r");
+  try { await protectedDirectory.sync(); } finally { await protectedDirectory.close(); }
+}
+
+async function writePendingChecksReceipt(qaRoot: string, pendingPath: string, isolatedBytes: Uint8Array): Promise<void> {
+  const pendingSha256 = sha256Bytes(await readImmutablePrivateFile(pendingPath, 0o400));
+  const projection = {
+    schemaVersion: "boulder.k0r.pending-checks.v1",
+    status: "pass_pending_exact_byte_review",
+    pendingTransition: { path: "protected/k0r-transition.pending.json", sha256: pendingSha256 },
+    isolatedRunReceipt: { path: isolatedRunReceiptPath, sha256: sha256Bytes(isolatedBytes) },
+  };
+  const receipt = { ...projection, receiptSha256: `sha256:${sha256CanonicalK0r(projection)}` };
+  const content = `${canonicalizeK0rJson(receipt)}\n`;
+  const destination = join(qaRoot, "receipts/k0r-pending-checks.json");
+  const parent = await verifiedContainedDirectory(qaRoot, dirname(destination));
+  const temporary = join(parent, `.k0r-pending-checks.${randomUUID()}.tmp`);
+  try {
+    const handle = await open(temporary, "wx", 0o400);
+    try {
+      await handle.writeFile(content, "utf8");
+      await handle.sync();
+    } finally { await handle.close(); }
+    if (await readFile(temporary, "utf8") !== content) throw new Error("Pending-checks temporary differs from intended bytes.");
+    await rename(temporary, destination);
+    const state = await lstat(destination);
+    if (!state.isFile() || state.isSymbolicLink() || state.nlink !== 1 || (state.mode & 0o777) !== 0o400 || await readFile(destination, "utf8") !== content) throw new Error("Pending-checks receipt installation failed.");
+    const directory = await open(parent, "r");
+    try { await directory.sync(); } finally { await directory.close(); }
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function restorePublicReceiptBytes(root: string, bytes: Uint8Array): Promise<void> {
+  const destination = join(root, isolatedRunReceiptPath);
+  const parent = dirname(destination);
+  const temporary = join(parent, `.isolated-run-rollback.${randomUUID()}.tmp`);
+  try {
+    const handle = await open(temporary, "wx", 0o600);
+    try {
+      await handle.writeFile(new TextDecoder("utf-8", { fatal: true }).decode(bytes), "utf8");
+      await handle.sync();
+    } finally { await handle.close(); }
+    await rename(temporary, destination);
+    if (sha256Bytes(await readImmutablePrivateFile(destination, 0o600)) !== sha256Bytes(bytes)) throw new Error("Unable to restore prior public isolated receipt.");
+    const directory = await open(parent, "r");
+    try { await directory.sync(); } finally { await directory.close(); }
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function writePrivateCandidate(pendingTransition: string, candidate: string, content: string): Promise<void> {
+  const qaRoot = await realpath(resolve(dirname(pendingTransition), ".."));
+  const parent = await verifiedContainedDirectory(qaRoot, dirname(resolve(candidate)));
+  if (resolve(candidate) !== join(qaRoot, "receipts/isolated-run.candidate.json")) throw new Error("Private candidate path is not canonical.");
+  const handle = await open(candidate, "wx", 0o600);
+  try {
+    await handle.writeFile(content, "utf8");
+    await handle.sync();
+  } finally {
+    await handle.close();
+  }
+  const state = await lstat(candidate);
+  if (!state.isFile() || state.isSymbolicLink() || state.nlink !== 1 || (state.mode & 0o777) !== 0o600) throw new Error("Private candidate is not a mode-0600 single-link regular file.");
+  const directory = await open(parent, "r");
+  try { await directory.sync(); } finally { await directory.close(); }
+}
+
 async function verifiedContainedDirectory(root: string, directory: string): Promise<string> {
   const rootState = await lstat(root);
   const directoryState = await lstat(directory);
@@ -1035,6 +1366,38 @@ async function verifiedContainedDirectory(root: string, directory: string): Prom
   const path = relative(rootReal, directoryReal);
   if (path === ".." || path.startsWith("../") || resolve(rootReal, path) !== directoryReal) throw new Error("Isolated-run receipt output directory escapes the root.");
   return directoryReal;
+}
+
+async function canonicalPrivateQaRoot(pendingTransition: string): Promise<string> {
+  const lexicalRoot = resolve(dirname(pendingTransition), "..");
+  const physicalRoot = await realpath(lexicalRoot);
+  if (physicalRoot !== lexicalRoot) throw new Error("Task 8 QA root is not canonical.");
+  const state = await lstat(physicalRoot);
+  if (!state.isDirectory() || state.isSymbolicLink() || (state.mode & 0o777) !== 0o700) throw new Error("Task 8 QA root is not a mode-0700 real directory.");
+  return physicalRoot;
+}
+
+async function readImmutablePrivateFile(path: string, expectedMode: number): Promise<Uint8Array> {
+  const before = await lstat(path);
+  if (!before.isFile() || before.isSymbolicLink() || before.nlink !== 1 || (before.mode & 0o777) !== expectedMode || before.size > 8 * 1024 * 1024) throw new Error("Task 8 private file is not immutable.");
+  const handle = await open(path, fsConstants.O_RDONLY | (fsConstants.O_NOFOLLOW ?? 0));
+  try {
+    const current = await handle.stat();
+    if (!current.isFile() || current.nlink !== 1 || (current.mode & 0o777) !== expectedMode || current.dev !== before.dev || current.ino !== before.ino || current.size !== before.size) throw new Error("Task 8 private file identity changed.");
+    const bytes = new Uint8Array(current.size);
+    let offset = 0;
+    while (offset < bytes.length) {
+      const { bytesRead } = await handle.read(bytes, offset, bytes.length - offset, offset);
+      if (bytesRead === 0) throw new Error("Task 8 private file ended early.");
+      offset += bytesRead;
+    }
+    const after = await handle.stat();
+    const live = await lstat(path);
+    if (after.dev !== current.dev || after.ino !== current.ino || after.size !== current.size || after.nlink !== 1 || (after.mode & 0o777) !== expectedMode || live.dev !== current.dev || live.ino !== current.ino || (live.mode & 0o777) !== expectedMode) throw new Error("Task 8 private file changed while reading.");
+    return bytes;
+  } finally {
+    await handle.close();
+  }
 }
 
 async function assertSingleLinkRegularFile(path: string, label: string): Promise<void> {
@@ -1073,12 +1436,12 @@ function validateDependencyBinding(binding: RecordValue): DependencyBinding {
 function validateSourceBundle(bundle: RecordValue): { readonly path: string; readonly sha256: string }[] {
   exactKeys(bundle, ["derivation", "files", "merkleSha256"], "isolated source bundle");
   const files = recordArray(bundle["files"], "isolated source files");
-  if (files.length !== sourceBundlePaths.length) throw new Error("Isolated source bundle file count is invalid.");
+  if (files.length !== isolatedSourceBundlePaths.length) throw new Error("Isolated source bundle file count is invalid.");
   const normalized = files.map((file) => {
     exactKeys(file, ["path", "sha256"], "isolated source file");
     return { path: stringValue(file["path"], "isolated source path"), sha256: digestValue(file["sha256"], "isolated source digest") };
   });
-  if (JSON.stringify(normalized.map((file) => file.path)) !== JSON.stringify([...sourceBundlePaths].sort())) throw new Error("Isolated source bundle paths are invalid.");
+  if (JSON.stringify(normalized.map((file) => file.path)) !== JSON.stringify([...isolatedSourceBundlePaths].sort())) throw new Error("Isolated source bundle paths are invalid.");
   if (JSON.stringify(normalized) !== JSON.stringify([...normalized].sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0))) throw new Error("Isolated source bundle must be sorted.");
   if (bundle["merkleSha256"] !== merkleDigest(normalized)) throw new Error("Isolated source bundle Merkle digest is invalid.");
   return normalized;
@@ -1140,11 +1503,15 @@ function stringValue(value: unknown, label: string): string { if (typeof value !
 function digestValue(value: unknown, label: string): string { const digest = stringValue(value, label); if (!sha256Pattern.test(digest)) throw new Error(`${label} must be a SHA-256 digest.`); return digest; }
 
 if (Bun.argv[1] !== undefined && resolve(Bun.argv[1]) === resolve(join(import.meta.dir, "k0r-run-evidence.ts"))) {
-  const args = Bun.argv.slice(2);
   try {
-    if (args.length === 1 && args[0] === "--isolated-oracle") console.log(JSON.stringify(await runK0rIndependentOracle({ root: repositoryRoot })));
-    else if (args.length === 1 && args[0] === "--write") console.log(JSON.stringify({ path: isolatedRunReceiptPath, status: (await runK0rIsolatedEvidence()).status }));
-    else throw new Error("Expected --write or --isolated-oracle.");
+    const command = parseK0rRunEvidenceArgv(Bun.argv.slice(2));
+    if (command.mode === "isolated-oracle") console.log(JSON.stringify(await runK0rIndependentOracle({ root: repositoryRoot })));
+    else {
+      const receipt = await runK0rIsolatedEvidence({ pendingTransition: command.pendingTransition, privateCandidate: command.privateCandidate, privateWorkRoot: command.privateWorkRoot });
+      console.log(JSON.stringify(receipt.status === "pass_pending_exact_byte_review"
+        ? { path: isolatedRunReceiptPath, status: receipt.status, priorPublicEvidencePreserved: false }
+        : { path: null, status: receipt.status, priorPublicEvidencePreserved: true }));
+    }
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;

@@ -77,6 +77,37 @@ test("K0R loads its source identity from the selected root while remaining indep
   }
 });
 
+test("K0R staged files produce the same seed scan as physical files", async () => {
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "boulder-k0r-staged-oracle-"));
+  try {
+    const [fixtures, source] = await Promise.all([fixtureBytes(), readFile(join(root, "test", "k0r-independent-oracle.ts"), "utf8")]);
+    const fixtureDirectory = join(temporaryRoot, "fixtures", "v2-kernel");
+    await Promise.all([mkdir(fixtureDirectory, { recursive: true }), mkdir(join(temporaryRoot, "test"), { recursive: true })]);
+    await Promise.all([
+      writeFile(join(fixtureDirectory, "valid-ed25519-authority-unsupported-effect.json"), fixtures.baseline),
+      writeFile(join(fixtureDirectory, "invalid-authority-vectors.json"), fixtures.mutations),
+      writeFile(join(fixtureDirectory, "valid-none-effect-execution.json"), fixtures.none),
+      writeFile(join(temporaryRoot, "test", "k0r-independent-oracle.ts"), source),
+      writeFile(join(temporaryRoot, "test", "v2-authority-vectors.generate.ts"), "export const fixture = true;\n"),
+    ]);
+    const stagedFile = { path: "evidence/k0r/baseline-transition.json", bytes: "{}\n" };
+    const staged = await runK0rIndependentOracle({ root: temporaryRoot, stagedFiles: [stagedFile] });
+    await mkdir(join(temporaryRoot, "evidence/k0r"), { recursive: true });
+    await writeFile(join(temporaryRoot, stagedFile.path), stagedFile.bytes);
+    const physical = await runK0rIndependentOracle({ root: temporaryRoot });
+    expect(staged.seedMaterial).toEqual(physical.seedMaterial);
+    expect(staged).toEqual(physical);
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test("K0R rejects staged path aliases", async () => {
+  for (const path of ["evidence\\k0r\\x.json", "evidence/k0r/\0x.json", "evidence/k0r/e\u0301.json"]) {
+    await expect(runK0rIndependentOracle({ root, stagedFiles: [{ path, bytes: "{}\n" }] })).rejects.toThrow("Staged oracle path is invalid");
+  }
+});
+
 test("K0R rejects an oracle source that imports product code", async () => {
   const source = await readFile(join(root, "test", "k0r-independent-oracle.ts"), "utf8");
   const report = await runK0rIndependentOracle({ root, oracleSourceBytes: `${source}\nimport "../src/v2-kernel.js";\n` });

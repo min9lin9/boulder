@@ -20,7 +20,8 @@ Checked-in maintainer evidence artifacts — not runtime state, and not generate
 - One directory per run-id or scenario; stable artifact names (`activation-transcript.txt`, `first-readiness.json`, `generated-metrics.json`).
 - Evidence must be reproducible: the generating command stays copy-pasteable from the repo root in the citing doc.
 - Observed output only; interpretation belongs in docs.
-- k0r artifacts are regenerated through the k0r harness (`test/k0r-capture-evidence.ts`, `test/k0r-run-evidence.ts`), never hand-written.
+- `evidence/k0r/` is an owner-generated, untracked transition subtree. Only the K0R reconcile, isolated-run, capture, and exit tools may install its artifacts; never hand-write or stage partial output.
+- K0R generators keep scanning/materialization (`test/k0r-reconcile-evidence.ts`), isolated execution (`test/k0r-run-evidence.ts`), capture (`test/k0r-capture-evidence.ts`), and exit issuance (`test/k0r-issue-exit.ts`) as separate ownership phases.
 
 ## ANTI-PATTERNS
 

@@ -1,6 +1,6 @@
 import { createHash, createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
 import { lstat, readFile, readdir } from "node:fs/promises";
-import { join, relative, resolve } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 type JsonRecord = { [key: string]: Json };
@@ -37,6 +37,7 @@ export type K0rOracleOptions = {
   readonly root?: string;
   readonly fixtureBytes?: Partial<Record<FixtureName, string>>;
   readonly oracleSourceBytes?: string;
+  readonly stagedFiles?: readonly { readonly path: string; readonly bytes: string | Uint8Array }[];
 };
 
 const encoder = new TextEncoder();
@@ -452,13 +453,41 @@ function expectedGenerationSource(baseline: JsonRecord): JsonRecord {
   };
 }
 
-async function loadFixture(root: string, relativePath: string, override: string | undefined): Promise<Uint8Array> {
-  return override === undefined ? readFile(join(root, relativePath)) : encoder.encode(override);
+function stagedFileMap(files: K0rOracleOptions["stagedFiles"]): ReadonlyMap<string, Uint8Array> {
+  const result = new Map<string, Uint8Array>();
+  let previous: Uint8Array | undefined;
+  for (const file of files ?? []) {
+    const path = file.path.normalize("NFC");
+    assert(path === file.path && path !== "" && !isAbsolute(path) && !path.includes("\\") && !path.includes("\0") && !path.split("/").some((part) => part === "" || part === "." || part === ".."), "Staged oracle path is invalid.");
+    const bytes = encoder.encode(path);
+    assert(previous === undefined || compareBytes(previous, bytes) < 0, "Staged oracle paths must be unique and sorted.");
+    assert(!result.has(path), "Staged oracle paths must be unique and sorted.");
+    result.set(path, typeof file.bytes === "string" ? encoder.encode(file.bytes) : file.bytes);
+    previous = bytes;
+  }
+  return result;
 }
 
-async function scanForSeed(root: string): Promise<{ readonly status: "absentOutsideApprovedOracleAndGenerator" | "present"; readonly scannedFileCount: number }> {
+function compareBytes(left: Uint8Array, right: Uint8Array): number {
+  for (let index = 0; index < Math.min(left.length, right.length); index += 1) {
+    const difference = left[index]! - right[index]!;
+    if (difference !== 0) return difference;
+  }
+  return left.length - right.length;
+}
+
+async function loadRootFile(root: string, relativePath: string, staged: ReadonlyMap<string, Uint8Array>): Promise<Uint8Array> {
+  return staged.get(relativePath) ?? readFile(join(root, relativePath));
+}
+
+async function loadFixture(root: string, relativePath: string, override: string | undefined, staged: ReadonlyMap<string, Uint8Array>): Promise<Uint8Array> {
+  return override === undefined ? loadRootFile(root, relativePath, staged) : encoder.encode(override);
+}
+
+async function scanForSeed(root: string, staged: ReadonlyMap<string, Uint8Array>): Promise<{ readonly status: "absentOutsideApprovedOracleAndGenerator" | "present"; readonly scannedFileCount: number }> {
   let scannedFileCount = 0;
   let present = false;
+  const scanned = new Set<string>();
   async function scan(path: string): Promise<void> {
     const relativePath = relative(root, path);
     if (approvedSeedSourcePaths.has(relativePath) || ignoredSeedScanDirectories.has(relativePath.split("/")[0])) return;
@@ -469,10 +498,16 @@ async function scanForSeed(root: string): Promise<{ readonly status: "absentOuts
       return;
     }
     if (!stat.isFile()) return;
+    scanned.add(relativePath);
     scannedFileCount += 1;
-    if (decoder.decode(await readFile(path)).includes(rfc8032Vector1Seed)) present = true;
+    if (decoder.decode(await loadRootFile(root, relativePath, staged)).includes(rfc8032Vector1Seed)) present = true;
   }
   await scan(root);
+  for (const [path, bytes] of staged) {
+    if (approvedSeedSourcePaths.has(path) || ignoredSeedScanDirectories.has(path.split("/")[0]) || scanned.has(path)) continue;
+    scannedFileCount += 1;
+    if (decoder.decode(bytes).includes(rfc8032Vector1Seed)) present = true;
+  }
   return { status: present ? "present" : "absentOutsideApprovedOracleAndGenerator", scannedFileCount };
 }
 
@@ -486,6 +521,7 @@ export function assertIndependentOracleSource(source: string): void {
 
 export async function runK0rIndependentOracle(options: K0rOracleOptions = {}): Promise<K0rOracleReport> {
   const root = options.root === undefined ? repositoryRoot : resolve(options.root);
+  const staged = stagedFileMap(options.stagedFiles);
   const artifacts: Record<FixtureName, string> = { baseline: "", mutations: "", none: "" };
   const reproduced: Record<FixtureName, { sha256: string; fixtureSha256: string; byteMatch: boolean }> = {
     baseline: { sha256: "", fixtureSha256: "", byteMatch: false },
@@ -504,7 +540,7 @@ export async function runK0rIndependentOracle(options: K0rOracleOptions = {}): P
   };
 
   await check("oracle-source", async () => {
-    const source = options.oracleSourceBytes ?? decoder.decode(await readFile(join(root, "test/k0r-independent-oracle.ts")));
+    const source = options.oracleSourceBytes ?? decoder.decode(await loadRootFile(root, "test/k0r-independent-oracle.ts", staged));
     assertIndependentOracleSource(source);
     oracleSourceSha256 = sha256Text(source);
   });
@@ -542,7 +578,7 @@ export async function runK0rIndependentOracle(options: K0rOracleOptions = {}): P
   ];
   for (const [name, path, value, approvedDigest] of fixtureEntries) {
     await check(`fixture-${name}`, async () => {
-      const fixture = await loadFixture(root, path, options.fixtureBytes?.[name]);
+      const fixture = await loadFixture(root, path, options.fixtureBytes?.[name], staged);
       const expected = encoder.encode(serializeK0r(value));
       artifacts[name] = sha256(fixture);
       reproduced[name] = { sha256: sha256(expected), fixtureSha256: artifacts[name], byteMatch: equalBytes(expected, fixture) };
@@ -553,7 +589,7 @@ export async function runK0rIndependentOracle(options: K0rOracleOptions = {}): P
   }
 
   await check("seed-exclusion", async () => {
-    seedMaterial = await scanForSeed(root);
+    seedMaterial = await scanForSeed(root, staged);
     assert(seedMaterial.status === "absentOutsideApprovedOracleAndGenerator", "RFC 8032 seed material is present outside the approved oracle and generator.");
   });
   if (failures.some((failure) => failure.startsWith("seed-exclusion:")) && seedMaterial.status !== "present") seedMaterial = { ...seedMaterial, status: "scan_failed" };

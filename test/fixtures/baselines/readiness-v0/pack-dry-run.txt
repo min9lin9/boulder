@@ -87,6 +87,7 @@ packed 13.21KB docs/WORKFLOW_PROFILE_PLAN_REVIEW.ko.md
 packed 0.92KB docs/adr/0001-project-scope.md
 packed 0.90KB docs/adr/0002-contract-first-development.md
 packed 12.75KB docs/adr/0003-v2-kernel-gates.md
+packed 37.63KB docs/boulder-guide.ko.html
 packed 1.1KB docs/branch-protection.md
 packed 1.42KB docs/contributing/ai-contribution-policy.md
 packed 1.32KB docs/contributing/development-setup.md
@@ -98,12 +99,12 @@ packed 0.70KB fixtures/benchmarks/mcp-server.json
 packed 0.69KB fixtures/benchmarks/python-package.json
 packed 0.72KB fixtures/benchmarks/typescript-library.json
 packed 1.47KB fixtures/capabilities/codex-installed.json
-packed 19.88KB fixtures/docs/doc-registry.v0.json
+packed 20.1KB fixtures/docs/doc-registry.v0.json
 packed 0.91KB fixtures/handoffs/high.json
 packed 0.63KB fixtures/handoffs/low.json
 packed 0.74KB fixtures/handoffs/medium.json
 packed 1.55KB fixtures/k2a-f/contract-foundation.v1.json
-packed 12.30KB fixtures/package-inventory/packaged-files.v0.json
+packed 12.34KB fixtures/package-inventory/packaged-files.v0.json
 packed 1.11KB fixtures/plan-analysis/invalid.json
 packed 1.34KB fixtures/plan-analysis/valid.json
 packed 4.37KB fixtures/plan-receipts/vectors.json
@@ -271,5 +272,5 @@ packed 1.75KB src/workflows.ts
 
 boulder-oss-cli-0.1.16.tgz
 
-Total files: 268
-Unpacked size: 1.54MB
+Total files: 269
+Unpacked size: 1.58MB

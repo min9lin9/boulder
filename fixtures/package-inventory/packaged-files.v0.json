@@ -1,7 +1,7 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 267,
-  "totalPackedFiles": 268,
+  "totalUniqueFiles": 268,
+  "totalPackedFiles": 269,
   "classes": [
     {
       "class": "runtime",
@@ -130,7 +130,7 @@
     },
     {
       "class": "public-doc",
-      "count": 66,
+      "count": 67,
       "files": [
         "CHANGELOG.md",
         "CONTRIBUTING.md",
@@ -192,6 +192,7 @@
         "docs/adr/0001-project-scope.md",
         "docs/adr/0002-contract-first-development.md",
         "docs/adr/0003-v2-kernel-gates.md",
+        "docs/boulder-guide.ko.html",
         "docs/branch-protection.md",
         "docs/contributing/ai-contribution-policy.md",
         "docs/contributing/development-setup.md",
