@@ -292,10 +292,10 @@ describe("quickstart and replay reports", () => {
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
     expect(markdown).toContain("execute=lazycodex");
-    expect(markdown).toContain("GJC and LazyCodex are adapter preferences");
-    expect(markdown).toContain("Bootstrap task-category profiles");
-    expect(markdown).toContain("agency-agents is a profile-scoped subagent catalog");
-    expect(markdown).toContain("doctor verifies local installation before live execution");
+    expect(markdown).toContain("GJC is the planning adapter and LazyCodex is the execution adapter");
+    expect(markdown).toContain("bootstrap task-category profiles");
+    expect(markdown).toContain("agency-agents as their catalog of helper subagents");
+    expect(markdown).toContain("The doctor command verifies your installation before anything runs");
   });
 
   test("checks public replay fixtures and official docs references", async () => {

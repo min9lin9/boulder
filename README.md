@@ -1,8 +1,10 @@
 # boulder
 
-A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
+Turn any OSS repository into a workspace where AI coding agents plan, execute, and verify under your control - with signed evidence you can audit.
 
-Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
+Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes. Nothing executes without your approval.
+
+**Start in 90 seconds:** `bunx boulder-oss-cli@latest init && bunx boulder-oss-cli@latest quickstart` - `quickstart` verifies your local installation and prints your next commands.
 
 Current published package: `boulder-oss-cli@0.1.16`.
 Current release candidate: `v0.1.16`.
