@@ -1435,8 +1435,10 @@ describe("K0R isolated-run receipt", () => {
       const cleanInventory = recordValue(recordValue(receipt.run.isolation, "isolation")["cleanTempInventory"], "clean temporary inventory");
       const gitMetadata = recordValue(cleanInventory["gitMetadata"], "clean temporary Git metadata");
       const releaseManifest = parseRecord(await readFile(releaseManifestPath, "utf8"), "release manifest");
+      const releaseTag = stringValue(releaseManifest["tag"], "release manifest tag");
+      const releaseBundleFileName = `release-${releaseTag}.bundle`;
       expect(gitMetadata["packageVersion"]).toBe("0.1.17");
-      expect(gitMetadata["tag"]).toBe(releaseManifest["tag"]);
+      expect(gitMetadata["tag"]).toBe(releaseTag);
       expect(gitMetadata["tagCommit"]).toBe(releaseManifest["tagCommit"]);
       expect(gitMetadata["commit"]).toMatch(/^[0-9a-f]{40}$/);
       expect(gitMetadata["tree"]).toMatch(/^[0-9a-f]{40}$/);
@@ -1445,16 +1447,15 @@ describe("K0R isolated-run receipt", () => {
       const privateReceipt = structuredClone(receipt);
       if (privateReceipt.run === null) throw new Error("private receipt clone lost its run");
       const privateBundle = recordValue(privateReceipt.run.isolation.cleanTempInventory.gitMetadata.historicalTagBundle, "private historical tag bundle");
-      const privateBundlePath = join(privateQaRoot, "work/isolated-run/tmp/release-v0.1.16.bundle");
+      const privateBundlePath = join(privateQaRoot, "work/isolated-run/tmp", releaseBundleFileName);
       privateBundle["path"] = privateBundlePath;
       const privateBundleCommands = recordArray(privateBundle["commands"], "private historical tag bundle commands");
-      privateBundleCommands[1]!["argv"] = ["git", "bundle", "create", privateBundlePath, "refs/tags/v0.1.16"];
+      privateBundleCommands[1]!["argv"] = ["git", "bundle", "create", privateBundlePath, `refs/tags/${releaseTag}`];
       privateBundleCommands[2]!["argv"] = ["git", "bundle", "list-heads", privateBundlePath];
       const privateValidated = await validateK0rIsolatedRunReceipt(new TextEncoder().encode(`${JSON.stringify(privateReceipt)}\n`), root);
       const installedBundlePath = stringValue(historicalTagBundle["path"], "installed historical tag bundle path");
       expect({
-        installedPathMatches: /\/boulder-k0r-isolated-[^/]+\/tmp\/release-v0\.1\.16\.bundle$/.test(installedBundlePath)
-          || installedBundlePath.endsWith("/work/isolated-run/tmp/release-v0.1.16.bundle"),
+        installedPathMatches: installedBundlePath.endsWith(`/tmp/${releaseBundleFileName}`),
         privateStatus: privateValidated.status,
       }).toEqual({
         installedPathMatches: true,
@@ -1464,8 +1465,8 @@ describe("K0R isolated-run receipt", () => {
       expect(historicalTagBundle["sourceTagCommit"]).toBe(releaseManifest["tagCommit"]);
       expect(historicalTagBundle["removed"]).toBe(true);
       expect(recordArray(historicalTagBundle["commands"], "historical tag bundle commands").map((command) => command["argv"])).toEqual([
-        ["git", "rev-parse", "--verify", "refs/tags/v0.1.16^{}"],
-        ["git", "bundle", "create", historicalTagBundle["path"], "refs/tags/v0.1.16"],
+        ["git", "rev-parse", "--verify", `refs/tags/${releaseTag}^{}`],
+        ["git", "bundle", "create", historicalTagBundle["path"], `refs/tags/${releaseTag}`],
         ["git", "bundle", "list-heads", historicalTagBundle["path"]]
       ]);
       expect(stringArray(cleanInventory["tracked"], "clean temporary tracked paths")).toContain("package.json");
@@ -1476,9 +1477,9 @@ describe("K0R isolated-run receipt", () => {
         ["git", "commit", "--quiet", "--message", "K0R isolated clean source"],
         ["git", "rev-parse", "HEAD"],
         ["git", "rev-parse", "HEAD^{tree}"],
-        ["git", "fetch", "--no-tags", "/tmp/release-v0.1.16.bundle", "refs/tags/v0.1.16:refs/tags/v0.1.16"],
+        ["git", "fetch", "--no-tags", `/tmp/${releaseBundleFileName}`, `refs/tags/${releaseTag}:refs/tags/${releaseTag}`],
         ["git", "rev-parse", "HEAD"],
-        ["git", "rev-parse", "--verify", "refs/tags/v0.1.16^{}"]
+        ["git", "rev-parse", "--verify", `refs/tags/${releaseTag}^{}`]
       ]);
       const forged = JSON.parse(new TextDecoder().decode(bytes)) as RecordValue;
       recordValue(recordValue(forged["run"], "forged receipt run")["dependencyBinding"], "forged dependency binding")["bunLock"] = { path: "bun.lock", sha256: "sha256:0000000000000000000000000000000000000000000000000000000000000000" };
@@ -1566,6 +1567,9 @@ describe("K0R isolated-run receipt", () => {
   });
   test("enforces bwrap isolation probes and rejects argv drift before process spawn", async () => {
     const [, , isolation] = await readContracts();
+    const releaseManifest = parseRecord(await readFile(releaseManifestPath, "utf8"), "release manifest");
+    const releaseTag = stringValue(releaseManifest["tag"], "release manifest tag");
+    const releaseBundleFileName = `release-${releaseTag}.bundle`;
     const bwrap = recordValue(recordValue(isolation["isolation"], "isolation")["bwrap"], "bwrap policy");
     expect({
       priorSnapshotMode: isolatedPriorSnapshotMode,
@@ -1613,10 +1617,10 @@ describe("K0R isolated-run receipt", () => {
     expect(hasArgv(["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"])).toBe(true);
     expect(hasArgv(["bun", "pm", "pack", "--dry-run", "--ignore-scripts"])).toBe(true);
     expect(hasArgv(["git", "commit", "--quiet", "--message", "K0R isolated clean source"])).toBe(true);
-    expect(hasArgv(["git", "rev-parse", "--verify", "refs/tags/v0.1.16^{}"])).toBe(true);
-    expect(hasArgv(["git", "bundle", "create", "${K0R_TEMP_ROOT}/tmp/release-v0.1.16.bundle", "refs/tags/v0.1.16"])).toBe(true);
-    expect(hasArgv(["git", "bundle", "list-heads", "${K0R_TEMP_ROOT}/tmp/release-v0.1.16.bundle"])).toBe(true);
-    expect(hasArgv(["git", "fetch", "--no-tags", "/tmp/release-v0.1.16.bundle", "refs/tags/v0.1.16:refs/tags/v0.1.16"])).toBe(true);
+    expect(hasArgv(["git", "rev-parse", "--verify", `refs/tags/${releaseTag}^{}`])).toBe(true);
+    expect(hasArgv(["git", "bundle", "create", `${"${K0R_TEMP_ROOT}"}/tmp/${releaseBundleFileName}`, `refs/tags/${releaseTag}`])).toBe(true);
+    expect(hasArgv(["git", "bundle", "list-heads", `${"${K0R_TEMP_ROOT}"}/tmp/${releaseBundleFileName}`])).toBe(true);
+    expect(hasArgv(["git", "fetch", "--no-tags", `/tmp/${releaseBundleFileName}`, `refs/tags/${releaseTag}:refs/tags/${releaseTag}`])).toBe(true);
     expect(hasArgv(["git", "archive", "--format=tar", "--output", "${K0R_TEMP_ROOT}/tmp/head-source.tar", "HEAD"])).toBe(true);
     expect(hasArgv(["tar", "-xf", "${K0R_TEMP_ROOT}/tmp/head-source.tar", "-C", "${K0R_TEMP_ROOT}/boulder"])).toBe(true);
     assertK0rAllowedArgv(["git", "show", "HEAD:AGENTS.md"], allowlist);

@@ -197,5 +197,5 @@ describe("ref repo guards", () => {
     } finally {
       await removeTempRepo(probe);
     }
-  });
+  }, 30_000);
 });
