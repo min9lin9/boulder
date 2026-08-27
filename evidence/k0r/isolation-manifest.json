@@ -54,32 +54,6 @@
       ],
       [
         "git",
-        "rev-parse",
-        "--verify",
-        "refs/tags/v0.1.16^{}"
-      ],
-      [
-        "git",
-        "bundle",
-        "create",
-        "${K0R_TEMP_ROOT}/tmp/release-v0.1.16.bundle",
-        "refs/tags/v0.1.16"
-      ],
-      [
-        "git",
-        "bundle",
-        "list-heads",
-        "${K0R_TEMP_ROOT}/tmp/release-v0.1.16.bundle"
-      ],
-      [
-        "git",
-        "fetch",
-        "--no-tags",
-        "/tmp/release-v0.1.16.bundle",
-        "refs/tags/v0.1.16:refs/tags/v0.1.16"
-      ],
-      [
-        "git",
         "ls-files",
         "-z"
       ],
@@ -147,6 +121,32 @@
         "-z",
         "--untracked-files=all",
         "--ignored=matching"
+      ],
+      [
+        "git",
+        "rev-parse",
+        "--verify",
+        "refs/tags/v0.1.17^{}"
+      ],
+      [
+        "git",
+        "bundle",
+        "create",
+        "${K0R_TEMP_ROOT}/tmp/release-v0.1.17.bundle",
+        "refs/tags/v0.1.17"
+      ],
+      [
+        "git",
+        "bundle",
+        "list-heads",
+        "${K0R_TEMP_ROOT}/tmp/release-v0.1.17.bundle"
+      ],
+      [
+        "git",
+        "fetch",
+        "--no-tags",
+        "/tmp/release-v0.1.17.bundle",
+        "refs/tags/v0.1.17:refs/tags/v0.1.17"
       ],
       [
         "bun",
