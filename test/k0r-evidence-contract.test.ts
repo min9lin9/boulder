@@ -432,20 +432,23 @@ describe("K0R scope output authority", () => {
   }
   test("derives overlay base state from immutable HEAD bytes", async () => {
     const head = (await gitStdout(["rev-parse", "HEAD"])).trim();
-    const trackedBytes = await gitStdout(["show", `${head}:evidence/AGENTS.md`]);
+    const [guideBytes, evidenceAgentBytes] = await Promise.all([
+      gitStdout(["show", `${head}:docs/boulder-guide.ko.html`]),
+      gitStdout(["show", `${head}:evidence/AGENTS.md`]),
+    ]);
     const entries = await deriveK0rHeadOverlayBase(head, [
       { path: "docs/boulder-guide.ko.html", sha256: `sha256:${"1".repeat(64)}` },
       { path: "evidence/AGENTS.md", sha256: `sha256:${"2".repeat(64)}` },
     ]);
     expect(entries[0]).toEqual({
       path: "docs/boulder-guide.ko.html",
-      baseState: "absent",
-      baseSha256: null,
+      baseState: "present",
+      baseSha256: `sha256:${sha256K0rBytes(guideBytes)}`,
       replacementSha256: `sha256:${"1".repeat(64)}`,
       owner: "authorized tracked overlay",
     });
     expect(entries[1]?.["baseState"]).toBe("present");
-    expect(entries[1]?.["baseSha256"]).toBe(`sha256:${sha256K0rBytes(trackedBytes)}`);
+    expect(entries[1]?.["baseSha256"]).toBe(`sha256:${sha256K0rBytes(evidenceAgentBytes)}`);
   });
   test("parses exactly the documented finalize-transition argv", () => {
     const argv = [
