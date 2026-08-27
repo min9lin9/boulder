@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { runBoundedK0rProcess } from "./k0r-canonical.js";
 import { runK0rIndependentOracle, type K0rOracleOptions } from "./k0r-independent-oracle.js";
-import { isolatedOracleArgv, isolatedRunCommandArgv, resolveK0rRepositoryCheckArgv } from "./k0r-run-evidence.js";
+import { historicalTagBundleArgv, isolatedGitSetupArgv, isolatedOracleArgv, isolatedRunCommandArgv, resolveK0rRepositoryCheckArgv } from "./k0r-run-evidence.js";
 
 const repositoryRoot = resolve(import.meta.dir, "..");
 export const k0rBaselineGeneratorPath = "test/k0r-baseline-generator.ts";
@@ -137,13 +137,25 @@ async function refreshIsolation(root: string, isolation: RecordValue): Promise<R
   const repositoryChecks = await resolveK0rRepositoryCheckArgv(root);
   const generated = [[...isolatedRunCommandArgv], ...repositoryChecks.map((argv) => [...argv])];
   const generatedFamilies = new Set(generated.map((argv) => `${argv[0] ?? ""}\0${argv[1] ?? ""}`));
+  const versionedReleaseCommands = [
+    ...historicalTagBundleArgv.map((argv) => [...argv]),
+    [...(isolatedGitSetupArgv[5] ?? [])],
+  ];
+  const isVersionedReleaseCommand = (argv: readonly string[]): boolean =>
+    argv[0] === "git" && (
+      (argv[1] === "rev-parse" && argv[2] === "--verify" && argv[3]?.startsWith("refs/tags/v") === true)
+      || (argv[1] === "bundle" && ["create", "list-heads"].includes(argv[2] ?? "") && argv.some((part) => part.includes("/release-v")))
+      || (argv[1] === "fetch" && argv.some((part) => part.includes("/release-v")))
+    );
   commands["argvAllowlist"] = [
     ...recordArrayOfArrays(commands["argvAllowlist"], "isolation argv allowlist")
       .filter((argv) => JSON.stringify(argv) !== JSON.stringify(["bun", k0rBaselineGeneratorPath, "--write"])
         && (!generatedFamilies.has(`${argv[0] ?? ""}\0${argv[1] ?? ""}`)
           || JSON.stringify(argv) === JSON.stringify(isolatedOracleArgv))
         && !(argv[0] === "bunx" && argv.includes("tsc"))
-        && JSON.stringify(argv) !== JSON.stringify(["bun", "run", "ci"])),
+        && JSON.stringify(argv) !== JSON.stringify(["bun", "run", "ci"])
+        && !isVersionedReleaseCommand(argv)),
+    ...versionedReleaseCommands,
     ...generated,
   ];
   return result;

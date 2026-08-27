@@ -71,7 +71,7 @@ const disposableInventoryDerivationAlgorithm = "k0r.disposable-inventories";
 const disposableInventoryDerivationVersion = "v2";
 const safeEnvironmentNames = ["BOULDER_ROOT", "BUN_INSTALL_CACHE_DIR", "GIT_AUTHOR_DATE", "GIT_AUTHOR_EMAIL", "GIT_AUTHOR_NAME", "GIT_COMMITTER_DATE", "GIT_COMMITTER_EMAIL", "GIT_COMMITTER_NAME", "HOME", "LANG", "NPM_CONFIG_CACHE", "NPM_CONFIG_REGISTRY", "NPM_CONFIG_USERCONFIG", "PATH", "TMPDIR", "XDG_CACHE_HOME"] as const;
 const sha256Pattern = /^sha256:[0-9a-f]{64}$/;
-const isolatedReleaseTag = "v0.1.16";
+export const isolatedReleaseTag = "v0.1.17";
 const releaseManifestPath = "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json";
 const runRootPlaceholder = "${K0R_TEMP_ROOT}";
 const historicalTagBundleFileName = `release-${isolatedReleaseTag}.bundle`;
@@ -88,14 +88,14 @@ const canonicalPendingEvidenceManifest = `${JSON.stringify({
   status: "not_run",
   disposition: "disposable_isolated_capture_placeholder"
 }, null, 2)}\n`;
-const historicalTagBundleArgv = [
+export const historicalTagBundleArgv = [
   ["git", "rev-parse", "--verify", `refs/tags/${isolatedReleaseTag}^{}`],
   ["git", "bundle", "create", `${runRootPlaceholder}/tmp/${historicalTagBundleFileName}`, `refs/tags/${isolatedReleaseTag}`],
   ["git", "bundle", "list-heads", `${runRootPlaceholder}/tmp/${historicalTagBundleFileName}`]
 ] as const;
 const isolatedPackDryRunArgv = ["bun", "pm", "pack", "--dry-run", "--ignore-scripts"] as const;
 const headSourceArchiveFileName = "head-source.tar";
-const isolatedGitSetupArgv = [
+export const isolatedGitSetupArgv = [
   ["git", "init", "--quiet"],
   ["git", "add", "--all"],
   ["git", "commit", "--quiet", "--message", "K0R isolated clean source"],
