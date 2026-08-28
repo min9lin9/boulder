@@ -641,7 +641,7 @@ async function loadIssuanceContext(values: Readonly<Record<WriteOption, string>>
   const paths = Object.values(values);
   paths.forEach((path) => assertInputContained(path, privateRoot));
   for (const option of writeOptions) if (resolve(values[option]) !== resolve(privateRoot, canonicalWriteRolePaths[option])) throw new Error(`${option} path is not canonical.`);
-  await verifyPending(values["--pending-transition"], privateRoot);
+  await verifyPending(values["--pending-transition"], privateRoot, expectedCurrentExit);
   const [pending, scopePayload, scopeProvenance, implementer, architect, architectProvenance, critic, criticProvenance, manifest, maintainerRequest, maintainer, maintainerProvenance, architectAttestation, architectAttestationProvenance, criticAttestation, criticAttestationProvenance] = await Promise.all([
     readJsonFile(values["--pending-transition"]), readJsonFile(values["--scope-authorization"]), readJsonFile(values["--scope-provenance"]), readJsonFile(values["--implementer-provenance"]),
     readJsonFile(values["--architect-review"]), readJsonFile(values["--architect-provenance"]), readJsonFile(values["--critic-review"]), readJsonFile(values["--critic-provenance"]), readJsonFile(values["--reviewed-inputs-manifest"]),
@@ -803,7 +803,13 @@ function deriveWriteValues(receipt: JsonRecord, privateRoot: string, implementer
   };
 }
 
-async function verifyPending(path: string, privateRoot: string): Promise<JsonRecord> {
+export function validatePendingExitPresence(exitPresent: boolean, selfVerification: boolean): void {
+  if (exitPresent === selfVerification) return;
+  if (selfVerification) throw new Error("Expected exit receipt is missing during self-verification.");
+  throw new Error("Pending-only verification refuses a present exit receipt.");
+}
+
+async function verifyPending(path: string, privateRoot: string, expectedCurrentExit?: FileValue): Promise<JsonRecord> {
   assertInputContained(path, privateRoot);
   if (resolve(path) !== resolve(privateRoot, "protected/k0r-transition.pending.json")) throw new Error("Pending transition path is not canonical.");
   const pending = await readJsonFile(path);
@@ -876,7 +882,7 @@ async function verifyPending(path: string, privateRoot: string): Promise<JsonRec
   for (const mutation of recordArray(pending.value["ownerMutations"], "pending owner mutations")) if (mutation["afterSha256"] !== await digestFile(join(repositoryRoot, stringValue(mutation["path"], "owner mutation path")))) throw new Error("Pending owner mutation is stale.");
   await verifyTrackedFreezeAndGit(privateRoot, pending.value, scopePayload.value);
   const exitState = await lstat(resolve(repositoryRoot, exitReceiptPath)).catch((error: unknown) => isEnoent(error) ? undefined : Promise.reject(error));
-  if (exitState !== undefined) throw new Error("Pending-only verification refuses a present exit receipt.");
+  validatePendingExitPresence(exitState !== undefined, expectedCurrentExit !== undefined);
   const current = await readJsonFile(path);
   if (current.sha256 !== pending.sha256 || !equalCanonical(current.value, pending.value)) throw new Error("Pending transition changed during ancestry verification.");
   return { schemaVersion: "boulder.k0r.pending-exit-report.v1", status: "pending_exit", transitionSha256: pending.sha256, authoritySynthesized: false };

@@ -6,9 +6,9 @@
     "sourceBundle": {
       "derivation": {
         "base": {
-          "archiveSha256": "sha256:766ba0f6c31bdbbdcebe2ce57cfa004e00f96807f071d50f32c14074b36b629e",
-          "commit": "b886920c7125a562e83dfaa26a562191c7336215",
-          "tree": "196b715c56372d53614660a09575fb8a4b9849c4"
+          "archiveSha256": "sha256:d669d718a0ceac8f1e036f9df93b9f88277b273bcb0f662c94b4703ad64e05fa",
+          "commit": "c6fc6d6c626531fc04d52ec0dff5165d97f61a04",
+          "tree": "4c1726a31987fbe15bb483a5e5f66e24d6c2e0f9"
         },
         "overlay": {
           "allowedPaths": [
@@ -66,17 +66,47 @@
           ],
           "files": [
             {
+              "path": "evidence/k0r/acceptance-manifest.json",
+              "baseSha256": "sha256:490ee5d9cb8e69680f0a8afd02a1d9853c716fcbebc6fc3a8673548000084565",
+              "overlaySha256": "sha256:ae3f5e4690fd4d3222bbacbd093d8691a33fac251c2a456474287fa0b5ed8e98"
+            },
+            {
               "path": "evidence/k0r/independent-clean-source-reproduction.json",
-              "baseSha256": "sha256:18d7cee92a80616f537d47c8fa03bf85d231d0c9afb49d91099c95ab7d2c65c1",
-              "overlaySha256": "sha256:2de8658eb438d1fb285368fcba6e6c35c60613f720c51183200e1855d3ac2f56"
+              "baseSha256": "sha256:2de8658eb438d1fb285368fcba6e6c35c60613f720c51183200e1855d3ac2f56",
+              "overlaySha256": "sha256:6f9a2114012c88af51c93d9207efb6508df3975a3a08a06784d547b350c83b53"
             },
             {
               "path": "evidence/k0r/isolation-manifest.json",
-              "baseSha256": "sha256:245821c3f2ab39b097ad2daaa6e111af232055a286fb41d8dd787b186a7b286d",
-              "overlaySha256": "sha256:22c4d853c862864e87366e7edfe173d3b61607e74962f29947b76d2222ee3b7a"
+              "baseSha256": "sha256:22c4d853c862864e87366e7edfe173d3b61607e74962f29947b76d2222ee3b7a",
+              "overlaySha256": "sha256:76cd717154a1d373193334a40f21a2923d59ba0a1e180a697b25e751f29598ee"
+            },
+            {
+              "path": "evidence/k0r/v1-public-contract-inventory.json",
+              "baseSha256": "sha256:f55443efa29fec53491e165865f9365303b4ff776a8a2002090d62013c733d42",
+              "overlaySha256": "sha256:9327fac8c69f1c52f13756d4c54a51b9f20e04b79bb198734d950944efd1110f"
+            },
+            {
+              "path": "test/k0r-evidence-contract.test.ts",
+              "baseSha256": "sha256:c3419515be0bfe648de4b664c488a5dec6285ae707896e74800a7737f7cd7eb9",
+              "overlaySha256": "sha256:3937b688fc2c50219b8d0983d3e5baff758b0ab4d98f28fb847d51354f782b18"
+            },
+            {
+              "path": "test/k0r-issue-exit.ts",
+              "baseSha256": "sha256:c0cef44891de9adaea68f5edebee5754b68b62275d2fc4ccb087153cce591954",
+              "overlaySha256": "sha256:1ec2c82772ed4dbce83c205e705ed3c73323b5eae65c7fa3241e05789da67c77"
+            },
+            {
+              "path": "test/k0r-reconcile-evidence.ts",
+              "baseSha256": "sha256:55b627c06a99b7e1ef89cad67c2d05f2d1c98038ac668a6326d786278ae2d90b",
+              "overlaySha256": "sha256:ab5a609fb6ab7c7afaadb6b7605597a28217ab33e2292313bc1940eae63d3ee8"
+            },
+            {
+              "path": "test/k0r-run-evidence.ts",
+              "baseSha256": "sha256:5a41b4d4007f4e2e24e949bdc6ac1c2a7a141fa16b4d1fe4f1b07b917a9f7f23",
+              "overlaySha256": "sha256:df266bc61585823e55869849bbd7fa5a12aa0502cdebec1ea1ceaf64e4dcee43"
             }
           ],
-          "merkleSha256": "sha256:dbecf7608d1cf69ef45bc2067871b03167a202cd82efc91c1aa2d34de8894fad",
+          "merkleSha256": "sha256:a8ad68771b4cde87469c50248890edc979d104ce1928698a7dc6998a985df4b5",
           "generatedInventories": {
             "algorithm": "k0r.disposable-inventories",
             "version": "v2",
@@ -166,18 +196,18 @@
         },
         {
           "path": "test/k0r-issue-exit.ts",
-          "sha256": "sha256:c0cef44891de9adaea68f5edebee5754b68b62275d2fc4ccb087153cce591954"
+          "sha256": "sha256:1ec2c82772ed4dbce83c205e705ed3c73323b5eae65c7fa3241e05789da67c77"
         },
         {
           "path": "test/k0r-reconcile-evidence.ts",
-          "sha256": "sha256:55b627c06a99b7e1ef89cad67c2d05f2d1c98038ac668a6326d786278ae2d90b"
+          "sha256": "sha256:ab5a609fb6ab7c7afaadb6b7605597a28217ab33e2292313bc1940eae63d3ee8"
         },
         {
           "path": "test/k0r-run-evidence.ts",
-          "sha256": "sha256:5a41b4d4007f4e2e24e949bdc6ac1c2a7a141fa16b4d1fe4f1b07b917a9f7f23"
+          "sha256": "sha256:df266bc61585823e55869849bbd7fa5a12aa0502cdebec1ea1ceaf64e4dcee43"
         }
       ],
-      "merkleSha256": "sha256:1abb7dd7545c319457a097708c52696564c7aca440709ae8f84e946dccbc1a22"
+      "merkleSha256": "sha256:4831687a7ea8d02ee78553b09224f7595b93ca08567b3d76b4373b294fb074da"
     },
     "dependencyBinding": {
       "bunLock": {
@@ -506,12 +536,9 @@
           "evidence/k0r/approval-provenance.json",
           "evidence/k0r/baseline-transition.json",
           "evidence/k0r/evidence-manifest.json",
-          "evidence/k0r/final-verification-bundle.json",
           "evidence/k0r/independent-clean-source-reproduction.json",
           "evidence/k0r/isolated-run-receipt.json",
           "evidence/k0r/isolation-manifest.json",
-          "evidence/k0r/k0r-exit-receipt.json",
-          "evidence/k0r/source-generation.tar",
           "evidence/k0r/superseding-adr.md",
           "evidence/k0r/v1-public-contract-inventory.json",
           "evidence/workflow-profiles/manual-cli-qa.txt",
@@ -873,11 +900,11 @@
         "gitMetadata": {
           "packageVersion": "0.1.17",
           "tag": "v0.1.17",
-          "commit": "f26ed8143dd4708c3bdf21315abe0b41f4f7151d",
-          "tree": "cf0f30294039c76d1408a37ab507a908bdab50b7",
+          "commit": "1740593e0b5515a8321b15fae138168dbd48fe58",
+          "tree": "98cc95ebc3e024a5a0522f16c0e67861bc55a52d",
           "tagCommit": "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
           "historicalTagBundle": {
-            "path": "/home/burt/.b6/t/work/isolated-run/tmp/release-v0.1.17.bundle",
+            "path": "/home/burt/.b6/pr35-k0r-plan-aligned-v3/work/isolated-run/tmp/release-v0.1.17.bundle",
             "sha256": "sha256:bbe1098b2aee71de3f34db2e1f0a89418811e1e6b1ec0001d7cc329289e86217",
             "sourceTagCommit": "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
             "commands": [
@@ -916,7 +943,7 @@
                   "git",
                   "bundle",
                   "create",
-                  "/home/burt/.b6/t/work/isolated-run/tmp/release-v0.1.17.bundle",
+                  "/home/burt/.b6/pr35-k0r-plan-aligned-v3/work/isolated-run/tmp/release-v0.1.17.bundle",
                   "refs/tags/v0.1.17"
                 ],
                 "cwd": ".",
@@ -947,7 +974,7 @@
                   "git",
                   "bundle",
                   "list-heads",
-                  "/home/burt/.b6/t/work/isolated-run/tmp/release-v0.1.17.bundle"
+                  "/home/burt/.b6/pr35-k0r-plan-aligned-v3/work/isolated-run/tmp/release-v0.1.17.bundle"
                 ],
                 "cwd": ".",
                 "envNames": [
@@ -1091,7 +1118,7 @@
                 "XDG_CACHE_HOME"
               ],
               "exitCode": 0,
-              "stdoutSha256": "sha256:38d13540a29d2c734067a7d89d90729024bb3128df73682348a4ad4d09565ab4",
+              "stdoutSha256": "sha256:4947b10965395fa12f84e4c61615e34e10ea93b239df7e1c2b4c55fe1289df80",
               "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             },
             {
@@ -1120,7 +1147,7 @@
                 "XDG_CACHE_HOME"
               ],
               "exitCode": 0,
-              "stdoutSha256": "sha256:e31f5badae650f4f67d174b2aff3e63ca3dd5848a9435b3bc1c5aada70bf9a35",
+              "stdoutSha256": "sha256:98a0994bae625a995af634ae260bd49e441f4b633a70c2f5952dca321cfa2d87",
               "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             },
             {
@@ -1180,7 +1207,7 @@
                 "XDG_CACHE_HOME"
               ],
               "exitCode": 0,
-              "stdoutSha256": "sha256:38d13540a29d2c734067a7d89d90729024bb3128df73682348a4ad4d09565ab4",
+              "stdoutSha256": "sha256:4947b10965395fa12f84e4c61615e34e10ea93b239df7e1c2b4c55fe1289df80",
               "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
             },
             {
@@ -1335,7 +1362,7 @@
         {
           "path": "boulder/.git/index",
           "kind": "file",
-          "sha256": "sha256:03678248fead2d09d0aacb0162a80312d65a2cc06d433e31e88d93dc022720a3"
+          "sha256": "sha256:70ecb286b62168d381870eae79206ff185e2841143e476dcfac3f58ed6612735"
         },
         {
           "path": "boulder/.git/info",
@@ -1355,7 +1382,7 @@
         {
           "path": "boulder/.git/logs/HEAD",
           "kind": "file",
-          "sha256": "sha256:6f7284a446ac0eafe6611868125f003542c6fc5c1e119db1c4551c80ecd54934"
+          "sha256": "sha256:be1a4ad3ba018df0d705a902a6238997ee3fa55f7a17798522bc1f7e72d3d69b"
         },
         {
           "path": "boulder/.git/logs/refs",
@@ -1370,7 +1397,7 @@
         {
           "path": "boulder/.git/logs/refs/heads/master",
           "kind": "file",
-          "sha256": "sha256:6f7284a446ac0eafe6611868125f003542c6fc5c1e119db1c4551c80ecd54934"
+          "sha256": "sha256:be1a4ad3ba018df0d705a902a6238997ee3fa55f7a17798522bc1f7e72d3d69b"
         },
         {
           "path": "boulder/.git/objects",
@@ -1386,11 +1413,6 @@
           "path": "boulder/.git/objects/00/21bba45adf56c4ee494fe33514e427f07ba6cd",
           "kind": "file",
           "sha256": "sha256:ff660acb2bc65e9f64d6b73abf6158e9795900823c35618102c409e2b92e904f"
-        },
-        {
-          "path": "boulder/.git/objects/00/a2d87676445db94f86c63bc0b847b9ef5e8239",
-          "kind": "file",
-          "sha256": "sha256:64863a9d1fc3de5e0c23d058d486fe4c62473b8489e183f594e1c1b497f64c21"
         },
         {
           "path": "boulder/.git/objects/00/acc5bccbbe639b69c79ec8c3dde8361501b619",
@@ -1541,16 +1563,6 @@
           "path": "boulder/.git/objects/07/2b7c292c0ddc4cc4398bde25ac4bf33c59fbd8",
           "kind": "file",
           "sha256": "sha256:1a229cd8e238f061ef3229058c0fb96c50ec6d14a45538f5b17cf4fd790f8145"
-        },
-        {
-          "path": "boulder/.git/objects/07/4fa06a6c78929003513c7a121d36fc0c097c50",
-          "kind": "file",
-          "sha256": "sha256:1d8f69962fa8f354779ca19dc03fb4c6f251787a29d590cf6cdfdc2ccf55603c"
-        },
-        {
-          "path": "boulder/.git/objects/07/51761a4f465b4ec226efde903168a51a541514",
-          "kind": "file",
-          "sha256": "sha256:3287387ff235da2f85f1fe6c4fd4cc59a6b9e44dd858e091021dae79bc3dc061"
         },
         {
           "path": "boulder/.git/objects/07/7c909f33aa43c8cfd602f1e8a49f71bbe748f7",
@@ -1818,6 +1830,11 @@
           "sha256": "sha256:9bd9a915cec1c18d92bbc5279fd290ad7d41e8f1f4b31d095622eba80942d787"
         },
         {
+          "path": "boulder/.git/objects/17/40593e0b5515a8321b15fae138168dbd48fe58",
+          "kind": "file",
+          "sha256": "sha256:35d0b78a1bfdaae4825b6c5d2624e821e6aa3be29ffa234101b14368a0017616"
+        },
+        {
           "path": "boulder/.git/objects/17/4a9fc0500cb331f3a947eb5faf5ef0aba46aa4",
           "kind": "file",
           "sha256": "sha256:16d72bdc73e0ac65ed552e6ea763c1cc402c12d8e728f0b28acb6425a0a918f0"
@@ -1826,6 +1843,11 @@
           "path": "boulder/.git/objects/17/66d45997e6b0f36e5f80f71b2281f79e150841",
           "kind": "file",
           "sha256": "sha256:96a7748a3f479f923c6c8bdef1361f3aeccf62e34dc0741e2cddbb81d26ff670"
+        },
+        {
+          "path": "boulder/.git/objects/17/811f8c11e851fc9b9bf54bc1a40e8d7f6c2bca",
+          "kind": "file",
+          "sha256": "sha256:a121931d7cb4df184e8bcc9fc22d7f67dba3e4e14ec5433ada8e4aae4cbd3c37"
         },
         {
           "path": "boulder/.git/objects/18",
@@ -1993,11 +2015,6 @@
           "sha256": "sha256:ed65d10261256be6638ffb18dce2af87f21e6b77983d41910758921f1feaed94"
         },
         {
-          "path": "boulder/.git/objects/23/ffe015752dc33c4dcb210e7670b99823fdc1ea",
-          "kind": "file",
-          "sha256": "sha256:78cf766e74c77265b7fd33e1635b2cd89f946ba39e3d1a2cf5c2cfac889ee5ca"
-        },
-        {
           "path": "boulder/.git/objects/25",
           "kind": "directory",
           "sha256": "sha256:1699f8d484c1d075bc417f6124964c8a0ebe5e2091d40b7a3da86a02a333a59c"
@@ -2076,6 +2093,11 @@
           "path": "boulder/.git/objects/28/f5085a84a8b559fb2461da54bca8642840d080",
           "kind": "file",
           "sha256": "sha256:1f850a3ef5bccf41de708d27131eb6cb41e56d92132b83d6488bfbcd046b0533"
+        },
+        {
+          "path": "boulder/.git/objects/28/f79ad15a0ea3d55ae52b0b9216936f4d2edb74",
+          "kind": "file",
+          "sha256": "sha256:1f8dd5f704e02842b6c96464b8151ad45f65dc65284242a87ea03fa14548c11e"
         },
         {
           "path": "boulder/.git/objects/29",
@@ -2381,11 +2403,6 @@
           "path": "boulder/.git/objects/3c",
           "kind": "directory",
           "sha256": "sha256:12e1f831d78903898e89922ff4434ccc22990a494a247dfcdd8185b6ee665563"
-        },
-        {
-          "path": "boulder/.git/objects/3c/8d03c4a99a419c9be252a72b12e226f4ad344a",
-          "kind": "file",
-          "sha256": "sha256:118fad6900b4eb5f002565ab2b9bfb43c228caaa63ff950123aae06b51002bec"
         },
         {
           "path": "boulder/.git/objects/3c/a2ab3f0261c9c3d337079ab582202b3af4de1b",
@@ -3023,6 +3040,11 @@
           "sha256": "sha256:e4b7c6eafb55ef7c5774d3131a7220471ed890754c78167840e60d9ac578e351"
         },
         {
+          "path": "boulder/.git/objects/65/4367f6e8717792080ee023de65bb99de56e7ba",
+          "kind": "file",
+          "sha256": "sha256:fba3427f0d08f2d4e8f8a6ee3ffacc324e048e0243497ed1b74a69ed06c08acb"
+        },
+        {
           "path": "boulder/.git/objects/65/5af76ad812a580dd848432b342b6df24b87da5",
           "kind": "file",
           "sha256": "sha256:696075dd31159e5923374ba0fcca377e5d2f942c9c6e51769d53e039c0b81a07"
@@ -3268,11 +3290,6 @@
           "sha256": "sha256:66cf30228b76905143d8e2cf168dc167e714e9f462eacbb69c92392fe2889783"
         },
         {
-          "path": "boulder/.git/objects/77/4d286093d342486b544e7d356495a392d4b2e8",
-          "kind": "file",
-          "sha256": "sha256:75d1a360b50719f042f3708411a9682991d5d1c755e9d8a0b97564f4baa4dea4"
-        },
-        {
           "path": "boulder/.git/objects/78",
           "kind": "directory",
           "sha256": "sha256:00b31ebad3a2aa7f78a96c4d97c889c4b1f061df5bd3958d1500e3ad9d19d167"
@@ -3383,14 +3400,14 @@
           "sha256": "sha256:82cc274fa6d0433556807824283ba81a9e3f80f20202a2fbc1d3ea44dab34489"
         },
         {
+          "path": "boulder/.git/objects/7e/0abb492af0ae8098bf736baea14b889b21a92b",
+          "kind": "file",
+          "sha256": "sha256:f227238018ed70d3eed849f902fbf5216532564c128642fb79d84f147c0b5e55"
+        },
+        {
           "path": "boulder/.git/objects/7e/5c7b9a821266148516ed17471627de4e7f20bf",
           "kind": "file",
           "sha256": "sha256:2eba03703750cd8c05e2f9e1999f3275eb99e7e69a7dd9f1193e63ce9f7aa2b8"
-        },
-        {
-          "path": "boulder/.git/objects/7e/effaf4c552b1dc129a4dcfb36ffa6e86446877",
-          "kind": "file",
-          "sha256": "sha256:a10195e1bbe5714aef068377ee381e52af79d58af640d4ee85fb893a8f5fd1c3"
         },
         {
           "path": "boulder/.git/objects/7f",
@@ -3518,11 +3535,6 @@
           "sha256": "sha256:73c4cf2f7f2d72a6e1286efeee669fd873be23ae6a404f66a7726881395df067"
         },
         {
-          "path": "boulder/.git/objects/86/0c3bbae171f410c5a3105b6ee01715e3e93d5c",
-          "kind": "file",
-          "sha256": "sha256:69f3545128115b25de1b6fd16f0a7ad53e94cf01cee558479e9a3f01818751bb"
-        },
-        {
           "path": "boulder/.git/objects/86/86ee3a0f067ecf2bbc2ddd8664b7072e53ad63",
           "kind": "file",
           "sha256": "sha256:2c3e43a43aba64057d054cf82375f151407fb5fa66db68e60da526b87ebcf569"
@@ -3648,11 +3660,6 @@
           "sha256": "sha256:fad8b8201275dc667e04382223b9ca7a6cd44924d8a26091a2af1e7871007f3f"
         },
         {
-          "path": "boulder/.git/objects/8f/0022c58bf9c3011bf619cd6f04378ae260a5a7",
-          "kind": "file",
-          "sha256": "sha256:b83328afdded3a41c60569ca2f22d61d96faead5a13f72f4d4ba4be6d49ffb0e"
-        },
-        {
           "path": "boulder/.git/objects/8f/1cf826804590ae2ebe8694e19cbdc0c8833e50",
           "kind": "file",
           "sha256": "sha256:3ad3735e6f59df5db4f535df06b9bc72445b8ff097a888c25bde390dbfb9a1e7"
@@ -3773,6 +3780,11 @@
           "sha256": "sha256:f0a044d18874bc42f6540cd743867e3f7b0c3aa7f573e070ec0b7571d63e21cd"
         },
         {
+          "path": "boulder/.git/objects/98/cc95ebc3e024a5a0522f16c0e67861bc55a52d",
+          "kind": "file",
+          "sha256": "sha256:76d10e7030f7b121ab75511a177ecc5c165e6cc08093854c51158b1bd0cca3f0"
+        },
+        {
           "path": "boulder/.git/objects/98/d74653d97fd9d0c3b4685ef8a08807bb18a738",
           "kind": "file",
           "sha256": "sha256:137c1efff5b684ed6a10c97ee2366e7306a964bac7bd298925860323a699c1ca"
@@ -3831,11 +3843,6 @@
           "path": "boulder/.git/objects/9d/0b882b228334c45a82de94e7a424e53b56eab5",
           "kind": "file",
           "sha256": "sha256:4e1e37fec1f1033a36809f494336d4ddfcd73d8066f00d64f42c16b4a28d15c0"
-        },
-        {
-          "path": "boulder/.git/objects/9d/6ce73c16812818e9432968eda45bd0f1ed6756",
-          "kind": "file",
-          "sha256": "sha256:53877a80e4140e313ccabb04b1a757004ca12441e9a32c68a617b21bf987fe58"
         },
         {
           "path": "boulder/.git/objects/9e",
@@ -4031,6 +4038,11 @@
           "path": "boulder/.git/objects/aa/836712c75948bf6ec49e6e9cd32eb93f4837b3",
           "kind": "file",
           "sha256": "sha256:2977059dfc14ee7a97ecded31b2a309a0d48d47301687f48b25cbdedca6de9a5"
+        },
+        {
+          "path": "boulder/.git/objects/aa/af292ebec152e7fd0f28519f3c429f57e114ad",
+          "kind": "file",
+          "sha256": "sha256:92f19ac83a0b7d85696020e4e2946a968548bfacbe687f04c7a4fdd38d791f55"
         },
         {
           "path": "boulder/.git/objects/aa/d89c4a15b9935182b2a4c4c403fbd11620c789",
@@ -4251,6 +4263,11 @@
           "path": "boulder/.git/objects/ba",
           "kind": "directory",
           "sha256": "sha256:4cb85cab24debd104f85d1431afd53e5d7639151cd52e11e840638df9392b42a"
+        },
+        {
+          "path": "boulder/.git/objects/ba/9ee06e9f57c511eca2b35a10c513cf296007c7",
+          "kind": "file",
+          "sha256": "sha256:7c5bec81c9d380fb8c778460fbb928d998e121c723591a27b250a7453733d3d2"
         },
         {
           "path": "boulder/.git/objects/ba/fe0ff8c2acc8276d84b6b1e9eb6711e02efe45",
@@ -4548,6 +4565,11 @@
           "sha256": "sha256:4abbc7eea244e15a0c63d1e9a92df32e0dc40c4723c1602170b38c425d839350"
         },
         {
+          "path": "boulder/.git/objects/cd/fa6b588a81829084ed2f952f446e6c698a44c0",
+          "kind": "file",
+          "sha256": "sha256:a90376b68dddc186d42ad98bd756ca47775f0df0dcb5a3f79a8d8f32cf764859"
+        },
+        {
           "path": "boulder/.git/objects/ce",
           "kind": "directory",
           "sha256": "sha256:1bb838ee2de5b624817f3f61610b2a3291c64a26b4c55cfeda632a105ec2421f"
@@ -4573,14 +4595,19 @@
           "sha256": "sha256:3e96e7988093ced7484adb730c7cecc54019c99f72193a6d0eda4dfc00f972d6"
         },
         {
-          "path": "boulder/.git/objects/cf/0f30294039c76d1408a37ab507a908bdab50b7",
-          "kind": "file",
-          "sha256": "sha256:21ca76520d99ca0596483bdc051eb03bc99205ce55188bf13d7126fe3cac4294"
-        },
-        {
           "path": "boulder/.git/objects/cf/1d91593d4f7e870bf2ef15a934de227eb66f6b",
           "kind": "file",
           "sha256": "sha256:78e56762b611f49a2fff652fbcb2756e500b39eefeff014bb7585be381b4906c"
+        },
+        {
+          "path": "boulder/.git/objects/d1",
+          "kind": "directory",
+          "sha256": "sha256:f88cce1e26aad8f71b03d9701785fda21e1a73c4b9af432fa7b937f6e3b127c0"
+        },
+        {
+          "path": "boulder/.git/objects/d1/0ccabbefccdf9f71bbef6b5f8dc6386f2444d1",
+          "kind": "file",
+          "sha256": "sha256:fc342dc1f8e9cc7e6cd783d593c9467b275e0616f97cb84a2065a8206fb2c140"
         },
         {
           "path": "boulder/.git/objects/d3",
@@ -4813,11 +4840,6 @@
           "sha256": "sha256:fb9e9912eda0b8a60b03f1c20d2aaaafba44cb339a8ed96c11510f9de0724282"
         },
         {
-          "path": "boulder/.git/objects/e0/1db0fdc53bc7673e6a9441f85274de704edf65",
-          "kind": "file",
-          "sha256": "sha256:6d94983abae5b16c894dbc997b3f090d90ca7aa131a0b687d44e656d2e9ff358"
-        },
-        {
           "path": "boulder/.git/objects/e0/88cc67de613bce0b6eac8222f484e94ae74d24",
           "kind": "file",
           "sha256": "sha256:1ade122c92c89bf25e679cab5adbfa1fa63bc9ec01e33cd2a0116f4977a6263b"
@@ -4851,11 +4873,6 @@
           "path": "boulder/.git/objects/e1/76d5c884e79c97eea6ac416ddcaf73093e775e",
           "kind": "file",
           "sha256": "sha256:bfcf39b0a8f7f12e207e95729d3212648b0911e436a96f0adc37602cd656f453"
-        },
-        {
-          "path": "boulder/.git/objects/e1/e00eb085670e81ff61c6aa8b7604949e8fd9af",
-          "kind": "file",
-          "sha256": "sha256:2d2fa4d8fe0c7a73c08692f922952731aed1daea2702e16978e39249d7c58cff"
         },
         {
           "path": "boulder/.git/objects/e2",
@@ -5038,6 +5055,11 @@
           "sha256": "sha256:98e2c28fd8a831fcd4fec5ef99cd7779c4991eff0fb0230a933585e88658df77"
         },
         {
+          "path": "boulder/.git/objects/ec/9be43bb03299396907e3aa490d8f89d66d8988",
+          "kind": "file",
+          "sha256": "sha256:02e8b727c887f7ae0e6c0e7476ac2453dbf60b1fe8edd0043da67d46f7439efb"
+        },
+        {
           "path": "boulder/.git/objects/ec/bfc00081a7a70138e88dcf92f571dcbf333afb",
           "kind": "file",
           "sha256": "sha256:99a3b2c92ab6e7a4baa5908a36ebe2da76b0d956f395993a835e5ab6d5bf80d0"
@@ -5111,11 +5133,6 @@
           "path": "boulder/.git/objects/f2/30f93c1a20b883fe2da39e9dfc0f7c053fc907",
           "kind": "file",
           "sha256": "sha256:599ca0906cd66221439c3901027d8faae017aade173616b6fb4e8fb3822a5e5e"
-        },
-        {
-          "path": "boulder/.git/objects/f2/6ed8143dd4708c3bdf21315abe0b41f4f7151d",
-          "kind": "file",
-          "sha256": "sha256:01ed3f58b473c20fe9b472622ef8ee34e0689ac705e023b78626b28c975d0e81"
         },
         {
           "path": "boulder/.git/objects/f2/bfd033579359ce436a77e4ddf4bacfcee7027f",
@@ -5198,11 +5215,6 @@
           "sha256": "sha256:bbe6290127ce1a367adca8e250a0c470fbb63bf7f24a9da02db93b97b600da02"
         },
         {
-          "path": "boulder/.git/objects/f7/8c18981c8743cbed91f9b14db9af9cc25579e8",
-          "kind": "file",
-          "sha256": "sha256:e4839ae18e71bf21cb50f4b5143980c0d8e4c848e4e4b2a810cb11bd572463e8"
-        },
-        {
           "path": "boulder/.git/objects/f7/d2353d2288c52992a61823954d29e8a17a3d06",
           "kind": "file",
           "sha256": "sha256:194ae1d1e649140251426607931f5f4ddab885f6d6658eeb011c0a7f247bd2f3"
@@ -5211,6 +5223,11 @@
           "path": "boulder/.git/objects/f8",
           "kind": "directory",
           "sha256": "sha256:58c5ef2ee972d4d1e9dc8e4552da34cf16511abd408876a6b922f2c96fbd867a"
+        },
+        {
+          "path": "boulder/.git/objects/f8/9a82fa98a6a5b7bb918a2657c2bae684ea504a",
+          "kind": "file",
+          "sha256": "sha256:b74f2c4799d034f8de4fa25017567daaad03ca172263c21b8445bd38243a60fd"
         },
         {
           "path": "boulder/.git/objects/f8/a58694f07f07cba8537279bcb63916e7e5175a",
@@ -5365,7 +5382,7 @@
         {
           "path": "boulder/.git/refs/heads/master",
           "kind": "file",
-          "sha256": "sha256:38d13540a29d2c734067a7d89d90729024bb3128df73682348a4ad4d09565ab4"
+          "sha256": "sha256:4947b10965395fa12f84e4c61615e34e10ea93b239df7e1c2b4c55fe1289df80"
         },
         {
           "path": "boulder/.git/refs/tags",
@@ -6090,7 +6107,7 @@
         {
           "path": "boulder/evidence/k0r/acceptance-manifest.json",
           "kind": "file",
-          "sha256": "sha256:490ee5d9cb8e69680f0a8afd02a1d9853c716fcbebc6fc3a8673548000084565"
+          "sha256": "sha256:ae3f5e4690fd4d3222bbacbd093d8691a33fac251c2a456474287fa0b5ed8e98"
         },
         {
           "path": "boulder/evidence/k0r/approval-provenance.json",
@@ -6108,14 +6125,9 @@
           "sha256": "sha256:700f3aa7302fea8237bba7ac365b150d663132e8e8ac11636a309e121df70adf"
         },
         {
-          "path": "boulder/evidence/k0r/final-verification-bundle.json",
-          "kind": "file",
-          "sha256": "sha256:dbab84fe777dc65dad93a5f8727bc4109c21e938cc1aebb08b360600fc9d97b0"
-        },
-        {
           "path": "boulder/evidence/k0r/independent-clean-source-reproduction.json",
           "kind": "file",
-          "sha256": "sha256:2de8658eb438d1fb285368fcba6e6c35c60613f720c51183200e1855d3ac2f56"
+          "sha256": "sha256:6f9a2114012c88af51c93d9207efb6508df3975a3a08a06784d547b350c83b53"
         },
         {
           "path": "boulder/evidence/k0r/isolated-run-receipt.json",
@@ -6128,16 +6140,6 @@
           "sha256": "sha256:22c4d853c862864e87366e7edfe173d3b61607e74962f29947b76d2222ee3b7a"
         },
         {
-          "path": "boulder/evidence/k0r/k0r-exit-receipt.json",
-          "kind": "file",
-          "sha256": "sha256:59b8670ff04f0db28930c8028399c5d08ac4f6a38e776669a3d6ae15a935f72e"
-        },
-        {
-          "path": "boulder/evidence/k0r/source-generation.tar",
-          "kind": "file",
-          "sha256": "sha256:c08658fcdc226b7cf14b2dd4e12ef890b554f71051bb33e4690092f0a6b997dd"
-        },
-        {
           "path": "boulder/evidence/k0r/superseding-adr.md",
           "kind": "file",
           "sha256": "sha256:75f8bef99692326816838b5e83162fa8f37168a304cb1de8ef9add3a4d6bc08f"
@@ -6145,7 +6147,7 @@
         {
           "path": "boulder/evidence/k0r/v1-public-contract-inventory.json",
           "kind": "file",
-          "sha256": "sha256:f55443efa29fec53491e165865f9365303b4ff776a8a2002090d62013c733d42"
+          "sha256": "sha256:9327fac8c69f1c52f13756d4c54a51b9f20e04b79bb198734d950944efd1110f"
         },
         {
           "path": "boulder/evidence/workflow-profiles",
@@ -7875,7 +7877,7 @@
         {
           "path": "boulder/test/k0r-evidence-contract.test.ts",
           "kind": "file",
-          "sha256": "sha256:c3419515be0bfe648de4b664c488a5dec6285ae707896e74800a7737f7cd7eb9"
+          "sha256": "sha256:3937b688fc2c50219b8d0983d3e5baff758b0ab4d98f28fb847d51354f782b18"
         },
         {
           "path": "boulder/test/k0r-globals.d.ts",
@@ -7895,17 +7897,17 @@
         {
           "path": "boulder/test/k0r-issue-exit.ts",
           "kind": "file",
-          "sha256": "sha256:c0cef44891de9adaea68f5edebee5754b68b62275d2fc4ccb087153cce591954"
+          "sha256": "sha256:1ec2c82772ed4dbce83c205e705ed3c73323b5eae65c7fa3241e05789da67c77"
         },
         {
           "path": "boulder/test/k0r-reconcile-evidence.ts",
           "kind": "file",
-          "sha256": "sha256:55b627c06a99b7e1ef89cad67c2d05f2d1c98038ac668a6326d786278ae2d90b"
+          "sha256": "sha256:ab5a609fb6ab7c7afaadb6b7605597a28217ab33e2292313bc1940eae63d3ee8"
         },
         {
           "path": "boulder/test/k0r-run-evidence.ts",
           "kind": "file",
-          "sha256": "sha256:5a41b4d4007f4e2e24e949bdc6ac1c2a7a141fa16b4d1fe4f1b07b917a9f7f23"
+          "sha256": "sha256:df266bc61585823e55869849bbd7fa5a12aa0502cdebec1ea1ceaf64e4dcee43"
         },
         {
           "path": "boulder/test/k2a-f-contract-foundation.test.ts",
@@ -8377,7 +8379,7 @@
         {
           "path": "boulder/.git/index",
           "kind": "file",
-          "sha256": "sha256:03678248fead2d09d0aacb0162a80312d65a2cc06d433e31e88d93dc022720a3"
+          "sha256": "sha256:70ecb286b62168d381870eae79206ff185e2841143e476dcfac3f58ed6612735"
         },
         {
           "path": "boulder/.git/info",
@@ -8397,7 +8399,7 @@
         {
           "path": "boulder/.git/logs/HEAD",
           "kind": "file",
-          "sha256": "sha256:6f7284a446ac0eafe6611868125f003542c6fc5c1e119db1c4551c80ecd54934"
+          "sha256": "sha256:be1a4ad3ba018df0d705a902a6238997ee3fa55f7a17798522bc1f7e72d3d69b"
         },
         {
           "path": "boulder/.git/logs/refs",
@@ -8412,7 +8414,7 @@
         {
           "path": "boulder/.git/logs/refs/heads/master",
           "kind": "file",
-          "sha256": "sha256:6f7284a446ac0eafe6611868125f003542c6fc5c1e119db1c4551c80ecd54934"
+          "sha256": "sha256:be1a4ad3ba018df0d705a902a6238997ee3fa55f7a17798522bc1f7e72d3d69b"
         },
         {
           "path": "boulder/.git/objects",
@@ -8428,11 +8430,6 @@
           "path": "boulder/.git/objects/00/21bba45adf56c4ee494fe33514e427f07ba6cd",
           "kind": "file",
           "sha256": "sha256:ff660acb2bc65e9f64d6b73abf6158e9795900823c35618102c409e2b92e904f"
-        },
-        {
-          "path": "boulder/.git/objects/00/a2d87676445db94f86c63bc0b847b9ef5e8239",
-          "kind": "file",
-          "sha256": "sha256:64863a9d1fc3de5e0c23d058d486fe4c62473b8489e183f594e1c1b497f64c21"
         },
         {
           "path": "boulder/.git/objects/00/acc5bccbbe639b69c79ec8c3dde8361501b619",
@@ -8583,16 +8580,6 @@
           "path": "boulder/.git/objects/07/2b7c292c0ddc4cc4398bde25ac4bf33c59fbd8",
           "kind": "file",
           "sha256": "sha256:1a229cd8e238f061ef3229058c0fb96c50ec6d14a45538f5b17cf4fd790f8145"
-        },
-        {
-          "path": "boulder/.git/objects/07/4fa06a6c78929003513c7a121d36fc0c097c50",
-          "kind": "file",
-          "sha256": "sha256:1d8f69962fa8f354779ca19dc03fb4c6f251787a29d590cf6cdfdc2ccf55603c"
-        },
-        {
-          "path": "boulder/.git/objects/07/51761a4f465b4ec226efde903168a51a541514",
-          "kind": "file",
-          "sha256": "sha256:3287387ff235da2f85f1fe6c4fd4cc59a6b9e44dd858e091021dae79bc3dc061"
         },
         {
           "path": "boulder/.git/objects/07/7c909f33aa43c8cfd602f1e8a49f71bbe748f7",
@@ -8860,6 +8847,11 @@
           "sha256": "sha256:9bd9a915cec1c18d92bbc5279fd290ad7d41e8f1f4b31d095622eba80942d787"
         },
         {
+          "path": "boulder/.git/objects/17/40593e0b5515a8321b15fae138168dbd48fe58",
+          "kind": "file",
+          "sha256": "sha256:35d0b78a1bfdaae4825b6c5d2624e821e6aa3be29ffa234101b14368a0017616"
+        },
+        {
           "path": "boulder/.git/objects/17/4a9fc0500cb331f3a947eb5faf5ef0aba46aa4",
           "kind": "file",
           "sha256": "sha256:16d72bdc73e0ac65ed552e6ea763c1cc402c12d8e728f0b28acb6425a0a918f0"
@@ -8868,6 +8860,11 @@
           "path": "boulder/.git/objects/17/66d45997e6b0f36e5f80f71b2281f79e150841",
           "kind": "file",
           "sha256": "sha256:96a7748a3f479f923c6c8bdef1361f3aeccf62e34dc0741e2cddbb81d26ff670"
+        },
+        {
+          "path": "boulder/.git/objects/17/811f8c11e851fc9b9bf54bc1a40e8d7f6c2bca",
+          "kind": "file",
+          "sha256": "sha256:a121931d7cb4df184e8bcc9fc22d7f67dba3e4e14ec5433ada8e4aae4cbd3c37"
         },
         {
           "path": "boulder/.git/objects/18",
@@ -9035,11 +9032,6 @@
           "sha256": "sha256:ed65d10261256be6638ffb18dce2af87f21e6b77983d41910758921f1feaed94"
         },
         {
-          "path": "boulder/.git/objects/23/ffe015752dc33c4dcb210e7670b99823fdc1ea",
-          "kind": "file",
-          "sha256": "sha256:78cf766e74c77265b7fd33e1635b2cd89f946ba39e3d1a2cf5c2cfac889ee5ca"
-        },
-        {
           "path": "boulder/.git/objects/25",
           "kind": "directory",
           "sha256": "sha256:1699f8d484c1d075bc417f6124964c8a0ebe5e2091d40b7a3da86a02a333a59c"
@@ -9118,6 +9110,11 @@
           "path": "boulder/.git/objects/28/f5085a84a8b559fb2461da54bca8642840d080",
           "kind": "file",
           "sha256": "sha256:1f850a3ef5bccf41de708d27131eb6cb41e56d92132b83d6488bfbcd046b0533"
+        },
+        {
+          "path": "boulder/.git/objects/28/f79ad15a0ea3d55ae52b0b9216936f4d2edb74",
+          "kind": "file",
+          "sha256": "sha256:1f8dd5f704e02842b6c96464b8151ad45f65dc65284242a87ea03fa14548c11e"
         },
         {
           "path": "boulder/.git/objects/29",
@@ -9423,11 +9420,6 @@
           "path": "boulder/.git/objects/3c",
           "kind": "directory",
           "sha256": "sha256:12e1f831d78903898e89922ff4434ccc22990a494a247dfcdd8185b6ee665563"
-        },
-        {
-          "path": "boulder/.git/objects/3c/8d03c4a99a419c9be252a72b12e226f4ad344a",
-          "kind": "file",
-          "sha256": "sha256:118fad6900b4eb5f002565ab2b9bfb43c228caaa63ff950123aae06b51002bec"
         },
         {
           "path": "boulder/.git/objects/3c/a2ab3f0261c9c3d337079ab582202b3af4de1b",
@@ -10065,6 +10057,11 @@
           "sha256": "sha256:e4b7c6eafb55ef7c5774d3131a7220471ed890754c78167840e60d9ac578e351"
         },
         {
+          "path": "boulder/.git/objects/65/4367f6e8717792080ee023de65bb99de56e7ba",
+          "kind": "file",
+          "sha256": "sha256:fba3427f0d08f2d4e8f8a6ee3ffacc324e048e0243497ed1b74a69ed06c08acb"
+        },
+        {
           "path": "boulder/.git/objects/65/5af76ad812a580dd848432b342b6df24b87da5",
           "kind": "file",
           "sha256": "sha256:696075dd31159e5923374ba0fcca377e5d2f942c9c6e51769d53e039c0b81a07"
@@ -10310,11 +10307,6 @@
           "sha256": "sha256:66cf30228b76905143d8e2cf168dc167e714e9f462eacbb69c92392fe2889783"
         },
         {
-          "path": "boulder/.git/objects/77/4d286093d342486b544e7d356495a392d4b2e8",
-          "kind": "file",
-          "sha256": "sha256:75d1a360b50719f042f3708411a9682991d5d1c755e9d8a0b97564f4baa4dea4"
-        },
-        {
           "path": "boulder/.git/objects/78",
           "kind": "directory",
           "sha256": "sha256:00b31ebad3a2aa7f78a96c4d97c889c4b1f061df5bd3958d1500e3ad9d19d167"
@@ -10425,14 +10417,14 @@
           "sha256": "sha256:82cc274fa6d0433556807824283ba81a9e3f80f20202a2fbc1d3ea44dab34489"
         },
         {
+          "path": "boulder/.git/objects/7e/0abb492af0ae8098bf736baea14b889b21a92b",
+          "kind": "file",
+          "sha256": "sha256:f227238018ed70d3eed849f902fbf5216532564c128642fb79d84f147c0b5e55"
+        },
+        {
           "path": "boulder/.git/objects/7e/5c7b9a821266148516ed17471627de4e7f20bf",
           "kind": "file",
           "sha256": "sha256:2eba03703750cd8c05e2f9e1999f3275eb99e7e69a7dd9f1193e63ce9f7aa2b8"
-        },
-        {
-          "path": "boulder/.git/objects/7e/effaf4c552b1dc129a4dcfb36ffa6e86446877",
-          "kind": "file",
-          "sha256": "sha256:a10195e1bbe5714aef068377ee381e52af79d58af640d4ee85fb893a8f5fd1c3"
         },
         {
           "path": "boulder/.git/objects/7f",
@@ -10560,11 +10552,6 @@
           "sha256": "sha256:73c4cf2f7f2d72a6e1286efeee669fd873be23ae6a404f66a7726881395df067"
         },
         {
-          "path": "boulder/.git/objects/86/0c3bbae171f410c5a3105b6ee01715e3e93d5c",
-          "kind": "file",
-          "sha256": "sha256:69f3545128115b25de1b6fd16f0a7ad53e94cf01cee558479e9a3f01818751bb"
-        },
-        {
           "path": "boulder/.git/objects/86/86ee3a0f067ecf2bbc2ddd8664b7072e53ad63",
           "kind": "file",
           "sha256": "sha256:2c3e43a43aba64057d054cf82375f151407fb5fa66db68e60da526b87ebcf569"
@@ -10690,11 +10677,6 @@
           "sha256": "sha256:fad8b8201275dc667e04382223b9ca7a6cd44924d8a26091a2af1e7871007f3f"
         },
         {
-          "path": "boulder/.git/objects/8f/0022c58bf9c3011bf619cd6f04378ae260a5a7",
-          "kind": "file",
-          "sha256": "sha256:b83328afdded3a41c60569ca2f22d61d96faead5a13f72f4d4ba4be6d49ffb0e"
-        },
-        {
           "path": "boulder/.git/objects/8f/1cf826804590ae2ebe8694e19cbdc0c8833e50",
           "kind": "file",
           "sha256": "sha256:3ad3735e6f59df5db4f535df06b9bc72445b8ff097a888c25bde390dbfb9a1e7"
@@ -10815,6 +10797,11 @@
           "sha256": "sha256:f0a044d18874bc42f6540cd743867e3f7b0c3aa7f573e070ec0b7571d63e21cd"
         },
         {
+          "path": "boulder/.git/objects/98/cc95ebc3e024a5a0522f16c0e67861bc55a52d",
+          "kind": "file",
+          "sha256": "sha256:76d10e7030f7b121ab75511a177ecc5c165e6cc08093854c51158b1bd0cca3f0"
+        },
+        {
           "path": "boulder/.git/objects/98/d74653d97fd9d0c3b4685ef8a08807bb18a738",
           "kind": "file",
           "sha256": "sha256:137c1efff5b684ed6a10c97ee2366e7306a964bac7bd298925860323a699c1ca"
@@ -10873,11 +10860,6 @@
           "path": "boulder/.git/objects/9d/0b882b228334c45a82de94e7a424e53b56eab5",
           "kind": "file",
           "sha256": "sha256:4e1e37fec1f1033a36809f494336d4ddfcd73d8066f00d64f42c16b4a28d15c0"
-        },
-        {
-          "path": "boulder/.git/objects/9d/6ce73c16812818e9432968eda45bd0f1ed6756",
-          "kind": "file",
-          "sha256": "sha256:53877a80e4140e313ccabb04b1a757004ca12441e9a32c68a617b21bf987fe58"
         },
         {
           "path": "boulder/.git/objects/9e",
@@ -11073,6 +11055,11 @@
           "path": "boulder/.git/objects/aa/836712c75948bf6ec49e6e9cd32eb93f4837b3",
           "kind": "file",
           "sha256": "sha256:2977059dfc14ee7a97ecded31b2a309a0d48d47301687f48b25cbdedca6de9a5"
+        },
+        {
+          "path": "boulder/.git/objects/aa/af292ebec152e7fd0f28519f3c429f57e114ad",
+          "kind": "file",
+          "sha256": "sha256:92f19ac83a0b7d85696020e4e2946a968548bfacbe687f04c7a4fdd38d791f55"
         },
         {
           "path": "boulder/.git/objects/aa/d89c4a15b9935182b2a4c4c403fbd11620c789",
@@ -11293,6 +11280,11 @@
           "path": "boulder/.git/objects/ba",
           "kind": "directory",
           "sha256": "sha256:4cb85cab24debd104f85d1431afd53e5d7639151cd52e11e840638df9392b42a"
+        },
+        {
+          "path": "boulder/.git/objects/ba/9ee06e9f57c511eca2b35a10c513cf296007c7",
+          "kind": "file",
+          "sha256": "sha256:7c5bec81c9d380fb8c778460fbb928d998e121c723591a27b250a7453733d3d2"
         },
         {
           "path": "boulder/.git/objects/ba/fe0ff8c2acc8276d84b6b1e9eb6711e02efe45",
@@ -11590,6 +11582,11 @@
           "sha256": "sha256:4abbc7eea244e15a0c63d1e9a92df32e0dc40c4723c1602170b38c425d839350"
         },
         {
+          "path": "boulder/.git/objects/cd/fa6b588a81829084ed2f952f446e6c698a44c0",
+          "kind": "file",
+          "sha256": "sha256:a90376b68dddc186d42ad98bd756ca47775f0df0dcb5a3f79a8d8f32cf764859"
+        },
+        {
           "path": "boulder/.git/objects/ce",
           "kind": "directory",
           "sha256": "sha256:1bb838ee2de5b624817f3f61610b2a3291c64a26b4c55cfeda632a105ec2421f"
@@ -11615,14 +11612,19 @@
           "sha256": "sha256:3e96e7988093ced7484adb730c7cecc54019c99f72193a6d0eda4dfc00f972d6"
         },
         {
-          "path": "boulder/.git/objects/cf/0f30294039c76d1408a37ab507a908bdab50b7",
-          "kind": "file",
-          "sha256": "sha256:21ca76520d99ca0596483bdc051eb03bc99205ce55188bf13d7126fe3cac4294"
-        },
-        {
           "path": "boulder/.git/objects/cf/1d91593d4f7e870bf2ef15a934de227eb66f6b",
           "kind": "file",
           "sha256": "sha256:78e56762b611f49a2fff652fbcb2756e500b39eefeff014bb7585be381b4906c"
+        },
+        {
+          "path": "boulder/.git/objects/d1",
+          "kind": "directory",
+          "sha256": "sha256:f88cce1e26aad8f71b03d9701785fda21e1a73c4b9af432fa7b937f6e3b127c0"
+        },
+        {
+          "path": "boulder/.git/objects/d1/0ccabbefccdf9f71bbef6b5f8dc6386f2444d1",
+          "kind": "file",
+          "sha256": "sha256:fc342dc1f8e9cc7e6cd783d593c9467b275e0616f97cb84a2065a8206fb2c140"
         },
         {
           "path": "boulder/.git/objects/d3",
@@ -11855,11 +11857,6 @@
           "sha256": "sha256:fb9e9912eda0b8a60b03f1c20d2aaaafba44cb339a8ed96c11510f9de0724282"
         },
         {
-          "path": "boulder/.git/objects/e0/1db0fdc53bc7673e6a9441f85274de704edf65",
-          "kind": "file",
-          "sha256": "sha256:6d94983abae5b16c894dbc997b3f090d90ca7aa131a0b687d44e656d2e9ff358"
-        },
-        {
           "path": "boulder/.git/objects/e0/88cc67de613bce0b6eac8222f484e94ae74d24",
           "kind": "file",
           "sha256": "sha256:1ade122c92c89bf25e679cab5adbfa1fa63bc9ec01e33cd2a0116f4977a6263b"
@@ -11893,11 +11890,6 @@
           "path": "boulder/.git/objects/e1/76d5c884e79c97eea6ac416ddcaf73093e775e",
           "kind": "file",
           "sha256": "sha256:bfcf39b0a8f7f12e207e95729d3212648b0911e436a96f0adc37602cd656f453"
-        },
-        {
-          "path": "boulder/.git/objects/e1/e00eb085670e81ff61c6aa8b7604949e8fd9af",
-          "kind": "file",
-          "sha256": "sha256:2d2fa4d8fe0c7a73c08692f922952731aed1daea2702e16978e39249d7c58cff"
         },
         {
           "path": "boulder/.git/objects/e2",
@@ -12080,6 +12072,11 @@
           "sha256": "sha256:98e2c28fd8a831fcd4fec5ef99cd7779c4991eff0fb0230a933585e88658df77"
         },
         {
+          "path": "boulder/.git/objects/ec/9be43bb03299396907e3aa490d8f89d66d8988",
+          "kind": "file",
+          "sha256": "sha256:02e8b727c887f7ae0e6c0e7476ac2453dbf60b1fe8edd0043da67d46f7439efb"
+        },
+        {
           "path": "boulder/.git/objects/ec/bfc00081a7a70138e88dcf92f571dcbf333afb",
           "kind": "file",
           "sha256": "sha256:99a3b2c92ab6e7a4baa5908a36ebe2da76b0d956f395993a835e5ab6d5bf80d0"
@@ -12153,11 +12150,6 @@
           "path": "boulder/.git/objects/f2/30f93c1a20b883fe2da39e9dfc0f7c053fc907",
           "kind": "file",
           "sha256": "sha256:599ca0906cd66221439c3901027d8faae017aade173616b6fb4e8fb3822a5e5e"
-        },
-        {
-          "path": "boulder/.git/objects/f2/6ed8143dd4708c3bdf21315abe0b41f4f7151d",
-          "kind": "file",
-          "sha256": "sha256:01ed3f58b473c20fe9b472622ef8ee34e0689ac705e023b78626b28c975d0e81"
         },
         {
           "path": "boulder/.git/objects/f2/bfd033579359ce436a77e4ddf4bacfcee7027f",
@@ -12240,11 +12232,6 @@
           "sha256": "sha256:bbe6290127ce1a367adca8e250a0c470fbb63bf7f24a9da02db93b97b600da02"
         },
         {
-          "path": "boulder/.git/objects/f7/8c18981c8743cbed91f9b14db9af9cc25579e8",
-          "kind": "file",
-          "sha256": "sha256:e4839ae18e71bf21cb50f4b5143980c0d8e4c848e4e4b2a810cb11bd572463e8"
-        },
-        {
           "path": "boulder/.git/objects/f7/d2353d2288c52992a61823954d29e8a17a3d06",
           "kind": "file",
           "sha256": "sha256:194ae1d1e649140251426607931f5f4ddab885f6d6658eeb011c0a7f247bd2f3"
@@ -12253,6 +12240,11 @@
           "path": "boulder/.git/objects/f8",
           "kind": "directory",
           "sha256": "sha256:58c5ef2ee972d4d1e9dc8e4552da34cf16511abd408876a6b922f2c96fbd867a"
+        },
+        {
+          "path": "boulder/.git/objects/f8/9a82fa98a6a5b7bb918a2657c2bae684ea504a",
+          "kind": "file",
+          "sha256": "sha256:b74f2c4799d034f8de4fa25017567daaad03ca172263c21b8445bd38243a60fd"
         },
         {
           "path": "boulder/.git/objects/f8/a58694f07f07cba8537279bcb63916e7e5175a",
@@ -12407,7 +12399,7 @@
         {
           "path": "boulder/.git/refs/heads/master",
           "kind": "file",
-          "sha256": "sha256:38d13540a29d2c734067a7d89d90729024bb3128df73682348a4ad4d09565ab4"
+          "sha256": "sha256:4947b10965395fa12f84e4c61615e34e10ea93b239df7e1c2b4c55fe1289df80"
         },
         {
           "path": "boulder/.git/refs/tags",
@@ -13132,7 +13124,7 @@
         {
           "path": "boulder/evidence/k0r/acceptance-manifest.json",
           "kind": "file",
-          "sha256": "sha256:490ee5d9cb8e69680f0a8afd02a1d9853c716fcbebc6fc3a8673548000084565"
+          "sha256": "sha256:ae3f5e4690fd4d3222bbacbd093d8691a33fac251c2a456474287fa0b5ed8e98"
         },
         {
           "path": "boulder/evidence/k0r/approval-provenance.json",
@@ -13150,14 +13142,9 @@
           "sha256": "sha256:700f3aa7302fea8237bba7ac365b150d663132e8e8ac11636a309e121df70adf"
         },
         {
-          "path": "boulder/evidence/k0r/final-verification-bundle.json",
-          "kind": "file",
-          "sha256": "sha256:dbab84fe777dc65dad93a5f8727bc4109c21e938cc1aebb08b360600fc9d97b0"
-        },
-        {
           "path": "boulder/evidence/k0r/independent-clean-source-reproduction.json",
           "kind": "file",
-          "sha256": "sha256:2de8658eb438d1fb285368fcba6e6c35c60613f720c51183200e1855d3ac2f56"
+          "sha256": "sha256:6f9a2114012c88af51c93d9207efb6508df3975a3a08a06784d547b350c83b53"
         },
         {
           "path": "boulder/evidence/k0r/isolated-run-receipt.json",
@@ -13170,16 +13157,6 @@
           "sha256": "sha256:22c4d853c862864e87366e7edfe173d3b61607e74962f29947b76d2222ee3b7a"
         },
         {
-          "path": "boulder/evidence/k0r/k0r-exit-receipt.json",
-          "kind": "file",
-          "sha256": "sha256:59b8670ff04f0db28930c8028399c5d08ac4f6a38e776669a3d6ae15a935f72e"
-        },
-        {
-          "path": "boulder/evidence/k0r/source-generation.tar",
-          "kind": "file",
-          "sha256": "sha256:c08658fcdc226b7cf14b2dd4e12ef890b554f71051bb33e4690092f0a6b997dd"
-        },
-        {
           "path": "boulder/evidence/k0r/superseding-adr.md",
           "kind": "file",
           "sha256": "sha256:75f8bef99692326816838b5e83162fa8f37168a304cb1de8ef9add3a4d6bc08f"
@@ -13187,7 +13164,7 @@
         {
           "path": "boulder/evidence/k0r/v1-public-contract-inventory.json",
           "kind": "file",
-          "sha256": "sha256:f55443efa29fec53491e165865f9365303b4ff776a8a2002090d62013c733d42"
+          "sha256": "sha256:9327fac8c69f1c52f13756d4c54a51b9f20e04b79bb198734d950944efd1110f"
         },
         {
           "path": "boulder/evidence/workflow-profiles",
@@ -14917,7 +14894,7 @@
         {
           "path": "boulder/test/k0r-evidence-contract.test.ts",
           "kind": "file",
-          "sha256": "sha256:c3419515be0bfe648de4b664c488a5dec6285ae707896e74800a7737f7cd7eb9"
+          "sha256": "sha256:3937b688fc2c50219b8d0983d3e5baff758b0ab4d98f28fb847d51354f782b18"
         },
         {
           "path": "boulder/test/k0r-globals.d.ts",
@@ -14937,17 +14914,17 @@
         {
           "path": "boulder/test/k0r-issue-exit.ts",
           "kind": "file",
-          "sha256": "sha256:c0cef44891de9adaea68f5edebee5754b68b62275d2fc4ccb087153cce591954"
+          "sha256": "sha256:1ec2c82772ed4dbce83c205e705ed3c73323b5eae65c7fa3241e05789da67c77"
         },
         {
           "path": "boulder/test/k0r-reconcile-evidence.ts",
           "kind": "file",
-          "sha256": "sha256:55b627c06a99b7e1ef89cad67c2d05f2d1c98038ac668a6326d786278ae2d90b"
+          "sha256": "sha256:ab5a609fb6ab7c7afaadb6b7605597a28217ab33e2292313bc1940eae63d3ee8"
         },
         {
           "path": "boulder/test/k0r-run-evidence.ts",
           "kind": "file",
-          "sha256": "sha256:5a41b4d4007f4e2e24e949bdc6ac1c2a7a141fa16b4d1fe4f1b07b917a9f7f23"
+          "sha256": "sha256:df266bc61585823e55869849bbd7fa5a12aa0502cdebec1ea1ceaf64e4dcee43"
         },
         {
           "path": "boulder/test/k2a-f-contract-foundation.test.ts",
@@ -15333,9 +15310,9 @@
         "XDG_CACHE_HOME"
       ],
       "exitCode": 0,
-      "stdoutSha256": "sha256:dc24c049e17ca7a984968139edc821216f0a81d1bcce03b5b2d62e3eea0a6167",
+      "stdoutSha256": "sha256:9dd94230604c2dec78898627ba26d40a569672003a94dbca6147dc81b94441a5",
       "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reportSha256": "sha256:dc24c049e17ca7a984968139edc821216f0a81d1bcce03b5b2d62e3eea0a6167",
+      "reportSha256": "sha256:9dd94230604c2dec78898627ba26d40a569672003a94dbca6147dc81b94441a5",
       "reportStatus": "pass"
     },
     "commands": [
@@ -15344,9 +15321,9 @@
           "bun",
           "test/k0r-issue-exit.ts",
           "--verify-pending",
-          "/home/burt/.b6/t/protected/k0r-transition.pending.json",
+          "/home/burt/.b6/pr35-k0r-plan-aligned-v3/protected/k0r-transition.pending.json",
           "--private-root",
-          "/home/burt/.b6/t"
+          "/home/burt/.b6/pr35-k0r-plan-aligned-v3"
         ],
         "cwd": ".",
         "envNames": [
@@ -15398,7 +15375,7 @@
         ],
         "exitCode": 0,
         "stdoutSha256": "sha256:d6684989b8dd63b37d2f1954270826fbe1bd89a8debd12bcacf03ed1c6140ef6",
-        "stderrSha256": "sha256:52f5f012fc1064d91e4fae96ecf32c8cffc6ec9b7ba61f3417e03227fa414004"
+        "stderrSha256": "sha256:6b6edccbc2feb0ace330248fda35a97dc91d5719781ce94af9a9926c0f13246d"
       },
       {
         "argv": [
@@ -15511,7 +15488,7 @@
         ],
         "exitCode": 0,
         "stdoutSha256": "sha256:d6684989b8dd63b37d2f1954270826fbe1bd89a8debd12bcacf03ed1c6140ef6",
-        "stderrSha256": "sha256:79e2495c007ae995a584efaa715c93451e3ddaaff2661f30e6a17f506e156d72"
+        "stderrSha256": "sha256:f9960c90871198f90b677eaca6097440cb25fdc8ea68557f9f6b0e55848b540b"
       },
       {
         "argv": [

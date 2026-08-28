@@ -157,13 +157,14 @@ export const k0rFocusedGateReceiptPaths = {
   "post-materialization": "receipts/k0r-focused-gate.post-materialization.json",
   "post-isolated-run": "receipts/k0r-focused-gate.post-isolated-run.json",
 } as const;
+export const k0rPreCaptureFocusedGateStage: K0rFocusedGateStage = "post-isolated-run";
 
 const focusedGateMeasurementsFinalized = true;
-const focusedGatePlaceholderCounts = {
+const staleEvidenceCounts = {
   discoveredTests: 75,
-  passedTests: 67,
-  failedTests: 8,
-  assertions: 741,
+  passedTests: 70,
+  failedTests: 5,
+  assertions: 763,
   skippedTests: 0,
 } as const;
 const focusedGateFailureIds = [
@@ -176,44 +177,26 @@ const focusedGateFailureIds = [
   "K0R isolated-run receipt > enforces fixture-local isolation and declares the pre-Task-8 isolated-run contract",
   "K0R isolated-run receipt > validates the currently installed isolated-run receipt and rejects forgeries",
 ] as const;
-const focusedGatePlaceholderDiagnostics = [
-  "sha256:ff6f7cb0d69e6cdd6efff3e97b9fd79aa34dffe6b3d2aea5f7e2abc1fed1db26",
-  "sha256:b33617df3f2ea3d04f2c99c1e027c3c1f8d966534d5b00a11ee53e0b5aa56dea",
-  "sha256:8c0e5c2c492810cee31aaa13b618ee5dff9dbeac1340d0df41dcf7803c9d90fb",
-  "sha256:c9a7d82eacf9153d85fa28ffc11d61eb8dd6f6fb096957279dd8f8b20e5eefa4",
-  "sha256:5cdffda4e14f6571be94487d5042ba09c36f7bb6a09fe2b00ee2661eb1b532ed",
-  "sha256:f455449f3a8a831c5695e0c2b91a7d0c71819e77a0b057282701281930ed6467",
-  "sha256:cec5dfa0184c43a167d9b01e1e035f2f3e912787e19ba0c28fbee70e5fecf7ce",
-  "sha256:296782d87167b5cbe5068ba81f934ce147513f53b3c8d8dc22aebefc1ded11fe",
+const staleEvidenceFailures = [
+  { id: focusedGateFailureIds[2], diagnosticSha256: "sha256:488acd70efcaefeb26b4912f1b52243dd5818b1bcfb9e24a2882e9bb714495b3" },
+  { id: focusedGateFailureIds[3], diagnosticSha256: "sha256:d9d7372f4750fd428f1f7c370a1123b93d7dce735244c4b695312dee78870000" },
+  { id: focusedGateFailureIds[4], diagnosticSha256: "sha256:d75fcd19466eb465d60583bbd0056e97c02fc6af05079e5c95966a8f76d65c37" },
+  { id: focusedGateFailureIds[5], diagnosticSha256: "sha256:dcbb20a89b7f318da357a22d22e90e10c2993f669806a41d65d88b54076cf1c6" },
+  { id: focusedGateFailureIds[7], diagnosticSha256: "sha256:296782d87167b5cbe5068ba81f934ce147513f53b3c8d8dc22aebefc1ded11fe" },
 ] as const;
 
 export const k0rFocusedGatePolicies = [
   {
     stage: "pre-materialization",
     status: "fail",
-    counts: focusedGatePlaceholderCounts,
-    failures: focusedGateFailureIds.map((id, index) => ({
-      id,
-      diagnosticSha256: focusedGatePlaceholderDiagnostics[index]!,
-    })),
+    counts: staleEvidenceCounts,
+    failures: staleEvidenceFailures,
   },
   {
     stage: "post-materialization",
     status: "fail",
-    counts: {
-      discoveredTests: 75,
-      passedTests: 70,
-      failedTests: 5,
-      assertions: 763,
-      skippedTests: 0,
-    },
-    failures: [
-      { id: focusedGateFailureIds[2], diagnosticSha256: "sha256:488acd70efcaefeb26b4912f1b52243dd5818b1bcfb9e24a2882e9bb714495b3" },
-      { id: focusedGateFailureIds[3], diagnosticSha256: "sha256:d9d7372f4750fd428f1f7c370a1123b93d7dce735244c4b695312dee78870000" },
-      { id: focusedGateFailureIds[4], diagnosticSha256: "sha256:d75fcd19466eb465d60583bbd0056e97c02fc6af05079e5c95966a8f76d65c37" },
-      { id: focusedGateFailureIds[5], diagnosticSha256: "sha256:dcbb20a89b7f318da357a22d22e90e10c2993f669806a41d65d88b54076cf1c6" },
-      { id: focusedGateFailureIds[7], diagnosticSha256: focusedGatePlaceholderDiagnostics[7] },
-    ],
+    counts: staleEvidenceCounts,
+    failures: staleEvidenceFailures,
   },
   {
     stage: "post-isolated-run",
@@ -809,7 +792,7 @@ export async function verifyK0rPreCaptureFocusedGateForCapture(
     readRegular(planPath),
   ]);
   validateScope(scope, provenance, planBytes);
-  await verifyFocusedGateReceipt(path, root, "post-materialization", scope, planBytes, await gitIdentity());
+  await verifyFocusedGateReceipt(path, root, k0rPreCaptureFocusedGateStage, scope, planBytes, await gitIdentity());
 }
 
 function assertCanonicalPrivatePath(actual: string, privateRoot: string, expected: string, label: string): void {

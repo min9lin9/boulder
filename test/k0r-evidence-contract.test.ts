@@ -16,6 +16,7 @@ import {
   formatK0rHistoricalBindingDiagnostic,
   formatK0rRemovedBindingDiagnostic,
   k0rFocusedGatePolicies,
+  k0rPreCaptureFocusedGateStage,
   k0rFocusedGateReceiptPaths,
   k0rPlanAuthoritySha256,
   myersK0rByteEdits,
@@ -28,8 +29,8 @@ import {
   type K0rFocusedGatePolicy,
   type K0rFocusedGateStage,
 } from "./k0r-reconcile-evidence.js";
-import { assertK0rAllowedArgv, isolatedPriorSnapshotMode, isolatedRunCommandArgv, isolatedRunReceiptPath, isolatedRunSchemaVersion, isolatedSourceBundlePaths, parseK0rRunEvidenceArgv, readK0rIsolationArgvAllowlist, registerK0rIsolationBoundaryHandler, resolveK0rRepositoryCheckArgv, resolveK0rRepositoryCheckExecution, runK0rIsolatedEvidence, validateK0rIsolatedRunReceipt, verifyK0rSandboxEnforcement, writeK0rIsolatedRunReceipt, writeK0rIsolatedRunReceiptForTest } from "./k0r-run-evidence.js";
-import { assertExactK0rEvidenceOutputPaths, authenticateImplementerProvenance, authenticateTaskProvenance, authenticateUserProvenance, buildMaintainerApprovalRequest, parseK0rIssueExitArgv, trackedOverlayPaths, validateMaintainerApproval, validatePriorExit } from "./k0r-issue-exit.js";
+import { applyK0rApprovedOverlayForTest, assertK0rAllowedArgv, deriveK0rSourceBaseForTest, isolatedPriorSnapshotMode, isolatedRunCommandArgv, isolatedRunReceiptPath, isolatedRunSchemaVersion, isolatedSourceBundlePaths, parseK0rRunEvidenceArgv, readK0rIsolationArgvAllowlist, registerK0rIsolationBoundaryHandler, resolveK0rRepositoryCheckArgv, resolveK0rRepositoryCheckExecution, runK0rIsolatedEvidence, validateK0rIsolatedRunReceipt, validateK0rSourceBaseForTest, verifyK0rSandboxEnforcement, writeK0rIsolatedRunReceipt, writeK0rIsolatedRunReceiptForTest } from "./k0r-run-evidence.js";
+import { assertExactK0rEvidenceOutputPaths, authenticateImplementerProvenance, authenticateTaskProvenance, authenticateUserProvenance, buildMaintainerApprovalRequest, parseK0rIssueExitArgv, trackedOverlayPaths, validateMaintainerApproval, validatePendingExitPresence, validatePriorExit } from "./k0r-issue-exit.js";
 
 const root = join(import.meta.dir, "..");
 const inventoryPath = join(root, "evidence/k0r/v1-public-contract-inventory.json");
@@ -107,14 +108,21 @@ describe("K0R focused gate receipt contract", () => {
   });
 
   test("records the expected failure IDs at each materialization boundary", () => {
-    expect(focusedGatePolicy("pre-materialization").failures).toHaveLength(8);
-    expect(focusedGatePolicy("post-materialization").failures.map((failure) => failure.id)).toEqual([
+    const staleEvidenceFailures = [
       "K0R evidence contract > binds the complete-byte report and rejects forged reproduction, alternate-root source, and semantic report evidence",
       "K0R evidence contract > rejects changed and deleted declared prior K0/K1 inventory entries",
       "K0R evidence contract > rejects root, oracle, directory, pending approval, and ignored-path forgeries",
       "K0R evidence contract > atomically replaces an existing evidence manifest and cleans up after rename failure",
       "K0R isolated-run receipt > validates the currently installed isolated-run receipt and rejects forgeries",
-    ]);
+    ];
+    expect({
+      counts: focusedGatePolicy("pre-materialization").counts,
+      failures: focusedGatePolicy("pre-materialization").failures.map((failure) => failure.id),
+    }).toEqual({
+      counts: { assertions: 763, discoveredTests: 75, failedTests: 5, passedTests: 70, skippedTests: 0 },
+      failures: staleEvidenceFailures,
+    });
+    expect(focusedGatePolicy("post-materialization").failures.map((failure) => failure.id)).toEqual(staleEvidenceFailures);
     expect(focusedGatePolicy("post-isolated-run").failures).toEqual([]);
   });
 
@@ -322,7 +330,19 @@ describe("K0R compact maintainer approval", () => {
     ];
     const argv = ["--write", ...options.flatMap((option) => [option, `/private/${option.slice(2)}.json`])];
     const parsed = parseK0rIssueExitArgv(argv);
-    expect(parsed.mode).toBe("write");
+    expect({
+      mode: parsed.mode,
+      pendingOnlyAbsentAccepted: thrownMessage(() => validatePendingExitPresence(false, false)) === "",
+      pendingOnlyPresentRejected: thrownMessage(() => validatePendingExitPresence(true, false)) !== "",
+      selfVerificationPresentAccepted: thrownMessage(() => validatePendingExitPresence(true, true)) === "",
+      selfVerificationAbsentRejected: thrownMessage(() => validatePendingExitPresence(false, true)) !== "",
+    }).toEqual({
+      mode: "write",
+      pendingOnlyAbsentAccepted: true,
+      pendingOnlyPresentRejected: true,
+      selfVerificationPresentAccepted: true,
+      selfVerificationAbsentRejected: true,
+    });
     if (parsed.mode !== "write") throw new Error("Expected write command.");
     expect(parsed.values["--maintainer-request"]).toBe("/private/maintainer-request.json");
     expect(thrownMessage(() => parseK0rIssueExitArgv(argv.filter((value) => value !== "--maintainer-request")))).not.toBe("");
@@ -332,7 +352,13 @@ describe("K0R compact maintainer approval", () => {
 describe("K0R scope output authority", () => {
   test("accepts only exact ordered Task 8 runner and capture argv", () => {
     const runner = ["--write", "--pending-transition", "/qa/protected/k0r-transition.pending.json", "--private-candidate", "/qa/receipts/isolated-run.candidate.json", "--private-work-root", "/qa/work/isolated-run"];
-    expect(parseK0rRunEvidenceArgv(runner).mode).toBe("write");
+    expect({
+      mode: parseK0rRunEvidenceArgv(runner).mode,
+      preCaptureFocusedGateStage: k0rPreCaptureFocusedGateStage,
+    }).toEqual({
+      mode: "write",
+      preCaptureFocusedGateStage: "post-isolated-run",
+    });
     expect(thrownMessage(() => parseK0rRunEvidenceArgv(["--write"]))).toContain("exact Task 8");
     expect(thrownMessage(() => parseK0rRunEvidenceArgv([...runner, "trailing"]))).toContain("exact Task 8");
     const capture = [
@@ -1381,6 +1407,8 @@ describe("K0R isolated-run receipt", () => {
       unregister.forEach((remove) => remove());
       await rm(temp, { recursive: true, force: true });
     }
+    await verifyAtomicSourceBaseRegression();
+    await verifySymlinkOverlayParentRegression();
     const acceptance = parseRecord(await readFile(acceptancePath, "utf8"), "acceptance manifest");
     const artifact = recordArray(acceptance["requiredArtifacts"], "required artifacts").find((entry) => entry["id"] === "isolated-run-receipt");
     expect(artifact).toEqual({
@@ -1489,7 +1517,7 @@ describe("K0R isolated-run receipt", () => {
       await expect(validateK0rIsolatedRunReceipt(new TextEncoder().encode(JSON.stringify(forged)), root)).rejects.toThrow("dependency binding is stale");
       const forgedBase = JSON.parse(new TextDecoder().decode(bytes)) as RecordValue;
       recordValue(recordValue(recordValue(forgedBase["run"], "forged receipt run")["sourceBundle"], "forged source bundle")["derivation"], "forged source derivation")["base"] = { archiveSha256: "sha256:0000000000000000000000000000000000000000000000000000000000000000", commit: "0000000000000000000000000000000000000000", tree: "0000000000000000000000000000000000000000" };
-      await expect(validateK0rIsolatedRunReceipt(new TextEncoder().encode(JSON.stringify(forgedBase)), root)).rejects.toThrow("source derivation");
+      await expect(validateK0rIsolatedRunReceipt(new TextEncoder().encode(JSON.stringify(forgedBase)), root)).rejects.toThrow("Unable to resolve immutable Git source identity");
 
       const forgedOverlay = JSON.parse(new TextDecoder().decode(bytes)) as RecordValue;
       const overlayFiles = recordArray(recordValue(recordValue(recordValue(recordValue(forgedOverlay["run"], "forged receipt run")["sourceBundle"], "forged source bundle")["derivation"], "forged source derivation")["overlay"], "forged source overlay")["files"], "forged source overlay files");
@@ -2124,12 +2152,77 @@ function thrownMessage(action: () => unknown): string {
 }
 
 function gitStdout(args: readonly string[]): Promise<string> {
+  return gitStdoutAt(root, args);
+}
+
+function gitStdoutAt(cwd: string, args: readonly string[]): Promise<string> {
   return new Promise((resolve, reject) => {
-    execFile("git", args, { cwd: root }, (error, stdout, stderr) => {
+    execFile("git", args, { cwd }, (error, stdout, stderr) => {
       if (error) reject(new Error(stderr || error.message));
       else resolve(stdout);
     });
   });
+}
+
+async function verifyAtomicSourceBaseRegression(): Promise<void> {
+  const temp = await mkdtemp(join(tmpdir(), "boulder-k0r-source-revision-"));
+  const fixture = join(temp, "repo");
+  try {
+    await runGit(root, ["worktree", "add", "--detach", fixture, "HEAD"]);
+    let resolvedCommit = "";
+    const base = await deriveK0rSourceBaseForTest(fixture, async (commit) => {
+      resolvedCommit = commit;
+      await runGit(fixture, ["-c", "user.name=K0R Test", "-c", "user.email=k0r@example.invalid", "commit", "--allow-empty", "-m", "advance fixture head"]);
+    });
+    const declaredCommit = stringValue(base["commit"], "generated source commit");
+    if (declaredCommit !== resolvedCommit || (await gitStdoutAt(fixture, ["rev-parse", "HEAD"])).trim() === declaredCommit) throw new Error("K0R source base did not remain pinned while HEAD advanced.");
+    await validateK0rSourceBaseForTest(base, fixture);
+
+    const malformed = structuredClone(base);
+    malformed["commit"] = "not-a-git-object";
+    await requireRejection(() => validateK0rSourceBaseForTest(malformed, fixture), "source base is invalid");
+
+    const unresolved = structuredClone(base);
+    unresolved["commit"] = "0".repeat(40);
+    await requireRejection(() => validateK0rSourceBaseForTest(unresolved, fixture), "Unable to resolve immutable Git source identity");
+
+    const mismatched = structuredClone(base);
+    mismatched["tree"] = "0".repeat(40);
+    mismatched["archiveSha256"] = `sha256:${"0".repeat(64)}`;
+    await requireRejection(() => validateK0rSourceBaseForTest(mismatched, fixture), "stale or forged");
+  } finally {
+    await execGit(root, ["worktree", "remove", "--force", fixture]);
+    await rm(temp, { recursive: true, force: true });
+  }
+}
+
+async function verifySymlinkOverlayParentRegression(): Promise<void> {
+  const temp = await mkdtemp(join(tmpdir(), "boulder-k0r-overlay-parent-"));
+  const source = join(temp, "source");
+  const destination = join(temp, "destination");
+  const outside = join(temp, "outside");
+  const path = "fixture-docs/guide.html";
+  try {
+    await mkdir(join(source, "fixture-docs"), { recursive: true });
+    await mkdir(destination);
+    await mkdir(outside);
+    await writeFile(join(source, path), "approved overlay\n");
+    await symlink(outside, join(destination, "fixture-docs"));
+    await requireRejection(() => applyK0rApprovedOverlayForTest(source, destination, [path]), "overlay parent");
+    if (await lstat(join(outside, "guide.html")).then(() => true, () => false)) throw new Error("K0R overlay escaped through a symlinked archive parent.");
+  } finally {
+    await rm(temp, { recursive: true, force: true });
+  }
+}
+
+async function requireRejection(action: () => Promise<unknown>, message: string): Promise<void> {
+  try {
+    await action();
+  } catch (error) {
+    if (error instanceof Error && error.message.includes(message)) return;
+    throw error;
+  }
+  throw new Error(`Expected rejection containing: ${message}`);
 }
 
 function deferred<T>(): { readonly promise: Promise<T>; readonly resolve: (value: T | PromiseLike<T>) => void; readonly reject: (reason?: unknown) => void } {

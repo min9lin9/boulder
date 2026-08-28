@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { constants as fsConstants } from "node:fs";
 import { copyFile, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rename, rm, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { canonicalizeK0rJson, runBoundedK0rProcess, sha256CanonicalK0r } from "./k0r-canonical.js";
 import { runK0rIndependentOracle } from "./k0r-independent-oracle.js";
@@ -554,10 +554,20 @@ export async function validateK0rIsolatedRunReceipt(bytes: Uint8Array, sourceRoo
   return receipt as K0rIsolatedRunReceipt;
 }
 
-async function copyAndVerifySourceBundle(root: string, roots: DedicatedRoots, hostEnvironment: Record<string, string>, environment: Record<string, string>, policy: IsolationPolicy, dependencies: ResolvedDependencyBinding): Promise<SourceBundle> {
-  const base = await materializeHeadSource(root, roots.boulder, roots.tmp, hostEnvironment, policy);
+async function copyAndVerifySourceBundle(
+  root: string,
+  roots: DedicatedRoots,
+  hostEnvironment: Record<string, string>,
+  environment: Record<string, string>,
+  policy: IsolationPolicy,
+  dependencies: ResolvedDependencyBinding,
+  afterRevisionResolved: (revision: string) => Promise<void> = async () => {},
+): Promise<SourceBundle> {
+  const materialized = await materializeHeadGitSource(root, roots.boulder, roots.tmp, hostEnvironment, policy, afterRevisionResolved);
+  const base = materialized.base;
+  const boundPolicy = materialized.policy;
   const overlay = await applyApprovedOverlay(root, roots.boulder, policy.allowedOverlayPaths);
-  const generatedInventories = await deriveDisposableGeneratedInventories(root, roots, environment, policy, dependencies);
+  const generatedInventories = await deriveDisposableGeneratedInventories(root, roots, environment, boundPolicy, dependencies);
   await writeFile(join(roots.boulder, isolatedRunReceiptPath), `${JSON.stringify(notRunK0rIsolatedRunReceipt, null, 2)}\n`, "utf8");
   const files = await Promise.all(isolatedSourceBundlePaths.map(async (path) => {
     const source = await readRegularFile(root, path, "source bundle");
@@ -570,19 +580,38 @@ async function copyAndVerifySourceBundle(root: string, roots: DedicatedRoots, ho
   return { derivation: { base, overlay: { ...overlay, generatedInventories } }, files, merkleSha256: merkleDigest(files) };
 }
 
-async function materializeHeadSource(root: string, destination: string, temporaryDirectory: string, env: Record<string, string>, policy: IsolationPolicy): Promise<SourceDerivation["base"]> {
+async function materializeHeadGitSource(
+  root: string,
+  destination: string,
+  temporaryDirectory: string,
+  environment: Record<string, string>,
+  policy: IsolationPolicy,
+  afterRevisionResolved: (revision: string) => Promise<void>,
+): Promise<{ readonly base: SourceDerivation["base"]; readonly policy: IsolationPolicy }> {
+  const head = await runHostCommand(["git", "rev-parse", "HEAD"], root, environment, policy);
+  const revision = head.stdout.trim();
+  if (head.exitCode !== 0 || !gitObjectId(revision)) throw new Error("Unable to resolve immutable Git source identity.");
+  await afterRevisionResolved(revision);
+  const boundPolicy = bindK0rSourceRevision(policy, revision);
+  return {
+    base: await materializeGitSource(root, destination, temporaryDirectory, environment, boundPolicy, revision),
+    policy: boundPolicy,
+  };
+}
+
+async function materializeGitSource(root: string, destination: string, temporaryDirectory: string, env: Record<string, string>, policy: IsolationPolicy, revision: string): Promise<SourceDerivation["base"]> {
   const archivePath = join(temporaryDirectory, headSourceArchiveFileName);
   const [commit, tree] = await Promise.all([
-    runHostCommand(["git", "rev-parse", "HEAD"], root, env, policy),
-    runHostCommand(["git", "rev-parse", "HEAD^{tree}"], root, env, policy)
+    runHostCommand(["git", "rev-parse", `${revision}^{commit}`], root, env, policy),
+    runHostCommand(["git", "rev-parse", `${revision}^{tree}`], root, env, policy)
   ]);
-  if (commit.exitCode !== 0 || tree.exitCode !== 0 || !gitObjectId(commit.stdout.trim()) || !gitObjectId(tree.stdout.trim())) throw new Error("Unable to resolve immutable HEAD source identity.");
-  const archive = await runHostCommand(["git", "archive", "--format=tar", "--output", archivePath, "HEAD"], root, env, policy);
-  if (archive.exitCode !== 0) throw new Error("Unable to read immutable HEAD archive.");
-  const archiveSha256 = sha256Bytes(await readRegularFile(temporaryDirectory, headSourceArchiveFileName, "immutable HEAD archive"));
+  if (commit.exitCode !== 0 || tree.exitCode !== 0 || !gitObjectId(commit.stdout.trim()) || !gitObjectId(tree.stdout.trim())) throw new Error("Unable to resolve immutable Git source identity.");
+  const archive = await runHostCommand(["git", "archive", "--format=tar", "--output", archivePath, revision], root, env, policy);
+  if (archive.exitCode !== 0) throw new Error("Unable to read immutable Git archive.");
+  const archiveSha256 = sha256Bytes(await readRegularFile(temporaryDirectory, headSourceArchiveFileName, "immutable Git archive"));
   const extracted = await runHostCommand(["tar", "-xf", archivePath, "-C", destination], root, env, policy);
   await rm(archivePath, { force: true });
-  if (extracted.exitCode !== 0) throw new Error("Unable to extract immutable HEAD archive.");
+  if (extracted.exitCode !== 0) throw new Error("Unable to extract immutable Git archive.");
   return { archiveSha256, commit: commit.stdout.trim(), tree: tree.stdout.trim() };
 }
 
@@ -591,18 +620,92 @@ async function applyApprovedOverlay(root: string, destination: string, allowedPa
   for (const path of allowedPaths) {
     if (path === packageInventoryPath || path === generatedEvidenceManifestPath) continue;
     const current = await readRegularFile(root, path, "approved source overlay");
+    const target = join(destination, path);
+    await prepareK0rOverlayParent(destination, target);
     const baseline = await readOptionalRegularFile(destination, path, "immutable HEAD source");
     const baseSha256 = baseline === undefined ? null : sha256Bytes(baseline);
     const overlaySha256 = sha256Bytes(current);
     if (baseSha256 === overlaySha256) continue;
-    const target = join(destination, path);
-    await mkdir(dirname(target), { recursive: true });
     if (await pathExists(target)) await assertSingleLinkRegularFile(target, "approved source overlay destination");
     await copyFile(join(root, path), target);
     if (sha256Bytes(await readRegularFile(destination, path, "derived source overlay")) !== overlaySha256) throw new Error(`Approved source overlay hash mismatch: ${path}.`);
     files.push({ path, baseSha256, overlaySha256 });
   }
   return { allowedPaths: [...allowedPaths], files, merkleSha256: overlayMerkleDigest(files) };
+}
+
+async function prepareK0rOverlayParent(root: string, target: string): Promise<void> {
+  const rootState = await lstat(root);
+  if (!rootState.isDirectory() || rootState.isSymbolicLink()) throw new Error("K0R overlay parent root is unsafe.");
+  const rootReal = await realpath(root);
+  const parent = dirname(target);
+  const parentRelative = relative(root, parent);
+  if (isAbsolute(parentRelative) || parentRelative === ".." || parentRelative.startsWith(`..${sep}`)) throw new Error("K0R overlay parent escapes its source root.");
+  let current = root;
+  for (const part of parentRelative === "" ? [] : parentRelative.split(sep)) {
+    current = join(current, part);
+    const state = await lstat(current).catch(() => undefined);
+    if (state === undefined) await mkdir(current);
+    else if (!state.isDirectory() || state.isSymbolicLink()) throw new Error("K0R overlay parent must contain only physical directories.");
+    const currentReal = await realpath(current);
+    const physicalRelative = relative(rootReal, currentReal);
+    if (isAbsolute(physicalRelative) || physicalRelative === ".." || physicalRelative.startsWith(`..${sep}`)) throw new Error("K0R overlay parent escapes its physical source root.");
+  }
+}
+
+export async function applyK0rApprovedOverlayForTest(root: string, destination: string, allowedPaths: readonly string[]): Promise<void> {
+  await applyApprovedOverlay(root, destination, allowedPaths);
+}
+
+export async function deriveK0rSourceBaseForTest(root: string, afterRevisionResolved: (revision: string) => Promise<void> = async () => {}): Promise<RecordValue> {
+  const sourceRoot = await realpath(resolve(root));
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "boulder-k0r-source-derivation-"));
+  const destination = join(temporaryRoot, "boulder");
+  const temporaryDirectory = join(temporaryRoot, "tmp");
+  try {
+    await mkdir(destination);
+    await mkdir(temporaryDirectory);
+    const policy = bindK0rRunRoot(await readK0rIsolationPolicy(sourceRoot), temporaryRoot);
+    const materialized = await materializeHeadGitSource(sourceRoot, destination, temporaryDirectory, hostIsolatedEnvironment({
+      home: join(temporaryRoot, "home"),
+      cache: join(temporaryRoot, "cache"),
+      tmp: temporaryDirectory,
+      registry: join(temporaryRoot, "registry"),
+      credentials: join(temporaryRoot, "credentials-empty"),
+      boulder: destination,
+    }), policy, afterRevisionResolved);
+    return materialized.base as unknown as RecordValue;
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
+}
+
+export async function validateK0rSourceBaseForTest(baseValue: unknown, root: string): Promise<void> {
+  const sourceRoot = await realpath(resolve(root));
+  const base = recordValue(baseValue, "isolated source base");
+  exactKeys(base, ["archiveSha256", "commit", "tree"], "isolated source base");
+  if (!digestValue(base["archiveSha256"], "isolated source archive digest") || !gitObjectId(base["commit"]) || !gitObjectId(base["tree"])) throw new Error("Isolated source base is invalid.");
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "boulder-k0r-validate-source-base-"));
+  const destination = join(temporaryRoot, "boulder");
+  const temporaryDirectory = join(temporaryRoot, "tmp");
+  try {
+    await mkdir(destination);
+    await mkdir(temporaryDirectory);
+    const revision = stringValue(base["commit"], "isolated source base commit");
+    const policy = bindK0rSourceRevision(bindK0rRunRoot(await readK0rIsolationPolicy(sourceRoot), temporaryRoot), revision);
+    const environment = hostIsolatedEnvironment({
+      home: join(temporaryRoot, "home"),
+      cache: join(temporaryRoot, "cache"),
+      tmp: temporaryDirectory,
+      registry: join(temporaryRoot, "registry"),
+      credentials: join(temporaryRoot, "credentials-empty"),
+      boulder: destination,
+    });
+    const actual = await materializeGitSource(sourceRoot, destination, temporaryDirectory, environment, policy, revision);
+    if (JSON.stringify(base) !== JSON.stringify(actual)) throw new Error("Isolated source base is stale or forged.");
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 }
 
 async function readOptionalRegularFile(root: string, path: string, label: string): Promise<Uint8Array | undefined> {
@@ -778,11 +881,13 @@ async function validateSourceDerivation(derivation: RecordValue, sourceRoot: str
   };
   try {
     await Promise.all(Object.values(roots).map((path) => mkdir(path, { recursive: true })));
-    const boundPolicy = bindK0rRunRoot(policy, temporaryRoot);
-    const actualBase = await materializeHeadSource(sourceRoot, roots.boulder, roots.tmp, hostIsolatedEnvironment(roots), boundPolicy);
+    const revision = stringValue(base["commit"], "isolated source base commit");
+    const boundPolicy = bindK0rSourceRevision(bindK0rRunRoot(policy, temporaryRoot), revision);
+    const actualBase = await materializeGitSource(sourceRoot, roots.boulder, roots.tmp, hostIsolatedEnvironment(roots), boundPolicy, revision);
     const actualOverlay = await applyApprovedOverlay(sourceRoot, roots.boulder, policy.allowedOverlayPaths);
     const actualGeneratedInventories = await deriveDisposableGeneratedInventories(sourceRoot, roots, isolatedEnvironment(roots), boundPolicy, await bindK0rDependencies(sourceRoot, policy.dependencies));
-    if (JSON.stringify(base) !== JSON.stringify(actualBase) || JSON.stringify(overlay) !== JSON.stringify({ ...actualOverlay, generatedInventories: actualGeneratedInventories })) throw new Error("Isolated source derivation is stale or forged.");
+    const actualCompleteOverlay = { ...actualOverlay, generatedInventories: actualGeneratedInventories };
+    if (JSON.stringify(base) !== JSON.stringify(actualBase) || JSON.stringify(overlay) !== JSON.stringify(actualCompleteOverlay)) throw new Error("Isolated source derivation is stale or forged.");
   } finally {
     await rm(temporaryRoot, { recursive: true, force: true });
   }
@@ -972,6 +1077,27 @@ function bindK0rRunRoot(policy: IsolationPolicy, temporaryRoot: string, qaRoot?:
       .replaceAll(runRootPlaceholder, temporaryRoot)
       .replaceAll("${QA_ROOT}", qaRoot ?? "${QA_ROOT}")))
   };
+}
+function bindK0rSourceRevision(policy: IsolationPolicy, revision: string): IsolationPolicy {
+  if (!gitObjectId(revision)) throw new Error("K0R source revision is invalid.");
+  let replacements = 0;
+  const argvAllowlist = policy.argvAllowlist.map((argv) => {
+    if (JSON.stringify(argv) === JSON.stringify(["git", "rev-parse", "HEAD"])) {
+      replacements += 1;
+      return ["git", "rev-parse", `${revision}^{commit}`];
+    }
+    if (JSON.stringify(argv) === JSON.stringify(["git", "rev-parse", "HEAD^{tree}"])) {
+      replacements += 1;
+      return ["git", "rev-parse", `${revision}^{tree}`];
+    }
+    if (argv.length === 6 && argv[0] === "git" && argv[1] === "archive" && argv[2] === "--format=tar" && argv[3] === "--output" && argv[5] === "HEAD") {
+      replacements += 1;
+      return [...argv.slice(0, 5), revision];
+    }
+    return argv;
+  });
+  if (replacements !== 3) throw new Error("K0R immutable source command policy is invalid.");
+  return { ...policy, argvAllowlist };
 }
 async function bindK0rDependencies(root: string, policy: DependencyPolicy): Promise<ResolvedDependencyBinding> {
   const projectManifest = recordValue(JSON.parse(await readFile(join(root, "package.json"), "utf8")), "K0R project package manifest");
