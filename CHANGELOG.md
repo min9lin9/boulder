@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.1.17
+
+- Published npm metadata linking back to the public repository (`repository`, `homepage`, `bugs`) so the package page reaches its source.
+- Sharpened the README opening with a one-line value proposition and a 90-second start path; rewrote the quickstart routing paragraph so every internal term is defined inline.
+- Added stale-lock recovery to the plan store: cooperative locks older than a configurable TTL are recovered instead of blocking forever, while fresh foreign locks still fail closed.
+- Added a persisted-schema migration scaffold with a typed unsupported-version error (`plan.schema.unsupported`).
+- Published the `boulder-evidence-format` draft spec and JSON schemas under `spec/evidence-format/`.
+- Added `scripts/adoption-ledger.sh` as dev-only tooling (outside the published package) for monthly download observations.
+- Kept the release boundary explicit: zero runtime dependencies, local-first execution, and approval-gated external providers are unchanged.
+
 ## 0.1.16
 
 - Added `boulder routine capture` for repo-local repeated-work metadata.

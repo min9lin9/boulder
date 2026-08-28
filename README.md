@@ -1,11 +1,21 @@
 # boulder
 
-A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
+Turn any OSS repository into a workspace where AI coding agents plan, execute, and verify under your control - with signed evidence you can audit.
 
-Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes.
+Boulder makes an OSS repo agent-ready without giving up maintainer control. It creates repo briefs, operator contracts, workflow boundaries, release checks, replay fixtures, and exportable Codex notes. Nothing executes without your approval.
 
-Current published package: `boulder-oss-cli@0.1.16`.
-Current release candidate: `v0.1.16`.
+**Start in 90 seconds:** `bunx boulder-oss-cli@latest init && bunx boulder-oss-cli@latest quickstart` - `quickstart` verifies your local installation and prints your next commands.
+
+## How Boulder works
+
+1. **Intake** - `init` reads the repository shape and writes the operator contract.
+2. **Plan** - `bootstrap interview` and `profile resolve` map the task onto the right workflow profile.
+3. **Execute** - approved packets run through gated adapters (`v2 execute`, `handoff packet`).
+4. **Verify** - `doctor`, `release-check`, and `replay-check` prove the result before anyone trusts it.
+5. **Record** - signed receipts, run events, and `export` leave an audit trail behind.
+
+Current published package: `boulder-oss-cli@0.1.17`.
+Current release candidate: `v0.1.17`.
 
 ## 3-minute route for non-developers
 
@@ -125,9 +135,9 @@ The designer chooses one of the built-in bootstrap profiles: `programming-heavy`
 For recurring work outside interviews, use the learning loop docs directly:
 
 ```bash
-boulder routine capture --task "weekly release note draft"
+boulder routine capture --task "weekly release note draft" --dry-run
 boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
+boulder skill propose --from-routine <routine-id> --dry-run
 ```
 
 Recommended order:
@@ -155,6 +165,17 @@ gjc setup hermes --root . --smoke
 Live planning delegation through `gjc_delegate_plan` is suggested only after packet review and explicit approval.
 
 See [`docs/BOULDER_CODEX_SKILL_USAGE.ko.md`](docs/BOULDER_CODEX_SKILL_USAGE.ko.md).
+## Explicit boulder-native Preview
+
+`boulder-native-preview` is an opt-in local planning preview; it does not replace `programming-default`. Select it explicitly with `boulder profile use boulder-native-preview`, then use `plan analyze`, `plan show`, and `plan validate` only to inspect local inputs and plan artifacts:
+
+```bash
+boulder plan analyze --task "review the release workflow" --friction focused --json
+boulder plan show --run-id <run-id> --json
+boulder plan validate --input <packet-path> --artifact packet --json
+```
+
+These commands are read-only: they do not install software, contact providers, invoke external agents, mutate product files, or execute a plan. Preview planning approval and execution approval are separate explicit decisions. Any preview event evidence is local-only and remains in `.boulder/`; an external bridge from this preview to Handoff is a follow-up RFC, not a shipped feature. Boulder Handoff v1 remains the existing sanitized packet and review flow.
 
 ## Core Commands
 
@@ -179,9 +200,9 @@ boulder replay-run --dry-run
 boulder release-check
 boulder product-readiness
 boulder service-readiness
-boulder routine capture --task "<text>"
+boulder routine capture --task "<text>" --dry-run
 boulder retro weekly --dry-run
-boulder skill propose --from-routine <routine-id>
+boulder skill propose --from-routine <routine-id> --dry-run
 boulder export
 ```
 

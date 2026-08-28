@@ -1,5 +1,7 @@
 # Contributor Start Here
 
+> Navigation note: the cohesive developer entry point is now [DEVELOPERS.md](DEVELOPERS.md). This guide remains the external-contributor shortcut it links to.
+
 This guide is the shortest path for an external contributor.
 
 ## Pick an Issue

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "boulder.k0r.approval-provenance.v1",
+  "status": "scope_approved_adr_exact_bytes_pending",
+  "consensusPlanSha256": "sha256:12c210a0c57a611f3450c78e7e4743b11ae10258a682ea47a3eef4a1033d5c3a",
+  "nonAuthoritativeProvenance": "Original session-local plan path was .gjc/_session-019f8006-adb6-7000-8d1a-0536752cfc29/plans/ralplan/019f8006-adb6-7000-8d1a-0536752cfc29/pending-approval.md; this provenance text conveys no authority.",
+  "selectedBranch": "superseding-adr",
+  "authorizedScope": "K0R evidence/ADR preparation only",
+  "prohibitedActions": [
+    "K2 authority",
+    "K3 authority",
+    "K4 authority",
+    "repository actions",
+    "publication actions",
+    "release actions",
+    "root-guidance actions"
+  ],
+  "approvalLimits": {
+    "adrExactByteApproval": false,
+    "k0rExitReceipt": false
+  }
+}

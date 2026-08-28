@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'; child-src 'none'; worker-src 'none'; media-src 'none'; manifest-src 'none'; form-action 'none'; base-uri 'none'">
+  <title>Boulder 아키텍처와 사용 흐름</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm;
+    }
+
+    :root {
+      color-scheme: light;
+      --ink: #1d1b16;
+      --muted: #676158;
+      --paper: #fffef8;
+      --canvas: #efeee8;
+      --line: #d8d4c8;
+      --soft: #f7f5eb;
+      --yellow: #fee500;
+      --yellow-soft: #fff7b2;
+      --brown: #3b3025;
+      --green: #216e4e;
+      --red: #a63d2f;
+      --radius: 12px;
+      --shadow: 0 4px 16px rgba(37, 32, 24, 0.06);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--canvas);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font-size: 16px;
+      line-height: 1.7;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    a {
+      color: inherit;
+      text-underline-offset: 0.2em;
+    }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--brown);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      z-index: 10;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #ffffff;
+      transform: translateY(-180%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 12px max(20px, calc((100vw - 1120px) / 2));
+      border-bottom: 1px solid rgba(29, 27, 22, 0.12);
+      background: rgba(255, 254, 248, 0.96);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--yellow);
+      color: var(--brown);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px 14px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+    }
+
+    .guide {
+      width: min(1120px, calc(100% - 32px));
+      margin: 32px auto 72px;
+    }
+
+    .sheet {
+      position: relative;
+      min-height: 720px;
+      margin: 0 0 28px;
+      padding: clamp(28px, 5vw, 64px);
+      scroll-margin-top: 76px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .sheet-number {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: var(--yellow);
+      color: var(--brown);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .eyebrow {
+      margin: 18px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin-top: 0;
+    }
+
+    p,
+    .notice,
+    .receipt {
+      text-wrap: pretty;
+    }
+
+    h1 {
+      max-width: 820px;
+      margin-bottom: 22px;
+      font-size: clamp(42px, 8vw, 80px);
+      line-height: 1.05;
+      letter-spacing: -0.045em;
+    }
+
+    h2 {
+      max-width: 780px;
+      margin: 0 0 18px;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      line-height: 1.4;
+    }
+
+    h4 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .lead {
+      max-width: 780px;
+      color: #3f3a33;
+      font-size: clamp(18px, 2.5vw, 23px);
+      line-height: 1.65;
+    }
+
+    .keep-together {
+      white-space: nowrap;
+    }
+
+    .claim {
+      display: block;
+      margin-top: 14px;
+      color: var(--muted);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-grid,
+    .two-column,
+    .case-grid,
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .hero-grid {
+      align-items: end;
+      min-height: 500px;
+    }
+
+    .hero-side {
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--brown);
+    }
+
+    .hero-side strong {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 24px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+    }
+
+    .card.soft {
+      background: var(--soft);
+    }
+
+    .card.yellow {
+      border-color: #e3ce00;
+      background: var(--yellow-soft);
+    }
+
+    .card.dark {
+      border-color: var(--brown);
+      background: var(--brown);
+      color: #ffffff;
+    }
+
+    .card p:last-child,
+    .card ul:last-child,
+    .card ol:last-child {
+      margin-bottom: 0;
+    }
+
+    .metric {
+      display: block;
+      margin-bottom: 6px;
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .layer-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: layer;
+    }
+
+    .layer-list li {
+      position: relative;
+      padding: 15px 16px 15px 54px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      counter-increment: layer;
+    }
+
+    .layer-list li::before {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--yellow);
+      color: var(--brown);
+      content: counter(layer);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      font-size: 14px;
+    }
+
+    caption {
+      padding-bottom: 12px;
+      color: var(--muted);
+      text-align: left;
+      font-weight: 700;
+    }
+
+    th,
+    td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #4a443c;
+      background: var(--soft);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    code,
+    pre,
+    .token {
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    code {
+      padding: 0.12em 0.38em;
+      border-radius: 5px;
+      background: #efeee8;
+      color: #342d25;
+      font-size: 0.88em;
+      white-space: nowrap;
+    }
+
+    .path-token {
+      font-size: 0.78em;
+      overflow-wrap: normal;
+      white-space: normal;
+    }
+
+    .path-segment {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    #lifecycle th:first-child,
+    #lifecycle td:first-child {
+      width: 4.5rem;
+      white-space: nowrap;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      padding: 18px;
+      overflow-x: auto;
+      border: 1px solid #2e2923;
+      border-radius: 12px;
+      background: #211e1a;
+      color: #f8f4e9;
+      font-size: 12px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 24px 0;
+    }
+
+    .flow li {
+      display: grid;
+      min-height: 76px;
+      place-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .flow li:nth-child(2) {
+      background: var(--yellow-soft);
+    }
+
+    .notice {
+      margin: 22px 0;
+      padding: 18px 20px;
+      border-left: 5px solid var(--yellow);
+      border-radius: 0 12px 12px 0;
+      background: var(--soft);
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e9f5ef;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .status.blocked {
+      background: #fcece8;
+      color: var(--red);
+    }
+
+    .status.preview {
+      background: var(--yellow-soft);
+      color: var(--brown);
+    }
+
+    .status.gated {
+      background: var(--yellow);
+      color: var(--brown);
+    }
+
+    .status.future {
+      background: var(--soft);
+      color: var(--muted);
+    }
+
+    .status-legend {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .status-legend .card p {
+      margin: 10px 0 0;
+      font-size: 14px;
+    }
+
+    .case-card {
+      display: flex;
+      min-width: 0;
+      min-height: 300px;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+    }
+
+    .case-card .case-index {
+      color: var(--muted);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .case-card ul {
+      padding-left: 20px;
+    }
+
+    .receipt {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    details {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+    }
+
+    summary {
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    details > div {
+      padding: 0 16px 16px;
+    }
+
+    .ref-panel {
+      padding: clamp(24px, 5vw, 46px);
+      border: 2px solid var(--brown);
+      border-radius: var(--radius);
+      background: var(--yellow);
+      color: var(--brown);
+    }
+
+    .ref-title {
+      margin-bottom: 18px;
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .token-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .token-list li {
+      padding: 12px 14px;
+      border: 1px solid rgba(59, 48, 37, 0.3);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.52);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      position: relative;
+      min-height: 46px;
+      padding: 10px 12px 10px 56px;
+      counter-increment: step;
+    }
+
+    .steps li::before {
+      position: absolute;
+      left: 0;
+      top: 6px;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--paper);
+      content: counter(step);
+      font-family: "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .source-footer {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 24px;
+      align-items: end;
+      margin-top: 42px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+
+    .source-link {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--yellow);
+      color: var(--brown);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .print-only {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .site-nav {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav-links {
+        justify-content: flex-start;
+      }
+
+      .guide {
+        width: min(100% - 20px, 760px);
+        margin-top: 12px;
+      }
+
+      .sheet {
+        min-height: auto;
+        padding: 26px 20px;
+        scroll-margin-top: 0;
+        border-radius: var(--radius);
+      }
+
+      .hero-grid,
+      .two-column,
+      .case-grid,
+      .trust-grid,
+      .architecture,
+      .status-legend,
+      .source-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow li {
+        min-height: 54px;
+      }
+
+      .token-list {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th,
+      td {
+        padding: 10px 8px;
+      }
+
+      #lifecycle thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      #lifecycle tbody,
+      #lifecycle tr,
+      #lifecycle td {
+        display: block;
+        width: auto;
+      }
+
+      #lifecycle tr {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      #lifecycle td {
+        padding: 3px 0;
+        border: 0;
+      }
+
+      #lifecycle td:first-child {
+        width: auto;
+      }
+
+      #lifecycle td:last-child {
+        color: var(--muted);
+      }
+
+      .case-card li code {
+        overflow-wrap: normal;
+        white-space: nowrap;
+      }
+
+      .case-card li code.path-token {
+        white-space: normal;
+      }
+
+      .case-card li > .keep-together {
+        font-size: 0.82em;
+      }
+
+      .case-card li > .keep-together code {
+        overflow-wrap: normal;
+        white-space: nowrap;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        background: #ffffff;
+      }
+
+      body {
+        font-size: 9pt;
+        line-height: 1.45;
+      }
+
+      .site-nav,
+      .skip-link {
+        display: none;
+      }
+
+      .guide {
+        width: auto;
+        margin: 0;
+      }
+
+      .hero-grid,
+      .two-column,
+      .case-grid,
+      .trust-grid,
+      .token-list,
+      .status-legend {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .architecture {
+        grid-template-columns: 0.8fr 1.2fr;
+      }
+
+      .flow {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .source-footer {
+        grid-template-columns: 1.3fr 0.7fr;
+      }
+
+      .hero-grid {
+        min-height: 0;
+      }
+
+      .sheet {
+        min-height: 0;
+        margin: 0;
+        padding: 5mm;
+        overflow: visible;
+        break-after: page;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .sheet:last-child {
+        break-after: auto;
+      }
+
+      h1 {
+        margin-bottom: 4mm;
+        font-size: 28pt;
+      }
+
+      h2 {
+        margin-bottom: 3mm;
+        font-size: 22pt;
+      }
+
+      h3 {
+        font-size: 12pt;
+      }
+
+      .eyebrow {
+        margin: 3mm 0 2mm;
+      }
+
+      .card,
+      .case-card,
+      details,
+      pre,
+      table,
+      .ref-panel {
+        break-inside: avoid;
+      }
+
+      details > div {
+        display: block;
+      }
+
+      .print-only {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+  <nav class="site-nav" aria-label="문서 바로가기">
+    <a class="brand" href="#cover">
+      <span class="brand-mark">B</span>
+      <span>Boulder Guide</span>
+    </a>
+    <div class="nav-links">
+      <a href="#architecture">아키텍처</a>
+      <a href="#lifecycle">Lifecycle</a>
+      <a href="#trust">Trust</a>
+      <a href="#cases">Cases</a>
+      <a href="#procedure">Procedure</a>
+      <a href="#sources">근거</a>
+    </div>
+  </nav>
+
+  <main class="guide" id="main">
+    <section class="sheet" id="cover" data-concept-id="guide-cover">
+      <div class="hero-grid">
+        <div>
+          <span class="sheet-number">01 / 08</span>
+          <p class="eyebrow">Local review-first operator guide</p>
+          <h1>Boulder 아키텍처와 <span class="keep-together">사용 흐름</span></h1>
+          <p class="lead">OSS 저장소를 evidence-backed <span class="keep-together">Codex workflow</span>로 정리할 때, command의 사용 시점과 <span class="keep-together">maintainer approval</span> 경계를 설명한다.</p>
+          <small class="claim">CLM-ARCH-001</small>
+        </div>
+        <aside class="hero-side">
+          <strong>문서가 하지 않는 일</strong>
+          <p>새 command, provider call, <span class="keep-together">execution authority</span>, <span class="keep-together">release status</span>를 추가하지 않는다. 현재 source와 local receipt가 확인한 범위만 안내한다.</p>
+          <small class="claim">CLM-TOBE-001</small>
+        </aside>
+      </div>
+      <div class="two-column">
+        <article class="card">
+          <span class="metric">review-first</span>
+          <p>Recommendation, dry-run, <span class="keep-together">persisted write</span>, external approval을 서로 다른 상태로 취급한다.</p>
+        </article>
+        <article class="card">
+          <span class="metric">local evidence</span>
+          <p>Command output과 filesystem delta를 private receipt로 관찰하고 <span class="keep-together">source hash</span>에 연결한다.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="sheet" id="architecture" data-concept-id="architecture">
+      <span class="sheet-number">02 / 08</span>
+      <p class="eyebrow">Architecture</p>
+      <h2>얇은 Router, 명확한 <span class="keep-together">authority boundary</span></h2>
+      <p class="lead">중앙 CLI는 option을 해석해 <span class="keep-together">domain router</span>로 전달한다. Planning, handoff, readiness, evidence는 <span class="keep-together">각 module</span>이 소유한다.</p>
+      <small class="claim">CLM-ARCH-001</small>
+
+      <div class="architecture">
+        <ol class="layer-list">
+          <li><strong>CLI router</strong><br><small>Global option과 command family dispatch</small></li>
+          <li><strong>Profile resolution</strong><br><small>Planning과 execution preference 선택</small></li>
+          <li><strong>Domain command</strong><br><small>Plan, handoff, readiness, evidence logic</small></li>
+          <li><strong>Filesystem boundary</strong><br><small>Repo-contained generated write 검사</small></li>
+          <li><strong>Receipt</strong><br><small>Exit, output, mode, filesystem delta 기록</small></li>
+        </ol>
+        <div>
+          <article class="card yellow">
+            <h3>Profile precedence</h3>
+            <ol>
+              <li>Explicit CLI profile</li>
+              <li><code>.boulder/current-profile</code></li>
+              <li>Legacy manifest executor 설정</li>
+              <li><code>programming-default</code></li>
+            </ol>
+            <small class="claim">CLM-PROFILE-001</small>
+          </article>
+          <article class="card soft">
+            <h3>Write safety</h3>
+            <p>Generated path는 <span class="keep-together">repository containment</span>를 통과하고 traversal, symlink, hardlink target을 거부한다. Command별 승인 조건이 write 가능 여부를 결정한다.</p>
+            <small class="claim">CLM-FS-001</small>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sheet" id="lifecycle" data-concept-id="lifecycle">
+      <span class="sheet-number">03 / 08</span>
+      <p class="eyebrow">Conceptual lifecycle</p>
+      <h2>다섯 개념을 <span class="keep-together">command family</span>에 매핑</h2>
+      <ol class="flow" aria-label="Boulder lifecycle">
+        <li>intake</li>
+        <li>plan</li>
+        <li>execute</li>
+        <li>verify</li>
+        <li>record</li>
+      </ol>
+      <div class="notice">
+        <strong>왼쪽은 개념, 아래는 실제 command다.</strong>
+        <span>다섯 단어가 모두 동일한 top-level command라는 뜻이 아니다. 특히 <span class="keep-together">일반 top-level</span> intake와 execute를 <span class="keep-together">가정하지 않는다.</span></span>
+      </div>
+      <small class="claim">CLM-LIFE-001</small>
+
+      <table>
+        <caption>Lifecycle-to-command mapping</caption>
+        <thead>
+          <tr>
+            <th scope="col">개념</th>
+            <th scope="col">현재 command family</th>
+            <th scope="col">관찰 목적</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>intake</strong></td>
+            <td><section data-lifecycle-stage="intake"><code data-command-family="inspect">inspect</code>, <code data-command-family="onboard">onboard</code>, <code data-command-family="bootstrap interview">bootstrap interview</code></section></td>
+            <td><span class="status">local read/discovery</span></td>
+          </tr>
+          <tr>
+            <td><strong>plan</strong></td>
+            <td><section data-lifecycle-stage="plan"><code data-command-family="plan analyze">plan analyze</code>, <code data-command-family="plan show">plan show</code>, <code data-command-family="plan validate">plan validate</code></section></td>
+            <td><span class="status">read-only preview/validation</span></td>
+          </tr>
+          <tr>
+            <td><strong>execute</strong></td>
+            <td><section data-lifecycle-stage="execute"><code data-command-family="handoff packet">handoff packet</code>, <code data-command-family="handoff review">handoff review</code>, <code data-command-family="handoff send">handoff send</code>, <code data-command-family="v2 execute">v2 execute</code></section></td>
+            <td><span class="status blocked">handoff send is approval-gated; v2 execute is explicitly v2-gated and is never the default</span></td>
+          </tr>
+          <tr>
+            <td><strong>verify</strong></td>
+            <td><section data-lifecycle-stage="verify"><code data-command-family="verify">verify</code>, <code data-command-family="doctor">doctor</code>, <code data-command-family="release-check">release-check</code>, <code data-command-family="product-readiness">product-readiness</code>, <code data-command-family="service-readiness">service-readiness</code>, <code data-command-family="replay-check">replay-check</code></section></td>
+            <td><span class="status">local verification/evidence gate</span></td>
+          </tr>
+          <tr>
+            <td><strong>record</strong></td>
+            <td><section data-lifecycle-stage="record"><code data-command-family="record field-readiness">record field-readiness</code></section></td>
+            <td><span class="status">explicit repo-local evidence write</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="sheet" id="trust" data-concept-id="trust-boundary">
+      <span class="sheet-number">04 / 08</span>
+      <p class="eyebrow">Trust boundaries</p>
+      <h2>읽기·기록과 <span class="keep-together">external authority</span></h2>
+      <div class="trust-grid">
+        <article class="card">
+          <h3>Planning preview</h3>
+          <p><code>boulder-native-preview</code>는 <span class="keep-together">opt-in이다</span>. <code>plan analyze</code>, <code>plan show</code>, <code>plan validate</code>는 <span class="keep-together">read-only planning surface</span>이며 default를 대체하지 않는다.</p>
+          <span class="status">local read-only</span>
+          <small class="claim">CLM-PREVIEW-001</small>
+        </article>
+        <article class="card">
+          <h3>Handoff</h3>
+          <p>Packet 생성, review, send approval은 별도 단계다. Approved <code>--dry-run</code>은 candidate command를 보여 주지만 adapter를 실행하지 않는다.</p>
+          <span class="status blocked">approval-gated</span>
+          <small class="claim">CLM-HANDOFF-001</small>
+        </article>
+      </div>
+
+      <div class="two-column">
+        <article class="card soft">
+          <h3>AS-IS</h3>
+          <p>현재 surface는 CLI help와 output, Markdown, JSON report, readiness/evidence artifact다. <span class="keep-together">이 guide</span> 이전 contract는 guide file 부재 하나로 RED였다.</p>
+          <small class="claim">CLM-ASIS-001</small>
+        </article>
+        <article class="card yellow">
+          <h3>TO-BE</h3>
+          <p><span class="keep-together">이 single-file guide는</span> <span class="keep-together">current behavior</span>와 evidence를 담은 <span class="keep-together">packaged documentation이다</span>. <span class="keep-together">실행 상태나</span> authority를 승격하지 않는다.</p>
+          <small class="claim">CLM-TOBE-001</small>
+        </article>
+      </div>
+
+      <h3>Current · Preview · Gated · Future</h3>
+      <div class="status-legend">
+        <article class="card">
+          <span class="status">Current</span>
+          <p>현재 source와 <code>boulder --help</code>가 확인하는 shipped surface다. 이 문서의 command family와 case가 여기 속한다.</p>
+        </article>
+        <article class="card">
+          <span class="status preview">Preview</span>
+          <p><code>boulder-native-preview</code>처럼 명시적 opt-in이 필요한 local surface다. 선택 전까지 default를 대체하지 않는다.</p>
+        </article>
+        <article class="card">
+          <span class="status gated">Gated</span>
+          <p><code>handoff send</code>, <code>v2 execute</code>, REF-E-SOP-02처럼 approval 또는 별도 gate evidence가 먼저 필요한 항목이다.</p>
+        </article>
+        <article class="card">
+          <span class="status future">Future</span>
+          <p><code>ROADMAP.md</code>에만 존재하는 항목이다. 현재 behavior나 evidence로 설명하지 않는다.</p>
+        </article>
+      </div>
+      <small class="claim">CLM-TOBE-001</small>
+
+      <details>
+        <summary>Handoff command 순서 보기</summary>
+        <div>
+          <pre>handoff packet --adapter gajae-code --include src/cli.ts --json
+handoff review --packet .boulder/handoffs/gajae-code.json
+handoff send --adapter gajae-code --approve-external --approval-code [review에서 확인] --dry-run</pre>
+        </div>
+      </details>
+    </section>
+
+    <section class="sheet" id="cases" data-concept-id="cases-intake-plan">
+      <span class="sheet-number">05 / 08</span>
+      <p class="eyebrow">Observed cases 1-2</p>
+      <h2>첫 접촉과 <span class="keep-together">opt-in planning preview</span></h2>
+      <div class="case-grid">
+        <article class="case-card" data-recipe-id="case-1">
+          <div>
+            <span class="case-index">CASE 01</span>
+            <h3>첫 접촉</h3>
+            <ul>
+              <li><span class="keep-together"><code>quickstart --json</code>: exit 0, <code>needs-init</code></span></li>
+              <li><span class="keep-together"><code>doctor --json</code>: exit 1, <code>fail</code></span></li>
+              <li><span class="keep-together">단일 issue: <code>capability-inventory-missing</code></span></li>
+              <li>두 step 모두 product filesystem delta 없음</li>
+            </ul>
+          </div>
+          <div class="receipt">
+            <strong>2 steps, isolated fixture</strong><br>
+            Recommendation, inventory, <span class="keep-together">verified availability를 구분한다.</span>
+            <small class="claim">CLM-CASE-001</small>
+          </div>
+        </article>
+
+        <article class="case-card" data-recipe-id="case-2">
+          <div>
+            <span class="case-index">CASE 02</span>
+            <h3>Planning preview</h3>
+            <ul>
+              <li><code>profile use</code> <code>boulder-native-preview</code> <code>--json</code>: exit 0</li>
+              <li><span class="keep-together">Write: <code>.boulder/current-profile</code></span> 하나 (mode <code>0664</code>)</li>
+              <li><code>plan analyze</code> <code>--task</code> <code class="path-token">"review the release workflow"</code> <code>--friction</code> <code>focused</code> <code>--json</code>: exit 0, <code>ready</code></li>
+              <li>Run id <code>analysis</code>, artifacts·nextActions는 빈 배열, step-local write 없음</li>
+            </ul>
+          </div>
+          <div class="receipt">
+            <strong>2 steps, local analysis</strong><br>
+            Provider <span class="keep-together">execution receipt</span>가 아니다.
+            <small class="claim">CLM-CASE-002</small>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sheet" id="evidence-cases" data-concept-id="cases-handoff-record">
+      <span class="sheet-number">06 / 08</span>
+      <p class="eyebrow">Observed cases 3-4</p>
+      <h2><span class="keep-together">Handoff 승인과</span> <span class="keep-together">field evidence</span></h2>
+      <div class="case-grid">
+        <article class="case-card" data-recipe-id="case-3">
+          <div>
+            <span class="case-index">CASE 03</span>
+            <h3>Handoff</h3>
+            <ul>
+              <li>Packet·review·approved dry-run: <span class="keep-together">각각 exit 0</span></li>
+              <li>Writes: <code class="path-token"><span class="path-segment">.boulder/</span><span class="path-segment">handoffs/</span><span class="path-segment">gajae-code.json</span></code>, <code class="path-token"><span class="path-segment">.boulder/</span><span class="path-segment">handoffs/</span><span class="path-segment">gajae-code.json.reviewed</span></code>, <code class="path-token"><span class="path-segment">.boulder/</span><span class="path-segment">review-secret</span></code> — <span class="keep-together">mode <code>0600</code></span></li>
+              <li>Approved <code>--dry-run</code>은 candidate command만 보여 주고 <span class="keep-together">adapter를 실행하지 않는다</span></li>
+              <li><span class="keep-together">No approval: exit 1, <code>external.handoff.blocked</code></span></li>
+              <li><span class="keep-together">Wrong code: exit 1, <code>handoff.review_required</code></span></li>
+              <li>두 차단 모두 추가 product delta 없음</li>
+            </ul>
+          </div>
+          <div class="receipt">
+            <strong>5 steps, raw secret excluded</strong><br>
+            Receipt에는 approval code digest만 남는다.
+            <small class="claim">CLM-CASE-003</small>
+          </div>
+        </article>
+
+        <article class="case-card" data-recipe-id="case-4">
+          <div>
+            <span class="case-index">CASE 04</span>
+            <h3>Verification과 기록</h3>
+            <ul>
+              <li><code>verify --dry-run</code>: exit 0, Markdown report 출력과 <span class="keep-together"><code class="path-token"><span class="path-segment">docs/</span><span class="path-segment">VERIFICATION_REPORT.md</span></code> 기록</span></li>
+              <li><code>record field-readiness</code> <code>--run-id</code> <code>guide-case-4</code> <code>--evidence</code> <code class="path-token"><span class="path-segment">evidence/</span><span class="path-segment">field-readiness/</span><span class="path-segment">guide-case-4</span></code>: exit 0, 7 checks pass, <code>manifest.json</code> 기록</li>
+              <li><span class="keep-together">Wrong path <code>../outside</code>: exit 1,</span> 단일 <code>evidence-path</code> check fail</li>
+              <li>기존 positive manifest는 byte-identical하게 유지, 추가 write 없음</li>
+            </ul>
+          </div>
+          <div class="receipt">
+            <strong>3 steps, evidence path bounded</strong><br>
+            Wrong path는 추가 product write를 만들지 않는다.
+            <small class="claim">CLM-CASE-004</small>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="sheet" id="procedure" data-concept-id="static-procedure">
+      <span class="sheet-number">07 / 08</span>
+      <p class="eyebrow">Static procedure boundary</p>
+      <div class="ref-panel">
+        <h2 class="ref-title">REF-E-SOP-02</h2>
+        <p>정적 topology와 <span class="keep-together">human occurrence identifier</span>를 검증하기 위한 <span class="keep-together">정적 Procedure candidate일 뿐이다</span>. <code>executionPerformed:false</code> — human loop가 실행됐거나 <span class="keep-together">execution receipt</span>가 발행됐다는 <span class="keep-together">뜻이 아니다.</span> <span class="keep-together">K1 execution path에 연결되지 않았고</span> <span class="keep-together">K2, K3, K4 authority를 부여하지 않는다.</span></p>
+        <ul class="token-list">
+          <li>static-candidate</li>
+          <li>executionPerformed:false</li>
+          <li>k1-execution-wiring:false</li>
+          <li>k2-k4-authority:false</li>
+        </ul>
+        <small class="claim">CLM-REF-001</small>
+      </div>
+
+      <h3>운영 순서</h3>
+      <ol class="steps">
+        <li><code>quickstart</code>, <code>inspect</code>, <code>doctor</code>로 현재 상태를 확인한다.</li>
+        <li><code>profile resolve</code>로 routing precedence를 확인한다.</li>
+        <li>필요할 때만 <code>profile use</code>: <code>boulder-native-preview</code>.</li>
+        <li><span class="keep-together">Local artifact 읽기:</span> <code>plan analyze</code>, <code>plan show</code>, <code>plan validate</code>.</li>
+        <li>External handoff는 packet, review, send를 분리한다.</li>
+        <li><code>verify</code>와 readiness command로 결과를 검사한다.</li>
+        <li><code>record field-readiness</code>로 evidence를 기록한다.</li>
+      </ol>
+    </section>
+
+    <section class="sheet" id="sources" data-concept-id="limitations-and-sources">
+      <span class="sheet-number">08 / 08</span>
+      <p class="eyebrow">Limitations and sources</p>
+      <h2>Receipt가 증명하는 범위만 말한다</h2>
+      <div class="two-column">
+        <article class="card">
+          <h3>확인한 것</h3>
+          <ul>
+            <li>현재 source와 live help의 command surface</li>
+            <li>격리 fixture의 exit, output, mode, filesystem delta</li>
+            <li>Protected input과 <span class="keep-together">tracked overlay</span>의 <span class="keep-together">hash binding</span></li>
+            <li>Approval-gated dry-run과 <span class="keep-together">pinned negative errors</span></li>
+          </ul>
+        </article>
+        <article class="card soft">
+          <h3>확인하지 않은 것</h3>
+          <ul>
+            <li>Remote provider delivery와 production telemetry</li>
+            <li>Release 또는 <span class="keep-together">readiness status promotion</span></li>
+            <li>모든 operating system의 <span class="keep-together">동일 behavior</span></li>
+            <li>Human loop execution 또는 <span class="keep-together">K2-K4 authority</span></li>
+          </ul>
+        </article>
+      </div>
+      <small class="claim">CLM-LIMIT-001</small>
+
+      <div class="notice">
+        <strong>Claim marker 사용법</strong>
+        <span>각 marker는 private claim ledger의 source path, SHA-256, locator와 연결된다. Profile recommendation과 availability, dry-run과 <span class="keep-together">persisted write</span>, review와 external approval을 구분한다.</span>
+      </div>
+
+      <div class="source-footer">
+        <div>
+          <h3>Source policy</h3>
+          <p>Standalone file은 remote font, image, script를 요청하지 않는다. Repository citation은 허용된 source link 하나로 수렴한다.</p>
+          <small class="claim">CLM-ARCH-001</small>
+        </div>
+        <a class="source-link" href="https://github.com/min9lin9/boulder">Boulder 저장소 근거</a>
+      </div>
+      <p class="print-only">이 문서는 A4 portrait 8-page print layout을 포함한다.</p>
+    </section>
+  </main>
+</body>
+</html>

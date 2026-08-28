@@ -61,12 +61,12 @@ describe("benchmark and release reports", () => {
     expect(markdown).toContain("npm publish is not automated");
   });
 
-  test("reports root release evidence as ready after 0.1.16 is published and tagged", async () => {
+  test("reports root release evidence as ready after 0.1.17 is published and tagged", async () => {
     const root = join(import.meta.dir, "..");
     const report = await evaluateReleaseCheck(root);
     const markdown = releaseCheckToMarkdown(report);
 
-    expect(report.version).toBe("0.1.16");
+    expect(report.version).toBe("0.1.17");
     expect(report.status).toBe("ready");
     expect(report.checks.every((item) => item.status === "pass")).toBe(true);
     expect(report.checks.some((item) => item.id === "published-version-evidence")).toBe(true);
@@ -292,10 +292,10 @@ describe("quickstart and replay reports", () => {
     expect(markdown).toContain("# Boulder Quickstart");
     expect(markdown).toContain("plan=gajae-code");
     expect(markdown).toContain("execute=lazycodex");
-    expect(markdown).toContain("GJC and LazyCodex are adapter preferences");
-    expect(markdown).toContain("Bootstrap task-category profiles");
-    expect(markdown).toContain("agency-agents is a profile-scoped subagent catalog");
-    expect(markdown).toContain("doctor verifies local installation before live execution");
+    expect(markdown).toContain("GJC is the planning adapter and LazyCodex is the execution adapter");
+    expect(markdown).toContain("bootstrap task-category profiles");
+    expect(markdown).toContain("agency-agents as their catalog of helper subagents");
+    expect(markdown).toContain("The doctor command verifies your installation before anything runs");
   });
 
   test("checks public replay fixtures and official docs references", async () => {

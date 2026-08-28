@@ -36,16 +36,18 @@ describe("package inventory contract", () => {
     const inventory = parseInventory(await readFile(fixturePath, "utf8"));
     const result = await runCommand("bun pm pack --dry-run --ignore-scripts", root);
     const output = `${result.stdout}\n${result.stderr}`;
-    const summary = assertClassified(parsePackDryRun(output), inventory);
+    const packed = parsePackDryRun(output);
+    const summary = assertClassified(packed, inventory);
 
     expect(result.exitCode).toBe(0);
-    expect(summary.totalUniqueFiles).toBe(209);
-    expect(summary.totalPackedFiles).toBe(210);
+    expect(packed.files.filter((path) => path === "docs/boulder-guide.ko.html")).toHaveLength(1);
+    expect(summary.totalUniqueFiles).toBe(269);
+    expect(summary.totalPackedFiles).toBe(270);
     expect(summary.counts).toEqual({
-      runtime: 84,
-      "public-doc": 64,
+      runtime: 119,
+      "public-doc": 68,
       "case-study-evidence": 21,
-      fixture: 29,
+      fixture: 50,
       skill: 8,
       config: 1,
       license: 1,

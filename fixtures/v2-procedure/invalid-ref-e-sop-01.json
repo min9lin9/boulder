@@ -1,0 +1,121 @@
+[
+  {
+    "id": "unknown-field",
+    "expectedIssue": "v2.procedure.field_unknown",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "unknown-field",
+      "revision": 1,
+      "entryNodeId": "start",
+      "nodes": [{ "id": "start", "kind": "agent-task" }],
+      "edges": [],
+      "unexpected": true
+    }
+  },
+  {
+    "id": "runtime-literal",
+    "expectedIssue": "v2.procedure.runtime_literal_forbidden",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "runtime-literal",
+      "revision": 1,
+      "entryNodeId": "start",
+      "nodes": [{ "id": "start", "kind": "agent-task", "provider": "codex" }],
+      "edges": []
+    }
+  },
+  {
+    "id": "unresolved-reference",
+    "expectedIssue": "v2.procedure.reference_unknown",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "unresolved-reference",
+      "revision": 1,
+      "entryNodeId": "start",
+      "nodes": [{ "id": "start", "kind": "agent-task" }],
+      "edges": [{ "id": "missing-edge", "from": "start", "to": "missing" }]
+    }
+  },
+  {
+    "id": "duplicate-occurrence",
+    "expectedIssue": "v2.procedure.node_duplicate",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "duplicate-occurrence",
+      "revision": 1,
+      "entryNodeId": "same",
+      "nodes": [
+        { "id": "same", "kind": "agent-task" },
+        { "id": "same", "kind": "human-task" }
+      ],
+      "edges": []
+    }
+  },
+  {
+    "id": "implicit-cycle",
+    "expectedIssue": "v2.procedure.cycle_implicit",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "implicit-cycle",
+      "revision": 1,
+      "entryNodeId": "first",
+      "nodes": [
+        { "id": "first", "kind": "agent-task" },
+        { "id": "second", "kind": "deterministic-task" }
+      ],
+      "edges": [
+        { "id": "first-second", "from": "first", "to": "second" },
+        { "id": "second-first", "from": "second", "to": "first" }
+      ]
+    }
+  },
+  {
+    "id": "loop-bound-missing",
+    "expectedIssue": "v2.procedure.loop_bound_invalid",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "loop-bound-missing",
+      "revision": 1,
+      "entryNodeId": "loop",
+      "nodes": [{ "id": "loop", "kind": "bounded-loop" }],
+      "edges": []
+    }
+  },
+  {
+    "id": "loop-bound-invalid",
+    "expectedIssue": "v2.procedure.loop_bound_invalid",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "loop-bound-invalid",
+      "revision": 1,
+      "entryNodeId": "loop",
+      "nodes": [{ "id": "loop", "kind": "bounded-loop", "maxIterations": 0 }],
+      "edges": []
+    }
+  },
+  {
+    "id": "authority-action-mismatch",
+    "expectedIssue": "v2.procedure.authority_invalid",
+    "procedure": {
+      "schemaVersion": "boulder.v2.procedure.v1",
+      "procedureId": "authority-action-mismatch",
+      "revision": 1,
+      "entryNodeId": "loop",
+      "nodes": [
+        { "id": "loop", "kind": "bounded-loop", "maxIterations": 2 },
+        { "id": "human", "kind": "human-task" }
+      ],
+      "edges": [
+        {
+          "id": "loop-human",
+          "from": "loop",
+          "to": "human",
+          "authority": {
+            "action": "continue",
+            "policyDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          }
+        }
+      ]
+    }
+  }
+]

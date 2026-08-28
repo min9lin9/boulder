@@ -22,7 +22,7 @@ const PLAN_TARGETS = [
   "docs/PRODUCT_READINESS.md"
 ] as const;
 
-const READY_RELEASE_BUNDLE = {
+const PROSPECTIVE_RELEASE_BUNDLE = {
   ...releaseManifest,
   schemaVersion: 1,
   packageJsonVersion: packageJson.version,
@@ -40,24 +40,32 @@ const READY_RELEASE_BUNDLE = {
   }
 } satisfies ReleaseEvidenceBundleV1;
 
-const READY_RELEASE_EXPECTATION = {
+const PROSPECTIVE_RELEASE_EXPECTATION = {
   packageJsonVersion: packageJson.version,
   cliVersion: packageJson.version,
   tag: `v${packageJson.version}`,
-  releaseCommit: READY_RELEASE_BUNDLE.releaseCommit,
-  packDryRunFileCount: READY_RELEASE_BUNDLE.packDryRun.fileCount
+  releaseCommit: releaseManifest.releaseCommit,
+  packDryRunFileCount: packageInventory.totalPackedFiles
+} satisfies ReleaseEvidenceExpectation;
+
+const CHECKED_RELEASE_EXPECTATION = {
+  packageJsonVersion: "0.1.17",
+  cliVersion: "0.1.17",
+  tag: "v0.1.17",
+  releaseCommit: "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
+  packDryRunFileCount: 268
 } satisfies ReleaseEvidenceExpectation;
 
 describe("ReleaseEvidenceBundleV1", () => {
-  test("validates and renders a ready v0.1.16 bundle for the release evidence targets", () => {
-    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
+  test("validates and renders a ready prospective release bundle for the release evidence targets", () => {
+    const parsed = parseReleaseEvidenceBundle(PROSPECTIVE_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
-      return;
+      throw new Error(`Prospective release bundle failed to parse: ${parsed.issues.map((issue) => issue.message).join("; ")}`);
     }
 
-    const validation = checkReleaseEvidenceBundle(parsed, READY_RELEASE_EXPECTATION);
+    const validation = checkReleaseEvidenceBundle(parsed, PROSPECTIVE_RELEASE_EXPECTATION);
     const rendered = renderReleaseEvidenceBundle(parsed.value);
 
     expect(validation.status).toBe("pass");
@@ -69,31 +77,31 @@ describe("ReleaseEvidenceBundleV1", () => {
     }
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json"]).toContain(`"packageJsonVersion": "${packageJson.version}"`);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/github-actions.txt"]).toContain(releaseManifest.githubActions.runUrl);
-    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(READY_RELEASE_BUNDLE.installSmoke.command);
+    expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt"]).toContain(PROSPECTIVE_RELEASE_BUNDLE.installSmoke.command);
     expect(rendered["docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt"]).toContain(`Total files: ${packageInventory.totalPackedFiles}`);
     expect(rendered["docs/PRODUCT_READINESS.md"]).toBe(`- public-release-check: pass - release-check ready for ${packageJson.version}\n`);
   });
 
-  test("reports current checked release evidence as ready", () => {
-    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), READY_RELEASE_EXPECTATION);
+  test("reports checked historical release evidence as ready", () => {
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(releaseManifest), CHECKED_RELEASE_EXPECTATION);
 
     expect(validation.status).toBe("pass");
     expect(validation.issues).toEqual([]);
   });
 
   test("rejects malformed input with a stable recovery code", () => {
-    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle({ schemaVersion: 1 }), READY_RELEASE_EXPECTATION);
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle({ schemaVersion: 1 }), PROSPECTIVE_RELEASE_EXPECTATION);
 
     expect(validation.status).toBe("fail");
     expect(validation.issues.map((issue) => issue.code)).toEqual([RELEASE_RECOVERY_CODES.malformedInput]);
   });
 
   test("mismatch rejects package, CLI, tag, and pack versions with stable recovery codes", () => {
-    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
+    const parsed = parseReleaseEvidenceBundle(PROSPECTIVE_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
-      return;
+      throw new Error(`Prospective release bundle failed to parse: ${parsed.issues.map((issue) => issue.message).join("; ")}`);
     }
 
     const mismatched = {
@@ -108,7 +116,10 @@ describe("ReleaseEvidenceBundleV1", () => {
       }
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), PROSPECTIVE_RELEASE_EXPECTATION);
+    const codes = validation.issues.map((issue) => issue.code);
+
+    expect(validation.status).toBe("fail");
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.packageJsonVersionMismatch);
     expect(codes).toContain(RELEASE_RECOVERY_CODES.versionMismatch);
@@ -117,11 +128,11 @@ describe("ReleaseEvidenceBundleV1", () => {
   });
 
   test("mismatch rejects CI release commit drift with a stable recovery code", () => {
-    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
+    const parsed = parseReleaseEvidenceBundle(PROSPECTIVE_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
-      return;
+      throw new Error(`Prospective release bundle failed to parse: ${parsed.issues.map((issue) => issue.message).join("; ")}`);
     }
 
     const mismatched = {
@@ -129,17 +140,20 @@ describe("ReleaseEvidenceBundleV1", () => {
       releaseCommit: "0000000000000000000000000000000000000000"
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), PROSPECTIVE_RELEASE_EXPECTATION);
+    const codes = validation.issues.map((issue) => issue.code);
+
+    expect(validation.status).toBe("fail");
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.releaseCommitMismatch);
   });
 
   test("mismatch rejects pack dry-run file count drift with a stable recovery code", () => {
-    const parsed = parseReleaseEvidenceBundle(READY_RELEASE_BUNDLE);
+    const parsed = parseReleaseEvidenceBundle(PROSPECTIVE_RELEASE_BUNDLE);
 
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) {
-      return;
+      throw new Error(`Prospective release bundle failed to parse: ${parsed.issues.map((issue) => issue.message).join("; ")}`);
     }
 
     const mismatched = {
@@ -150,7 +164,10 @@ describe("ReleaseEvidenceBundleV1", () => {
       }
     };
 
-    const codes = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), READY_RELEASE_EXPECTATION).issues.map((issue) => issue.code);
+    const validation = checkReleaseEvidenceBundle(parseReleaseEvidenceBundle(mismatched), PROSPECTIVE_RELEASE_EXPECTATION);
+    const codes = validation.issues.map((issue) => issue.code);
+
+    expect(validation.status).toBe("fail");
 
     expect(codes).toContain(RELEASE_RECOVERY_CODES.packFileCountMismatch);
   });

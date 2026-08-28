@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "boulder.k2a-f.contract-foundation.fixture.v1",
+  "domain": "boulder.k2a-f.contract-foundation.v1",
+  "valid": {
+    "title": "Contract foundation",
+    "contractDigest": "sha256:a1261e8304321938586cb9a3a8ae05100623a47a87baadcaa473f0bdce8b983d",
+    "invariants": [
+      {
+        "statement": "Validation is deterministic.",
+        "id": "deterministic-validation"
+      },
+      {
+        "statement": "Digests use canonical bytes.",
+        "id": "canonical-digests"
+      }
+    ],
+    "id": "k2a-f-foundation",
+    "schemaVersion": "boulder.k2a-f.contract-foundation.v1"
+  },
+  "canonicalJson": "{\"id\":\"k2a-f-foundation\",\"invariants\":[{\"id\":\"deterministic-validation\",\"statement\":\"Validation is deterministic.\"},{\"id\":\"canonical-digests\",\"statement\":\"Digests use canonical bytes.\"}],\"schemaVersion\":\"boulder.k2a-f.contract-foundation.v1\",\"title\":\"Contract foundation\"}",
+  "preimage": "boulder.k2a-f.contract-foundation.v1\n{\"id\":\"k2a-f-foundation\",\"invariants\":[{\"id\":\"deterministic-validation\",\"statement\":\"Validation is deterministic.\"},{\"id\":\"canonical-digests\",\"statement\":\"Digests use canonical bytes.\"}],\"schemaVersion\":\"boulder.k2a-f.contract-foundation.v1\",\"title\":\"Contract foundation\"}",
+  "digest": "sha256:a1261e8304321938586cb9a3a8ae05100623a47a87baadcaa473f0bdce8b983d",
+  "invalid": {
+    "schemaVersion": "boulder.k2a-f.contract-foundation.v0",
+    "id": "K2A_F",
+    "title": "",
+    "invariants": [],
+    "contractDigest": "sha256:ABC"
+  }
+}

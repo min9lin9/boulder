@@ -34,6 +34,15 @@ export class PlanStoreLockError extends Error {
   }
 }
 
+export class PlanStoreSchemaError extends Error {
+  readonly id = "plan.schema.unsupported";
+
+  constructor(message = "Persisted record uses a schemaVersion this build cannot read.") {
+    super(message);
+    this.name = "PlanStoreSchemaError";
+  }
+}
+
 export type PlanLock = Readonly<{ owner: string; revision: number }>;
 export type PlanChallengePurpose = "plan" | "execution";
 export type PersistedChallenge = Readonly<{ expectedRevision: number; challengeDigest: string; content: string }>;
@@ -80,23 +89,47 @@ export async function readPlanArtifact(workspace: string, runId: string, artifac
   }
 }
 
-export async function acquirePlanLock(workspace: string, runId: string, lock: PlanLock): Promise<void> {
+export const DEFAULT_PLAN_LOCK_STALE_TTL_MS = 5 * 60 * 1000;
+
+export type AcquirePlanLockOptions = Readonly<{ staleTtlMs?: number }>;
+
+/** Recovers cooperative locks whose file has been stale longer than the TTL instead of blocking forever. */
+export async function acquirePlanLock(workspace: string, runId: string, lock: PlanLock, options?: AcquirePlanLockOptions): Promise<void> {
   if (!validLock(lock)) throw new PlanStorePathError("Plan lock owner and revision are required.");
   const runRoot = planRunPath(workspace, runId);
   const lockPath = planArtifactPath(workspace, runId, "lock");
   await ensureSafeRunRoot(workspace, runId);
   await assertSafeArtifactPath(runRoot, lockPath);
-  try {
-    const handle = await open(lockPath, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
-    try { await handle.writeFile(`${JSON.stringify(lock)}\n`, "utf8"); } finally { await handle.close(); }
-  } catch (error) {
-    if (isCode(error, "EEXIST")) throw new PlanStoreLockError();
-    if (isUnsafeOpen(error)) throw new PlanStorePathError();
-    throw error;
+  const staleTtlMs = Math.max(0, options?.staleTtlMs ?? DEFAULT_PLAN_LOCK_STALE_TTL_MS);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const handle = await open(lockPath, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | noFollowFlag(), 0o600);
+      try { await handle.writeFile(`${JSON.stringify(lock)}\n`, "utf8"); } finally { await handle.close(); }
+      try { await assertSafeArtifactPath(runRoot, lockPath); } catch (error) {
+        await unlink(lockPath).catch(() => undefined);
+        throw error;
+      }
+      return;
+    } catch (error) {
+      if (isCode(error, "EEXIST")) {
+        if (attempt === 0 && (await isStalePlanLockFile(lockPath, staleTtlMs))) {
+          await unlink(lockPath).catch(() => undefined);
+          continue;
+        }
+        throw new PlanStoreLockError();
+      }
+      if (isUnsafeOpen(error)) throw new PlanStorePathError();
+      throw error;
+    }
   }
-  try { await assertSafeArtifactPath(runRoot, lockPath); } catch (error) {
-    await unlink(lockPath).catch(() => undefined);
-    throw error;
+}
+
+async function isStalePlanLockFile(lockPath: string, staleTtlMs: number): Promise<boolean> {
+  try {
+    const stats = await lstat(lockPath);
+    return Date.now() - stats.mtimeMs > staleTtlMs;
+  } catch {
+    return false;
   }
 }
 
@@ -216,6 +249,40 @@ export async function readReceiptSecret(workspace: string, runId: string): Promi
     if (isCode(error, "ENOENT")) return null;
     throw error;
   }
+}
+
+export const PLANNER_LOCAL_EVENT_SCHEMA_VERSION = "boulder.planner-local-event.v1";
+
+export type PlanStoreSchemaMigration = Readonly<{
+  from: string;
+  to: string;
+  migrate: (raw: Record<string, unknown>) => Record<string, unknown>;
+}>;
+
+/**
+ * Registry of persisted-record migrations. Scaffold: register future v(N)->v(N+1)
+ * steps here so readers upgrade transparently instead of failing on unknown versions.
+ */
+export const PLAN_STORE_SCHEMA_MIGRATIONS: readonly PlanStoreSchemaMigration[] = [];
+
+/** Rejects persisted records whose schemaVersion this build cannot reach. */
+export function ensureSupportedSchemaVersion(schemaVersion: string): void {
+  const reachable = schemaVersion === PLANNER_LOCAL_EVENT_SCHEMA_VERSION
+    || PLAN_STORE_SCHEMA_MIGRATIONS.some((migration) => migration.from === schemaVersion || migration.to === schemaVersion);
+  if (!reachable) throw new PlanStoreSchemaError(`Unsupported persisted schemaVersion: ${schemaVersion}`);
+}
+
+/** Applies registered migrations until the record reaches a supported schemaVersion. */
+export function applyPlanStoreSchemaMigrations(raw: Record<string, unknown>): Record<string, unknown> {
+  let value = raw;
+  for (let guard = 0; guard <= PLAN_STORE_SCHEMA_MIGRATIONS.length; guard++) {
+    const version = typeof value.schemaVersion === "string" ? value.schemaVersion : "";
+    if (version === PLANNER_LOCAL_EVENT_SCHEMA_VERSION) return value;
+    const step = PLAN_STORE_SCHEMA_MIGRATIONS.find((migration) => migration.from === version);
+    if (!step) throw new PlanStoreSchemaError(`Unsupported persisted schemaVersion: ${version}`);
+    value = step.migrate(value);
+  }
+  throw new PlanStoreSchemaError("Schema migration chain did not converge.");
 }
 
 export type PlannerLocalEvent = Readonly<{
@@ -418,8 +485,11 @@ function validatePlannerLocalEvent(event: unknown): asserts event is PlannerLoca
   if (typeof event !== "object" || event === null || Array.isArray(event)) throw new PlanStorePathError("Planner event metadata is invalid.");
   const value = event as Record<string, unknown>;
   const allowed = new Set(["schemaVersion", "kind", "status", "revision", "occurredAt", "artifactDigest", "durationMs", "errorId"]);
+  if (typeof value.schemaVersion === "string" && value.schemaVersion !== PLANNER_LOCAL_EVENT_SCHEMA_VERSION) {
+    throw new PlanStoreSchemaError(`Unsupported persisted schemaVersion: ${value.schemaVersion}`);
+  }
   if (Object.keys(value).some((key) => !allowed.has(key))
-    || value.schemaVersion !== "boulder.planner-local-event.v1"
+    || value.schemaVersion !== PLANNER_LOCAL_EVENT_SCHEMA_VERSION
     || !isPlannerEventKind(value.kind)
     || !isPlannerEventStatus(value.status)
     || !isMatchingPlannerEventStatus(value.kind, value.status)

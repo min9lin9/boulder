@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "boulder.v2.work-vectors.v1",
+  "vectors": [
+    {
+      "id": "external-effect-without-approval",
+      "workId": "invalid-approval",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedReasonCode": "v2.work.approval_required",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-invalid",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-invalid"
+          }
+        },
+        {
+          "kind": "effect-claimed",
+          "data": {
+            "gateId": "gate-missing",
+            "effectId": "effect-invalid",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "external",
+            "role": "primary",
+            "targetEffectReceiptDigest": null
+          }
+        }
+      ]
+    },
+    {
+      "id": "new-revision-before-rollback",
+      "workId": "invalid-recovery",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedReasonCode": "v2.work.recovery_required",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-one",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-one"
+          }
+        },
+        {
+          "kind": "effect-claimed",
+          "data": {
+            "gateId": null,
+            "effectId": "effect-local",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "local",
+            "role": "primary",
+            "checkpointDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "targetEffectReceiptDigest": null
+          }
+        },
+        {
+          "kind": "effect-receipt-recorded",
+          "data": {
+            "effectId": "effect-local",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "local",
+            "outcome": "committed",
+            "receiptDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          }
+        },
+        {
+          "kind": "attempt-terminal",
+          "data": {
+            "attemptId": "attempt-one",
+            "status": "failed",
+            "terminalReceiptDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+          }
+        },
+        {
+          "kind": "critique-recorded",
+          "data": {
+            "critiqueDigest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "requiresMaterialChange": true
+          }
+        },
+        {
+          "kind": "revision-created",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "revision": 2,
+            "previousWorkRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        },
+        {
+          "kind": "attempt-started",
+          "workRevisionDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "data": {
+            "attemptId": "attempt-two",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-two"
+          }
+        }
+      ]
+    },
+    {
+      "id": "rollback-external-effect",
+      "workId": "invalid-rollback",
+      "initialRevisionDigest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "expectedReasonCode": "v2.work.recovery_kind_mismatch",
+      "entries": [
+        {
+          "kind": "revision-created",
+          "data": { "revision": 1, "previousWorkRevisionDigest": null }
+        },
+        {
+          "kind": "attempt-started",
+          "data": {
+            "attemptId": "attempt-external",
+            "attempt": 1,
+            "runnerKind": "process",
+            "sessionId": "session-external"
+          }
+        },
+        {
+          "kind": "approval-requested",
+          "data": {
+            "gateId": "gate-external",
+            "actionId": "action-external",
+            "effectId": "effect-external"
+          }
+        },
+        {
+          "kind": "approval-recorded",
+          "data": {
+            "gateId": "gate-external",
+            "effectId": "effect-external",
+            "decision": "approved"
+          }
+        },
+        {
+          "kind": "effect-claimed",
+          "data": {
+            "gateId": "gate-external",
+            "effectId": "effect-external",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "external",
+            "role": "primary",
+            "targetEffectReceiptDigest": null
+          }
+        },
+        {
+          "kind": "effect-receipt-recorded",
+          "data": {
+            "effectId": "effect-external",
+            "operationKey": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "boundary": "external",
+            "outcome": "committed",
+            "receiptDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        {
+          "kind": "rollback-recorded",
+          "data": {
+            "targetEffectReceiptDigest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "checkpointDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "receiptDigest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "outcome": "rolled-back"
+          }
+        }
+      ]
+    }
+  ]
+}

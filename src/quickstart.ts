@@ -34,6 +34,11 @@ const QUICKSTART_STEPS = [
     purpose: "See the available workflow profiles before routing work."
   },
   {
+    id: "native-planner-preview",
+    command: "boulder profile use boulder-native-preview --cwd .",
+    purpose: "Explicitly select the bundled local planner preview when needed; it is not installed or active until this command is run."
+  },
+  {
     id: "bootstrap-interview",
     command: "boulder bootstrap interview --cwd . --task \"<repeated work>\"",
     purpose: "Map repeated work to a task-category profile such as programming-heavy or release-safe before changing active profile state."
@@ -91,6 +96,7 @@ export async function evaluateQuickstart(root: string): Promise<QuickstartReport
     await fileCheck(root, "operator-contract", "BOULDER.md"),
     await fileCheck(root, "repo-brief", "docs/REPO_BRIEF.md"),
     profileCheck(resolution.profile.id, resolution.profile.source),
+    nativePlannerPreviewCheck(),
     executorCheck("executor-planning", "plan", resolution.profile.lanes.plan.adapter, resolution.profile.lanes.plan.mode),
     executorCheck("executor-execution", "execute", resolution.profile.lanes.execute.adapter, resolution.profile.lanes.execute.mode)
   ];
@@ -114,7 +120,7 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
     "",
     "This is the first-run guided flow for a maintainer opening Boulder in a repository.",
     "",
-    "GJC and LazyCodex are adapter preferences. agency-agents is a profile-scoped subagent catalog. Bootstrap task-category profiles such as programming-heavy and release-safe sit on top of broader base profiles such as programming-default and ops-default. doctor verifies local installation before live execution; absent adapters stay configured-unverified and approval-gated.",
+    "How routing works: Boulder delegates planning and coding to adapters - GJC is the planning adapter and LazyCodex is the execution adapter, with agency-agents as their catalog of helper subagents. Profiles tune behavior on top: programming-default is the base profile, bootstrap task-category profiles such as programming-heavy or release-safe refine it for specific kinds of work, and boulder-native-preview is an optional local planner that stays inactive until you explicitly select it. The doctor command verifies your installation before anything runs, and nothing executes without your approval.",
     "",
     "## Checks",
     "",
@@ -131,6 +137,13 @@ export function quickstartToMarkdown(report: QuickstartReport): string {
   ].join("\n");
 }
 
+function nativePlannerPreviewCheck(): QuickstartCheck {
+  return {
+    id: "native-planner-preview",
+    status: "pass",
+    evidence: "boulder-native-preview is a bundled local recommendation and requires explicit profile selection."
+  };
+}
 function profileCheck(profileId: string, source: string): QuickstartCheck {
   return {
     id: "active-profile",

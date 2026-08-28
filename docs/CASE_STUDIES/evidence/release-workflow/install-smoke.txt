@@ -1,8 +1,20 @@
-bunx boulder-oss-cli@0.1.16 --version
+bunx boulder-oss-cli@0.1.17 --version
+0.1.17
 Published help smoke:
 bunx boulder-oss-cli --help
+boulder
+
+A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
+
 Usage:
-Published version: 0.1.16
+
+Versioned help smoke:
+bunx boulder-oss-cli@0.1.17 --help
+boulder
+
+A min9lin9 operator kit for turning OSS repositories into evidence-backed Codex workflows.
+
+Published version: 0.1.17
 Result: success
-Generated at: 2026-07-07
+Generated at: 2026-08-26
 exit: 0

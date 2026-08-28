@@ -1,23 +1,25 @@
 {
   "schemaVersion": 1,
   "packageName": "boulder-oss-cli",
-  "packageJsonVersion": "0.1.16",
-  "cliVersion": "0.1.16",
-  "tag": "v0.1.16",
-  "tagCommit": "df3538c7ed0dd7f1b50d4644c6e47204ede45ea7",
-  "releaseCommit": "6671bcaceb4b35180a5756d6a340798ccdf3c206",
-  "publishedVersion": "0.1.16",
+  "packageJsonVersion": "0.1.17",
+  "cliVersion": "0.1.17",
+  "tag": "v0.1.17",
+  "tagCommit": "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
+  "releaseCommit": "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
+  "publishedVersion": "0.1.17",
   "installSmoke": {
-    "command": "bunx boulder-oss-cli@0.1.16 --version",
+    "command": "bunx boulder-oss-cli@0.1.17 --version",
     "exitCode": 0,
-    "generatedAt": "2026-07-07"
+    "generatedAt": "2026-08-26"
   },
   "githubActions": {
     "runUrl": "https://github.com/min9lin9/boulder/actions/runs/28885567998"
   },
   "packDryRun": {
-    "fileCount": 210,
-    "packageVersion": "0.1.16"
+    "fileCount": 268,
+    "packageVersion": "0.1.17"
   },
-  "limitations": []
+  "limitations": [
+    "GitHub Actions run evidence pending push of v0.1.17 release commit"
+  ]
 }
