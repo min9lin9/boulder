@@ -1,0 +1,214 @@
+{
+  "schemaVersion": "boulder.b2-outreach-gate.v1",
+  "collectedAt": "2026-08-28T15:48:57Z",
+  "spec": {
+    "tag": "v0.1.17",
+    "tagCommit": "a0bb9107a602c3529dc8ab484ce86c9fba2ad906",
+    "url": "https://github.com/min9lin9/boulder/blob/v0.1.17/spec/evidence-format/SPEC.md"
+  },
+  "integration": {
+    "pullRequest": "https://github.com/min9lin9/boulder/pull/35",
+    "headCommit": "ad07e301ad818bc457bdf4b605031616c08bd733",
+    "ci": {
+      "conclusion": "success",
+      "url": "https://github.com/min9lin9/boulder/actions/runs/33186272763"
+    },
+    "security": {
+      "conclusion": "success",
+      "url": "https://github.com/min9lin9/boulder/actions/runs/33186272651"
+    }
+  },
+  "gate": {
+    "requiredConcreteResponses": 2,
+    "observedConcreteResponses": 1,
+    "status": "blocked",
+    "b3Authorized": false,
+    "m2ImplementationAuthorized": false,
+    "nextAction": "recheck_on_external_activity"
+  },
+  "qualifyingResponses": [
+    {
+      "target": "https://github.com/krivonosoff161/agentic-security-harness/issues/253",
+      "comment": "https://github.com/krivonosoff161/agentic-security-harness/issues/253#issuecomment-5442077104",
+      "author": "krivonosoff161",
+      "authorAssociation": "OWNER",
+      "responseType": "spec_review",
+      "summary": [
+        "Technically implementable as interoperability fixtures",
+        "Requires immutable release and terminal green CI",
+        "Rejects HMAC alone as independently verifiable human approval",
+        "Requires signer trust root, freshness, replay, correlated schemas, and independent vectors"
+      ]
+    }
+  ],
+  "maintainerCorrections": [
+    {
+      "comment": "https://github.com/krivonosoff161/agentic-security-harness/issues/253#issuecomment-5454611531",
+      "excludedFromResponseCount": true
+    }
+  ],
+  "posts": [
+    {
+      "kind": "issue",
+      "url": "https://github.com/aevum-labs/aevum/issues/417",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/allthingsN/openwright/issues/1",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/zerkerlabs/treeship/issues/336",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/tetsuo-ai/agenc-core/issues/1774",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/Thormatt/orc/issues/17",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/manuelsampedro1/agent-run-ledger/issues/1",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/varmabudharaju/agent-pd/issues/32",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/Melbourneandrew/agentscope/issues/87",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/jflyby/agent-guardrails/issues/1",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/krivonosoff161/agentic-security-harness/issues/253",
+      "immutableSpecLink": true,
+      "externalCommentCount": 1,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 1
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/Open330/muxa/issues/86",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/Njengah/agent-trace/issues/5",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/radotsvetkov/soma/issues/1",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "issue",
+      "url": "https://github.com/wdh107/agent-audit-trail/issues/1",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "discussion",
+      "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/3308",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "discussion",
+      "url": "https://github.com/github/gh-aw/discussions/55955",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "discussion",
+      "url": "https://github.com/Fission-AI/OpenSpec/discussions/1724",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    },
+    {
+      "kind": "discussion",
+      "url": "https://github.com/github/spec-kit/discussions/4332",
+      "immutableSpecLink": true,
+      "externalCommentCount": 0,
+      "externalReplyCount": 0,
+      "externalReactionCount": 0,
+      "qualifyingConcreteResponseCount": 0
+    }
+  ]
+}
