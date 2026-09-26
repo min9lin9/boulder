@@ -1,0 +1,27 @@
+{
+  "fixture": "case-03-inplace-update.sqlite",
+  "session_id": "sess-update-001",
+  "updated_seq": 3,
+  "max_seq_before_update": 3,
+  "max_seq_after_update": 3,
+  "cursor_note": "A MAX(seq) cursor positioned at 3 before the update observes no new rows; the payload at seq 3 changed in place.",
+  "payload_before": {
+    "type": "message",
+    "role": "assistant",
+    "content": "Working on it.",
+    "ts": "2026-01-05T12:02:00.000Z"
+  },
+  "payload_after": {
+    "type": "message",
+    "role": "assistant",
+    "content": "Working on it.",
+    "ts": "2026-01-05T12:02:00.000Z",
+    "usage": {
+      "promptTokens": 300,
+      "completionTokens": 25,
+      "cacheReadTokens": 0
+    }
+  },
+  "sha256_before": "94ac17c96152e9eff8df7bddd1bd20876cc19e60e15e139c44074a88cb36362f",
+  "sha256_after": "7d7e91f6eaebdbb5c58a1026ae3f72ccf6ab21045256004743ed472972dd1cb1"
+}

@@ -15,6 +15,7 @@ import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { runRoutineCommand } from "./routine-command";
 import { runRunsCommand } from "./runs-command";
 import { scorecardToMarkdown, scoreManifest } from "./scorecard";
+import { runTraceCommand } from "./trace-command";
 import { formatManifestIssues, hasManifestErrors, validateManifest } from "./validation";
 import { initHarness } from "./workflows";
 import { verifyHarness, verifyResultsToMarkdown } from "./verify";
@@ -86,6 +87,9 @@ async function runMain(args: string[]): Promise<void> {
     return;
   }
   if (await runRoutineCommand(parsed.commandArgs, options)) {
+    return;
+  }
+  if (await runTraceCommand(parsed.commandArgs, options, args)) {
     return;
   }
   if (command === "runs") {

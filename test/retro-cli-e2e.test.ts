@@ -135,6 +135,87 @@ describe("boulder retro CLI e2e", () => {
       await removeTempRepo(root);
     }
   });
+
+  test("renders attached evidence refs and a resolved trace binding without changing candidates", async () => {
+    const root = await tempRepo();
+    try {
+      const bindingId = await writeTraceBinding(root);
+      await writeRoutine(root, "daily-issue-review", "daily issue review", 3, `.boulder/routines/daily-issue-review.json`, {
+        evidenceRefs: [
+          { kind: "manual", path: ".boulder/runs/review.json" },
+          { kind: "trace", path: `.boulder/evidence/traces/${bindingId}.json` }
+        ],
+        // Legacy snake_case twin: merged into the same attached-evidence view.
+        evidence_refs: [".boulder/evidence/manual/qa-checks.json"]
+      });
+
+      const jsonResult = await runBoulder(["retro", "weekly", "--dry-run", "--json", "--cwd", root]);
+      const payload = parseRetro(jsonResult.stdout);
+      const textResult = await runBoulder(["retro", "weekly", "--dry-run", "--cwd", root]);
+
+      expect(jsonResult.exitCode).toBe(0);
+      expect(payload.attachedEvidence).toEqual([
+        { routineId: "daily-issue-review", kind: "manual", path: ".boulder/runs/review.json" },
+        { routineId: "daily-issue-review", kind: "trace", path: `.boulder/evidence/traces/${bindingId}.json`, descriptorId: bindingId },
+        { routineId: "daily-issue-review", kind: "manual", path: ".boulder/evidence/manual/qa-checks.json", descriptorId: "qa-checks" }
+      ]);
+      expect(payload.traceBindings).toEqual([{
+        routineId: "daily-issue-review",
+        bindingId,
+        snapshotId: "fixture-snapshot",
+        commandRunId: "11111111-2222-3333-4444-555555555555"
+      }]);
+      expect(textResult.exitCode).toBe(0);
+      expect(textResult.stdout).toContain("Attached evidence");
+      expect(textResult.stdout).toContain(`- evidence: daily-issue-review kind=manual path=.boulder/runs/review.json`);
+      expect(textResult.stdout).toContain(`- evidence: daily-issue-review kind=trace path=.boulder/evidence/traces/${bindingId}.json id=${bindingId}`);
+      expect(textResult.stdout).toContain(`- evidence: daily-issue-review kind=manual path=.boulder/evidence/manual/qa-checks.json id=qa-checks`);
+      expect(textResult.stdout).toContain(`- trace-binding: daily-issue-review binding=${bindingId} snapshot=fixture-snapshot run=11111111-2222-3333-4444-555555555555`);
+      expect(payload.improvementCandidates.map((item) => item.routineId)).toEqual(["daily-issue-review"]);
+      expect(payload.warnings).toEqual([]);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("marks a referenced binding without resolvable backing as unavailable", async () => {
+    const root = await tempRepo();
+    try {
+      const bindingId = "a".repeat(64);
+      await writeRoutine(root, "daily-issue-review", "daily issue review", 2, `.boulder/routines/daily-issue-review.json`, {
+        evidenceRefs: [{ kind: "trace", path: `.boulder/evidence/traces/${bindingId}.json` }]
+      });
+
+      const result = await runBoulder(["retro", "weekly", "--dry-run", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toContain(`- trace-binding: daily-issue-review binding=${bindingId} (backing unavailable)`);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("empty and blocked reports omit the attached evidence section cleanly", async () => {
+    const root = await tempRepo();
+    const blocked = await tempRepo();
+    try {
+      await writeRoutine(blocked, "escape", "escape should not count", 99, ".boulder/routines/..escape.json");
+      for (const [dir, status] of [[root, "empty"], [blocked, "blocked"]] as const) {
+        const text = await runBoulder(["retro", "weekly", "--dry-run", "--cwd", dir]);
+        const json = await runBoulder(["retro", "weekly", "--dry-run", "--json", "--cwd", dir]);
+        expect(text.exitCode).toBe(0);
+        expect(text.stdout).not.toContain("Attached evidence");
+        expect(text.stdout).not.toContain("evidence");
+        expect(text.stdout).toContain(`- status: ${status}`);
+        expect(parseRetro(json.stdout).attachedEvidence).toEqual([]);
+        expect(parseRetro(json.stdout).traceBindings).toEqual([]);
+      }
+    } finally {
+      await removeTempRepo(root);
+      await removeTempRepo(blocked);
+    }
+  });
 });
 
 type RetroCandidate = {
@@ -151,10 +232,12 @@ type RetroReport = {
   readonly routineCount: number;
   readonly improvementCandidates: readonly RetroCandidate[];
   readonly skillProposalCandidates: readonly RetroCandidate[];
+  readonly attachedEvidence: readonly Record<string, unknown>[];
+  readonly traceBindings: readonly Record<string, unknown>[];
   readonly warnings: readonly string[];
 };
 
-async function writeRoutine(root: string, id: string, title: string, seenCount: number, path = `.boulder/routines/${id}.json`): Promise<void> {
+async function writeRoutine(root: string, id: string, title: string, seenCount: number, path = `.boulder/routines/${id}.json`, evidence: { evidenceRefs?: readonly Record<string, unknown>[]; evidence_refs?: readonly string[] } = {}): Promise<void> {
   await write(root, path, `${JSON.stringify({
     schemaVersion: 1,
     id,
@@ -165,8 +248,35 @@ async function writeRoutine(root: string, id: string, title: string, seenCount: 
     createdAt: "2026-06-01T00:00:00.000Z",
     seenCount,
     lastSeenAt: "2026-07-01T00:00:00.000Z",
-    evidenceRefs: []
+    evidenceRefs: evidence.evidenceRefs ?? [],
+    ...(evidence.evidence_refs === undefined ? {} : { evidence_refs: evidence.evidence_refs })
   }, null, 2)}\n`);
+}
+
+// Spec-shaped binding file: content-addressed id like linkTrace would persist,
+// without requiring a committed journal fixture.
+async function writeTraceBinding(root: string): Promise<string> {
+  const { sourceRevisionForDecodedEvent } = await import("../src/trace/contracts");
+  const content = {
+    schemaVersion: "boulder.trace.binding.v1",
+    journal_id: "fixture-journal",
+    snapshot_id: "fixture-snapshot",
+    snapshot_digest: "b".repeat(64),
+    selected_events: [{
+      source_row_key: "session-1:1",
+      logical_event_id: "event-1",
+      source_revision: "c".repeat(64)
+    }],
+    boulder_command_run_id: "11111111-2222-3333-4444-555555555555",
+    binding_basis: "operator_explicit"
+  };
+  const bindingId = await sourceRevisionForDecodedEvent(content);
+  await write(root, `.boulder/trace-state/bindings/${bindingId}.json`, `${JSON.stringify({
+    ...content,
+    binding_id: bindingId,
+    createdAt: "2026-09-25T00:00:00.000Z"
+  }, null, 2)}\n`);
+  return bindingId;
 }
 
 function parseRetro(text: string): RetroReport {
@@ -180,7 +290,9 @@ function parseRetro(text: string): RetroReport {
     || !Array.isArray(parsed["skillProposalCandidates"])
     || !parsed["skillProposalCandidates"].every(isRetroCandidate)
     || !Array.isArray(parsed["warnings"])
-    || !parsed["warnings"].every((item) => typeof item === "string")) {
+    || !parsed["warnings"].every((item) => typeof item === "string")
+    || !Array.isArray(parsed["attachedEvidence"])
+    || !Array.isArray(parsed["traceBindings"])) {
     throw new Error("invalid retro report");
   }
   return {
@@ -189,6 +301,8 @@ function parseRetro(text: string): RetroReport {
     routineCount: parsed["routineCount"],
     improvementCandidates: parsed["improvementCandidates"],
     skillProposalCandidates: parsed["skillProposalCandidates"],
+    attachedEvidence: parsed["attachedEvidence"],
+    traceBindings: parsed["traceBindings"],
     warnings: parsed["warnings"]
   };
 }

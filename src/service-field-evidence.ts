@@ -9,7 +9,7 @@ export async function fieldEvidenceCheck(root: string): Promise<ServiceReadiness
   if (!await exists(fieldRoot)) {
     return { id: "field-evidence", status: "fail", evidence: "missing evidence/field-readiness/<run-id>" };
   }
-  const runIds = await readdir(fieldRoot);
+  const runIds = (await readdir(fieldRoot)).sort();
   if (runIds.length === 0) {
     return { id: "field-evidence", status: "fail", evidence: "missing evidence/field-readiness/<run-id>" };
   }

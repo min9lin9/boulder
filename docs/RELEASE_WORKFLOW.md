@@ -43,6 +43,10 @@ bunx --no-cache boulder-oss-cli --help
 - `boulder product-readiness --json` returns `ready` in a clean release tree.
 - `boulder service-readiness --json` returns `ready` in a clean release tree.
 
+## Published Contents
+
+The `files` allowlist ships `bin/`, `src/` (the launcher spawns `bun bin/boulder.ts`, so TypeScript sources are the runtime), `docs/`, `fixtures/`, `skills/`, and `packages/trace-ui/dist` — the built UI bundle that `boulder trace serve` resolves module-relative via `findStaticRoot`. The `packages/trace-ui` source tree is not packed. `fixtures/` stays packed because runtime commands resolve fixture paths and `fixtures/trace/` is the `trace doctor` baseline documented in `docs/trace/openclaw-admission.md`. Tests, `.omo/`, and `node_modules` are never packed. `prepack` runs `build:trace-ui` so `npm pack`/`npm publish` ship fresh UI assets; `bun pm pack` never runs lifecycle scripts, so `bun run ci` typechecks, builds, tests both suites, and explicitly rebuilds the bundle before its pack dry-run.
+
 ## Deferred External Provenance Hardening
 
 `release-check` verifies repository files only. It must not block on npm account or package settings unless a maintainer supplies external evidence and asks Boulder to evaluate it.

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added `boulder trace` observability: `doctor` source admission, `collect` bounded session snapshots into a hash-chained journal, `verify --strict`, a read-only local `serve` UI, and `link` frozen event-range bindings.
+- `boulder trace link --write` now also mints the committable evidence descriptor `.boulder/evidence/traces/<binding_id>.json` that `routine evidence add` authenticates, and reports a named partial failure instead of claiming success when the descriptor cannot be written.
+- Added `boulder routine evidence add` for attaching authenticated evidence descriptors to routines; stored refs carry `{kind, path, hash, note?}` and `retro weekly` resolves trace bindings by id.
+- Kept the release boundary explicit: trace collection persists metadata only (no message bodies), and no scheduler, external model call, or live transcript streaming is introduced.
+
 ## 0.1.16
 
 - Added `boulder routine capture` for repo-local repeated-work metadata.

@@ -1,14 +1,17 @@
 {
   "schemaVersion": "packaged-files.v0",
-  "totalUniqueFiles": 186,
-  "totalPackedFiles": 187,
+  "totalUniqueFiles": 215,
+  "totalPackedFiles": 216,
   "classes": [
     {
       "class": "runtime",
-      "count": 68,
+      "count": 85,
       "files": [
         "bin/boulder.js",
         "bin/boulder.ts",
+        "packages/trace-ui/dist/index-5qvnyg6f.css",
+        "packages/trace-ui/dist/index-m3wcxdvj.js",
+        "packages/trace-ui/dist/index.html",
         "src/AGENTS.md",
         "src/benchmark.ts",
         "src/bootstrap-interview.ts",
@@ -22,6 +25,8 @@
         "src/cli-options.ts",
         "src/cli-run-recording.ts",
         "src/cli.ts",
+        "src/evidence-write-lock.ts",
+        "src/evidence/descriptors.ts",
         "src/executor-adapters.ts",
         "src/executors.ts",
         "src/export.ts",
@@ -67,6 +72,18 @@
         "src/task-scoring.ts",
         "src/templates/export.ts",
         "src/templates/init.ts",
+        "src/trace-command.ts",
+        "src/trace/bindings.ts",
+        "src/trace/collect.ts",
+        "src/trace/contracts.ts",
+        "src/trace/journal.ts",
+        "src/trace/normalize.ts",
+        "src/trace/openclaw-adapter.ts",
+        "src/trace/published-chain.ts",
+        "src/trace/projection.ts",
+        "src/trace/server.ts",
+        "src/trace/source-config.ts",
+        "src/trace/verify.ts",
         "src/types.ts",
         "src/validation.ts",
         "src/verify.ts",
@@ -79,7 +96,7 @@
     },
     {
       "class": "public-doc",
-      "count": 64,
+      "count": 66,
       "files": [
         "CHANGELOG.md",
         "CONTRIBUTING.md",
@@ -144,7 +161,9 @@
         "docs/contributing/development-setup.md",
         "docs/contributing/review-policy.md",
         "docs/labels-and-milestones.md",
-        "docs/prompts/HARNESS_MANAGER_BENCHMARK_PROMPT.md"
+        "docs/prompts/HARNESS_MANAGER_BENCHMARK_PROMPT.md",
+        "docs/trace/openclaw-admission.md",
+        "docs/trace/usage.md"
       ]
     },
     {
@@ -169,14 +188,14 @@
         "docs/CASE_STUDIES/evidence/release-workflow/install-smoke.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/pack-dry-run.txt",
         "docs/CASE_STUDIES/evidence/release-workflow/pr26-review-closure.md",
-        "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
         "docs/CASE_STUDIES/evidence/release-workflow/release-evidence-plan.json",
+        "docs/CASE_STUDIES/evidence/release-workflow/release-manifest.json",
         "docs/CASE_STUDIES/evidence/release-workflow/run-event-redaction-repro.json"
       ]
     },
     {
       "class": "fixture",
-      "count": 24,
+      "count": 34,
       "files": [
         "fixtures/benchmarks/mcp-server.json",
         "fixtures/benchmarks/python-package.json",
@@ -201,6 +220,16 @@
         "fixtures/replay/kimi-agent-swarm-skill/replay.json",
         "fixtures/service-readiness/gates.json",
         "fixtures/service-readiness/metric-log-template.json",
+        "fixtures/trace/openclaw/30afbaf8-claim/README.md",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-01-plain.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-02-zstd.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-03-inplace-update.provenance.json",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-03-inplace-update.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-04-missing-timing.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-05-tool-pair.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-06-malformed.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/case-07-unsupported-schema.sqlite",
+        "fixtures/trace/openclaw/30afbaf8-claim/generate.ts",
         "fixtures/workflow-map/primary-workflow.v0.json"
       ]
     },

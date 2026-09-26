@@ -79,6 +79,8 @@
   {"path":"docs/contributing/review-policy.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/contributing/review-policy.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/labels-and-milestones.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/labels-and-milestones.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/prompts/HARNESS_MANAGER_BENCHMARK_PROMPT.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/prompts/HARNESS_MANAGER_BENCHMARK_PROMPT.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
+  {"path":"docs/trace/openclaw-admission.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/trace/openclaw-admission.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
+  {"path":"docs/trace/usage.md","kind":"canonical","locale":"en","dir":"ltr","source":"docs/trace/usage.md","version":"0.1.16","generatedBy":null,"packaging":"packaged","translatable":true},
   {"path":"docs/*SESSION_SUMMARY*.md","kind":"local-only","locale":"und","dir":"ltr","source":"package.json#files","version":"0.1.16","generatedBy":null,"packaging":"excluded","translatable":false},
   {"path":"docs/NEXT_*GAP*PLAN*.md","kind":"local-only","locale":"und","dir":"ltr","source":"package.json#files","version":"0.1.16","generatedBy":null,"packaging":"excluded","translatable":false},
   {"path":"**/* 2.*","kind":"local-only","locale":"und","dir":"ltr","source":"package.json#files","version":"0.1.16","generatedBy":null,"packaging":"excluded","translatable":false}

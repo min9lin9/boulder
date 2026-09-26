@@ -1,9 +1,19 @@
+import * as fs from "node:fs/promises";
 import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
+import * as bunTest from "bun:test";
 import { describe, expect, test } from "bun:test";
 import { recordFieldEvidence } from "../src/field-evidence";
 import { evaluateServiceReadiness } from "../src/service-readiness";
 import { tempRepo, write } from "./helpers/cli";
+
+// The repository's minimal bun:test declarations do not include spyOn.
+const { spyOn } = bunTest as unknown as {
+  spyOn<T, K extends keyof T>(target: T, method: K): {
+    mockImplementation(implementation: T[K]): void;
+    mockRestore(): void;
+  };
+};
 
 async function writeServiceFixture(root: string): Promise<void> {
   await write(root, "docs/SERVICE_LOOP.md", "install\ninit\ninspect\npipeline\nhandoff\nverify\nexport\nreadiness\nreplay\nsupport\nnot hosted\nprovider launch\n");
@@ -61,7 +71,7 @@ async function writeServiceFixture(root: string): Promise<void> {
     contributionPolicy: "Use repository README and issues.",
     securityPolicy: "Do not include secrets.",
     constraints: ["No credentials"],
-    retrievedAt: "2026-06-12"
+    retrievedAt: new Date().toISOString().slice(0, 10)
   }));
   await write(root, "fixtures/replay/kimi-agent-swarm-skill/replay.json", JSON.stringify({
     project: "kimi-agent-swarm-skill",
@@ -220,6 +230,54 @@ describe("service readiness", () => {
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "onboarding" && item.status === "fail" && item.evidence.includes("Published Package Path"))).toBe(true);
+  });
+
+  test("orders replay and field evidence identically regardless of readdir order", async () => {
+    const root = await tempRepo("boulder-service-readiness-");
+    await writeServiceFixture(root);
+    await write(root, "fixtures/replay/aaa-replay-proj/official-docs.json", JSON.stringify({
+      project: "aaa-replay-proj",
+      repoUrl: "https://github.com/example/aaa-replay-proj",
+      docsUrls: ["https://github.com/example/aaa-replay-proj#readme"],
+      versionOrRef: "main",
+      setupCommands: ["bun install"],
+      testCommands: ["bun test"],
+      contributionPolicy: "Use repository README and issues.",
+      securityPolicy: "Do not include secrets.",
+      constraints: ["No credentials"],
+      retrievedAt: new Date().toISOString().slice(0, 10)
+    }));
+    await write(root, "fixtures/replay/aaa-replay-proj/replay.json", JSON.stringify({
+      project: "aaa-replay-proj",
+      repoUrl: "https://github.com/example/aaa-replay-proj",
+      ref: "main",
+      officialDocsPath: "fixtures/replay/aaa-replay-proj/official-docs.json",
+      commands: ["bun bin/boulder.ts inspect --cwd . --json"],
+      expectedArtifacts: ["docs/REPO_BRIEF.md"],
+      evidencePaths: ["docs/CASE_STUDIES/evidence/external-replay/aaa-replay-proj.txt"],
+      limitations: ["Public replay requires network checkout."]
+    }));
+    await write(root, "docs/CASE_STUDIES/evidence/external-replay/aaa-replay-proj.txt", "share-safe external replay evidence\n");
+    await writeFieldEvidence(root, "aaa-run-0");
+    await recordFieldEvidence(root, "aaa-run-0", "evidence/field-readiness/aaa-run-0");
+    const read = fs.readdir;
+    const spy = spyOn(fs, "readdir");
+    spy.mockImplementation(async (path: string) => (await read(path)).sort().reverse());
+    try {
+      const readiness = await evaluateServiceReadiness(root);
+      const coverage = readiness.checks.find((item) => item.id === "official-docs-coverage");
+      const externalReplay = readiness.checks.find((item) => item.id === "external-replay");
+      const fieldEvidence = readiness.checks.find((item) => item.id === "field-evidence");
+
+      expect(coverage?.status).toBe("pass");
+      expect(coverage?.evidence).toBe("fixtures/replay/aaa-replay-proj/official-docs.json, fixtures/replay/kimi-agent-swarm-skill/official-docs.json");
+      expect(externalReplay?.status).toBe("pass");
+      expect(externalReplay?.evidence).toBe("fixtures/replay/aaa-replay-proj/replay.json, fixtures/replay/kimi-agent-swarm-skill/replay.json");
+      expect(fieldEvidence?.status).toBe("pass");
+      expect(fieldEvidence?.evidence).toBe("evidence/field-readiness/aaa-run-0, evidence/field-readiness/oss-run-1");
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   test("blocks when onboarding mixes current and stale publish terms", async () => {

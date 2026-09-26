@@ -3,7 +3,7 @@ import type { FileHandle } from "node:fs/promises";
 import { lstat, open } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import { at, isMissingPath, noFollowFlag, pathIsProtectedLink, protectedWritePathIsSafe, safeReplaceText } from "./fs";
-import { isRoutineArtifact, isSafeEvidencePath, type EvidenceRef, type RoutineArtifact } from "./routine";
+import { isRoutineArtifact, isSafeEvidencePath, routineEvidenceRefs, type EvidenceRef, type RoutineArtifact } from "./routine";
 
 export type SkillProposalResult = {
   readonly status: "dry-run" | "written";
@@ -84,7 +84,7 @@ async function readRoutineFromHandle(handle: FileHandle, id: string): Promise<Ro
 }
 
 function skillProposalMarkdown(routine: RoutineArtifact): string {
-  const evidence = safeEvidenceRefs(routine.evidenceRefs);
+  const evidence = safeEvidenceRefs(routineEvidenceRefs(routine));
   return [
     `# Skill Proposal: ${safeMetadataText(routine.title)}`,
     "",
@@ -117,7 +117,7 @@ function safeMetadataText(value: string): string {
 }
 
 function containsSensitiveText(value: string): boolean {
-  return /sk-[a-z0-9_-]+/i.test(value)
+  return /(?<![a-z0-9_-])sk-[a-z0-9_-]+/i.test(value)
     || /\bsecret\s*=/i.test(value)
     || /\btoken\b/i.test(value)
     || /\bAKIA[0-9A-Z]{16}\b/.test(value);
@@ -128,7 +128,7 @@ function safeEvidenceRefs(refs: readonly EvidenceRef[]): readonly EvidenceRef[] 
 }
 
 function safeEvidenceKind(kind: string): boolean {
-  return /^(routine|retro|test|verification|manual)$/.test(kind);
+  return /^(routine|retro|test|verification|manual|trace|traces)$/.test(kind);
 }
 
 function formatEvidence(refs: readonly EvidenceRef[]): readonly string[] {

@@ -3,7 +3,7 @@
   "repoUrl": "https://github.com/Yeachan-Heo/gajae-code",
   "docsUrls": [
     "https://github.com/Yeachan-Heo/gajae-code#readme",
-    "https://github.com/Yeachan-Heo/gajae-code/blob/main/docs/bridge.md",
+    "https://github.com/Yeachan-Heo/gajae-code/blob/main/docs/hermes-mcp-bridge.md",
     "https://gajae-code.com/docs/hermes-mcp-bridge.html"
   ],
   "versionOrRef": "main",
@@ -30,5 +30,5 @@
     "Prefer visible routed sessions first; move to the coordinator MCP bridge for pure machine control.",
     "Mutating coordinator calls require startup opt-in and per-call allow_mutation."
   ],
-  "retrievedAt": "2026-06-13"
+  "retrievedAt": "2026-09-26"
 }

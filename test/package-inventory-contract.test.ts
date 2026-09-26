@@ -39,13 +39,13 @@ describe("package inventory contract", () => {
     const summary = assertClassified(parsePackDryRun(output), inventory);
 
     expect(result.exitCode).toBe(0);
-    expect(summary.totalUniqueFiles).toBe(186);
-    expect(summary.totalPackedFiles).toBe(187);
+    expect(summary.totalUniqueFiles).toBe(215);
+    expect(summary.totalPackedFiles).toBe(216);
     expect(summary.counts).toEqual({
-      runtime: 68,
-      "public-doc": 64,
+      runtime: 85,
+      "public-doc": 66,
       "case-study-evidence": 21,
-      fixture: 24,
+      fixture: 34,
       skill: 6,
       config: 1,
       license: 1,
@@ -69,6 +69,19 @@ describe("package inventory contract", () => {
     }
 
     expect(message).toBe("Packed files missing from fixture: tmp/stray.txt");
+  });
+
+  test("tolerates trace-ui bundle hash drift", () => {
+    const inventory: Inventory = {
+      schemaVersion: "packaged-files.v0",
+      totalUniqueFiles: 2,
+      totalPackedFiles: 2,
+      classes: [{ className: "runtime", count: 2, files: ["packages/trace-ui/dist/index-deadbeef.css", "src/known.ts"] }]
+    };
+
+    const summary = assertClassified({ files: ["packages/trace-ui/dist/index-cafebabe.css", "src/known.ts"], reportedTotal: 2 }, inventory);
+
+    expect(summary.totalUniqueFiles).toBe(2);
   });
 
   test("reports fixture and pack drift separately", () => {
@@ -109,8 +122,9 @@ function assertClassified(pack: { readonly files: readonly string[]; readonly re
   readonly totalUniqueFiles: number;
   readonly totalPackedFiles: number;
 } {
-  const classified = new Map<string, PackageClass>();
   const counts = emptyCounts();
+  const seen = new Set<string>();
+  const classified = new Map<string, string[]>();
 
   for (const item of inventory.classes) {
     if (item.files.length !== item.count) {
@@ -119,15 +133,32 @@ function assertClassified(pack: { readonly files: readonly string[]; readonly re
 
     counts[item.className] = item.files.length;
     for (const file of item.files) {
-      const duplicate = classified.get(file);
-      if (duplicate) throw new Error(`Fixture classifies file more than once: ${file}`);
-      classified.set(file, item.className);
+      if (seen.has(file)) throw new Error(`Fixture classifies file more than once: ${file}`);
+      seen.add(file);
+      const key = packKey(file);
+      const entries = classified.get(key);
+      if (entries) entries.push(file);
+      else classified.set(key, [file]);
     }
   }
 
-  const packed = new Set(pack.files);
-  const unclassified = pack.files.filter((file) => !classified.has(file));
-  const stale = Array.from(classified.keys()).filter((file) => !packed.has(file)).sort();
+  const remaining = new Map<string, number>();
+  for (const [key, entries] of classified) remaining.set(key, entries.length);
+
+  const unclassified: string[] = [];
+  for (const file of pack.files) {
+    const key = packKey(file);
+    const left = remaining.get(key) ?? 0;
+    if (left === 0) unclassified.push(file);
+    else remaining.set(key, left - 1);
+  }
+
+  const stale: string[] = [];
+  for (const [key, entries] of classified) {
+    const left = remaining.get(key) ?? 0;
+    for (const file of entries.slice(entries.length - left)) stale.push(file);
+  }
+  stale.sort();
   const drift = [
     unclassified.length > 0 ? `Packed files missing from fixture: ${unclassified.join(", ")}` : "",
     stale.length > 0 ? `Fixture files missing from pack: ${stale.join(", ")}` : ""
@@ -142,6 +173,14 @@ function assertClassified(pack: { readonly files: readonly string[]; readonly re
   }
 
   return { counts, totalUniqueFiles: pack.files.length, totalPackedFiles: pack.reportedTotal };
+}
+
+// packages/trace-ui/dist is a gitignored build artifact; bun build emits content-hashed
+// filenames, so fixture and pack output are compared on the hash-normalized path.
+const HASHED_TRACE_UI_BUNDLE = /^(packages\/trace-ui\/dist\/index-)[0-9a-z]{8}(\.[a-z]+)$/;
+
+function packKey(path: string): string {
+  return path.replace(HASHED_TRACE_UI_BUNDLE, "$1*$2");
 }
 
 function parseInventory(source: string): Inventory {
