@@ -23,5 +23,5 @@
     "Project-specific .codex/agents entries override global ~/.codex/agents entries.",
     "Agent installation is an explicit copy step, not an automatic Boulder side effect."
   ],
-  "retrievedAt": "2026-06-13"
+  "retrievedAt": "2026-09-26"
 }

@@ -54,7 +54,7 @@ export async function evaluateReplayCheck(root: string): Promise<ReplayCheckRepo
       policy: replayPolicy()
     };
   }
-  const projects = await readdir(replayRoot);
+  const projects = (await readdir(replayRoot)).sort();
   const reports = [];
   for (const project of projects) {
     reports.push(await evaluateReplayProject(root, project));

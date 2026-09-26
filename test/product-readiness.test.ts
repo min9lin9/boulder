@@ -1,9 +1,19 @@
+import * as fs from "node:fs/promises";
 import { symlink } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { join } from "node:path";
+import * as bunTest from "bun:test";
 import { describe, expect, test } from "bun:test";
 import { evaluateProductReadiness } from "../src/product-readiness";
 import { tempRepo, write } from "./helpers/cli";
+
+// The repository's minimal bun:test declarations do not include spyOn.
+const { spyOn } = bunTest as unknown as {
+  spyOn<T, K extends keyof T>(target: T, method: K): {
+    mockImplementation(implementation: T[K]): void;
+    mockRestore(): void;
+  };
+};
 
 async function writeReadyPublicProductFixture(root: string): Promise<void> {
   const version = "1.2.3";
@@ -136,6 +146,25 @@ describe("tight product readiness", () => {
 
     expect(readiness.status).toBe("blocked");
     expect(readiness.checks.some((item) => item.id === "clean-release-tree" && item.status === "fail")).toBe(true);
+  });
+
+  test("reports duplicate copy artifacts in sorted order regardless of readdir order", async () => {
+    const root = await tempRepo("boulder-product-readiness-");
+    await write(root, "package.json", "{\"name\":\"fixture\"}\n");
+    await write(root, "docs/b-copy 2.md", "dup\n");
+    await write(root, "a-copy 2.md", "dup\n");
+    const read = fs.readdir;
+    const spy = spyOn(fs, "readdir");
+    spy.mockImplementation(async (path: string) => (await read(path)).sort().reverse());
+    try {
+      const readiness = await evaluateProductReadiness(root);
+      const tree = readiness.checks.find((item) => item.id === "clean-release-tree");
+
+      expect(tree?.status).toBe("fail");
+      expect(tree?.evidence).toBe("duplicate copy artifacts: a-copy 2.md, docs/b-copy 2.md");
+    } finally {
+      spy.mockRestore();
+    }
   });
 
   test("ignores broken local codegraph symlinks during release tree scan", async () => {

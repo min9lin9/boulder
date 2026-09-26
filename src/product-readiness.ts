@@ -172,7 +172,7 @@ async function findDuplicateCopyArtifacts(root: string): Promise<readonly string
 }
 
 async function collectDuplicateCopyArtifacts(root: string, relativeDir: string, artifacts: string[]): Promise<void> {
-  const entries = await readdir(join(root, relativeDir));
+  const entries = (await readdir(join(root, relativeDir))).sort();
   for (const entry of entries) {
     const relativePath = relativeDir ? `${relativeDir}/${entry}` : entry;
     const entryStat = await lstat(join(root, relativePath)) as { isDirectory(): boolean; isFile(): boolean };
