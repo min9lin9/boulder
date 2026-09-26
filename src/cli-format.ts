@@ -41,8 +41,17 @@ export function printHelp(): void {
     "",
     "Secondary loops:",
     "  boulder routine capture --task text --dry-run|--write [--cwd path] [--json]",
+    "  boulder routine evidence add --task id --ordinal 1 --descriptor-kind kind --descriptor-id id [--note text] [--cwd path] [--json]",
     "  boulder retro weekly --dry-run [--cwd path] [--json]",
     "  boulder skill propose --from-routine id --dry-run|--write [--cwd path] [--json]",
+    "",
+    "Trace observability:",
+    "  boulder trace doctor --source openclaw-local --db-path path [--cwd path] [--json]",
+    "  boulder trace collect --source openclaw-local --session id --once --dry-run|--write [--cwd path] [--json]",
+    "  boulder trace verify --strict [--cwd path] [--json]",
+    "  boulder trace serve --host 127.0.0.1 --port 4319 [--cwd path]",
+    "  boulder trace link --snapshot id --from-event a --to-event b --run-id uuid --dry-run|--write [--cwd path] [--json]",
+    "  boulder trace unlock --confirm [--nonce n] [--cwd path] [--json]",
     "",
     "Utilities:",
     "  boulder validate [--cwd path]",
@@ -71,8 +80,26 @@ export function formatWeeklyRetroReport(report: WeeklyRetroReport): string {
     `- routines: ${report.routineCount}`,
     ...report.improvementCandidates.map((item) => `- improvement-candidate: ${item.routineId} (${item.seenCount}) - ${item.reason}`),
     ...report.skillProposalCandidates.map((item) => `- skill-proposal-candidate: ${item.routineId} (${item.seenCount}) - ${item.reason}`),
+    ...formatAttachedEvidence(report),
     ...report.warnings.map((item) => `- warning: ${item}`)
   ].join("\n");
+}
+
+function formatAttachedEvidence(report: WeeklyRetroReport): readonly string[] {
+  if (report.attachedEvidence.length === 0 && report.traceBindings.length === 0) return [];
+  return [
+    "Attached evidence",
+    ...report.attachedEvidence.map((item) =>
+      `- evidence: ${item.routineId} kind=${safeDisplay(item.kind)} path=${safeDisplay(item.path)}${item.descriptorId === undefined ? "" : ` id=${item.descriptorId}`}`),
+    ...report.traceBindings.map((item) =>
+      `- trace-binding: ${item.routineId} binding=${item.bindingId}${item.snapshotId === undefined ? " (backing unavailable)" : ` snapshot=${item.snapshotId} run=${item.commandRunId}`}`)
+  ];
+}
+
+// Rendered metadata is untrusted text: strip control characters like the
+// skill-proposal metadata path does.
+function safeDisplay(value: string): string {
+  return value.replace(/[\u0000-\u001F\u007F]/g, " ");
 }
 
 export function formatDoctorReport(report: Awaited<ReturnType<typeof evaluateCapabilityDoctor>>): string {

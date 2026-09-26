@@ -105,9 +105,97 @@ describe("boulder skill proposal CLI e2e", () => {
       await removeTempRepo(external);
     }
   });
+
+  test("accepts trace-kind evidence refs end to end", async () => {
+    const root = await tempRepo();
+    try {
+      const bindingId = "a".repeat(64);
+      await writeRoutine(root, "daily-issue-review", "daily issue review", 3, [
+        { kind: "manual", path: ".boulder/runs/review.json" },
+        { kind: "trace", path: `.boulder/evidence/traces/${bindingId}.json`, note: "linked session evidence" }
+      ]);
+
+      const result = await runBoulder(["skill", "propose", "--from-routine", "daily-issue-review", "--dry-run", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe("");
+      expect(result.stdout).toContain(`- evidence: kind=manual path=.boulder/runs/review.json`);
+      expect(result.stdout).toContain(`- evidence: kind=trace path=.boulder/evidence/traces/${bindingId}.json`);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("renders an attached traces-kind descriptor ref end to end", async () => {
+    const root = await tempRepo();
+    try {
+      // Attach stores the descriptor kind verbatim; the conventional trace
+      // descriptor directory is .boulder/evidence/traces/ (plural).
+      await writeRoutine(root, "daily-issue-review", "daily issue review", 3, [
+        { kind: "traces", path: `.boulder/evidence/traces/${"b".repeat(64)}.json` }
+      ]);
+
+      const result = await runBoulder(["skill", "propose", "--from-routine", "daily-issue-review", "--dry-run", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain(`- evidence: kind=traces path=.boulder/evidence/traces/${"b".repeat(64)}.json`);
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("does not redact routine text or paths that merely contain an sk- substring", async () => {
+    const root = await tempRepo();
+    try {
+      // Regression: the old /sk-[a-z0-9_-]+/i pattern matched the sk- substring
+      // inside 'task-sk-foo' and 'task-sk-report.json', redacting clean text.
+      await writeRoutine(root, "task-sk-foo", "task-sk-foo review", 3, [
+        { kind: "manual", path: ".boulder/runs/task-sk-report.json" }
+      ]);
+      await writeRoutine(root, "real-key", "leaked sk-abc123def prefix", 1);
+
+      const clean = await runBoulder(["skill", "propose", "--from-routine", "task-sk-foo", "--dry-run", "--cwd", root]);
+      expect(clean.exitCode).toBe(0);
+      expect(clean.stderr).toBe("");
+      expect(clean.stdout).toContain("# Skill Proposal: task-sk-foo review");
+      expect(clean.stdout).toContain("- routine-title: task-sk-foo review");
+      expect(clean.stdout).toContain("- evidence: kind=manual path=.boulder/runs/task-sk-report.json");
+
+      const leaky = await runBoulder(["skill", "propose", "--from-routine", "real-key", "--dry-run", "--cwd", root]);
+      expect(leaky.exitCode).toBe(0);
+      expect(leaky.stdout).toContain("# Skill Proposal: [redacted]");
+      expect(leaky.stdout).not.toContain("sk-abc123def");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
+
+  test("still filters unsupported or malformed evidence kinds", async () => {
+    const root = await tempRepo();
+    try {
+      await writeRoutine(root, "daily-issue-review", "daily issue review", 3, [
+        { kind: "tracer", path: "evidence/tracer.json" },
+        { kind: "trace;rm", path: "evidence/trace.json" },
+        { kind: "TRACE", path: "evidence/trace.json" },
+        { kind: "tracing", path: "evidence/tracing.json" },
+        { kind: "trace", path: "../outside.json" }
+      ]);
+
+      const result = await runBoulder(["skill", "propose", "--from-routine", "daily-issue-review", "--dry-run", "--cwd", root]);
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toContain("- evidence: none");
+      expect(result.stdout).not.toContain("kind=tracer");
+      expect(result.stdout).not.toContain("kind=TRACE");
+      expect(result.stdout).not.toContain("kind=tracing");
+      expect(result.stdout).not.toContain("outside.json");
+    } finally {
+      await removeTempRepo(root);
+    }
+  });
 });
 
-async function writeRoutine(root: string, id: string, title: string, seenCount: number): Promise<void> {
+async function writeRoutine(root: string, id: string, title: string, seenCount: number, evidenceRefs: readonly Record<string, unknown>[] = []): Promise<void> {
   await write(root, `.boulder/routines/${id}.json`, `${JSON.stringify({
     schemaVersion: 1,
     id,
@@ -118,7 +206,7 @@ async function writeRoutine(root: string, id: string, title: string, seenCount: 
     createdAt: "2026-06-01T00:00:00.000Z",
     seenCount,
     lastSeenAt: "2026-07-01T00:00:00.000Z",
-    evidenceRefs: []
+    evidenceRefs
   }, null, 2)}\n`);
 }
 
