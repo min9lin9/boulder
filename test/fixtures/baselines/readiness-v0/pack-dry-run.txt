@@ -1,6 +1,6 @@
 bun pack v1.3.14 (0d9b296a)
 
-packed 1.93KB package.json
+packed 1.79KB package.json
 packed 7.17KB CHANGELOG.md
 packed 1.28KB CONTRIBUTING.md
 packed 1.1KB LICENSE
