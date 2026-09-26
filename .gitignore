@@ -1,7 +1,14 @@
 node_modules/
+# Build artifacts, including packages/trace-ui/dist; regenerate before packaging.
 dist/
 coverage/
 .DS_Store
 *.log
 .omo/
 _workspace/
+
+# Local trace journal/runtime state; reviewable evidence, routines, and runs stay tracked.
+.boulder/traces/
+.boulder/trace-state/
+.boulder/trace-cache/
+.boulder/**/writer.lock
