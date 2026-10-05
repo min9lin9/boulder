@@ -171,6 +171,7 @@ boulder capability import --from https://github.com/msitarzewski/agency-agents -
 boulder doctor
 boulder verify --dry-run
 boulder pipeline --friction high
+boulder workflow --friction high
 boulder handoff packet --adapter gajae-code --include src/cli.ts
 boulder handoff review --packet .boulder/handoffs/gajae-code.json
 boulder handoff send --adapter gajae-code --approve-external --approval-code <code> --dry-run

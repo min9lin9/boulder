@@ -9,7 +9,7 @@ import { exportHarness } from "./export";
 import { runHandoffCommand } from "./handoff-command";
 import { inspectRepo, inspectionToMarkdown } from "./inspect";
 import { loadManifest } from "./manifest";
-import { buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
+import { FRICTION_LEVELS, buildPipelinePlan, formatPipelinePlan, invalidFrictionMessage, isFrictionLevel } from "./pipeline";
 import { runProfileCommand } from "./profile-command";
 import { evaluateQuickstart, quickstartToMarkdown } from "./quickstart";
 import { runRoutineCommand } from "./routine-command";
@@ -84,6 +84,33 @@ async function runMain(args: string[]): Promise<void> {
       return;
     }
     console.log(prettyJson(buildPrimaryWorkflowMap()));
+    return;
+  }
+  if (command === "workflow") {
+    if (args.includes("--friction") && optionValue(args, "--friction") === null) {
+      console.error("ERROR workflow.friction.missing: Missing friction value. Expected one of: low, medium, high.");
+      process.exitCode = 1;
+      return;
+    }
+    if (!isFrictionLevel(options.friction)) {
+      console.error(invalidFrictionMessage(options.friction));
+      process.exitCode = 1;
+      return;
+    }
+    const resolution = await resolveWorkflowProfile(options.cwd, {});
+    const executors = executorsFromResolvedProfile(resolution.profile);
+    if (options.json && !args.includes("--friction")) {
+      console.log(prettyJson({
+        pipelines: FRICTION_LEVELS.map((friction) => buildPipelinePlan(friction, executors, resolution.profile))
+      }));
+      return;
+    }
+    const plan = buildPipelinePlan(options.friction, executors, resolution.profile);
+    if (options.json) {
+      console.log(prettyJson(plan));
+      return;
+    }
+    console.log(formatPipelinePlan(plan));
     return;
   }
   if (await runRoutineCommand(parsed.commandArgs, options)) {

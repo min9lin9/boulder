@@ -1,3 +1,4 @@
+import { exec } from "node:child_process";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -12,6 +13,20 @@ import { verifyHarness } from "../src/verify";
 
 async function tempRepo(): Promise<string> {
   return await mkdtemp(join(tmpdir(), "boulder-test-"));
+}
+
+async function runBoulder(args: string[]): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const command = ["bun", "bin/boulder.ts", ...args.map(shellQuote)].join(" ");
+  return await new Promise((resolveRun) => {
+    exec(command, { cwd: join(import.meta.dir, ".."), timeout: 5000 }, (error, stdout, stderr) => {
+      const failure = error as { code?: number } | null;
+      resolveRun({ exitCode: failure?.code ?? 0, stdout, stderr });
+    });
+  });
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
 describe("boulder M1 surface", () => {
@@ -145,6 +160,68 @@ describe("boulder M1 surface", () => {
     expect(notes).toContain("Superpowers spine");
     expect(notes).toContain("GStack gates");
     expect(notes).toContain("Compound learning layer");
+  });
+});
+
+describe("operator workflow pipeline", () => {
+  test("workflow command renders high friction operator pipeline", async () => {
+    const result = await runBoulder(["workflow", "--friction", "high"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Boulder pipeline plan");
+    expect(result.stdout).toContain("- friction: high");
+    expect(result.stdout).toContain("stage: deep-interview");
+    expect(result.stdout).toContain("stage: pm-debate");
+    expect(result.stdout).toContain("stage: cso-qa");
+  });
+
+  test("workflow command renders the medium plan by default", async () => {
+    const result = await runBoulder(["workflow"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("- friction: medium");
+    expect(result.stdout).not.toContain("stage: cso-qa");
+  });
+
+  test("workflow command returns JSON catalog", async () => {
+    const result = await runBoulder(["workflow", "--json"]);
+    const parsed = JSON.parse(result.stdout) as { pipelines: Array<{ friction: string }> };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.pipelines.map((item) => item.friction).join(",")).toBe("low,medium,high");
+  });
+
+  test("workflow command returns a single plan as JSON with --friction", async () => {
+    const result = await runBoulder(["workflow", "--friction", "low", "--json"]);
+    const parsed = JSON.parse(result.stdout) as { friction: string; stages: Array<{ id: string }> };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.friction).toBe("low");
+    expect(parsed.stages.map((stage) => stage.id).join(",")).toBe("classification,synthesizer");
+  });
+
+  test("workflow command rejects unknown friction", async () => {
+    const result = await runBoulder(["workflow", "--friction", "impossible"]);
+
+    expect(result.exitCode).toBeGreaterThan(0);
+    expect(result.stderr).toContain("Unsupported friction level");
+    expect(result.stdout).toBe("");
+  });
+
+  test("workflow command rejects missing friction value", async () => {
+    const result = await runBoulder(["workflow", "--friction"]);
+
+    expect(result.exitCode).toBeGreaterThan(0);
+    expect(result.stderr).toContain("Missing friction value");
+    expect(result.stdout).toBe("");
+  });
+
+  test("help lists workflow command without dropping export", async () => {
+    const result = await runBoulder(["--help"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("boulder export");
+    expect(result.stdout).toContain("boulder workflow");
   });
 });
 
