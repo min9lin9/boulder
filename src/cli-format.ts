@@ -57,6 +57,7 @@ export function printHelp(): void {
     "  boulder validate [--cwd path]",
     "  boulder verify [--cwd path] [--dry-run]",
     "  boulder pipeline [--cwd path] [--friction low|medium|high] [--json]",
+    "  boulder workflow [--cwd path] [--friction low|medium|high] [--json]",
     "  boulder scorecard [--cwd path] [--json]",
     "  boulder benchmark [--cwd path] [--json]",
     "  boulder release-plan [--cwd path] [--json]",
